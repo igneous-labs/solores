@@ -1,0 +1,697 @@
+{
+  "version": "0.1.0",
+  "name": "unstake",
+  "instructions": [
+    {
+      "name": "initProtocolFee",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "setProtocolFee",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "protocolFee",
+          "type": {
+            "defined": "ProtocolFee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createPool",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "Fee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "addLiquidity",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintLpTokensTo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "removeLiquidity",
+      "accounts": [
+        {
+          "name": "burnLpTokensFromAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "lpMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "burnLpTokensFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amountLp",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setFee",
+      "accounts": [
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "fee",
+          "type": {
+            "defined": "Fee"
+          }
+        }
+      ]
+    },
+    {
+      "name": "setFeeAuthority",
+      "accounts": [
+        {
+          "name": "feeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newFeeAuthority",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deactivateStakeAccount",
+      "accounts": [
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "reclaimStakeAccount",
+      "accounts": [
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeHistory",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstake",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "unstaker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeDestination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstakeWsol",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "unstaker",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSolReserves",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccountRecordAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeDestination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Fee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee",
+            "type": {
+              "defined": "FeeEnum"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feeAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "incomingStake",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProtocolFee",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "destination",
+            "type": "publicKey"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "feeRatio",
+            "type": {
+              "defined": "Rational"
+            }
+          },
+          {
+            "name": "referrerFeeRatio",
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakeAccountRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lamportsAtCreation",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Rational",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "num",
+            "type": "u64"
+          },
+          {
+            "name": "denom",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LiquidityLinearParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "maxLiqRemaining",
+            "type": {
+              "defined": "Rational"
+            }
+          },
+          {
+            "name": "zeroLiqRemaining",
+            "type": {
+              "defined": "Rational"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeEnum",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Flat",
+            "fields": [
+              {
+                "name": "ratio",
+                "type": {
+                  "defined": "Rational"
+                }
+              }
+            ]
+          },
+          {
+            "name": "LiquidityLinear",
+            "fields": [
+              {
+                "name": "params",
+                "type": {
+                  "defined": "LiquidityLinearParams"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidLpTokenAccount",
+      "msg": "The provided LP token account is invalid"
+    },
+    {
+      "code": 6001,
+      "name": "PdaBumpNotCached",
+      "msg": "Could not find PDA bump"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidFeeAuthority",
+      "msg": "The provided fee authority does not have the authority over the provided pool account"
+    },
+    {
+      "code": 6003,
+      "name": "StakeAccountAuthorizedNotRetrievable",
+      "msg": "The Authorized of the given stake account is None (possibly an uninitialized stake account was given)"
+    },
+    {
+      "code": 6004,
+      "name": "StakeAccountLockupNotRetrievable",
+      "msg": "The Lockup of the given stake account is None (possibly an uninitialized stake account was given)"
+    },
+    {
+      "code": 6005,
+      "name": "StakeAccountLockupInForce",
+      "msg": "The provided stake account is locked up"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidFee",
+      "msg": "The provided description of fee violates the invariants"
+    },
+    {
+      "code": 6007,
+      "name": "InternalError",
+      "msg": "Internal Error"
+    },
+    {
+      "code": 6008,
+      "name": "NotEnoughLiquidity",
+      "msg": "Not enough liquidity to service this unstake"
+    },
+    {
+      "code": 6009,
+      "name": "LiquidityToAddTooLittle",
+      "msg": "Liquidity to add too little"
+    },
+    {
+      "code": 6010,
+      "name": "DestinationNotWSol",
+      "msg": "Destination token account is not a wrapped SOL account"
+    },
+    {
+      "code": 6011,
+      "name": "WrongProtocolFeeDestination",
+      "msg": "Wrong protocol fee destination account"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidProtocolFeeAuthority",
+      "msg": "The provided protocol fee authority does not have the authority over the protocol fee account"
+    }
+  ],
+  "metadata": {
+    "address": "6KBz9djJAH3gRHscq9ujMpyZ5bCK9a27o3ybDtJLXowz"
+  }
+}
