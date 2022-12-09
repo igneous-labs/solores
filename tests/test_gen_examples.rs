@@ -2,7 +2,7 @@ use std::{path::PathBuf, process::Command};
 
 use assert_cmd::prelude::{CommandCargoExt, OutputAssertExt};
 
-const BIN_NAME: &'static str = "shumbert";
+const BIN_NAME: &'static str = "solores";
 
 fn example_dir(example_name: &str) -> PathBuf {
     let mut p = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

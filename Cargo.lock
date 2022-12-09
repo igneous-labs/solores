@@ -381,7 +381,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "shumbert"
+name = "solores"
 version = "0.1.0"
 dependencies = [
  "assert_cmd",
