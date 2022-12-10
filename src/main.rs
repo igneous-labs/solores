@@ -1,10 +1,26 @@
-use std::path::PathBuf;
+use std::{
+    fs::{self, File},
+    path::PathBuf,
+};
 
 use clap::{command, Parser};
+use idl_format::IdlFormat;
+
+use crate::idl_format::shank::ShankIdl;
+
+mod idl_format;
+mod utils;
+mod write_cargotoml;
+mod write_gitignore;
+
+use write_cargotoml::write_cargotoml;
+use write_gitignore::write_gitignore;
+
+const DEFAULT_OUTPUT_CRATE_NAME: &str = "<name-of-program>_interface";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
-struct Args {
+pub struct Args {
     pub idl_path: PathBuf,
 
     #[arg(
@@ -42,15 +58,39 @@ struct Args {
     #[arg(
         long,
         help = "output crate name",
-        default_value = "<name-of-program>_interface"
+        default_value = DEFAULT_OUTPUT_CRATE_NAME,
     )]
     pub output_crate_name: String,
 }
 
+fn check_valid_semver_req(arg: &str, arg_name: &str) {
+    semver::VersionReq::parse(arg)
+        .unwrap_or_else(|_| panic!("Invalid version req '{}' for {}", arg, arg_name));
+}
+
 fn main() {
     env_logger::init();
-    let args = Args::parse();
+
+    let mut args = Args::parse();
+
+    check_valid_semver_req(&args.solana_program_vers, "solana-program");
+    check_valid_semver_req(&args.borsh_vers, "borsh");
+
+    let file = File::open(&args.idl_path).unwrap();
+
+    // TODO: anchor
+    let idl: ShankIdl = serde_json::from_reader(&file).unwrap();
+
+    args.output_crate_name = if args.output_crate_name == DEFAULT_OUTPUT_CRATE_NAME {
+        format!("{}_interface", idl.program_name())
+    } else {
+        args.output_crate_name
+    };
+
+    let dir = args.output_dir.join(&args.output_crate_name);
+    fs::create_dir_all(dir.join("src/")).unwrap();
 
     // TODO: multithread, 1 thread per generated file
-    println!("{:?}, {}", args.idl_path, args.keep_partial_artifacts);
+    write_gitignore(&dir).unwrap();
+    write_cargotoml(&args, &idl, &dir).unwrap();
 }

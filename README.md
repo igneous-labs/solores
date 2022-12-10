@@ -116,3 +116,10 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
 
 ### anchor-gen
 
+Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
+
+- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's only dependencies are [borsh](https://github.com/near/borsh-rs) and [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), making it suitable for use in on-chain programs (both anchor and non-anchor) and client programs.
+
+- Produces human-readable rust code in a new, separate crate instead of using a proc-macro.
+
+- Exposes lower-level constructs such as functions for creating the `solana_program::instruction::Instruction` struct for an instruction to allow for greater customizability.
