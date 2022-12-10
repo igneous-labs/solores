@@ -7,6 +7,12 @@ use super::IdlFormat;
 pub struct ShankIdl {
     name: String,
     version: String,
+    metadata: Metadata,
+}
+
+#[derive(Deserialize)]
+pub struct Metadata {
+    address: String,
 }
 
 impl IdlFormat for ShankIdl {
@@ -16,5 +22,9 @@ impl IdlFormat for ShankIdl {
 
     fn program_version(&self) -> &str {
         &self.version
+    }
+
+    fn program_address(&self) -> &str {
+        &self.metadata.address
     }
 }

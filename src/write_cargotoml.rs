@@ -1,19 +1,14 @@
-use std::{io::Write, path::PathBuf};
+use std::io::Write;
 
 use serde::Serialize;
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
-pub fn write_cargotoml<'a, I: IdlFormat, P: Into<PathBuf>>(
-    args: &'a Args,
-    idl: &'a I,
-    dir: P,
-) -> std::io::Result<()> {
+pub fn write_cargotoml<'a, I: IdlFormat>(args: &'a Args, idl: &'a I) -> std::io::Result<()> {
     let cargo_toml = CargoToml::from_args_and_idl(args, idl);
     let cargo_toml_str = toml::to_string(&cargo_toml).unwrap();
 
-    let mut path: PathBuf = dir.into();
-    path.push("Cargo.toml");
+    let path = args.output_dir.join("Cargo.toml");
     let mut file = open_file_create_overwrite(path)?;
     file.write_all(cargo_toml_str.as_bytes())
 }

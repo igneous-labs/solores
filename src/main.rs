@@ -12,9 +12,11 @@ mod idl_format;
 mod utils;
 mod write_cargotoml;
 mod write_gitignore;
+mod write_src_lib;
 
 use write_cargotoml::write_cargotoml;
 use write_gitignore::write_gitignore;
+use write_src_lib::write_src_lib;
 
 const DEFAULT_OUTPUT_CRATE_NAME: &str = "<name-of-program>_interface";
 
@@ -87,10 +89,11 @@ fn main() {
         args.output_crate_name
     };
 
-    let dir = args.output_dir.join(&args.output_crate_name);
-    fs::create_dir_all(dir.join("src/")).unwrap();
+    args.output_dir.push(&args.output_crate_name);
+    fs::create_dir_all(&args.output_dir.join("src/")).unwrap();
 
     // TODO: multithread, 1 thread per generated file
-    write_gitignore(&dir).unwrap();
-    write_cargotoml(&args, &idl, &dir).unwrap();
+    write_gitignore(&args).unwrap();
+    write_cargotoml(&args, &idl).unwrap();
+    write_src_lib(&args, &idl).unwrap();
 }

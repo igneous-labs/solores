@@ -409,9 +409,11 @@ dependencies = [
  "env_logger",
  "log",
  "prettyplease",
+ "quote",
  "semver",
  "serde",
  "serde_json",
+ "syn",
  "toml",
 ]
 
