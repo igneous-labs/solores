@@ -27,15 +27,22 @@ struct Args {
         long,
         short,
         help = "solana-program dependency version for generated crate",
-        default_value = "1.13.4"
+        default_value = "^1.9"
     )]
     pub solana_program_vers: String,
 
-    // TODO: multithread, 1 thread per generated file
+    #[arg(
+        long,
+        short,
+        help = "borsh dependency version for generated crate",
+        default_value = "^0.9"
+    )]
+    pub borsh_vers: String,
+
     #[arg(
         long,
         help = "output crate name",
-        default_value = "<name-of-program>-interface"
+        default_value = "<name-of-program>_interface"
     )]
     pub output_crate_name: String,
 }
@@ -44,5 +51,6 @@ fn main() {
     env_logger::init();
     let args = Args::parse();
 
+    // TODO: multithread, 1 thread per generated file
     println!("{:?}, {}", args.idl_path, args.keep_partial_artifacts);
 }

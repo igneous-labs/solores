@@ -25,5 +25,5 @@ fn run_example(example_name: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
-    run_example("token-metadata")
+    run_example("shank/token-metadata")
 }
