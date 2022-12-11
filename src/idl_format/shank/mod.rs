@@ -1,9 +1,10 @@
 use serde::Deserialize;
 
-use self::typedefs::NamedType;
+use self::{instructions::NamedInstruction, typedefs::NamedType};
 
 use super::IdlFormat;
 
+mod instructions;
 mod typedefs;
 
 #[derive(Deserialize)]
@@ -14,6 +15,7 @@ pub struct ShankIdl {
     metadata: Metadata,
     accounts: Vec<NamedType>,
     types: Vec<NamedType>,
+    instructions: Vec<NamedInstruction>,
 }
 
 #[derive(Deserialize)]
@@ -21,7 +23,7 @@ pub struct Metadata {
     address: String,
 }
 
-impl IdlFormat<NamedType, NamedType> for ShankIdl {
+impl IdlFormat<NamedType, NamedType, NamedInstruction> for ShankIdl {
     fn program_name(&self) -> &str {
         &self.name
     }
@@ -40,5 +42,9 @@ impl IdlFormat<NamedType, NamedType> for ShankIdl {
 
     fn accounts(&self) -> &[NamedType] {
         &self.accounts
+    }
+
+    fn instructions(&self) -> &[NamedInstruction] {
+        &self.instructions
     }
 }

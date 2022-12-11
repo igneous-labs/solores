@@ -4,9 +4,9 @@ use crate::{idl_format::IdlFormat, Args};
 
 use super::write_src_file;
 
-pub fn write_typedefs<'a, T: ToTokens, A: ToTokens, I: IdlFormat<T, A>>(
+pub fn write_typedefs<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<T, A, I>>(
     args: &'a Args,
-    idl: &'a I,
+    idl: &'a Idl,
 ) -> std::io::Result<()> {
     let typedefs = idl.typedefs();
     let mut contents = quote! {

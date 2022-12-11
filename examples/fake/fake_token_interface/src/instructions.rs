@@ -47,6 +47,12 @@ impl<'a> From<&TransferAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; 2] {
         ]
     }
 }
+
+#[derive(BorshSerialize, BorshDeserialize, Clone, Debug)]
+pub struct TransferArgs {
+    pub amount: u64,
+}
+
 pub struct TransferIxData<'me> {
     pub transfer_args: &'me TransferArgs,
 }

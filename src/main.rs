@@ -98,4 +98,5 @@ fn main() {
     write_lib(&args, &idl).unwrap();
     write_accounts(&args, &idl).unwrap();
     write_typedefs(&args, &idl).unwrap();
+    write_instructions(&args, &idl).unwrap();
 }

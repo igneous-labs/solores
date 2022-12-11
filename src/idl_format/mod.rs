@@ -2,7 +2,7 @@ use quote::ToTokens;
 
 pub mod shank;
 
-pub trait IdlFormat<TypedefElem: ToTokens, AccountElem: ToTokens> {
+pub trait IdlFormat<TypedefElem: ToTokens, AccountElem: ToTokens, IxElem: ToTokens> {
     fn program_name(&self) -> &str;
 
     fn program_version(&self) -> &str;
@@ -12,4 +12,6 @@ pub trait IdlFormat<TypedefElem: ToTokens, AccountElem: ToTokens> {
     fn typedefs(&self) -> &[TypedefElem];
 
     fn accounts(&self) -> &[AccountElem];
+
+    fn instructions(&self) -> &[IxElem];
 }
