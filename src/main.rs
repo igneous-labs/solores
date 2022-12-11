@@ -12,11 +12,11 @@ mod idl_format;
 mod utils;
 mod write_cargotoml;
 mod write_gitignore;
-mod write_src_lib;
+mod write_src;
 
 use write_cargotoml::write_cargotoml;
 use write_gitignore::write_gitignore;
-use write_src_lib::write_src_lib;
+use write_src::*;
 
 const DEFAULT_OUTPUT_CRATE_NAME: &str = "<name-of-program>_interface";
 
@@ -95,5 +95,7 @@ fn main() {
     // TODO: multithread, 1 thread per generated file
     write_gitignore(&args).unwrap();
     write_cargotoml(&args, &idl).unwrap();
-    write_src_lib(&args, &idl).unwrap();
+    write_lib(&args, &idl).unwrap();
+    write_accounts(&args, &idl).unwrap();
+    write_typedefs(&args, &idl).unwrap();
 }
