@@ -1,4 +1,3 @@
-#[allow(clippy::all)]
 use heck::ToSnakeCase;
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
