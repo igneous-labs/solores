@@ -105,15 +105,19 @@ impl ToTokens for NamedType {
 
 impl ToTokens for TypedefStruct {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let fields = self.fields.iter().map(|f| {
-            let name = format_ident!("{}", f.name.to_snake_case());
-            let field_type_tokens = &f.r#type;
-            quote! {
-                pub #name: #field_type_tokens
-            }
-        });
+        let fields = self.fields.iter();
         tokens.extend(quote! {
             #(#fields),*
+        })
+    }
+}
+
+impl ToTokens for TypedefField {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let name = format_ident!("{}", self.name.to_snake_case());
+        let ty = &self.r#type;
+        tokens.extend(quote! {
+            pub #name: #ty
         })
     }
 }

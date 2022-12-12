@@ -13,7 +13,11 @@ use serde::{
 use void::Void;
 
 pub fn open_file_create_overwrite<P: AsRef<Path>>(path: P) -> std::io::Result<File> {
-    OpenOptions::new().create(true).write(true).open(path)
+    OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(path)
 }
 
 /// Copied from https://serde.rs/string-or-struct.html

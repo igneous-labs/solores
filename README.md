@@ -16,7 +16,7 @@ Anchor coming soon.
 
 ## Examples
 
-### Shank IDL Example Usage
+### Shank IDL
 
 Lets say you had the following shank generated IDL, `my_token_idl.json`:
 
@@ -99,11 +99,11 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
     ...
 
     let transfer_accounts = TransferKeys {
-      src: &some_pubkey,
-      dest: &another_pubkey,
+        src: &some_pubkey,
+        dest: &another_pubkey,
     };
     let transfer_ix_args = TransferIxData {
-      transfer_args: &TransferArgs { amount: 1_000u64 }
+        transfer_args: &TransferArgs { amount: 1_000u64 }
     };
     let ix = transfer_ix(&transfer_accounts, &transfer_ix_args)?;
 
@@ -120,6 +120,6 @@ Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 
 - Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's only dependencies are [borsh](https://github.com/near/borsh-rs) and [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), making it suitable for use in on-chain programs (both anchor and non-anchor) and client programs.
 
-- Produces human-readable rust code in a new, separate crate instead of using a proc-macro.
+- Produces (almost) human-readable rust code in a new, separate crate instead of using a proc-macro.
 
-- Exposes lower-level constructs such as functions for creating the `solana_program::instruction::Instruction` struct for an instruction to allow for greater customizability.
+- Exposes lower-level constructs such as functions for creating the `solana_program::instruction::Instruction` struct to allow for greater customizability.

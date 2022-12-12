@@ -1,0 +1,8 @@
+[package]
+name = "mpl_token_metadata_interface"
+version = "1.2.5"
+edition = "2021"
+
+[dependencies]
+borsh = "^0.9"
+solana-program = "^1.9"

@@ -14,7 +14,8 @@ pub fn write_cargotoml<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat
 
     let path = args.output_dir.join("Cargo.toml");
     let mut file = open_file_create_overwrite(path)?;
-    file.write_all(cargo_toml_str.as_bytes())
+    file.write_all(cargo_toml_str.as_bytes())?;
+    file.flush()
 }
 
 #[derive(Serialize)]

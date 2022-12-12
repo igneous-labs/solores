@@ -24,5 +24,6 @@ pub fn write_src_file<P: AsRef<Path>>(
 
     let path = args.output_dir.join(src_file_path);
     let mut file = open_file_create_overwrite(path)?;
-    file.write_all(formatted.as_bytes())
+    file.write_all(formatted.as_bytes())?;
+    file.flush()
 }
