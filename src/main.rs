@@ -72,6 +72,7 @@ fn check_valid_semver_req(arg: &str, arg_name: &str) {
 
 fn main() {
     env_logger::init();
+    log_panics::init();
 
     let mut args = Args::parse();
 

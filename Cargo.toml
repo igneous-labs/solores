@@ -11,6 +11,7 @@ env_logger = "0.10.0"
 heck = "^0.4.0"
 prettyplease = "0.1.21"
 log = "0.4.17"
+log-panics = { version = "2", features = ["with-backtrace"]}
 proc-macro2 = "^1.0"
 quote = "^1.0"
 semver = "^1.0"

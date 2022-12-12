@@ -63,7 +63,13 @@ impl ToTokens for NamedInstruction {
             account_info_lifetime.params.push(
                 LifetimeDef::new(Lifetime::new(&format!("'a{}", i), Span::call_site())).into(),
             );
+            let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
+                quote! {
+                    #[doc = #desc]
+                }
+            });
             quote! {
+                #maybe_doc_comment
                 pub #account_name: &'me AccountInfo #account_info_lifetime
             }
         });
@@ -77,7 +83,13 @@ impl ToTokens for NamedInstruction {
         // impl Keys
         let keys_fields = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
+            let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
+                quote! {
+                    #[doc = #desc]
+                }
+            });
             quote! {
+                #maybe_doc_comment
                 pub #account_ident: &'me Pubkey
             }
         });

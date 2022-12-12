@@ -72,7 +72,7 @@ Lets say you had the following shank generated IDL, `my_token_idl.json`:
 Running `solores my_token_idl.json` should generate a `my_token_interface` rust crate that allows you to use it in an on-chain program as so:
 
 ```rust
-use my_token_interface::{TransferAccounts, TransferArgs, TransferIxData, transfer_ix};
+use my_token_interface::{TransferAccounts, TransferArgs, transfer_ix};
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
@@ -82,9 +82,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
     transfer_invoke_signed(
         &TransferAccounts { src, dest },
-        &TransferIxData {
-            transfer_args: &TransferArgs { amount: 1_000u64 }
-        },
+        &TransferArgs { amount: 1_000u64 },
         &[&[&[0u8]]],
     )
 }
@@ -93,7 +91,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 or in a client-side app:
 
 ```rust
-use my_token_interface::{TransferKeys, TransferArgs, TransferIxData, transfer_ix};
+use my_token_interface::{TransferKeys, TransferArgs, transfer_ix};
 
 pub fn do_something_with_instruction() -> std::io::Result<()> {
     ...
@@ -102,9 +100,7 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
         src: &some_pubkey,
         dest: &another_pubkey,
     };
-    let transfer_ix_args = TransferIxData {
-        transfer_args: &TransferArgs { amount: 1_000u64 }
-    };
+    let transfer_ix_args = &TransferArgs { amount: 1_000u64 };
     let ix = transfer_ix(&transfer_accounts, &transfer_ix_args)?;
 
     ...
