@@ -40,7 +40,7 @@ impl ToTokens for NamedInstruction {
         let ix_fn_ident = format_ident!("{}_ix", snake_case_name);
         let invoke_fn_ident = format_ident!("{}_invoke", snake_case_name);
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
-        let discm_ident = format_ident!("{}_DISCM", name.to_shouty_snake_case());
+        let discm_ident = format_ident!("{}_IX_DISCM", name.to_shouty_snake_case());
 
         let accounts = &self.accounts;
         let n_accounts = accounts.len();

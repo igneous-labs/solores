@@ -99,7 +99,7 @@ pub struct CreateMetadataAccountIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountIxData<'me>(pub &'me CreateMetadataAccountIxArgs);
-pub const CREATE_METADATA_ACCOUNT_DISCM: u8 = 0u8;
+pub const CREATE_METADATA_ACCOUNT_IX_DISCM: u8 = 0u8;
 impl<'me> From<&'me CreateMetadataAccountIxArgs> for CreateMetadataAccountIxData<'me> {
     fn from(args: &'me CreateMetadataAccountIxArgs) -> Self {
         Self(args)
@@ -107,7 +107,7 @@ impl<'me> From<&'me CreateMetadataAccountIxArgs> for CreateMetadataAccountIxData
 }
 impl BorshSerialize for CreateMetadataAccountIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[CREATE_METADATA_ACCOUNT_DISCM])?;
+        writer.write(&[CREATE_METADATA_ACCOUNT_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -187,7 +187,7 @@ pub struct UpdateMetadataAccountIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountIxData<'me>(pub &'me UpdateMetadataAccountIxArgs);
-pub const UPDATE_METADATA_ACCOUNT_DISCM: u8 = 1u8;
+pub const UPDATE_METADATA_ACCOUNT_IX_DISCM: u8 = 1u8;
 impl<'me> From<&'me UpdateMetadataAccountIxArgs> for UpdateMetadataAccountIxData<'me> {
     fn from(args: &'me UpdateMetadataAccountIxArgs) -> Self {
         Self(args)
@@ -195,7 +195,7 @@ impl<'me> From<&'me UpdateMetadataAccountIxArgs> for UpdateMetadataAccountIxData
 }
 impl BorshSerialize for UpdateMetadataAccountIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[UPDATE_METADATA_ACCOUNT_DISCM])?;
+        writer.write(&[UPDATE_METADATA_ACCOUNT_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -446,7 +446,7 @@ pub struct DeprecatedCreateMasterEditionIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedCreateMasterEditionIxData<'me>(pub &'me DeprecatedCreateMasterEditionIxArgs);
-pub const DEPRECATED_CREATE_MASTER_EDITION_DISCM: u8 = 2u8;
+pub const DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM: u8 = 2u8;
 impl<'me> From<&'me DeprecatedCreateMasterEditionIxArgs>
     for DeprecatedCreateMasterEditionIxData<'me>
 {
@@ -456,7 +456,7 @@ impl<'me> From<&'me DeprecatedCreateMasterEditionIxArgs>
 }
 impl BorshSerialize for DeprecatedCreateMasterEditionIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[DEPRECATED_CREATE_MASTER_EDITION_DISCM])?;
+        writer.write(&[DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -779,7 +779,7 @@ pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData<'me>(
     pub &'me DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs,
 );
-pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_DISCM: u8 = 3u8;
+pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM: u8 = 3u8;
 impl<'me> From<&'me DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>
     for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData<'me>
 {
@@ -789,8 +789,9 @@ impl<'me> From<&'me DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxA
 }
 impl BorshSerialize for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer
-            .write(&[DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_DISCM])?;
+        writer.write(&[
+            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM,
+        ])?;
         self.0.serialize(writer)
     }
 }
@@ -926,7 +927,7 @@ pub struct UpdatePrimarySaleHappenedViaTokenIxArgs {}
 pub struct UpdatePrimarySaleHappenedViaTokenIxData<'me>(
     pub &'me UpdatePrimarySaleHappenedViaTokenIxArgs,
 );
-pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_DISCM: u8 = 4u8;
+pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM: u8 = 4u8;
 impl<'me> From<&'me UpdatePrimarySaleHappenedViaTokenIxArgs>
     for UpdatePrimarySaleHappenedViaTokenIxData<'me>
 {
@@ -936,7 +937,7 @@ impl<'me> From<&'me UpdatePrimarySaleHappenedViaTokenIxArgs>
 }
 impl BorshSerialize for UpdatePrimarySaleHappenedViaTokenIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_DISCM])?;
+        writer.write(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1036,7 +1037,7 @@ pub struct DeprecatedSetReservationListIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedSetReservationListIxData<'me>(pub &'me DeprecatedSetReservationListIxArgs);
-pub const DEPRECATED_SET_RESERVATION_LIST_DISCM: u8 = 5u8;
+pub const DEPRECATED_SET_RESERVATION_LIST_IX_DISCM: u8 = 5u8;
 impl<'me> From<&'me DeprecatedSetReservationListIxArgs>
     for DeprecatedSetReservationListIxData<'me>
 {
@@ -1046,7 +1047,7 @@ impl<'me> From<&'me DeprecatedSetReservationListIxArgs>
 }
 impl BorshSerialize for DeprecatedSetReservationListIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[DEPRECATED_SET_RESERVATION_LIST_DISCM])?;
+        writer.write(&[DEPRECATED_SET_RESERVATION_LIST_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1197,7 +1198,7 @@ pub struct DeprecatedCreateReservationListIxArgs {}
 pub struct DeprecatedCreateReservationListIxData<'me>(
     pub &'me DeprecatedCreateReservationListIxArgs,
 );
-pub const DEPRECATED_CREATE_RESERVATION_LIST_DISCM: u8 = 6u8;
+pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM: u8 = 6u8;
 impl<'me> From<&'me DeprecatedCreateReservationListIxArgs>
     for DeprecatedCreateReservationListIxData<'me>
 {
@@ -1207,7 +1208,7 @@ impl<'me> From<&'me DeprecatedCreateReservationListIxArgs>
 }
 impl BorshSerialize for DeprecatedCreateReservationListIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[DEPRECATED_CREATE_RESERVATION_LIST_DISCM])?;
+        writer.write(&[DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1293,7 +1294,7 @@ impl<'a> From<&SignMetadataAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; 2] {
 pub struct SignMetadataIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SignMetadataIxData<'me>(pub &'me SignMetadataIxArgs);
-pub const SIGN_METADATA_DISCM: u8 = 7u8;
+pub const SIGN_METADATA_IX_DISCM: u8 = 7u8;
 impl<'me> From<&'me SignMetadataIxArgs> for SignMetadataIxData<'me> {
     fn from(args: &'me SignMetadataIxArgs) -> Self {
         Self(args)
@@ -1301,7 +1302,7 @@ impl<'me> From<&'me SignMetadataIxArgs> for SignMetadataIxData<'me> {
 }
 impl BorshSerialize for SignMetadataIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[SIGN_METADATA_DISCM])?;
+        writer.write(&[SIGN_METADATA_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1472,7 +1473,7 @@ pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
 pub struct DeprecatedMintPrintingTokensViaTokenIxData<'me>(
     pub &'me DeprecatedMintPrintingTokensViaTokenIxArgs,
 );
-pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_DISCM: u8 = 8u8;
+pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM: u8 = 8u8;
 impl<'me> From<&'me DeprecatedMintPrintingTokensViaTokenIxArgs>
     for DeprecatedMintPrintingTokensViaTokenIxData<'me>
 {
@@ -1482,7 +1483,7 @@ impl<'me> From<&'me DeprecatedMintPrintingTokensViaTokenIxArgs>
 }
 impl BorshSerialize for DeprecatedMintPrintingTokensViaTokenIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_DISCM])?;
+        writer.write(&[DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1625,7 +1626,7 @@ pub struct DeprecatedMintPrintingTokensIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensIxData<'me>(pub &'me DeprecatedMintPrintingTokensIxArgs);
-pub const DEPRECATED_MINT_PRINTING_TOKENS_DISCM: u8 = 9u8;
+pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM: u8 = 9u8;
 impl<'me> From<&'me DeprecatedMintPrintingTokensIxArgs>
     for DeprecatedMintPrintingTokensIxData<'me>
 {
@@ -1635,7 +1636,7 @@ impl<'me> From<&'me DeprecatedMintPrintingTokensIxArgs>
 }
 impl BorshSerialize for DeprecatedMintPrintingTokensIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[DEPRECATED_MINT_PRINTING_TOKENS_DISCM])?;
+        writer.write(&[DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -1794,7 +1795,7 @@ pub struct CreateMasterEditionIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionIxData<'me>(pub &'me CreateMasterEditionIxArgs);
-pub const CREATE_MASTER_EDITION_DISCM: u8 = 10u8;
+pub const CREATE_MASTER_EDITION_IX_DISCM: u8 = 10u8;
 impl<'me> From<&'me CreateMasterEditionIxArgs> for CreateMasterEditionIxData<'me> {
     fn from(args: &'me CreateMasterEditionIxArgs) -> Self {
         Self(args)
@@ -1802,7 +1803,7 @@ impl<'me> From<&'me CreateMasterEditionIxArgs> for CreateMasterEditionIxData<'me
 }
 impl BorshSerialize for CreateMasterEditionIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[CREATE_MASTER_EDITION_DISCM])?;
+        writer.write(&[CREATE_MASTER_EDITION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2064,7 +2065,7 @@ pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
 pub struct MintNewEditionFromMasterEditionViaTokenIxData<'me>(
     pub &'me MintNewEditionFromMasterEditionViaTokenIxArgs,
 );
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_DISCM: u8 = 11u8;
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM: u8 = 11u8;
 impl<'me> From<&'me MintNewEditionFromMasterEditionViaTokenIxArgs>
     for MintNewEditionFromMasterEditionViaTokenIxData<'me>
 {
@@ -2074,7 +2075,7 @@ impl<'me> From<&'me MintNewEditionFromMasterEditionViaTokenIxArgs>
 }
 impl BorshSerialize for MintNewEditionFromMasterEditionViaTokenIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_DISCM])?;
+        writer.write(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2204,7 +2205,7 @@ impl<'a> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'a, 'a, 'a>> for [AccountI
 pub struct ConvertMasterEditionV1ToV2IxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ConvertMasterEditionV1ToV2IxData<'me>(pub &'me ConvertMasterEditionV1ToV2IxArgs);
-pub const CONVERT_MASTER_EDITION_V1_TO_V2_DISCM: u8 = 12u8;
+pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM: u8 = 12u8;
 impl<'me> From<&'me ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1ToV2IxData<'me> {
     fn from(args: &'me ConvertMasterEditionV1ToV2IxArgs) -> Self {
         Self(args)
@@ -2212,7 +2213,7 @@ impl<'me> From<&'me ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1
 }
 impl BorshSerialize for ConvertMasterEditionV1ToV2IxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[CONVERT_MASTER_EDITION_V1_TO_V2_DISCM])?;
+        writer.write(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2518,7 +2519,7 @@ pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxData<'me>(
     pub &'me MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 );
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_DISCM: u8 = 13u8;
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM: u8 = 13u8;
 impl<'me> From<&'me MintNewEditionFromMasterEditionViaVaultProxyIxArgs>
     for MintNewEditionFromMasterEditionViaVaultProxyIxData<'me>
 {
@@ -2528,7 +2529,7 @@ impl<'me> From<&'me MintNewEditionFromMasterEditionViaVaultProxyIxArgs>
 }
 impl BorshSerialize for MintNewEditionFromMasterEditionViaVaultProxyIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_DISCM])?;
+        writer.write(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2644,7 +2645,7 @@ impl<'a> From<&PuffMetadataAccounts<'_, 'a>> for [AccountInfo<'a>; 1] {
 pub struct PuffMetadataIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct PuffMetadataIxData<'me>(pub &'me PuffMetadataIxArgs);
-pub const PUFF_METADATA_DISCM: u8 = 14u8;
+pub const PUFF_METADATA_IX_DISCM: u8 = 14u8;
 impl<'me> From<&'me PuffMetadataIxArgs> for PuffMetadataIxData<'me> {
     fn from(args: &'me PuffMetadataIxArgs) -> Self {
         Self(args)
@@ -2652,7 +2653,7 @@ impl<'me> From<&'me PuffMetadataIxArgs> for PuffMetadataIxData<'me> {
 }
 impl BorshSerialize for PuffMetadataIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[PUFF_METADATA_DISCM])?;
+        writer.write(&[PUFF_METADATA_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2727,7 +2728,7 @@ pub struct UpdateMetadataAccountV2IxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountV2IxData<'me>(pub &'me UpdateMetadataAccountV2IxArgs);
-pub const UPDATE_METADATA_ACCOUNT_V2_DISCM: u8 = 15u8;
+pub const UPDATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 15u8;
 impl<'me> From<&'me UpdateMetadataAccountV2IxArgs> for UpdateMetadataAccountV2IxData<'me> {
     fn from(args: &'me UpdateMetadataAccountV2IxArgs) -> Self {
         Self(args)
@@ -2735,7 +2736,7 @@ impl<'me> From<&'me UpdateMetadataAccountV2IxArgs> for UpdateMetadataAccountV2Ix
 }
 impl BorshSerialize for UpdateMetadataAccountV2IxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[UPDATE_METADATA_ACCOUNT_V2_DISCM])?;
+        writer.write(&[UPDATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -2870,7 +2871,7 @@ pub struct CreateMetadataAccountV2IxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountV2IxData<'me>(pub &'me CreateMetadataAccountV2IxArgs);
-pub const CREATE_METADATA_ACCOUNT_V2_DISCM: u8 = 16u8;
+pub const CREATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 16u8;
 impl<'me> From<&'me CreateMetadataAccountV2IxArgs> for CreateMetadataAccountV2IxData<'me> {
     fn from(args: &'me CreateMetadataAccountV2IxArgs) -> Self {
         Self(args)
@@ -2878,7 +2879,7 @@ impl<'me> From<&'me CreateMetadataAccountV2IxArgs> for CreateMetadataAccountV2Ix
 }
 impl BorshSerialize for CreateMetadataAccountV2IxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[CREATE_METADATA_ACCOUNT_V2_DISCM])?;
+        writer.write(&[CREATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3033,7 +3034,7 @@ pub struct CreateMasterEditionV3IxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionV3IxData<'me>(pub &'me CreateMasterEditionV3IxArgs);
-pub const CREATE_MASTER_EDITION_V3_DISCM: u8 = 17u8;
+pub const CREATE_MASTER_EDITION_V3_IX_DISCM: u8 = 17u8;
 impl<'me> From<&'me CreateMasterEditionV3IxArgs> for CreateMasterEditionV3IxData<'me> {
     fn from(args: &'me CreateMasterEditionV3IxArgs) -> Self {
         Self(args)
@@ -3041,7 +3042,7 @@ impl<'me> From<&'me CreateMasterEditionV3IxArgs> for CreateMasterEditionV3IxData
 }
 impl BorshSerialize for CreateMasterEditionV3IxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[CREATE_MASTER_EDITION_V3_DISCM])?;
+        writer.write(&[CREATE_MASTER_EDITION_V3_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3153,7 +3154,7 @@ impl<'a> From<&VerifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>> for [Accoun
 pub struct VerifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct VerifyCollectionIxData<'me>(pub &'me VerifyCollectionIxArgs);
-pub const VERIFY_COLLECTION_DISCM: u8 = 18u8;
+pub const VERIFY_COLLECTION_IX_DISCM: u8 = 18u8;
 impl<'me> From<&'me VerifyCollectionIxArgs> for VerifyCollectionIxData<'me> {
     fn from(args: &'me VerifyCollectionIxArgs) -> Self {
         Self(args)
@@ -3161,7 +3162,7 @@ impl<'me> From<&'me VerifyCollectionIxArgs> for VerifyCollectionIxData<'me> {
 }
 impl BorshSerialize for VerifyCollectionIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[VERIFY_COLLECTION_DISCM])?;
+        writer.write(&[VERIFY_COLLECTION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3324,7 +3325,7 @@ pub struct UtilizeIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UtilizeIxData<'me>(pub &'me UtilizeIxArgs);
-pub const UTILIZE_DISCM: u8 = 19u8;
+pub const UTILIZE_IX_DISCM: u8 = 19u8;
 impl<'me> From<&'me UtilizeIxArgs> for UtilizeIxData<'me> {
     fn from(args: &'me UtilizeIxArgs) -> Self {
         Self(args)
@@ -3332,7 +3333,7 @@ impl<'me> From<&'me UtilizeIxArgs> for UtilizeIxData<'me> {
 }
 impl BorshSerialize for UtilizeIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[UTILIZE_DISCM])?;
+        writer.write(&[UTILIZE_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3494,7 +3495,7 @@ pub struct ApproveUseAuthorityIxArgs {
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveUseAuthorityIxData<'me>(pub &'me ApproveUseAuthorityIxArgs);
-pub const APPROVE_USE_AUTHORITY_DISCM: u8 = 20u8;
+pub const APPROVE_USE_AUTHORITY_IX_DISCM: u8 = 20u8;
 impl<'me> From<&'me ApproveUseAuthorityIxArgs> for ApproveUseAuthorityIxData<'me> {
     fn from(args: &'me ApproveUseAuthorityIxArgs) -> Self {
         Self(args)
@@ -3502,7 +3503,7 @@ impl<'me> From<&'me ApproveUseAuthorityIxArgs> for ApproveUseAuthorityIxData<'me
 }
 impl BorshSerialize for ApproveUseAuthorityIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[APPROVE_USE_AUTHORITY_DISCM])?;
+        writer.write(&[APPROVE_USE_AUTHORITY_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3649,7 +3650,7 @@ impl<'a> From<&RevokeUseAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a
 pub struct RevokeUseAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeUseAuthorityIxData<'me>(pub &'me RevokeUseAuthorityIxArgs);
-pub const REVOKE_USE_AUTHORITY_DISCM: u8 = 21u8;
+pub const REVOKE_USE_AUTHORITY_IX_DISCM: u8 = 21u8;
 impl<'me> From<&'me RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData<'me> {
     fn from(args: &'me RevokeUseAuthorityIxArgs) -> Self {
         Self(args)
@@ -3657,7 +3658,7 @@ impl<'me> From<&'me RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData<'me> 
 }
 impl BorshSerialize for RevokeUseAuthorityIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[REVOKE_USE_AUTHORITY_DISCM])?;
+        writer.write(&[REVOKE_USE_AUTHORITY_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3776,7 +3777,7 @@ impl<'a> From<&UnverifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>> for [Acco
 pub struct UnverifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UnverifyCollectionIxData<'me>(pub &'me UnverifyCollectionIxArgs);
-pub const UNVERIFY_COLLECTION_DISCM: u8 = 22u8;
+pub const UNVERIFY_COLLECTION_IX_DISCM: u8 = 22u8;
 impl<'me> From<&'me UnverifyCollectionIxArgs> for UnverifyCollectionIxData<'me> {
     fn from(args: &'me UnverifyCollectionIxArgs) -> Self {
         Self(args)
@@ -3784,7 +3785,7 @@ impl<'me> From<&'me UnverifyCollectionIxArgs> for UnverifyCollectionIxData<'me> 
 }
 impl BorshSerialize for UnverifyCollectionIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[UNVERIFY_COLLECTION_DISCM])?;
+        writer.write(&[UNVERIFY_COLLECTION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -3925,7 +3926,7 @@ impl<'a> From<&ApproveCollectionAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a
 pub struct ApproveCollectionAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveCollectionAuthorityIxData<'me>(pub &'me ApproveCollectionAuthorityIxArgs);
-pub const APPROVE_COLLECTION_AUTHORITY_DISCM: u8 = 23u8;
+pub const APPROVE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 23u8;
 impl<'me> From<&'me ApproveCollectionAuthorityIxArgs> for ApproveCollectionAuthorityIxData<'me> {
     fn from(args: &'me ApproveCollectionAuthorityIxArgs) -> Self {
         Self(args)
@@ -3933,7 +3934,7 @@ impl<'me> From<&'me ApproveCollectionAuthorityIxArgs> for ApproveCollectionAutho
 }
 impl BorshSerialize for ApproveCollectionAuthorityIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[APPROVE_COLLECTION_AUTHORITY_DISCM])?;
+        writer.write(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -4038,7 +4039,7 @@ impl<'a> From<&RevokeCollectionAuthorityAccounts<'_, 'a, 'a, 'a, 'a>> for [Accou
 pub struct RevokeCollectionAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeCollectionAuthorityIxData<'me>(pub &'me RevokeCollectionAuthorityIxArgs);
-pub const REVOKE_COLLECTION_AUTHORITY_DISCM: u8 = 24u8;
+pub const REVOKE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 24u8;
 impl<'me> From<&'me RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthorityIxData<'me> {
     fn from(args: &'me RevokeCollectionAuthorityIxArgs) -> Self {
         Self(args)
@@ -4046,7 +4047,7 @@ impl<'me> From<&'me RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthori
 }
 impl BorshSerialize for RevokeCollectionAuthorityIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[REVOKE_COLLECTION_AUTHORITY_DISCM])?;
+        writer.write(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -4189,7 +4190,7 @@ impl<'a> From<&SetAndVerifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a
 pub struct SetAndVerifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SetAndVerifyCollectionIxData<'me>(pub &'me SetAndVerifyCollectionIxArgs);
-pub const SET_AND_VERIFY_COLLECTION_DISCM: u8 = 25u8;
+pub const SET_AND_VERIFY_COLLECTION_IX_DISCM: u8 = 25u8;
 impl<'me> From<&'me SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxData<'me> {
     fn from(args: &'me SetAndVerifyCollectionIxArgs) -> Self {
         Self(args)
@@ -4197,7 +4198,7 @@ impl<'me> From<&'me SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxDa
 }
 impl BorshSerialize for SetAndVerifyCollectionIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[SET_AND_VERIFY_COLLECTION_DISCM])?;
+        writer.write(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -4305,7 +4306,7 @@ impl<'a> From<&FreezeDelegatedAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a>> for [Acco
 pub struct FreezeDelegatedAccountIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct FreezeDelegatedAccountIxData<'me>(pub &'me FreezeDelegatedAccountIxArgs);
-pub const FREEZE_DELEGATED_ACCOUNT_DISCM: u8 = 26u8;
+pub const FREEZE_DELEGATED_ACCOUNT_IX_DISCM: u8 = 26u8;
 impl<'me> From<&'me FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxData<'me> {
     fn from(args: &'me FreezeDelegatedAccountIxArgs) -> Self {
         Self(args)
@@ -4313,7 +4314,7 @@ impl<'me> From<&'me FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxDa
 }
 impl BorshSerialize for FreezeDelegatedAccountIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[FREEZE_DELEGATED_ACCOUNT_DISCM])?;
+        writer.write(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -4417,7 +4418,7 @@ impl<'a> From<&ThawDelegatedAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a>> for [Accoun
 pub struct ThawDelegatedAccountIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ThawDelegatedAccountIxData<'me>(pub &'me ThawDelegatedAccountIxArgs);
-pub const THAW_DELEGATED_ACCOUNT_DISCM: u8 = 27u8;
+pub const THAW_DELEGATED_ACCOUNT_IX_DISCM: u8 = 27u8;
 impl<'me> From<&'me ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData<'me> {
     fn from(args: &'me ThawDelegatedAccountIxArgs) -> Self {
         Self(args)
@@ -4425,7 +4426,7 @@ impl<'me> From<&'me ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData<'
 }
 impl BorshSerialize for ThawDelegatedAccountIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[THAW_DELEGATED_ACCOUNT_DISCM])?;
+        writer.write(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
@@ -4505,7 +4506,7 @@ impl<'a> From<&RemoveCreatorVerificationAccounts<'_, 'a, 'a>> for [AccountInfo<'
 pub struct RemoveCreatorVerificationIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveCreatorVerificationIxData<'me>(pub &'me RemoveCreatorVerificationIxArgs);
-pub const REMOVE_CREATOR_VERIFICATION_DISCM: u8 = 28u8;
+pub const REMOVE_CREATOR_VERIFICATION_IX_DISCM: u8 = 28u8;
 impl<'me> From<&'me RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificationIxData<'me> {
     fn from(args: &'me RemoveCreatorVerificationIxArgs) -> Self {
         Self(args)
@@ -4513,7 +4514,7 @@ impl<'me> From<&'me RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificati
 }
 impl BorshSerialize for RemoveCreatorVerificationIxData<'_> {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write(&[REMOVE_CREATOR_VERIFICATION_DISCM])?;
+        writer.write(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])?;
         self.0.serialize(writer)
     }
 }
