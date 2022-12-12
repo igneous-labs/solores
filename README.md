@@ -72,7 +72,7 @@ Lets say you had the following shank generated IDL, `my_token_idl.json`:
 Running `solores my_token_idl.json` should generate a `my_token_interface` rust crate that allows you to use it in an on-chain program as so:
 
 ```rust
-use my_token_interface::{TransferAccounts, TransferArgs, transfer_ix};
+use my_token_interface::{TransferAccounts, TransferArgs, transfer_invoke_signed};
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
