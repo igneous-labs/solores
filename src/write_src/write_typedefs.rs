@@ -10,6 +10,8 @@ pub fn write_typedefs<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
 ) -> std::io::Result<()> {
     let typedefs = idl.typedefs();
     let mut contents = quote! {
+        // TODO: maybe these imports should be part of the idl trait like typedefs_headers() or smth
+
         use borsh::{BorshDeserialize, BorshSerialize};
         // TODO: not all typedefs use pubkey, remove if unnecessary
         use solana_program::pubkey::Pubkey;

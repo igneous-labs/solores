@@ -1,4 +1,4 @@
-use heck::ToSnakeCase;
+use heck::{ToShoutySnakeCase, ToSnakeCase};
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
@@ -40,6 +40,7 @@ impl ToTokens for NamedInstruction {
         let ix_fn_ident = format_ident!("{}_ix", snake_case_name);
         let invoke_fn_ident = format_ident!("{}_invoke", snake_case_name);
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
+        let discm_ident = format_ident!("{}_DISCM", name.to_shouty_snake_case());
 
         let accounts = &self.accounts;
         let n_accounts = accounts.len();
@@ -167,7 +168,7 @@ impl ToTokens for NamedInstruction {
         // impl Args
         let args_fields = self.args.iter();
         tokens.extend(quote! {
-            #[derive(BorshSerialize, Clone, Debug)]
+            #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
             pub struct #ix_args_ident {
                 #(#args_fields),*
             }
@@ -179,6 +180,8 @@ impl ToTokens for NamedInstruction {
             #[derive(Copy, Clone, Debug)]
             pub struct #ix_data_ident<'me>(pub &'me#ix_args_ident);
 
+            pub const #discm_ident: u8 = #discm_value;
+
             impl<'me> From<&'me #ix_args_ident> for #ix_data_ident<'me> {
                 fn from(args: &'me #ix_args_ident) -> Self {
                     Self(args)
@@ -187,8 +190,7 @@ impl ToTokens for NamedInstruction {
 
             impl BorshSerialize for #ix_data_ident<'_> {
                 fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    // discriminant
-                    writer.write(&[#discm_value])?;
+                    writer.write(&[#discm_ident])?;
                     self.0.serialize(writer)
                 }
             }

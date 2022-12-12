@@ -1,0 +1,9 @@
+[package]
+name = "mpl_token_metadata_client_consumer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mpl_token_metadata_interface = { path = "../mpl_token_metadata_interface" }
+solana-cli-config = "1.13.14"
+solana-sdk = "1.13.14"

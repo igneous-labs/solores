@@ -10,8 +10,10 @@ pub fn write_instructions<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFor
 ) -> std::io::Result<()> {
     let typedefs = idl.instructions();
     let mut contents = quote! {
+        // TODO: maybe these imports should be part of the idl trait like instructions_headers() or smth
+
         use crate::*;
-        use borsh::BorshSerialize;
+        use borsh::{BorshDeserialize, BorshSerialize};
         use solana_program::{
             account_info::AccountInfo,
             entrypoint::ProgramResult,

@@ -10,6 +10,8 @@ pub fn write_accounts<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
 ) -> std::io::Result<()> {
     let typedefs = idl.accounts();
     let mut contents = quote! {
+        // TODO: maybe these imports should be part of the idl trait like accounts_headers() or smth
+
         // TODO: not all accounts use defined types, remove if necessary
         use crate::*;
         use borsh::{BorshDeserialize, BorshSerialize};
