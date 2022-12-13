@@ -1,6 +1,8 @@
 use std::{
+    collections::HashSet,
     fmt,
     fs::{File, OpenOptions},
+    hash::Hash,
     marker::PhantomData,
     path::Path,
     str::FromStr,
@@ -63,4 +65,30 @@ where
     }
 
     deserializer.deserialize_any(StringOrStruct(PhantomData))
+}
+
+pub struct UniqueByReportDupsResult<'a, T> {
+    pub unique: Vec<&'a T>,
+    pub duplicates: Vec<&'a T>,
+}
+
+pub fn unique_by_report_dups<'a, I, T, V, F>(vals: I, mut f: F) -> UniqueByReportDupsResult<'a, T>
+where
+    I: Iterator<Item = &'a T>,
+    V: Eq + Hash,
+    F: FnMut(&T) -> V,
+{
+    let mut hashes = HashSet::new();
+    let mut unique = Vec::new();
+    let mut duplicates = Vec::new();
+    for val in vals {
+        let hash = f(val);
+        if hashes.contains(&hash) {
+            duplicates.push(val);
+        } else {
+            hashes.insert(hash);
+            unique.push(val);
+        }
+    }
+    UniqueByReportDupsResult { unique, duplicates }
 }

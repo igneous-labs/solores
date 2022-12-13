@@ -1,8 +1,11 @@
 use heck::{ToShoutySnakeCase, ToSnakeCase};
+use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
 use syn::{Generics, Index, Lifetime, LifetimeDef, LitBool};
+
+use crate::utils::unique_by_report_dups;
 
 use super::typedefs::TypedefField;
 
@@ -46,11 +49,22 @@ impl ToTokens for NamedInstruction {
         let n_accounts = accounts.len();
         let n_accounts_index = Index::from(n_accounts);
 
+        let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
+
+        if !accounts_dedup.duplicates.is_empty() {
+            log::warn!(
+                "Found duplicate accounts for instruction {}: {}. Assuming different indexes in generated AccountInfo/Meta arrays refer to the same account",
+                &self.name, accounts_dedup.duplicates.iter().map(|acc| &acc.name).format(", ")
+            );
+        }
+        let unique_accounts = &accounts_dedup.unique;
+        let n_unique_accounts = unique_accounts.len();
+
         // impl Accounts
         let mut accounts_lifetimes = Generics::default();
         let struct_lifetime = LifetimeDef::new(Lifetime::new("'me", Span::call_site()));
         accounts_lifetimes.params.push(struct_lifetime.into());
-        for i in 0..n_accounts {
+        for i in 0..n_unique_accounts {
             let mut account_info_lifetime =
                 LifetimeDef::new(Lifetime::new(&format!("'a{}", i), Span::call_site()));
             account_info_lifetime
@@ -58,7 +72,7 @@ impl ToTokens for NamedInstruction {
                 .push(Lifetime::new("'me", Span::call_site()));
             accounts_lifetimes.params.push(account_info_lifetime.into());
         }
-        let accounts_fields = accounts.iter().enumerate().map(|(i, acc)| {
+        let accounts_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
             let mut account_info_lifetime = Generics::default();
             account_info_lifetime.params.push(
@@ -82,7 +96,7 @@ impl ToTokens for NamedInstruction {
         });
 
         // impl Keys
-        let keys_fields = accounts.iter().map(|acc| {
+        let keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
                 quote! {
@@ -106,14 +120,14 @@ impl ToTokens for NamedInstruction {
         from_accounts_generics
             .params
             .push(LifetimeDef::new(Lifetime::new("'me", Span::call_site())).into());
-        for _i in 0..n_accounts {
+        for _i in 0..n_unique_accounts {
             from_accounts_generics
                 .params
                 .push(LifetimeDef::new(Lifetime::new("'_", Span::call_site())).into());
         }
 
         // impl From &Accounts for Keys
-        let from_keys_fields = accounts.iter().map(|acc| {
+        let from_keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
                 #account_ident: *accounts.#account_ident.key
@@ -146,7 +160,7 @@ impl ToTokens for NamedInstruction {
         account_infos_lifetime_intersection_generics
             .params
             .push(LifetimeDef::new(Lifetime::new("'_", Span::call_site())).into());
-        for _i in 0..n_accounts {
+        for _i in 0..n_unique_accounts {
             account_infos_lifetime_intersection_generics
                 .params
                 .push(LifetimeDef::new(Lifetime::new("'a", Span::call_site())).into());

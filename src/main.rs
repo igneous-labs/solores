@@ -1,4 +1,5 @@
 use std::{
+    env,
     fs::{self, File},
     path::PathBuf,
 };
@@ -19,6 +20,7 @@ use write_gitignore::write_gitignore;
 use write_src::*;
 
 const DEFAULT_OUTPUT_CRATE_NAME: &str = "<name-of-program>_interface";
+const RUST_LOG_ENV_VAR: &str = "RUST_LOG";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -71,6 +73,9 @@ fn check_valid_semver_req(arg: &str, arg_name: &str) {
 }
 
 fn main() {
+    if env::var(RUST_LOG_ENV_VAR).is_err() {
+        env::set_var(RUST_LOG_ENV_VAR, "warn")
+    }
     env_logger::init();
     log_panics::init();
 

@@ -478,6 +478,7 @@ dependencies = [
  "clap",
  "env_logger",
  "heck",
+ "itertools",
  "log",
  "log-panics",
  "prettyplease",
