@@ -208,7 +208,7 @@ impl ToTokens for NamedInstruction {
 
             impl BorshSerialize for #ix_data_ident<'_> {
                 fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    writer.write(&[#discm_ident])?;
+                    writer.write_all(&[#discm_ident])?;
                     self.0.serialize(writer)
                 }
             }
