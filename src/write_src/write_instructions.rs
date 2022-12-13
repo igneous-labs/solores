@@ -8,7 +8,10 @@ pub fn write_instructions<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFor
     args: &'a Args,
     idl: &'a Idl,
 ) -> std::io::Result<()> {
-    let typedefs = idl.instructions();
+    let ixs = match idl.instructions() {
+        None => return Ok(()),
+        Some(i) => i,
+    };
     let mut contents = quote! {
         // TODO: maybe these imports should be part of the idl trait like instructions_headers() or smth
 
@@ -22,7 +25,7 @@ pub fn write_instructions<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFor
             pubkey::Pubkey,
         };
     };
-    for t in typedefs.iter() {
+    for t in ixs.iter() {
         contents.extend(t.into_token_stream());
     }
 

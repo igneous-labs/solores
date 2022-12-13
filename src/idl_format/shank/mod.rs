@@ -13,9 +13,9 @@ pub struct ShankIdl {
     name: String,
     version: String,
     metadata: Metadata,
-    accounts: Vec<NamedType>,
-    types: Vec<NamedType>,
-    instructions: Vec<NamedInstruction>,
+    accounts: Option<Vec<NamedType>>,
+    types: Option<Vec<NamedType>>,
+    instructions: Option<Vec<NamedInstruction>>,
 }
 
 #[derive(Deserialize)]
@@ -36,15 +36,15 @@ impl IdlFormat<NamedType, NamedType, NamedInstruction> for ShankIdl {
         &self.metadata.address
     }
 
-    fn typedefs(&self) -> &[NamedType] {
-        &self.types
+    fn typedefs(&self) -> Option<&[NamedType]> {
+        self.types.as_ref().map(|v| v.as_ref())
     }
 
-    fn accounts(&self) -> &[NamedType] {
-        &self.accounts
+    fn accounts(&self) -> Option<&[NamedType]> {
+        self.accounts.as_ref().map(|v| v.as_ref())
     }
 
-    fn instructions(&self) -> &[NamedInstruction] {
-        &self.instructions
+    fn instructions(&self) -> Option<&[NamedInstruction]> {
+        self.instructions.as_ref().map(|v| v.as_ref())
     }
 }

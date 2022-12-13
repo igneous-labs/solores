@@ -9,9 +9,9 @@ pub trait IdlFormat<TypedefElem: ToTokens, AccountElem: ToTokens, IxElem: ToToke
 
     fn program_address(&self) -> &str;
 
-    fn typedefs(&self) -> &[TypedefElem];
+    fn typedefs(&self) -> Option<&[TypedefElem]>;
 
-    fn accounts(&self) -> &[AccountElem];
+    fn accounts(&self) -> Option<&[AccountElem]>;
 
-    fn instructions(&self) -> &[IxElem];
+    fn instructions(&self) -> Option<&[IxElem]>;
 }

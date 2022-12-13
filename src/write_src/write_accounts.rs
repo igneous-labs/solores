@@ -8,7 +8,10 @@ pub fn write_accounts<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
     args: &'a Args,
     idl: &'a Idl,
 ) -> std::io::Result<()> {
-    let typedefs = idl.accounts();
+    let accounts = match idl.accounts() {
+        None => return Ok(()),
+        Some(a) => a,
+    };
     let mut contents = quote! {
         // TODO: maybe these imports should be part of the idl trait like accounts_headers() or smth
 
@@ -18,7 +21,7 @@ pub fn write_accounts<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
         // TODO: not all accounts use pubkey, remove if unnecessary
         use solana_program::pubkey::Pubkey;
     };
-    for t in typedefs.iter() {
+    for t in accounts.iter() {
         contents.extend(t.into_token_stream());
     }
 

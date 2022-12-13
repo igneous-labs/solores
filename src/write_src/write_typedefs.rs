@@ -8,7 +8,10 @@ pub fn write_typedefs<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
     args: &'a Args,
     idl: &'a Idl,
 ) -> std::io::Result<()> {
-    let typedefs = idl.typedefs();
+    let typedefs = match idl.typedefs() {
+        None => return Ok(()),
+        Some(t) => t,
+    };
     let mut contents = quote! {
         // TODO: maybe these imports should be part of the idl trait like typedefs_headers() or smth
 
