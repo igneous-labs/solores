@@ -8,10 +8,10 @@ fn main() {
     let kp = read_keypair_file(cli_config.keypair_path).unwrap();
 
     let accounts = RemoveCreatorVerificationKeys {
-        creator: &kp.pubkey(),
-        metadata: &Pubkey::new_unique(),
+        creator: kp.pubkey(),
+        metadata: Pubkey::new_unique(),
     };
     let args = RemoveCreatorVerificationIxArgs {};
-    let remove_creator_ver_ix = remove_creator_verification_ix(accounts, &args).unwrap();
+    let remove_creator_ver_ix = remove_creator_verification_ix(accounts, args).unwrap();
     println!("{:?}", remove_creator_ver_ix);
 }

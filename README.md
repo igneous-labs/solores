@@ -4,9 +4,22 @@ Solana IDL to Rust client / CPI interface generator.
 
 > [solita](https://github.com/metaplex-foundation/solita), light of my life, fire of my loins
 
-## Supported IDL formats
+## Contents
 
-- Shank
+- [solores](#solores)
+  - [Contents](#contents)
+  - [Supported IDL Formats](#supported-idl-formats)
+  - [Installation](#installation)
+  - [Examples](#examples)
+    - [Shank IDL](#shank-idl)
+  - [Features](#features)
+    - [Instruction Function Generics](#instruction-function-generics)
+  - [Comparison to similar libs](#comparison-to-similar-libs)
+    - [anchor-gen](#anchor-gen)
+
+## Supported IDL Formats
+
+- [Shank](https://github.com/metaplex-foundation/shank)
 
 Anchor coming soon.
 
@@ -82,7 +95,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
     transfer_invoke_signed(
         &TransferAccounts { src, dest },
-        &TransferArgs { amount: 1_000u64 },
+        TransferArgs { amount: 1_000u64 },
         &[&[&[0u8]]],
     )
 }
@@ -97,15 +110,59 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
     ...
 
     let transfer_accounts = TransferKeys {
-        src: &some_pubkey,
-        dest: &another_pubkey,
+        src: some_pubkey,
+        dest: another_pubkey,
     };
-    let transfer_ix_args = &TransferArgs { amount: 1_000u64 };
-    let ix = transfer_ix(&transfer_accounts, &transfer_ix_args)?;
+    let transfer_ix_args = TransferArgs { amount: 1_000u64 };
+    let ix = transfer_ix(&transfer_accounts, transfer_ix_args)?;
 
     ...
 }
 
+```
+
+## Features
+
+### Instruction Function Generics
+
+The generated `*_ix()` function parameters are genericized over any type that impls `Into<*Keys>` for the first arg and any type that impls `Into<*Args>` for the second arg. This allows users to easily implement, for example, account structs that compute/retrieve known pubkeys (like PDAs) at runtime:
+
+```rust
+use my_token_interface::{TransferArgs, TransferKeys, ID};
+use solana_program::pubkey::Pubkey;
+
+struct MyTransferKeys {
+    pub src: Pubkey,
+}
+
+impl From<&MyTransferKeys> for TransferKeys {
+    fn from(my_transfer_keys: MyTransferKeys) -> Self {
+        let (my_pda_dest, _bump) = Pubkey::find_program_address(
+            &[&[0u8]],
+            &ID,
+        );
+        Self {
+          src: my_transfer_keys.src,
+          dest: my_pda_dest,
+        }
+    }
+}
+
+struct MyTransferArgs {};
+
+impl From<MyTransferArgs> for TransferArgs {
+    fn from(_unused: MyTransferArgs) -> Self {
+        Self {
+            amount: 1000u64,
+        }
+    }
+}
+
+//  Now you can do:
+//  let ix = transfer_ix(
+//      &MyTransferKeys { src: my_pubkey },
+//      MyTransferArgs {},
+//  );
 ```
 
 ## Comparison to similar libs

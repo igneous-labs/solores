@@ -40,6 +40,6 @@ fn process_instruction(
             system_program,
             rent,
         },
-        &create_master_edition_ix_args_without_discm,
+        create_master_edition_ix_args_without_discm,
     )
 }

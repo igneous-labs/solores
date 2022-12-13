@@ -91,17 +91,17 @@ impl ToTokens for NamedInstruction {
             });
             quote! {
                 #maybe_doc_comment
-                pub #account_ident: &'me Pubkey
+                pub #account_ident: Pubkey
             }
         });
         tokens.extend(quote! {
             #[derive(Copy, Clone, Debug)]
-            pub struct #keys_ident<'me> {
+            pub struct #keys_ident {
                 #(#keys_fields),*
             }
         });
 
-        // impl From &Accounts for Keys
+        // <'me, '_, '_, ... '_>
         let mut from_accounts_generics = Generics::default();
         from_accounts_generics
             .params
@@ -111,14 +111,16 @@ impl ToTokens for NamedInstruction {
                 .params
                 .push(LifetimeDef::new(Lifetime::new("'_", Span::call_site())).into());
         }
+
+        // impl From &Accounts for Keys
         let from_keys_fields = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
-                #account_ident: accounts.#account_ident.key
+                #account_ident: *accounts.#account_ident.key
             }
         });
         tokens.extend(quote! {
-            impl<'me> From<&#accounts_ident #from_accounts_generics> for #keys_ident<'me> {
+            impl<'me> From<&#accounts_ident #from_accounts_generics> for #keys_ident {
                 fn from(accounts: &#accounts_ident #from_accounts_generics) -> Self {
                     Self {
                         #(#from_keys_fields),*
@@ -130,8 +132,8 @@ impl ToTokens for NamedInstruction {
         // impl From &Keys for [AccountMeta]
         let from_keys_meta = accounts.iter().map(|acc| acc.to_keys_account_meta_tokens());
         tokens.extend(quote! {
-            impl From<&#keys_ident<'_>> for [AccountMeta; #n_accounts_index] {
-                fn from(keys: &#keys_ident<'_>) -> Self {
+            impl From<&#keys_ident> for [AccountMeta; #n_accounts_index] {
+                fn from(keys: &#keys_ident) -> Self {
                     [
                         #(#from_keys_meta),*
                     ]
@@ -139,7 +141,7 @@ impl ToTokens for NamedInstruction {
             }
         });
 
-        // impl From Accounts for [AccountInfo]
+        // <'_, 'a, 'a, ..., 'a>
         let mut account_infos_lifetime_intersection_generics = Generics::default();
         account_infos_lifetime_intersection_generics
             .params
@@ -149,6 +151,8 @@ impl ToTokens for NamedInstruction {
                 .params
                 .push(LifetimeDef::new(Lifetime::new("'a", Span::call_site())).into());
         }
+
+        // impl From Accounts for [AccountInfo]
         let account_info_clone = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
@@ -198,13 +202,14 @@ impl ToTokens for NamedInstruction {
 
         // impl _ix()
         tokens.extend(quote! {
-            pub fn #ix_fn_ident<'k, 'd, K: Into<#keys_ident<'k>>, D: Into<#ix_data_ident<'d>>>(
+            pub fn #ix_fn_ident<K: Into<#keys_ident>, A: Into<#ix_args_ident>>(
                 accounts: K,
-                args: D,
+                args: A,
             ) -> std::io::Result<Instruction> {
                 let keys: #keys_ident = accounts.into();
                 let metas: [AccountMeta; #n_accounts_index] = (&keys).into();
-                let data: #ix_data_ident = args.into();
+                let args_full: #ix_args_ident = args.into();
+                let data: #ix_data_ident = (&args_full).into();
                 Ok(Instruction {
                     program_id: crate::ID,
                     accounts: Vec::from(metas),
@@ -215,9 +220,9 @@ impl ToTokens for NamedInstruction {
 
         // impl _invoke()
         tokens.extend(quote! {
-            pub fn #invoke_fn_ident<'a, 'd, D: Into<#ix_data_ident<'d>>>(
+            pub fn #invoke_fn_ident<'a, A: Into<#ix_args_ident>>(
                 accounts: &#accounts_ident #account_infos_lifetime_intersection_generics,
-                args: D,
+                args: A,
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
                 let account_info: [AccountInfo<'a>; #n_accounts_index] = accounts.into();
@@ -227,9 +232,9 @@ impl ToTokens for NamedInstruction {
 
         // impl _invoke_signed()
         tokens.extend(quote! {
-            pub fn #invoke_signed_fn_ident<'a, 'd, D: Into<#ix_data_ident<'d>>>(
+            pub fn #invoke_signed_fn_ident<'a, A: Into<#ix_args_ident>>(
                 accounts: &#accounts_ident #account_infos_lifetime_intersection_generics,
-                args: D,
+                args: A,
                 seeds: &[&[&[u8]]],
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
@@ -252,7 +257,7 @@ impl IxAccount {
         let is_signer_arg = LitBool::new(self.is_signer, Span::call_site());
         let name = format_ident!("{}", self.name.to_snake_case());
         quote! {
-            AccountMeta::#call_ident(*keys.#name, #is_signer_arg)
+            AccountMeta::#call_ident(keys.#name, #is_signer_arg)
         }
     }
 }
