@@ -1,4 +1,4 @@
-use quote::{quote, ToTokens};
+use quote::ToTokens;
 
 use crate::{idl_format::IdlFormat, Args};
 
@@ -12,15 +12,7 @@ pub fn write_accounts<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<
         None => return Ok(()),
         Some(a) => a,
     };
-    let mut contents = quote! {
-        // TODO: maybe these imports should be part of the idl trait like accounts_headers() or smth
-
-        // TODO: not all accounts use defined types, remove if necessary
-        use crate::*;
-        use borsh::{BorshDeserialize, BorshSerialize};
-        // TODO: not all accounts use pubkey, remove if unnecessary
-        use solana_program::pubkey::Pubkey;
-    };
+    let mut contents = idl.accounts_header();
     for t in accounts.iter() {
         contents.extend(t.into_token_stream());
     }

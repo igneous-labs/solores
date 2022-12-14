@@ -168,12 +168,52 @@ impl ToTokens for EnumVariant {
     }
 }
 
+const PUBKEY_TOKEN: &str = "Pubkey";
+
 fn primitive_or_pubkey_to_token(s: &str) -> String {
     if s == "publicKey" {
-        "Pubkey".to_owned()
+        PUBKEY_TOKEN.to_owned()
     } else if s == "string" {
         s.to_pascal_case()
     } else {
         s.to_owned()
+    }
+}
+
+impl TypedefType {
+    pub fn has_pubkey_field(&self) -> bool {
+        match self {
+            Self::r#enum(_) => false,
+            Self::r#struct(s) => s.fields.iter().any(|f| f.r#type.is_or_has_pubkey()),
+        }
+    }
+
+    pub fn has_defined_field(&self) -> bool {
+        match self {
+            Self::r#enum(_) => false,
+            Self::r#struct(s) => s.fields.iter().any(|f| f.r#type.is_or_has_defined()),
+        }
+    }
+}
+
+impl TypedefFieldType {
+    pub fn is_or_has_pubkey(&self) -> bool {
+        match self {
+            Self::PrimitiveOrPubkey(s) => primitive_or_pubkey_to_token(s) == PUBKEY_TOKEN,
+            Self::array(a) => a.0.is_or_has_pubkey(),
+            Self::option(o) => o.is_or_has_pubkey(),
+            Self::vec(v) => v.is_or_has_pubkey(),
+            Self::defined(_) => false,
+        }
+    }
+
+    pub fn is_or_has_defined(&self) -> bool {
+        match self {
+            Self::PrimitiveOrPubkey(_) => false,
+            Self::array(a) => a.0.is_or_has_defined(),
+            Self::option(o) => o.is_or_has_defined(),
+            Self::vec(v) => v.is_or_has_defined(),
+            Self::defined(_) => true,
+        }
     }
 }
