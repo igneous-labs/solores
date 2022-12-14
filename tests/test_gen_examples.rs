@@ -18,7 +18,7 @@ fn run_example(example_name: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut idl_path = dir.clone();
     idl_path.push("idl.json");
 
-    cmd.arg(idl_path).arg("-o").arg(dir).arg("-k");
+    cmd.arg(idl_path).arg("-o").arg(dir);
     cmd.assert().success();
     Ok(())
 }

@@ -1,5 +1,6 @@
+use heck::ToPascalCase;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{format_ident, quote, ToTokens};
 
 pub mod shank;
 
@@ -23,12 +24,15 @@ trait IdlCodegenElems {
     type TypedefElem: ToTokens;
     type AccountElem: ToTokens;
     type IxElem: ToTokens;
+    type ErrorsEnumVariantElem: ToTokens;
 
     fn typedefs(&self) -> Option<&[Self::TypedefElem]>;
 
     fn accounts(&self) -> Option<&[Self::AccountElem]>;
 
     fn instructions(&self) -> Option<&[Self::IxElem]>;
+
+    fn errors(&self) -> Option<&[Self::ErrorsEnumVariantElem]>;
 }
 
 pub trait IdlCodegen {
@@ -38,11 +42,15 @@ pub trait IdlCodegen {
 
     fn instructions_file(&self) -> Option<TokenStream>;
 
+    fn error_enum_variants(&self) -> Option<TokenStream>;
+
     fn has_typedefs(&self) -> bool;
 
     fn has_accounts(&self) -> bool;
 
     fn has_instructions(&self) -> bool;
+
+    fn has_errors(&self) -> bool;
 }
 
 impl<I: IdlCodegenElems> IdlCodegen for I {
@@ -67,6 +75,13 @@ impl<I: IdlCodegenElems> IdlCodegen for I {
         Some(res)
     }
 
+    fn error_enum_variants(&self) -> Option<TokenStream> {
+        let elems = self.errors()?.iter().map(|e| e.into_token_stream());
+        let mut res = quote! {};
+        res.extend(elems);
+        Some(res)
+    }
+
     fn has_typedefs(&self) -> bool {
         self.typedefs().is_some()
     }
@@ -77,6 +92,10 @@ impl<I: IdlCodegenElems> IdlCodegen for I {
 
     fn has_instructions(&self) -> bool {
         self.instructions().is_some()
+    }
+
+    fn has_errors(&self) -> bool {
+        self.errors().is_some()
     }
 }
 
@@ -144,5 +163,53 @@ pub trait IdlFormat: IdlCodegen {
             })
         }
         res
+    }
+
+    fn errors_header(&self) -> TokenStream {
+        quote! {
+            use solana_program::{
+                decode_error::DecodeError,
+                msg,
+                program_error::{PrintProgramError, ProgramError},
+            };
+            use thiserror::Error;
+        }
+    }
+
+    fn errors_file(&self) -> Option<TokenStream> {
+        let error_enum_variants = self.error_enum_variants()?;
+        let error_enum_ident_str = format!("{}Error", self.program_name().to_pascal_case());
+        let error_enum_ident = format_ident!("{}", &error_enum_ident_str);
+        Some(quote! {
+            #[derive(Clone, Copy, Debug, Eq, Error, num_derive::FromPrimitive, PartialEq)]
+            pub enum #error_enum_ident {
+                #error_enum_variants
+            }
+
+            impl From<#error_enum_ident> for ProgramError {
+                fn from(e: #error_enum_ident) -> Self {
+                    ProgramError::Custom(e as u32)
+                }
+            }
+
+            impl<T> DecodeError<T> for #error_enum_ident {
+                fn type_of() -> &'static str {
+                    #error_enum_ident_str
+                }
+            }
+
+            impl PrintProgramError for #error_enum_ident {
+                fn print<E>(&self)
+                where
+                    E: 'static
+                        + std::error::Error
+                        + DecodeError<E>
+                        + PrintProgramError
+                        + num_traits::FromPrimitive,
+                {
+                    msg!(&self.to_string());
+                }
+            }
+        })
     }
 }

@@ -1,4 +1,5 @@
 mod write_accounts;
+mod write_errors;
 mod write_instructions;
 mod write_lib;
 mod write_typedefs;
@@ -8,6 +9,7 @@ use std::{io::Write, path::Path};
 use proc_macro2::TokenStream;
 
 pub use write_accounts::*;
+pub use write_errors::*;
 pub use write_instructions::*;
 pub use write_lib::*;
 pub use write_typedefs::*;

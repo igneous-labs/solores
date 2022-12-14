@@ -1,16 +1,16 @@
 use serde::Deserialize;
 
-use self::{instructions::NamedInstruction, typedefs::NamedType};
+use self::{errors::ErrorEnumVariant, instructions::NamedInstruction, typedefs::NamedType};
 
 use super::{
     AccountsHeaderFlags, IdlCodegenElems, IdlFormat, InstructionsHeaderFlags, TypedefsHeaderFlags,
 };
 
+mod errors;
 mod instructions;
 mod typedefs;
 
 #[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ShankIdl {
     name: String,
     version: String,
@@ -18,6 +18,7 @@ pub struct ShankIdl {
     accounts: Option<Vec<NamedType>>,
     types: Option<Vec<NamedType>>,
     instructions: Option<Vec<NamedInstruction>>,
+    errors: Option<Vec<ErrorEnumVariant>>,
 }
 
 #[derive(Deserialize)]
@@ -30,6 +31,7 @@ impl IdlCodegenElems for ShankIdl {
     type TypedefElem = NamedType;
     type AccountElem = NamedType;
     type IxElem = NamedInstruction;
+    type ErrorsEnumVariantElem = ErrorEnumVariant;
 
     fn typedefs(&self) -> Option<&[Self::TypedefElem]> {
         self.types.as_ref().map(|v| v.as_ref())
@@ -40,6 +42,10 @@ impl IdlCodegenElems for ShankIdl {
 
     fn instructions(&self) -> Option<&[Self::IxElem]> {
         self.instructions.as_ref().map(|v| v.as_ref())
+    }
+
+    fn errors(&self) -> Option<&[Self::ErrorsEnumVariantElem]> {
+        self.errors.as_ref().map(|v| v.as_ref())
     }
 }
 

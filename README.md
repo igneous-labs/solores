@@ -171,7 +171,7 @@ impl From<MyTransferArgs> for TransferArgs {
 
 Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 
-- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's only dependencies are [borsh](https://github.com/near/borsh-rs) and [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program)
+- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's dependencies are [borsh](https://github.com/near/borsh-rs) + [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), and [thiserror](https://github.com/dtolnay/thiserror), [num-derive](https://github.com/rust-num/num-derive) and [num-traits](https://github.com/rust-num/num-traits) if the idl contains error enum definitions.
 
 - Produces (almost) human-readable rust code in a new, separate crate instead of using a proc-macro.
 

@@ -37,11 +37,10 @@ pub struct Args {
 
     #[arg(
         long,
-        short,
-        help = "Keep partially output built artifacts instead of deleting everything. Useful for debugging",
-        default_value = "false"
+        help = "output crate name",
+        default_value = DEFAULT_OUTPUT_CRATE_NAME,
     )]
-    pub keep_partial_artifacts: bool,
+    pub output_crate_name: String,
 
     #[arg(
         long,
@@ -61,10 +60,24 @@ pub struct Args {
 
     #[arg(
         long,
-        help = "output crate name",
-        default_value = DEFAULT_OUTPUT_CRATE_NAME,
+        help = "thiserror dependency version for generated crate",
+        default_value = "^1.0"
     )]
-    pub output_crate_name: String,
+    pub thiserror_vers: String,
+
+    #[arg(
+        long,
+        help = "num-derive dependency version for generated crate",
+        default_value = "^0.3"
+    )]
+    pub num_derive_vers: String,
+
+    #[arg(
+        long,
+        help = "num-traits dependency version for generated crate",
+        default_value = "^0.2"
+    )]
+    pub num_traits_vers: String,
 }
 
 fn check_valid_semver_req(arg: &str, arg_name: &str) {
@@ -102,6 +115,7 @@ fn main() {
     write_cargotoml(&args, idl.as_ref()).unwrap();
     write_lib(&args, idl.as_ref()).unwrap();
     write_accounts(&args, idl.as_ref()).unwrap();
+    write_errors(&args, idl.as_ref()).unwrap();
     write_typedefs(&args, idl.as_ref()).unwrap();
     write_instructions(&args, idl.as_ref()).unwrap();
 

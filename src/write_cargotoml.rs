@@ -22,6 +22,14 @@ struct CargoToml<'a> {
 
 impl<'a> CargoToml<'a> {
     pub fn from_args_and_idl(args: &'a Args, idl: &'a dyn IdlFormat) -> Self {
+        let (thiserror, num_derive, num_traits) = match idl.has_errors() {
+            true => (
+                Some(args.thiserror_vers.as_str()),
+                Some(args.num_derive_vers.as_str()),
+                Some(args.num_traits_vers.as_str()),
+            ),
+            false => (None, None, None),
+        };
         Self {
             package: Package {
                 name: &args.output_crate_name,
@@ -31,6 +39,9 @@ impl<'a> CargoToml<'a> {
             dependencies: GeneratedCrateDependencies {
                 borsh: &args.borsh_vers,
                 solana_program: &args.solana_program_vers,
+                thiserror,
+                num_derive,
+                num_traits,
             },
         }
     }
@@ -49,4 +60,12 @@ struct GeneratedCrateDependencies<'a> {
 
     #[serde(rename = "solana-program")]
     solana_program: &'a str,
+
+    thiserror: Option<&'a str>,
+
+    #[serde(rename = "num-derive")]
+    num_derive: Option<&'a str>,
+
+    #[serde(rename = "num-traits")]
+    num_traits: Option<&'a str>,
 }
