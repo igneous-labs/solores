@@ -74,7 +74,7 @@ fn check_valid_semver_req(arg: &str, arg_name: &str) {
 
 fn main() {
     if env::var(RUST_LOG_ENV_VAR).is_err() {
-        env::set_var(RUST_LOG_ENV_VAR, "warn")
+        env::set_var(RUST_LOG_ENV_VAR, "info")
     }
     env_logger::init();
     log_panics::init();
@@ -86,8 +86,7 @@ fn main() {
 
     let file = File::open(&args.idl_path).unwrap();
 
-    // TODO: anchor
-    let idl: ShankIdl = serde_json::from_reader(&file).unwrap();
+    let idl = load_idl(file);
 
     args.output_crate_name = if args.output_crate_name == DEFAULT_OUTPUT_CRATE_NAME {
         format!("{}_interface", idl.program_name())
@@ -100,9 +99,26 @@ fn main() {
 
     // TODO: multithread, 1 thread per generated file
     write_gitignore(&args).unwrap();
-    write_cargotoml(&args, &idl).unwrap();
-    write_lib(&args, &idl).unwrap();
-    write_accounts(&args, &idl).unwrap();
-    write_typedefs(&args, &idl).unwrap();
-    write_instructions(&args, &idl).unwrap();
+    write_cargotoml(&args, idl.as_ref()).unwrap();
+    write_lib(&args, idl.as_ref()).unwrap();
+    write_accounts(&args, idl.as_ref()).unwrap();
+    write_typedefs(&args, idl.as_ref()).unwrap();
+    write_instructions(&args, idl.as_ref()).unwrap();
+
+    log::info!(
+        "{} crate written to {}",
+        args.output_crate_name,
+        args.output_dir.to_string_lossy()
+    );
+}
+
+fn load_idl(file: File) -> Box<dyn IdlFormat> {
+    if let Ok(shank_idl) = serde_json::from_reader::<File, ShankIdl>(file) {
+        if shank_idl.is_correct_idl_format() {
+            log::info!("Successfully loaded shank IDL");
+            return Box::new(shank_idl);
+        }
+    }
+    // TODO: anchor
+    panic!("Could not determine IDL format");
 }

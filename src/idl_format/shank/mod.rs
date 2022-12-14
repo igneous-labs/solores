@@ -2,7 +2,9 @@ use serde::Deserialize;
 
 use self::{instructions::NamedInstruction, typedefs::NamedType};
 
-use super::{AccountsHeaderFlags, IdlFormat, InstructionsHeaderFlags, TypedefsHeaderFlags};
+use super::{
+    AccountsHeaderFlags, IdlCodegenElems, IdlFormat, InstructionsHeaderFlags, TypedefsHeaderFlags,
+};
 
 mod instructions;
 mod typedefs;
@@ -24,7 +26,24 @@ pub struct Metadata {
     origin: String,
 }
 
-impl IdlFormat<NamedType, NamedType, NamedInstruction> for ShankIdl {
+impl IdlCodegenElems for ShankIdl {
+    type TypedefElem = NamedType;
+    type AccountElem = NamedType;
+    type IxElem = NamedInstruction;
+
+    fn typedefs(&self) -> Option<&[Self::TypedefElem]> {
+        self.types.as_ref().map(|v| v.as_ref())
+    }
+    fn accounts(&self) -> Option<&[Self::AccountElem]> {
+        self.accounts.as_ref().map(|v| v.as_ref())
+    }
+
+    fn instructions(&self) -> Option<&[Self::IxElem]> {
+        self.instructions.as_ref().map(|v| v.as_ref())
+    }
+}
+
+impl IdlFormat for ShankIdl {
     fn program_name(&self) -> &str {
         &self.name
     }
@@ -35,17 +54,6 @@ impl IdlFormat<NamedType, NamedType, NamedInstruction> for ShankIdl {
 
     fn program_address(&self) -> &str {
         &self.metadata.address
-    }
-
-    fn typedefs(&self) -> Option<&[NamedType]> {
-        self.types.as_ref().map(|v| v.as_ref())
-    }
-    fn accounts(&self) -> Option<&[NamedType]> {
-        self.accounts.as_ref().map(|v| v.as_ref())
-    }
-
-    fn instructions(&self) -> Option<&[NamedInstruction]> {
-        self.instructions.as_ref().map(|v| v.as_ref())
     }
 
     fn is_correct_idl_format(&self) -> bool {

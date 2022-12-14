@@ -1,14 +1,10 @@
 use std::io::Write;
 
-use quote::ToTokens;
 use serde::Serialize;
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
-pub fn write_cargotoml<'a, T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<T, A, I>>(
-    args: &'a Args,
-    idl: &'a Idl,
-) -> std::io::Result<()> {
+pub fn write_cargotoml(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
     let cargo_toml = CargoToml::from_args_and_idl(args, idl);
     let cargo_toml_str = toml::to_string(&cargo_toml).unwrap();
 
@@ -25,10 +21,7 @@ struct CargoToml<'a> {
 }
 
 impl<'a> CargoToml<'a> {
-    pub fn from_args_and_idl<T: ToTokens, A: ToTokens, I: ToTokens, Idl: IdlFormat<T, A, I>>(
-        args: &'a Args,
-        idl: &'a Idl,
-    ) -> Self {
+    pub fn from_args_and_idl(args: &'a Args, idl: &'a dyn IdlFormat) -> Self {
         Self {
             package: Package {
                 name: &args.output_crate_name,
