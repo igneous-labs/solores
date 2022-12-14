@@ -3,7 +3,7 @@ use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
-use syn::{Generics, Index, Lifetime, LifetimeDef, LitBool};
+use syn::{Generics, Lifetime, LifetimeDef, LitBool};
 
 use crate::utils::unique_by_report_dups;
 
@@ -43,11 +43,12 @@ impl ToTokens for NamedInstruction {
         let ix_fn_ident = format_ident!("{}_ix", snake_case_name);
         let invoke_fn_ident = format_ident!("{}_invoke", snake_case_name);
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
-        let discm_ident = format_ident!("{}_IX_DISCM", name.to_shouty_snake_case());
+        let shouty_snake_case_name = name.to_shouty_snake_case();
+        let accounts_len_ident = format_ident!("{}_IX_ACCOUNTS_LEN", shouty_snake_case_name);
+        let discm_ident = format_ident!("{}_IX_DISCM", shouty_snake_case_name);
 
         let accounts = &self.accounts;
         let n_accounts = accounts.len();
-        let n_accounts_index = Index::from(n_accounts);
 
         let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
 
@@ -59,6 +60,11 @@ impl ToTokens for NamedInstruction {
         }
         let unique_accounts = &accounts_dedup.unique;
         let n_unique_accounts = unique_accounts.len();
+
+        // export accounts_len as const
+        tokens.extend(quote! {
+            pub const #accounts_len_ident: usize = #n_accounts;
+        });
 
         // impl Accounts
         let mut accounts_lifetimes = Generics::default();
@@ -146,7 +152,7 @@ impl ToTokens for NamedInstruction {
         // impl From &Keys for [AccountMeta]
         let from_keys_meta = accounts.iter().map(|acc| acc.to_keys_account_meta_tokens());
         tokens.extend(quote! {
-            impl From<&#keys_ident> for [AccountMeta; #n_accounts_index] {
+            impl From<&#keys_ident> for [AccountMeta; #accounts_len_ident] {
                 fn from(keys: &#keys_ident) -> Self {
                     [
                         #(#from_keys_meta),*
@@ -174,7 +180,7 @@ impl ToTokens for NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl<'a> From<&#accounts_ident #account_infos_lifetime_intersection_generics> for [AccountInfo<'a>; #n_accounts_index] {
+            impl<'a> From<&#accounts_ident #account_infos_lifetime_intersection_generics> for [AccountInfo<'a>; #accounts_len_ident] {
                 fn from(accounts: &#accounts_ident #account_infos_lifetime_intersection_generics) -> Self {
                     [
                         #(#account_info_clone),*
@@ -221,7 +227,7 @@ impl ToTokens for NamedInstruction {
                 args: A,
             ) -> std::io::Result<Instruction> {
                 let keys: #keys_ident = accounts.into();
-                let metas: [AccountMeta; #n_accounts_index] = (&keys).into();
+                let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
                 let args_full: #ix_args_ident = args.into();
                 let data: #ix_data_ident = (&args_full).into();
                 Ok(Instruction {
@@ -239,7 +245,7 @@ impl ToTokens for NamedInstruction {
                 args: A,
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
-                let account_info: [AccountInfo<'a>; #n_accounts_index] = accounts.into();
+                let account_info: [AccountInfo<'a>; #accounts_len_ident] = accounts.into();
                 invoke(&ix, &account_info)
             }
         });
@@ -252,7 +258,7 @@ impl ToTokens for NamedInstruction {
                 seeds: &[&[&[u8]]],
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
-                let account_info: [AccountInfo<'a>; #n_accounts_index] = accounts.into();
+                let account_info: [AccountInfo<'a>; #accounts_len_ident] = accounts.into();
                 invoke_signed(&ix, &account_info, seeds)
             }
         });
