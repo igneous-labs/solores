@@ -6,6 +6,18 @@ repository = "https://github.com/igneous-labs/solores"
 version = "0.1.0"
 edition = "2021"
 exclude = ["install-precommit.sh", "examples/", "tests/test_gen_examples.rs"]
+categories = [
+    "command-line-utilities",
+    "cryptography::cryptocurrencies",
+    "development-tools",
+]
+keywords = [
+    "anchor",
+    "codegen",
+    "metaplex",
+    "shank",
+    "solana",
+]
 
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }
