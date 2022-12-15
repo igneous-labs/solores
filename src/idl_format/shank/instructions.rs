@@ -190,7 +190,7 @@ impl ToTokens for NamedInstruction {
         });
 
         // impl Args
-        let args_fields = self.args.iter();
+        let args_fields = self.args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
             #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
             pub struct #ix_args_ident {

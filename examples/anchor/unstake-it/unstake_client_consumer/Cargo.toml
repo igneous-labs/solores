@@ -1,0 +1,9 @@
+[package]
+name = "unstake_client_consumer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+solana-cli-config = "1.13.14"
+solana-sdk = "1.13.14"
+unstake_interface = { path = "../unstake_interface" }

@@ -135,7 +135,7 @@ impl<'a> From<&SetProtocolFeeAccounts<'_, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct SetProtocolFeeIxArgs {
-    protocol_fee: ProtocolFee,
+    pub protocol_fee: ProtocolFee,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SetProtocolFeeIxData<'me>(pub &'me SetProtocolFeeIxArgs);
@@ -267,7 +267,7 @@ impl<'a> From<&CreatePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct CreatePoolIxArgs {
-    fee: Fee,
+    pub fee: Fee,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreatePoolIxData<'me>(pub &'me CreatePoolIxArgs);
@@ -387,7 +387,7 @@ impl<'a> From<&AddLiquidityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct AddLiquidityIxArgs {
-    amount: u64,
+    pub amount: u64,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct AddLiquidityIxData<'me>(pub &'me AddLiquidityIxArgs);
@@ -515,7 +515,7 @@ impl<'a> From<&RemoveLiquidityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct RemoveLiquidityIxArgs {
-    amount_lp: u64,
+    pub amount_lp: u64,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveLiquidityIxData<'me>(pub &'me RemoveLiquidityIxArgs);
@@ -616,7 +616,7 @@ impl<'a> From<&SetFeeAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct SetFeeIxArgs {
-    fee: Fee,
+    pub fee: Fee,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SetFeeIxData<'me>(pub &'me SetFeeIxArgs);
