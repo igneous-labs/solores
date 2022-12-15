@@ -5,7 +5,12 @@ license = "Apache 2.0"
 repository = "https://github.com/igneous-labs/solores"
 version = "0.1.0"
 edition = "2021"
-exclude = ["install-precommit.sh", "examples/", "tests/test_gen_examples.rs"]
+exclude = [
+    ".pre-commit-config.yaml",
+    "examples/",
+    "install-precommit.sh",
+    "tests/test_gen_examples.rs"
+]
 categories = [
     "command-line-utilities",
     "cryptography::cryptocurrencies",
