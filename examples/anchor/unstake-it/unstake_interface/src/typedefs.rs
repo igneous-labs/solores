@@ -11,6 +11,6 @@ pub struct LiquidityLinearParams {
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum FeeEnum {
-    Flat,
-    LiquidityLinear,
+    Flat { ratio: Rational },
+    LiquidityLinear { params: LiquidityLinearParams },
 }

@@ -76,10 +76,12 @@ pub struct TypedefEnum {
     pub variants: Vec<EnumVariant>,
 }
 
-// TODO: ENUMS WITH STRUCTS IN THEM
+// TODO: handle EnumVariant(fields), not just
+// EnumVariant { field1: type }
 #[derive(Deserialize)]
 pub struct EnumVariant {
     pub name: String,
+    pub fields: Option<Vec<TypedefField>>,
 }
 
 impl ToTokens for NamedType {
@@ -105,9 +107,9 @@ impl ToTokens for NamedType {
 
 impl ToTokens for TypedefStruct {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let fields = self.fields.iter();
+        let typedef_fields = self.fields.iter().map(|f| quote! { pub #f });
         tokens.extend(quote! {
-            #(#fields),*
+            #(#typedef_fields),*
         })
     }
 }
@@ -117,7 +119,7 @@ impl ToTokens for TypedefField {
         let name = format_ident!("{}", self.name.to_snake_case());
         let ty = &self.r#type;
         tokens.extend(quote! {
-            pub #name: #ty
+            #name: #ty
         })
     }
 }
@@ -158,13 +160,18 @@ impl ToTokens for TypedefEnum {
     }
 }
 
-// TODO: handle complex enum structs
 impl ToTokens for EnumVariant {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let v = format_ident!("{}", self.name.to_pascal_case());
+        let maybe_inner_fields = self.fields.as_ref().map_or(quote! {}, |fields| {
+            let typedef_fields = fields.iter();
+            quote! {
+                { #(#typedef_fields),* }
+            }
+        });
         tokens.extend(quote! {
-            #v
-        })
+            #v #maybe_inner_fields
+        });
     }
 }
 
@@ -183,14 +190,14 @@ fn primitive_or_pubkey_to_token(s: &str) -> String {
 impl TypedefType {
     pub fn has_pubkey_field(&self) -> bool {
         match self {
-            Self::r#enum(_) => false,
+            Self::r#enum(e) => e.variants.iter().any(|e| e.has_pubkey()),
             Self::r#struct(s) => s.fields.iter().any(|f| f.r#type.is_or_has_pubkey()),
         }
     }
 
     pub fn has_defined_field(&self) -> bool {
         match self {
-            Self::r#enum(_) => false,
+            Self::r#enum(e) => e.variants.iter().any(|e| e.has_defined()),
             Self::r#struct(s) => s.fields.iter().any(|f| f.r#type.is_or_has_defined()),
         }
     }
@@ -214,6 +221,22 @@ impl TypedefFieldType {
             Self::option(o) => o.is_or_has_defined(),
             Self::vec(v) => v.is_or_has_defined(),
             Self::defined(_) => true,
+        }
+    }
+}
+
+impl EnumVariant {
+    pub fn has_pubkey(&self) -> bool {
+        match &self.fields {
+            None => false,
+            Some(fields) => fields.iter().any(|f| f.r#type.is_or_has_pubkey()),
+        }
+    }
+
+    pub fn has_defined(&self) -> bool {
+        match &self.fields {
+            None => false,
+            Some(fields) => fields.iter().any(|f| f.r#type.is_or_has_defined()),
         }
     }
 }

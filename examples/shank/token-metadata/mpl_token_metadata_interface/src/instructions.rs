@@ -96,7 +96,7 @@ impl<'a> From<&CreateMetadataAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct CreateMetadataAccountIxArgs {
-    pub create_metadata_account_args: CreateMetadataAccountArgs,
+    create_metadata_account_args: CreateMetadataAccountArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountIxData<'me>(pub &'me CreateMetadataAccountIxArgs);
@@ -186,7 +186,7 @@ impl<'a> From<&UpdateMetadataAccountAccounts<'_, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct UpdateMetadataAccountIxArgs {
-    pub update_metadata_account_args: UpdateMetadataAccountArgs,
+    update_metadata_account_args: UpdateMetadataAccountArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountIxData<'me>(pub &'me UpdateMetadataAccountIxArgs);
@@ -449,7 +449,7 @@ impl<'a>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct DeprecatedCreateMasterEditionIxArgs {
-    pub create_master_edition_args: CreateMasterEditionArgs,
+    create_master_edition_args: CreateMasterEditionArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedCreateMasterEditionIxData<'me>(pub &'me DeprecatedCreateMasterEditionIxArgs);
@@ -1054,7 +1054,7 @@ impl<'a> From<&DeprecatedSetReservationListAccounts<'_, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct DeprecatedSetReservationListIxArgs {
-    pub set_reservation_list_args: SetReservationListArgs,
+    set_reservation_list_args: SetReservationListArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedSetReservationListIxData<'me>(pub &'me DeprecatedSetReservationListIxArgs);
@@ -1495,7 +1495,7 @@ impl<'a> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'a, 'a, 'a, 'a, 
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
-    pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
+    mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensViaTokenIxData<'me>(
@@ -1653,7 +1653,7 @@ impl<'a> From<&DeprecatedMintPrintingTokensAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensIxArgs {
-    pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
+    mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensIxData<'me>(pub &'me DeprecatedMintPrintingTokensIxArgs);
@@ -1819,7 +1819,7 @@ impl<'a> From<&CreateMasterEditionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct CreateMasterEditionIxArgs {
-    pub create_master_edition_args: CreateMasterEditionArgs,
+    create_master_edition_args: CreateMasterEditionArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionIxData<'me>(pub &'me CreateMasterEditionIxArgs);
@@ -2088,7 +2088,7 @@ impl<'a>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
-    pub mint_new_edition_from_master_edition_via_token_args:
+    mint_new_edition_from_master_edition_via_token_args:
         MintNewEditionFromMasterEditionViaTokenArgs,
 }
 #[derive(Copy, Clone, Debug)]
@@ -2546,7 +2546,7 @@ impl<'a>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
-    pub mint_new_edition_from_master_edition_via_token_args:
+    mint_new_edition_from_master_edition_via_token_args:
         MintNewEditionFromMasterEditionViaTokenArgs,
 }
 #[derive(Copy, Clone, Debug)]
@@ -2765,7 +2765,7 @@ impl<'a> From<&UpdateMetadataAccountV2Accounts<'_, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct UpdateMetadataAccountV2IxArgs {
-    pub update_metadata_account_args_v2: UpdateMetadataAccountArgsV2,
+    update_metadata_account_args_v2: UpdateMetadataAccountArgsV2,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountV2IxData<'me>(pub &'me UpdateMetadataAccountV2IxArgs);
@@ -2908,7 +2908,7 @@ impl<'a> From<&CreateMetadataAccountV2Accounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct CreateMetadataAccountV2IxArgs {
-    pub create_metadata_account_args_v2: CreateMetadataAccountArgsV2,
+    create_metadata_account_args_v2: CreateMetadataAccountArgsV2,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountV2IxData<'me>(pub &'me CreateMetadataAccountV2IxArgs);
@@ -3069,7 +3069,7 @@ impl<'a> From<&CreateMasterEditionV3Accounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a,
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct CreateMasterEditionV3IxArgs {
-    pub create_master_edition_args: CreateMasterEditionArgs,
+    create_master_edition_args: CreateMasterEditionArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionV3IxData<'me>(pub &'me CreateMasterEditionV3IxArgs);
@@ -3355,7 +3355,7 @@ impl<'a> From<&UtilizeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct UtilizeIxArgs {
-    pub utilize_args: UtilizeArgs,
+    utilize_args: UtilizeArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UtilizeIxData<'me>(pub &'me UtilizeIxArgs);
@@ -3527,7 +3527,7 @@ impl<'a> From<&ApproveUseAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct ApproveUseAuthorityIxArgs {
-    pub approve_use_authority_args: ApproveUseAuthorityArgs,
+    approve_use_authority_args: ApproveUseAuthorityArgs,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveUseAuthorityIxData<'me>(pub &'me ApproveUseAuthorityIxArgs);
