@@ -4,6 +4,8 @@ Solana IDL to Rust client / CPI interface generator.
 
 > [solita](https://github.com/metaplex-foundation/solita), light of my life, fire of my loins
 
+This software is still in its early stages of development. USE AT YOUR OWN RISK.
+
 ## Contents
 
 - [solores](#solores)
@@ -16,12 +18,14 @@ Solana IDL to Rust client / CPI interface generator.
     - [Instruction Function Generics](#instruction-function-generics)
   - [Comparison to similar libs](#comparison-to-similar-libs)
     - [anchor-gen](#anchor-gen)
+  - [Known Missing Features](#known-missing-features)
+    - [General](#general)
+    - [Anchor](#anchor)
 
 ## Supported IDL Formats
 
 - [Shank](https://github.com/metaplex-foundation/shank)
-
-Anchor coming soon.
+- [Anchor](https://github.com/coral-xyz/anchor)
 
 ## Installation
 
@@ -121,6 +125,12 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
 
 ```
 
+The crate will also export the instructions' discriminant as consts, and any error types defined in the IDL as an enum convertible to/from u32.
+
+### Anchor IDL
+
+The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). The crate will also export all accounts' discriminant as consts.
+
 ## Features
 
 ### Instruction Function Generics
@@ -171,8 +181,21 @@ impl From<MyTransferArgs> for TransferArgs {
 
 Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 
-- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's dependencies are [borsh](https://github.com/near/borsh-rs) + [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), and [thiserror](https://github.com/dtolnay/thiserror), [num-derive](https://github.com/rust-num/num-derive) and [num-traits](https://github.com/rust-num/num-traits) if the idl contains error enum definitions.
+- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's dependencies are [borsh](https://github.com/near/borsh-rs) + [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), and also [thiserror](https://github.com/dtolnay/thiserror) + [num-derive](https://github.com/rust-num/num-derive) + [num-traits](https://github.com/rust-num/num-traits) if the idl contains error enum definitions.
 
 - Produces (almost) human-readable rust code in a new, separate crate instead of using a proc-macro.
 
 - Exposes lower-level constructs such as functions for creating the `solana_program::instruction::Instruction` struct to allow for greater customizability.
+
+## Known Missing Features
+
+Please check the repo's issues list for more.
+
+### General
+
+- Does not handle tuple struct enum variants like `pub enum MyEnum { MyVariant(field1: u8, field2: u64) }` 
+
+### Anchor
+
+- Does not handle account namespaces
+- Does not handle the state instruction namespace

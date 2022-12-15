@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "anchor/unstake-it/*",
+    "shank/token-metadata/*",
+]
