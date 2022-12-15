@@ -14,6 +14,7 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
   - [Installation](#installation)
   - [Examples](#examples)
     - [Shank IDL](#shank-idl)
+    - [Anchor IDL](#anchor-idl)
   - [Features](#features)
     - [Instruction Function Generics](#instruction-function-generics)
   - [Comparison to similar libs](#comparison-to-similar-libs)
