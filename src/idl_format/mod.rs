@@ -2,6 +2,7 @@ use heck::ToPascalCase;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, ToTokens};
 
+pub mod anchor;
 pub mod shank;
 
 #[derive(Copy, Clone, Debug, Default)]

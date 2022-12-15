@@ -1,13 +1,14 @@
 use std::{
     env,
-    fs::{self, File},
+    fs::{self, File, OpenOptions},
+    io::Seek,
     path::PathBuf,
 };
 
 use clap::{command, Parser};
 use idl_format::IdlFormat;
 
-use crate::idl_format::shank::ShankIdl;
+use crate::idl_format::{anchor::AnchorIdl, shank::ShankIdl};
 
 mod idl_format;
 mod utils;
@@ -97,9 +98,9 @@ fn main() {
     check_valid_semver_req(&args.solana_program_vers, "solana-program");
     check_valid_semver_req(&args.borsh_vers, "borsh");
 
-    let file = File::open(&args.idl_path).unwrap();
+    let mut file = OpenOptions::new().read(true).open(&args.idl_path).unwrap();
 
-    let idl = load_idl(file);
+    let idl = load_idl(&mut file);
 
     args.output_crate_name = if args.output_crate_name == DEFAULT_OUTPUT_CRATE_NAME {
         format!("{}_interface", idl.program_name())
@@ -126,13 +127,22 @@ fn main() {
     );
 }
 
-fn load_idl(file: File) -> Box<dyn IdlFormat> {
-    if let Ok(shank_idl) = serde_json::from_reader::<File, ShankIdl>(file) {
+fn load_idl(file: &mut File) -> Box<dyn IdlFormat> {
+    if let Ok(shank_idl) = serde_json::from_reader::<&File, ShankIdl>(file) {
         if shank_idl.is_correct_idl_format() {
             log::info!("Successfully loaded shank IDL");
             return Box::new(shank_idl);
         }
     }
-    // TODO: anchor
-    panic!("Could not determine IDL format");
+    file.rewind().unwrap();
+    // Assume anchor if unidentified
+    match serde_json::from_reader::<&File, AnchorIdl>(file) {
+        Ok(anchor_idl) => {
+            log::info!("Successfully loaded anchor IDL");
+            Box::new(anchor_idl)
+        }
+        Err(e) => {
+            panic!("Could not determine IDL format: {:?}", e);
+        }
+    }
 }

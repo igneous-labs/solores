@@ -27,3 +27,8 @@ fn run_example(example_name: &str) -> Result<(), Box<dyn std::error::Error>> {
 fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
     run_example("shank/token-metadata")
 }
+
+#[test]
+fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
+    run_example("anchor/unstake-it")
+}
