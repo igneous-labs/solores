@@ -4,8 +4,16 @@ use crate::{idl_format::IdlFormat, Args};
 
 use super::write_src_file;
 
+const DEFAULT_ADDRESS: &str = "11111111111111111111111111111111";
+
 pub fn write_lib(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
-    let id = idl.program_address();
+    let id = idl.program_address().unwrap_or_else(|| {
+        log::warn!(
+            "program address not in IDL, setting to default: {}",
+            DEFAULT_ADDRESS
+        );
+        DEFAULT_ADDRESS
+    });
 
     let mut contents = quote! {
         solana_program::declare_id!(#id);

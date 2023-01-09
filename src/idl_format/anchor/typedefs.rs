@@ -36,9 +36,14 @@ pub struct TypedefField {
     pub r#type: TypedefFieldType,
 }
 
+/// All instances should be annotated with
+/// deserialize_with = "string_or_struct"
 #[derive(Deserialize)]
 pub enum TypedefFieldType {
+    // handled by string_or_struct's string
     PrimitiveOrPubkey(String),
+
+    // rest handled by string_or_struct's struct
     defined(String),
     array(TypedefFieldArray),
 
@@ -54,6 +59,11 @@ pub struct TypedefFieldArray(
     #[serde(deserialize_with = "string_or_struct")] Box<TypedefFieldType>,
     u32, // borsh spec says array sizes are u32
 );
+
+/// serde newtype workaround for use in Vec<TypedefFieldType>:
+/// https://github.com/serde-rs/serde/issues/723#issuecomment-871016087
+#[derive(Deserialize)]
+pub struct TypedefFieldTypeWrap(#[serde(deserialize_with = "string_or_struct")] TypedefFieldType);
 
 impl FromStr for TypedefFieldType {
     type Err = Void;
@@ -76,12 +86,33 @@ pub struct TypedefEnum {
     pub variants: Vec<EnumVariant>,
 }
 
-// TODO: handle EnumVariant(fields), not just
-// EnumVariant { field1: type }
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum EnumVariantFields {
+    Struct(Vec<TypedefField>),
+    Tuple(Vec<TypedefFieldTypeWrap>),
+}
+
+impl EnumVariantFields {
+    pub fn has_pubkey(&self) -> bool {
+        match self {
+            Self::Struct(v) => v.iter().any(|f| f.r#type.is_or_has_pubkey()),
+            Self::Tuple(v) => v.iter().any(|f| f.0.is_or_has_pubkey()),
+        }
+    }
+
+    pub fn has_defined(&self) -> bool {
+        match self {
+            Self::Struct(v) => v.iter().any(|f| f.r#type.is_or_has_defined()),
+            Self::Tuple(v) => v.iter().any(|f| f.0.is_or_has_defined()),
+        }
+    }
+}
+
 #[derive(Deserialize)]
 pub struct EnumVariant {
     pub name: String,
-    pub fields: Option<Vec<TypedefField>>,
+    pub fields: Option<EnumVariantFields>,
 }
 
 impl ToTokens for NamedType {
@@ -128,7 +159,7 @@ impl ToTokens for TypedefFieldType {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let ty: TokenStream = match self {
             Self::PrimitiveOrPubkey(s) => primitive_or_pubkey_to_token(s).parse().unwrap(),
-            Self::defined(s) => s.to_pascal_case().parse().unwrap(),
+            Self::defined(s) => s.parse().unwrap(),
             Self::array(a) => a.to_token_stream(),
             Self::vec(v) => quote! {
                 Vec<#v>
@@ -163,12 +194,23 @@ impl ToTokens for TypedefEnum {
 impl ToTokens for EnumVariant {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let v = format_ident!("{}", self.name.to_pascal_case());
-        let maybe_inner_fields = self.fields.as_ref().map_or(quote! {}, |fields| {
-            let typedef_fields = fields.iter();
-            quote! {
-                { #(#typedef_fields),* }
-            }
-        });
+        let maybe_inner_fields = self
+            .fields
+            .as_ref()
+            .map_or(quote! {}, |fields| match fields {
+                EnumVariantFields::Struct(v) => {
+                    let typedef_fields = v.iter();
+                    quote! {
+                        { #(#typedef_fields),* }
+                    }
+                }
+                EnumVariantFields::Tuple(v) => {
+                    let unnamed_fields = v.iter().map(|wrap| &wrap.0);
+                    quote! {
+                        ( #(#unnamed_fields),* )
+                    }
+                }
+            });
         tokens.extend(quote! {
             #v #maybe_inner_fields
         });
@@ -229,14 +271,14 @@ impl EnumVariant {
     pub fn has_pubkey(&self) -> bool {
         match &self.fields {
             None => false,
-            Some(fields) => fields.iter().any(|f| f.r#type.is_or_has_pubkey()),
+            Some(fields) => fields.has_pubkey(),
         }
     }
 
     pub fn has_defined(&self) -> bool {
         match &self.fields {
             None => false,
-            Some(fields) => fields.iter().any(|f| f.r#type.is_or_has_defined()),
+            Some(fields) => fields.has_defined(),
         }
     }
 }

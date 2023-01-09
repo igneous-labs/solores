@@ -192,10 +192,6 @@ Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 
 Please check the repo's issues list for more.
 
-### General
-
-- Does not handle tuple struct enum variants like `pub enum MyEnum { MyVariant(field1: u8, field2: u64) }` 
-
 ### Anchor
 
 - Does not handle account namespaces
