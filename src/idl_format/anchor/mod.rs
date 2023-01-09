@@ -18,7 +18,7 @@ mod typedefs;
 pub struct AnchorIdl {
     name: String,
     version: String,
-    metadata: Metadata,
+    metadata: Option<Metadata>,
     accounts: Option<Vec<NamedAccount>>,
     types: Option<Vec<NamedType>>,
     instructions: Option<Vec<NamedInstruction>>,
@@ -61,8 +61,8 @@ impl IdlFormat for AnchorIdl {
         &self.version
     }
 
-    fn program_address(&self) -> &str {
-        &self.metadata.address
+    fn program_address(&self) -> Option<&str> {
+        self.metadata.as_ref().map(|m| m.address.as_ref())
     }
 
     /// Anchor IDLs dont seem to have an identifier,

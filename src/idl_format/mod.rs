@@ -107,7 +107,7 @@ pub trait IdlFormat: IdlCodegen {
 
     fn program_version(&self) -> &str;
 
-    fn program_address(&self) -> &str;
+    fn program_address(&self) -> Option<&str>;
 
     fn is_correct_idl_format(&self) -> bool;
 

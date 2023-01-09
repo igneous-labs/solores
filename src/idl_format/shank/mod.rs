@@ -58,8 +58,8 @@ impl IdlFormat for ShankIdl {
         &self.version
     }
 
-    fn program_address(&self) -> &str {
-        &self.metadata.address
+    fn program_address(&self) -> Option<&str> {
+        Some(&self.metadata.address)
     }
 
     fn is_correct_idl_format(&self) -> bool {
