@@ -47,3 +47,8 @@ fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
 fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
     run_example("anchor/unstake-it", "unstake_interface")
 }
+
+#[test]
+fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
+    run_example("anchor/marinade", "marinade_finance_interface")
+}

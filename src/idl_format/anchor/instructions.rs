@@ -13,16 +13,44 @@ use super::typedefs::TypedefField;
 #[derive(Deserialize)]
 pub struct NamedInstruction {
     pub name: String,
-    pub accounts: Vec<IxAccount>,
+    pub accounts: Vec<IxAccountEntry>,
     pub args: Vec<TypedefField>,
 }
 
 #[derive(Deserialize)]
+pub struct InnerAccountStruct {
+    pub name: String,
+    pub accounts: Vec<IxAccountEntry>,
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum IxAccountEntry {
+    Account(IxAccount),
+    Struct(Box<InnerAccountStruct>),
+}
+
+#[derive(Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IxAccount {
     pub name: String,
     pub is_mut: bool,
     pub is_signer: bool,
+}
+
+pub fn to_ix_accounts(accounts: &[IxAccountEntry]) -> Vec<IxAccount> {
+    accounts.iter().fold(Vec::new(), |mut vec, entry| {
+        match entry {
+            IxAccountEntry::Account(a) => vec.push(a.clone()),
+            IxAccountEntry::Struct(s) => {
+                vec.extend(to_ix_accounts(&s.accounts).into_iter().map(|mut acc| {
+                    acc.name = format!("{}_{}", s.name, acc.name.to_snake_case());
+                    acc
+                }))
+            }
+        };
+        vec
+    })
 }
 
 impl ToTokens for NamedInstruction {
@@ -40,7 +68,7 @@ impl ToTokens for NamedInstruction {
         let accounts_len_ident = format_ident!("{}_IX_ACCOUNTS_LEN", shouty_snake_case_name);
         let discm_ident = format_ident!("{}_IX_DISCM", shouty_snake_case_name);
 
-        let accounts = &self.accounts;
+        let accounts = to_ix_accounts(&self.accounts);
         let n_accounts = accounts.len();
 
         let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
