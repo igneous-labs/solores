@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "anchor/marinade/*",
     "anchor/unstake-it/*",
     "shank/token-metadata/*",
 ]
