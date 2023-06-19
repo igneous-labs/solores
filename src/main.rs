@@ -49,7 +49,7 @@ pub struct Args {
         long,
         short,
         help = "solana-program dependency version for generated crate",
-        default_value = "^1.9"
+        default_value = "^1.16"
     )]
     pub solana_program_vers: String,
 
@@ -57,7 +57,7 @@ pub struct Args {
         long,
         short,
         help = "borsh dependency version for generated crate",
-        default_value = "^0.9"
+        default_value = "^0.10"
     )]
     pub borsh_vers: String,
 
@@ -111,7 +111,7 @@ fn main() {
     };
 
     args.output_dir.push(&args.output_crate_name);
-    fs::create_dir_all(&args.output_dir.join("src/")).unwrap();
+    fs::create_dir_all(args.output_dir.join("src/")).unwrap();
 
     // TODO: multithread, 1 thread per generated file
     write_gitignore(&args).unwrap();

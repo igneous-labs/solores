@@ -52,3 +52,8 @@ fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
 fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
     run_example("anchor/marinade", "marinade_finance_interface")
 }
+
+#[test]
+fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
+    run_example("anchor/drift", "drift_interface")
+}
