@@ -245,6 +245,131 @@ pub fn initialize_user_stats_invoke_signed<'a, A: Into<InitializeUserStatsIxArgs
     let account_info: [AccountInfo<'a>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7usize;
+#[derive(Copy, Clone, Debug)]
+pub struct InitializeReferrerNameAccounts<
+    'me,
+    'a0: 'me,
+    'a1: 'me,
+    'a2: 'me,
+    'a3: 'me,
+    'a4: 'me,
+    'a5: 'me,
+    'a6: 'me,
+> {
+    pub referrer_name: &'me AccountInfo<'a0>,
+    pub user: &'me AccountInfo<'a1>,
+    pub user_stats: &'me AccountInfo<'a2>,
+    pub authority: &'me AccountInfo<'a3>,
+    pub payer: &'me AccountInfo<'a4>,
+    pub rent: &'me AccountInfo<'a5>,
+    pub system_program: &'me AccountInfo<'a6>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct InitializeReferrerNameKeys {
+    pub referrer_name: Pubkey,
+    pub user: Pubkey,
+    pub user_stats: Pubkey,
+    pub authority: Pubkey,
+    pub payer: Pubkey,
+    pub rent: Pubkey,
+    pub system_program: Pubkey,
+}
+impl<'me> From<&InitializeReferrerNameAccounts<'me, '_, '_, '_, '_, '_, '_, '_>>
+    for InitializeReferrerNameKeys
+{
+    fn from(accounts: &InitializeReferrerNameAccounts<'me, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+        Self {
+            referrer_name: *accounts.referrer_name.key,
+            user: *accounts.user.key,
+            user_stats: *accounts.user_stats.key,
+            authority: *accounts.authority.key,
+            payer: *accounts.payer.key,
+            rent: *accounts.rent.key,
+            system_program: *accounts.system_program.key,
+        }
+    }
+}
+impl From<&InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] {
+    fn from(keys: &InitializeReferrerNameKeys) -> Self {
+        [
+            AccountMeta::new(keys.referrer_name, false),
+            AccountMeta::new(keys.user, false),
+            AccountMeta::new(keys.user_stats, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.payer, true),
+            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta::new_readonly(keys.system_program, false),
+        ]
+    }
+}
+impl<'a> From<&InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.referrer_name.clone(),
+            accounts.user.clone(),
+            accounts.user_stats.clone(),
+            accounts.authority.clone(),
+            accounts.payer.clone(),
+            accounts.rent.clone(),
+            accounts.system_program.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct InitializeReferrerNameIxArgs {
+    pub name: [u8; 32],
+}
+#[derive(Copy, Clone, Debug)]
+pub struct InitializeReferrerNameIxData<'me>(pub &'me InitializeReferrerNameIxArgs);
+pub const INITIALIZE_REFERRER_NAME_IX_DISCM: [u8; 8] = [235, 126, 231, 10, 42, 164, 26, 61];
+impl<'me> From<&'me InitializeReferrerNameIxArgs> for InitializeReferrerNameIxData<'me> {
+    fn from(args: &'me InitializeReferrerNameIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for InitializeReferrerNameIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_REFERRER_NAME_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn initialize_referrer_name_ix<
+    K: Into<InitializeReferrerNameKeys>,
+    A: Into<InitializeReferrerNameIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: InitializeReferrerNameKeys = accounts.into();
+    let metas: [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: InitializeReferrerNameIxArgs = args.into();
+    let data: InitializeReferrerNameIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn initialize_referrer_name_invoke<'a, A: Into<InitializeReferrerNameIxArgs>>(
+    accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = initialize_referrer_name_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn initialize_referrer_name_invoke_signed<'a, A: Into<InitializeReferrerNameIxArgs>>(
+    accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = initialize_referrer_name_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositAccounts<
@@ -972,6 +1097,193 @@ pub fn cancel_orders_invoke_signed<'a, A: Into<CancelOrdersIxArgs>>(
     let account_info: [AccountInfo<'a>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub user: &'me AccountInfo<'a1>,
+    pub authority: &'me AccountInfo<'a2>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderKeys {
+    pub state: Pubkey,
+    pub user: Pubkey,
+    pub authority: Pubkey,
+}
+impl<'me> From<&ModifyOrderAccounts<'me, '_, '_, '_>> for ModifyOrderKeys {
+    fn from(accounts: &ModifyOrderAccounts<'me, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            user: *accounts.user.key,
+            authority: *accounts.authority.key,
+        }
+    }
+}
+impl From<&ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: &ModifyOrderKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.user, false),
+            AccountMeta::new_readonly(keys.authority, true),
+        ]
+    }
+}
+impl<'a> From<&ModifyOrderAccounts<'_, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.user.clone(),
+            accounts.authority.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct ModifyOrderIxArgs {
+    pub order_id: Option<u32>,
+    pub modify_order_params: ModifyOrderParams,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderIxData<'me>(pub &'me ModifyOrderIxArgs);
+pub const MODIFY_ORDER_IX_DISCM: [u8; 8] = [47, 124, 117, 255, 201, 197, 130, 94];
+impl<'me> From<&'me ModifyOrderIxArgs> for ModifyOrderIxData<'me> {
+    fn from(args: &'me ModifyOrderIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for ModifyOrderIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&MODIFY_ORDER_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: ModifyOrderKeys = accounts.into();
+    let metas: [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: ModifyOrderIxArgs = args.into();
+    let data: ModifyOrderIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn modify_order_invoke<'a, A: Into<ModifyOrderIxArgs>>(
+    accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = modify_order_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn modify_order_invoke_signed<'a, A: Into<ModifyOrderIxArgs>>(
+    accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = modify_order_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3usize;
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderByUserIdAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub user: &'me AccountInfo<'a1>,
+    pub authority: &'me AccountInfo<'a2>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderByUserIdKeys {
+    pub state: Pubkey,
+    pub user: Pubkey,
+    pub authority: Pubkey,
+}
+impl<'me> From<&ModifyOrderByUserIdAccounts<'me, '_, '_, '_>> for ModifyOrderByUserIdKeys {
+    fn from(accounts: &ModifyOrderByUserIdAccounts<'me, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            user: *accounts.user.key,
+            authority: *accounts.authority.key,
+        }
+    }
+}
+impl From<&ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
+    fn from(keys: &ModifyOrderByUserIdKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.user, false),
+            AccountMeta::new_readonly(keys.authority, true),
+        ]
+    }
+}
+impl<'a> From<&ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.user.clone(),
+            accounts.authority.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct ModifyOrderByUserIdIxArgs {
+    pub user_order_id: u8,
+    pub modify_order_params: ModifyOrderParams,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct ModifyOrderByUserIdIxData<'me>(pub &'me ModifyOrderByUserIdIxArgs);
+pub const MODIFY_ORDER_BY_USER_ID_IX_DISCM: [u8; 8] = [158, 77, 4, 253, 252, 194, 161, 179];
+impl<'me> From<&'me ModifyOrderByUserIdIxArgs> for ModifyOrderByUserIdIxData<'me> {
+    fn from(args: &'me ModifyOrderByUserIdIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for ModifyOrderByUserIdIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&MODIFY_ORDER_BY_USER_ID_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn modify_order_by_user_id_ix<
+    K: Into<ModifyOrderByUserIdKeys>,
+    A: Into<ModifyOrderByUserIdIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: ModifyOrderByUserIdKeys = accounts.into();
+    let metas: [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: ModifyOrderByUserIdIxArgs = args.into();
+    let data: ModifyOrderByUserIdIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn modify_order_by_user_id_invoke<'a, A: Into<ModifyOrderByUserIdIxArgs>>(
+    accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = modify_order_by_user_id_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn modify_order_by_user_id_invoke_signed<'a, A: Into<ModifyOrderByUserIdIxArgs>>(
+    accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = modify_order_by_user_id_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
 pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndTakePerpOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
@@ -1511,6 +1823,301 @@ pub fn place_and_make_spot_order_invoke_signed<'a, A: Into<PlaceAndMakeSpotOrder
     let ix = place_and_make_spot_order_ix(accounts, args)?;
     let account_info: [AccountInfo<'a>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
+#[derive(Copy, Clone, Debug)]
+pub struct BeginSwapAccounts<
+    'me,
+    'a0: 'me,
+    'a1: 'me,
+    'a2: 'me,
+    'a3: 'me,
+    'a4: 'me,
+    'a5: 'me,
+    'a6: 'me,
+    'a7: 'me,
+    'a8: 'me,
+    'a9: 'me,
+    'a10: 'me,
+> {
+    pub state: &'me AccountInfo<'a0>,
+    pub user: &'me AccountInfo<'a1>,
+    pub user_stats: &'me AccountInfo<'a2>,
+    pub authority: &'me AccountInfo<'a3>,
+    pub out_spot_market_vault: &'me AccountInfo<'a4>,
+    pub in_spot_market_vault: &'me AccountInfo<'a5>,
+    pub out_token_account: &'me AccountInfo<'a6>,
+    pub in_token_account: &'me AccountInfo<'a7>,
+    pub token_program: &'me AccountInfo<'a8>,
+    pub drift_signer: &'me AccountInfo<'a9>,
+    pub instructions: &'me AccountInfo<'a10>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct BeginSwapKeys {
+    pub state: Pubkey,
+    pub user: Pubkey,
+    pub user_stats: Pubkey,
+    pub authority: Pubkey,
+    pub out_spot_market_vault: Pubkey,
+    pub in_spot_market_vault: Pubkey,
+    pub out_token_account: Pubkey,
+    pub in_token_account: Pubkey,
+    pub token_program: Pubkey,
+    pub drift_signer: Pubkey,
+    pub instructions: Pubkey,
+}
+impl<'me> From<&BeginSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
+    for BeginSwapKeys
+{
+    fn from(accounts: &BeginSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            user: *accounts.user.key,
+            user_stats: *accounts.user_stats.key,
+            authority: *accounts.authority.key,
+            out_spot_market_vault: *accounts.out_spot_market_vault.key,
+            in_spot_market_vault: *accounts.in_spot_market_vault.key,
+            out_token_account: *accounts.out_token_account.key,
+            in_token_account: *accounts.in_token_account.key,
+            token_program: *accounts.token_program.key,
+            drift_signer: *accounts.drift_signer.key,
+            instructions: *accounts.instructions.key,
+        }
+    }
+}
+impl From<&BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(keys: &BeginSwapKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.user, false),
+            AccountMeta::new(keys.user_stats, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.out_spot_market_vault, false),
+            AccountMeta::new(keys.in_spot_market_vault, false),
+            AccountMeta::new(keys.out_token_account, false),
+            AccountMeta::new(keys.in_token_account, false),
+            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta::new_readonly(keys.drift_signer, false),
+            AccountMeta::new_readonly(keys.instructions, false),
+        ]
+    }
+}
+impl<'a> From<&BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.user.clone(),
+            accounts.user_stats.clone(),
+            accounts.authority.clone(),
+            accounts.out_spot_market_vault.clone(),
+            accounts.in_spot_market_vault.clone(),
+            accounts.out_token_account.clone(),
+            accounts.in_token_account.clone(),
+            accounts.token_program.clone(),
+            accounts.drift_signer.clone(),
+            accounts.instructions.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct BeginSwapIxArgs {
+    pub in_market_index: u16,
+    pub out_market_index: u16,
+    pub amount_in: u64,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct BeginSwapIxData<'me>(pub &'me BeginSwapIxArgs);
+pub const BEGIN_SWAP_IX_DISCM: [u8; 8] = [174, 109, 228, 1, 242, 105, 232, 105];
+impl<'me> From<&'me BeginSwapIxArgs> for BeginSwapIxData<'me> {
+    fn from(args: &'me BeginSwapIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for BeginSwapIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&BEGIN_SWAP_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: BeginSwapKeys = accounts.into();
+    let metas: [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: BeginSwapIxArgs = args.into();
+    let data: BeginSwapIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn begin_swap_invoke<'a, A: Into<BeginSwapIxArgs>>(
+    accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = begin_swap_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn begin_swap_invoke_signed<'a, A: Into<BeginSwapIxArgs>>(
+    accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = begin_swap_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
+#[derive(Copy, Clone, Debug)]
+pub struct EndSwapAccounts<
+    'me,
+    'a0: 'me,
+    'a1: 'me,
+    'a2: 'me,
+    'a3: 'me,
+    'a4: 'me,
+    'a5: 'me,
+    'a6: 'me,
+    'a7: 'me,
+    'a8: 'me,
+    'a9: 'me,
+    'a10: 'me,
+> {
+    pub state: &'me AccountInfo<'a0>,
+    pub user: &'me AccountInfo<'a1>,
+    pub user_stats: &'me AccountInfo<'a2>,
+    pub authority: &'me AccountInfo<'a3>,
+    pub out_spot_market_vault: &'me AccountInfo<'a4>,
+    pub in_spot_market_vault: &'me AccountInfo<'a5>,
+    pub out_token_account: &'me AccountInfo<'a6>,
+    pub in_token_account: &'me AccountInfo<'a7>,
+    pub token_program: &'me AccountInfo<'a8>,
+    pub drift_signer: &'me AccountInfo<'a9>,
+    pub instructions: &'me AccountInfo<'a10>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct EndSwapKeys {
+    pub state: Pubkey,
+    pub user: Pubkey,
+    pub user_stats: Pubkey,
+    pub authority: Pubkey,
+    pub out_spot_market_vault: Pubkey,
+    pub in_spot_market_vault: Pubkey,
+    pub out_token_account: Pubkey,
+    pub in_token_account: Pubkey,
+    pub token_program: Pubkey,
+    pub drift_signer: Pubkey,
+    pub instructions: Pubkey,
+}
+impl<'me> From<&EndSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>> for EndSwapKeys {
+    fn from(accounts: &EndSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            user: *accounts.user.key,
+            user_stats: *accounts.user_stats.key,
+            authority: *accounts.authority.key,
+            out_spot_market_vault: *accounts.out_spot_market_vault.key,
+            in_spot_market_vault: *accounts.in_spot_market_vault.key,
+            out_token_account: *accounts.out_token_account.key,
+            in_token_account: *accounts.in_token_account.key,
+            token_program: *accounts.token_program.key,
+            drift_signer: *accounts.drift_signer.key,
+            instructions: *accounts.instructions.key,
+        }
+    }
+}
+impl From<&EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(keys: &EndSwapKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.user, false),
+            AccountMeta::new(keys.user_stats, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.out_spot_market_vault, false),
+            AccountMeta::new(keys.in_spot_market_vault, false),
+            AccountMeta::new(keys.out_token_account, false),
+            AccountMeta::new(keys.in_token_account, false),
+            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta::new_readonly(keys.drift_signer, false),
+            AccountMeta::new_readonly(keys.instructions, false),
+        ]
+    }
+}
+impl<'a> From<&EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.user.clone(),
+            accounts.user_stats.clone(),
+            accounts.authority.clone(),
+            accounts.out_spot_market_vault.clone(),
+            accounts.in_spot_market_vault.clone(),
+            accounts.out_token_account.clone(),
+            accounts.in_token_account.clone(),
+            accounts.token_program.clone(),
+            accounts.drift_signer.clone(),
+            accounts.instructions.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct EndSwapIxArgs {
+    pub in_market_index: u16,
+    pub out_market_index: u16,
+    pub limit_price: Option<u64>,
+    pub reduce_only: Option<SwapReduceOnly>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct EndSwapIxData<'me>(pub &'me EndSwapIxArgs);
+pub const END_SWAP_IX_DISCM: [u8; 8] = [177, 184, 27, 193, 34, 13, 210, 145];
+impl<'me> From<&'me EndSwapIxArgs> for EndSwapIxData<'me> {
+    fn from(args: &'me EndSwapIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for EndSwapIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&END_SWAP_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: EndSwapKeys = accounts.into();
+    let metas: [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: EndSwapIxArgs = args.into();
+    let data: EndSwapIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn end_swap_invoke<'a, A: Into<EndSwapIxArgs>>(
+    accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = end_swap_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn end_swap_invoke_signed<'a, A: Into<EndSwapIxArgs>>(
+    accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = end_swap_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3usize;
@@ -2375,6 +2982,100 @@ pub fn fill_perp_order_invoke_signed<'a, A: Into<FillPerpOrderIxArgs>>(
     let account_info: [AccountInfo<'a>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4usize;
+#[derive(Copy, Clone, Debug)]
+pub struct RevertFillAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub authority: &'me AccountInfo<'a1>,
+    pub filler: &'me AccountInfo<'a2>,
+    pub filler_stats: &'me AccountInfo<'a3>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct RevertFillKeys {
+    pub state: Pubkey,
+    pub authority: Pubkey,
+    pub filler: Pubkey,
+    pub filler_stats: Pubkey,
+}
+impl<'me> From<&RevertFillAccounts<'me, '_, '_, '_, '_>> for RevertFillKeys {
+    fn from(accounts: &RevertFillAccounts<'me, '_, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            authority: *accounts.authority.key,
+            filler: *accounts.filler.key,
+            filler_stats: *accounts.filler_stats.key,
+        }
+    }
+}
+impl From<&RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
+    fn from(keys: &RevertFillKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.filler, false),
+            AccountMeta::new(keys.filler_stats, false),
+        ]
+    }
+}
+impl<'a> From<&RevertFillAccounts<'_, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.authority.clone(),
+            accounts.filler.clone(),
+            accounts.filler_stats.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct RevertFillIxArgs {}
+#[derive(Copy, Clone, Debug)]
+pub struct RevertFillIxData<'me>(pub &'me RevertFillIxArgs);
+pub const REVERT_FILL_IX_DISCM: [u8; 8] = [236, 238, 176, 69, 239, 10, 181, 193];
+impl<'me> From<&'me RevertFillIxArgs> for RevertFillIxData<'me> {
+    fn from(args: &'me RevertFillIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for RevertFillIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&REVERT_FILL_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn revert_fill_ix<K: Into<RevertFillKeys>, A: Into<RevertFillIxArgs>>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: RevertFillKeys = accounts.into();
+    let metas: [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: RevertFillIxArgs = args.into();
+    let data: RevertFillIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn revert_fill_invoke<'a, A: Into<RevertFillIxArgs>>(
+    accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = revert_fill_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn revert_fill_invoke_signed<'a, A: Into<RevertFillIxArgs>>(
+    accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = revert_fill_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
 pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
 pub struct FillSpotOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me> {
@@ -2671,6 +3372,203 @@ pub fn force_cancel_orders_invoke_signed<'a, A: Into<ForceCancelOrdersIxArgs>>(
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts, args)?;
     let account_info: [AccountInfo<'a>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4usize;
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserIdleAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub authority: &'me AccountInfo<'a1>,
+    pub filler: &'me AccountInfo<'a2>,
+    pub user: &'me AccountInfo<'a3>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserIdleKeys {
+    pub state: Pubkey,
+    pub authority: Pubkey,
+    pub filler: Pubkey,
+    pub user: Pubkey,
+}
+impl<'me> From<&UpdateUserIdleAccounts<'me, '_, '_, '_, '_>> for UpdateUserIdleKeys {
+    fn from(accounts: &UpdateUserIdleAccounts<'me, '_, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            authority: *accounts.authority.key,
+            filler: *accounts.filler.key,
+            user: *accounts.user.key,
+        }
+    }
+}
+impl From<&UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] {
+    fn from(keys: &UpdateUserIdleKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.filler, false),
+            AccountMeta::new(keys.user, false),
+        ]
+    }
+}
+impl<'a> From<&UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.authority.clone(),
+            accounts.filler.clone(),
+            accounts.user.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct UpdateUserIdleIxArgs {}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserIdleIxData<'me>(pub &'me UpdateUserIdleIxArgs);
+pub const UPDATE_USER_IDLE_IX_DISCM: [u8; 8] = [253, 133, 67, 22, 103, 161, 20, 100];
+impl<'me> From<&'me UpdateUserIdleIxArgs> for UpdateUserIdleIxData<'me> {
+    fn from(args: &'me UpdateUserIdleIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for UpdateUserIdleIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>, A: Into<UpdateUserIdleIxArgs>>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: UpdateUserIdleKeys = accounts.into();
+    let metas: [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: UpdateUserIdleIxArgs = args.into();
+    let data: UpdateUserIdleIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn update_user_idle_invoke<'a, A: Into<UpdateUserIdleIxArgs>>(
+    accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = update_user_idle_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn update_user_idle_invoke_signed<'a, A: Into<UpdateUserIdleIxArgs>>(
+    accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = update_user_idle_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4usize;
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserOpenOrdersCountAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub authority: &'me AccountInfo<'a1>,
+    pub filler: &'me AccountInfo<'a2>,
+    pub user: &'me AccountInfo<'a3>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserOpenOrdersCountKeys {
+    pub state: Pubkey,
+    pub authority: Pubkey,
+    pub filler: Pubkey,
+    pub user: Pubkey,
+}
+impl<'me> From<&UpdateUserOpenOrdersCountAccounts<'me, '_, '_, '_, '_>>
+    for UpdateUserOpenOrdersCountKeys
+{
+    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'me, '_, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            authority: *accounts.authority.key,
+            filler: *accounts.filler.key,
+            user: *accounts.user.key,
+        }
+    }
+}
+impl From<&UpdateUserOpenOrdersCountKeys>
+    for [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
+{
+    fn from(keys: &UpdateUserOpenOrdersCountKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta::new(keys.filler, false),
+            AccountMeta::new(keys.user, false),
+        ]
+    }
+}
+impl<'a> From<&UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.authority.clone(),
+            accounts.filler.clone(),
+            accounts.user.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct UpdateUserOpenOrdersCountIxArgs {}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdateUserOpenOrdersCountIxData<'me>(pub &'me UpdateUserOpenOrdersCountIxArgs);
+pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM: [u8; 8] = [104, 39, 65, 210, 250, 163, 100, 134];
+impl<'me> From<&'me UpdateUserOpenOrdersCountIxArgs> for UpdateUserOpenOrdersCountIxData<'me> {
+    fn from(args: &'me UpdateUserOpenOrdersCountIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for UpdateUserOpenOrdersCountIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn update_user_open_orders_count_ix<
+    K: Into<UpdateUserOpenOrdersCountKeys>,
+    A: Into<UpdateUserOpenOrdersCountIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
+    let metas: [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: UpdateUserOpenOrdersCountIxArgs = args.into();
+    let data: UpdateUserOpenOrdersCountIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn update_user_open_orders_count_invoke<'a, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = update_user_open_orders_count_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn update_user_open_orders_count_invoke_signed<'a, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = update_user_open_orders_count_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4usize;
@@ -5868,6 +6766,327 @@ pub fn update_serum_fulfillment_config_status_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10usize;
+#[derive(Copy, Clone, Debug)]
+pub struct InitializePhoenixFulfillmentConfigAccounts<
+    'me,
+    'a0: 'me,
+    'a1: 'me,
+    'a2: 'me,
+    'a3: 'me,
+    'a4: 'me,
+    'a5: 'me,
+    'a6: 'me,
+    'a7: 'me,
+    'a8: 'me,
+    'a9: 'me,
+> {
+    pub base_spot_market: &'me AccountInfo<'a0>,
+    pub quote_spot_market: &'me AccountInfo<'a1>,
+    pub state: &'me AccountInfo<'a2>,
+    pub phoenix_program: &'me AccountInfo<'a3>,
+    pub phoenix_market: &'me AccountInfo<'a4>,
+    pub drift_signer: &'me AccountInfo<'a5>,
+    pub phoenix_fulfillment_config: &'me AccountInfo<'a6>,
+    pub admin: &'me AccountInfo<'a7>,
+    pub rent: &'me AccountInfo<'a8>,
+    pub system_program: &'me AccountInfo<'a9>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct InitializePhoenixFulfillmentConfigKeys {
+    pub base_spot_market: Pubkey,
+    pub quote_spot_market: Pubkey,
+    pub state: Pubkey,
+    pub phoenix_program: Pubkey,
+    pub phoenix_market: Pubkey,
+    pub drift_signer: Pubkey,
+    pub phoenix_fulfillment_config: Pubkey,
+    pub admin: Pubkey,
+    pub rent: Pubkey,
+    pub system_program: Pubkey,
+}
+impl<'me>
+    From<&InitializePhoenixFulfillmentConfigAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
+    for InitializePhoenixFulfillmentConfigKeys
+{
+    fn from(
+        accounts: &InitializePhoenixFulfillmentConfigAccounts<
+            'me,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+            '_,
+        >,
+    ) -> Self {
+        Self {
+            base_spot_market: *accounts.base_spot_market.key,
+            quote_spot_market: *accounts.quote_spot_market.key,
+            state: *accounts.state.key,
+            phoenix_program: *accounts.phoenix_program.key,
+            phoenix_market: *accounts.phoenix_market.key,
+            drift_signer: *accounts.drift_signer.key,
+            phoenix_fulfillment_config: *accounts.phoenix_fulfillment_config.key,
+            admin: *accounts.admin.key,
+            rent: *accounts.rent.key,
+            system_program: *accounts.system_program.key,
+        }
+    }
+}
+impl From<&InitializePhoenixFulfillmentConfigKeys>
+    for [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
+{
+    fn from(keys: &InitializePhoenixFulfillmentConfigKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.base_spot_market, false),
+            AccountMeta::new_readonly(keys.quote_spot_market, false),
+            AccountMeta::new(keys.state, false),
+            AccountMeta::new_readonly(keys.phoenix_program, false),
+            AccountMeta::new_readonly(keys.phoenix_market, false),
+            AccountMeta::new_readonly(keys.drift_signer, false),
+            AccountMeta::new(keys.phoenix_fulfillment_config, false),
+            AccountMeta::new(keys.admin, true),
+            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta::new_readonly(keys.system_program, false),
+        ]
+    }
+}
+impl<'a>
+    From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
+{
+    fn from(
+        accounts: &InitializePhoenixFulfillmentConfigAccounts<
+            '_,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+            'a,
+        >,
+    ) -> Self {
+        [
+            accounts.base_spot_market.clone(),
+            accounts.quote_spot_market.clone(),
+            accounts.state.clone(),
+            accounts.phoenix_program.clone(),
+            accounts.phoenix_market.clone(),
+            accounts.drift_signer.clone(),
+            accounts.phoenix_fulfillment_config.clone(),
+            accounts.admin.clone(),
+            accounts.rent.clone(),
+            accounts.system_program.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct InitializePhoenixFulfillmentConfigIxArgs {
+    pub market_index: u16,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct InitializePhoenixFulfillmentConfigIxData<'me>(
+    pub &'me InitializePhoenixFulfillmentConfigIxArgs,
+);
+pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM: [u8; 8] =
+    [135, 132, 110, 107, 185, 160, 169, 154];
+impl<'me> From<&'me InitializePhoenixFulfillmentConfigIxArgs>
+    for InitializePhoenixFulfillmentConfigIxData<'me>
+{
+    fn from(args: &'me InitializePhoenixFulfillmentConfigIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for InitializePhoenixFulfillmentConfigIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn initialize_phoenix_fulfillment_config_ix<
+    K: Into<InitializePhoenixFulfillmentConfigKeys>,
+    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
+    let metas: [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+        (&keys).into();
+    let args_full: InitializePhoenixFulfillmentConfigIxArgs = args.into();
+    let data: InitializePhoenixFulfillmentConfigIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn initialize_phoenix_fulfillment_config_invoke<
+    'a,
+    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
+>(
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<
+        '_,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+    >,
+    args: A,
+) -> ProgramResult {
+    let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn initialize_phoenix_fulfillment_config_invoke_signed<
+    'a,
+    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
+>(
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<
+        '_,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+        'a,
+    >,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
+#[derive(Copy, Clone, Debug)]
+pub struct PhoenixFulfillmentConfigStatusAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
+    pub state: &'me AccountInfo<'a0>,
+    pub phoenix_fulfillment_config: &'me AccountInfo<'a1>,
+    pub admin: &'me AccountInfo<'a2>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct PhoenixFulfillmentConfigStatusKeys {
+    pub state: Pubkey,
+    pub phoenix_fulfillment_config: Pubkey,
+    pub admin: Pubkey,
+}
+impl<'me> From<&PhoenixFulfillmentConfigStatusAccounts<'me, '_, '_, '_>>
+    for PhoenixFulfillmentConfigStatusKeys
+{
+    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'me, '_, '_, '_>) -> Self {
+        Self {
+            state: *accounts.state.key,
+            phoenix_fulfillment_config: *accounts.phoenix_fulfillment_config.key,
+            admin: *accounts.admin.key,
+        }
+    }
+}
+impl From<&PhoenixFulfillmentConfigStatusKeys>
+    for [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
+{
+    fn from(keys: &PhoenixFulfillmentConfigStatusKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.phoenix_fulfillment_config, false),
+            AccountMeta::new(keys.admin, true),
+        ]
+    }
+}
+impl<'a> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.state.clone(),
+            accounts.phoenix_fulfillment_config.clone(),
+            accounts.admin.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct PhoenixFulfillmentConfigStatusIxArgs {
+    pub status: SpotFulfillmentConfigStatus,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct PhoenixFulfillmentConfigStatusIxData<'me>(pub &'me PhoenixFulfillmentConfigStatusIxArgs);
+pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM: [u8; 8] = [96, 31, 113, 32, 12, 203, 7, 154];
+impl<'me> From<&'me PhoenixFulfillmentConfigStatusIxArgs>
+    for PhoenixFulfillmentConfigStatusIxData<'me>
+{
+    fn from(args: &'me PhoenixFulfillmentConfigStatusIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for PhoenixFulfillmentConfigStatusIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn phoenix_fulfillment_config_status_ix<
+    K: Into<PhoenixFulfillmentConfigStatusKeys>,
+    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
+    let metas: [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: PhoenixFulfillmentConfigStatusIxArgs = args.into();
+    let data: PhoenixFulfillmentConfigStatusIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn phoenix_fulfillment_config_status_invoke<
+    'a,
+    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
+>(
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn phoenix_fulfillment_config_status_invoke_signed<
+    'a,
+    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
+>(
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
 pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumVaultAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
@@ -6026,6 +7245,7 @@ impl<'a> From<&InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct InitializePerpMarketIxArgs {
+    pub market_index: u16,
     pub amm_base_asset_reserve: u128,
     pub amm_quote_asset_reserve: u128,
     pub amm_periodicity: i64,
@@ -6083,6 +7303,109 @@ pub fn initialize_perp_market_invoke_signed<'a, A: Into<InitializePerpMarketIxAr
 ) -> ProgramResult {
     let ix = initialize_perp_market_ix(accounts, args)?;
     let account_info: [AccountInfo<'a>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
+pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3usize;
+#[derive(Copy, Clone, Debug)]
+pub struct DeleteInitializedPerpMarketAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
+    pub admin: &'me AccountInfo<'a0>,
+    pub state: &'me AccountInfo<'a1>,
+    pub perp_market: &'me AccountInfo<'a2>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct DeleteInitializedPerpMarketKeys {
+    pub admin: Pubkey,
+    pub state: Pubkey,
+    pub perp_market: Pubkey,
+}
+impl<'me> From<&DeleteInitializedPerpMarketAccounts<'me, '_, '_, '_>>
+    for DeleteInitializedPerpMarketKeys
+{
+    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'me, '_, '_, '_>) -> Self {
+        Self {
+            admin: *accounts.admin.key,
+            state: *accounts.state.key,
+            perp_market: *accounts.perp_market.key,
+        }
+    }
+}
+impl From<&DeleteInitializedPerpMarketKeys>
+    for [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
+{
+    fn from(keys: &DeleteInitializedPerpMarketKeys) -> Self {
+        [
+            AccountMeta::new(keys.admin, true),
+            AccountMeta::new(keys.state, false),
+            AccountMeta::new(keys.perp_market, false),
+        ]
+    }
+}
+impl<'a> From<&DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.admin.clone(),
+            accounts.state.clone(),
+            accounts.perp_market.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct DeleteInitializedPerpMarketIxArgs {
+    pub market_index: u16,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct DeleteInitializedPerpMarketIxData<'me>(pub &'me DeleteInitializedPerpMarketIxArgs);
+pub const DELETE_INITIALIZED_PERP_MARKET_IX_DISCM: [u8; 8] = [91, 154, 24, 87, 106, 59, 190, 66];
+impl<'me> From<&'me DeleteInitializedPerpMarketIxArgs> for DeleteInitializedPerpMarketIxData<'me> {
+    fn from(args: &'me DeleteInitializedPerpMarketIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for DeleteInitializedPerpMarketIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&DELETE_INITIALIZED_PERP_MARKET_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn delete_initialized_perp_market_ix<
+    K: Into<DeleteInitializedPerpMarketKeys>,
+    A: Into<DeleteInitializedPerpMarketIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
+    let metas: [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let args_full: DeleteInitializedPerpMarketIxArgs = args.into();
+    let data: DeleteInitializedPerpMarketIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn delete_initialized_perp_market_invoke<'a, A: Into<DeleteInitializedPerpMarketIxArgs>>(
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = delete_initialized_perp_market_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn delete_initialized_perp_market_invoke_signed<
+    'a,
+    A: Into<DeleteInitializedPerpMarketIxArgs>,
+>(
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = delete_initialized_perp_market_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3usize;
@@ -9515,6 +10838,120 @@ pub fn update_perp_market_curve_update_intensity_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3usize;
+#[derive(Copy, Clone, Debug)]
+pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
+    pub admin: &'me AccountInfo<'a0>,
+    pub state: &'me AccountInfo<'a1>,
+    pub perp_market: &'me AccountInfo<'a2>,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpKeys {
+    pub admin: Pubkey,
+    pub state: Pubkey,
+    pub perp_market: Pubkey,
+}
+impl<'me> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, '_, '_, '_>>
+    for UpdatePerpMarketTargetBaseAssetAmountPerLpKeys
+{
+    fn from(
+        accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, '_, '_, '_>,
+    ) -> Self {
+        Self {
+            admin: *accounts.admin.key,
+            state: *accounts.state.key,
+            perp_market: *accounts.perp_market.key,
+        }
+    }
+}
+impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
+    for [AccountMeta; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
+{
+    fn from(keys: &UpdatePerpMarketTargetBaseAssetAmountPerLpKeys) -> Self {
+        [
+            AccountMeta::new_readonly(keys.admin, true),
+            AccountMeta::new_readonly(keys.state, false),
+            AccountMeta::new(keys.perp_market, false),
+        ]
+    }
+}
+impl<'a> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>>
+    for [AccountInfo<'a>; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>) -> Self {
+        [
+            accounts.admin.clone(),
+            accounts.state.clone(),
+            accounts.perp_market.clone(),
+        ]
+    }
+}
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs {
+    pub target_base_asset_amount_per_lp: i32,
+}
+#[derive(Copy, Clone, Debug)]
+pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxData<'me>(
+    pub &'me UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
+);
+pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM: [u8; 8] =
+    [62, 87, 68, 115, 29, 150, 150, 165];
+impl<'me> From<&'me UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>
+    for UpdatePerpMarketTargetBaseAssetAmountPerLpIxData<'me>
+{
+    fn from(args: &'me UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs) -> Self {
+        Self(args)
+    }
+}
+impl BorshSerialize for UpdatePerpMarketTargetBaseAssetAmountPerLpIxData<'_> {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM)?;
+        self.0.serialize(writer)
+    }
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_ix<
+    K: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>,
+    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
+>(
+    accounts: K,
+    args: A,
+) -> std::io::Result<Instruction> {
+    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] =
+        (&keys).into();
+    let args_full: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs = args.into();
+    let data: UpdatePerpMarketTargetBaseAssetAmountPerLpIxData = (&args_full).into();
+    Ok(Instruction {
+        program_id: crate::ID,
+        accounts: Vec::from(metas),
+        data: data.try_to_vec()?,
+    })
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke<
+    'a,
+    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
+>(
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+) -> ProgramResult {
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>;
+        UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke(&ix, &account_info)
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
+    'a,
+    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
+>(
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>,
+    args: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
+    let account_info: [AccountInfo<'a>;
+        UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
+    invoke_signed(&ix, &account_info, seeds)
+}
 pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLpCooldownTimeAccounts<'me, 'a0: 'me, 'a1: 'me> {
@@ -11495,7 +12932,7 @@ impl<'a> From<&UpdateExchangeStatusAccounts<'_, 'a, 'a>>
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 pub struct UpdateExchangeStatusIxArgs {
-    pub exchange_status: ExchangeStatus,
+    pub exchange_status: u8,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateExchangeStatusIxData<'me>(pub &'me UpdateExchangeStatusIxArgs);

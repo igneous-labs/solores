@@ -290,10 +290,10 @@ pub enum DriftError {
     InvalidSerumOpenOrders = 6140u32,
     #[error("FailedSerumCPI")]
     FailedSerumCpi = 6141u32,
-    #[error("FailedToFillOnSerum")]
-    FailedToFillOnSerum = 6142u32,
-    #[error("InvalidSerumFulfillmentConfig")]
-    InvalidSerumFulfillmentConfig = 6143u32,
+    #[error("FailedToFillOnExternalMarket")]
+    FailedToFillOnExternalMarket = 6142u32,
+    #[error("InvalidFulfillmentConfig")]
+    InvalidFulfillmentConfig = 6143u32,
     #[error("InvalidFeeStructure")]
     InvalidFeeStructure = 6144u32,
     #[error("Insufficient IF shares")]
@@ -456,6 +456,60 @@ pub enum DriftError {
     FailedUnwrap = 6223u32,
     #[error("Max Number Of Users")]
     MaxNumberOfUsers = 6224u32,
+    #[error("InvalidOracleForSettlePnl")]
+    InvalidOracleForSettlePnl = 6225u32,
+    #[error("MarginOrdersOpen")]
+    MarginOrdersOpen = 6226u32,
+    #[error("TierViolationLiquidatingPerpPnl")]
+    TierViolationLiquidatingPerpPnl = 6227u32,
+    #[error("CouldNotLoadUserData")]
+    CouldNotLoadUserData = 6228u32,
+    #[error("UserWrongMutability")]
+    UserWrongMutability = 6229u32,
+    #[error("InvalidUserAccount")]
+    InvalidUserAccount = 6230u32,
+    #[error("CouldNotLoadUserData")]
+    CouldNotLoadUserStatsData = 6231u32,
+    #[error("UserWrongMutability")]
+    UserStatsWrongMutability = 6232u32,
+    #[error("InvalidUserAccount")]
+    InvalidUserStatsAccount = 6233u32,
+    #[error("UserNotFound")]
+    UserNotFound = 6234u32,
+    #[error("UnableToLoadUserAccount")]
+    UnableToLoadUserAccount = 6235u32,
+    #[error("UserStatsNotFound")]
+    UserStatsNotFound = 6236u32,
+    #[error("UnableToLoadUserStatsAccount")]
+    UnableToLoadUserStatsAccount = 6237u32,
+    #[error("User Not Inactive")]
+    UserNotInactive = 6238u32,
+    #[error("RevertFill")]
+    RevertFill = 6239u32,
+    #[error("Invalid MarketAccount for Deletion")]
+    InvalidMarketAccountforDeletion = 6240u32,
+    #[error("Invalid Spot Fulfillment Params")]
+    InvalidSpotFulfillmentParams = 6241u32,
+    #[error("Failed to Get Mint")]
+    FailedToGetMint = 6242u32,
+    #[error("FailedPhoenixCPI")]
+    FailedPhoenixCpi = 6243u32,
+    #[error("FailedToDeserializePhoenixMarket")]
+    FailedToDeserializePhoenixMarket = 6244u32,
+    #[error("InvalidPricePrecision")]
+    InvalidPricePrecision = 6245u32,
+    #[error("InvalidPhoenixProgram")]
+    InvalidPhoenixProgram = 6246u32,
+    #[error("InvalidPhoenixMarket")]
+    InvalidPhoenixMarket = 6247u32,
+    #[error("InvalidSwap")]
+    InvalidSwap = 6248u32,
+    #[error("SwapLimitPriceBreached")]
+    SwapLimitPriceBreached = 6249u32,
+    #[error("SpotMarketReduceOnly")]
+    SpotMarketReduceOnly = 6250u32,
+    #[error("FundingWasNotUpdated")]
+    FundingWasNotUpdated = 6251u32,
 }
 impl From<DriftError> for ProgramError {
     fn from(e: DriftError) -> Self {

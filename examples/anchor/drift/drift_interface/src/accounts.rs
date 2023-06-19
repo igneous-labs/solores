@@ -1,6 +1,40 @@
 use crate::*;
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
+pub const PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] = [233, 45, 62, 40, 35, 129, 48, 72];
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub struct PhoenixV1FulfillmentConfig {
+    pub pubkey: Pubkey,
+    pub phoenix_program_id: Pubkey,
+    pub phoenix_log_authority: Pubkey,
+    pub phoenix_market: Pubkey,
+    pub phoenix_base_vault: Pubkey,
+    pub phoenix_quote_vault: Pubkey,
+    pub market_index: u16,
+    pub fulfillment_type: SpotFulfillmentType,
+    pub status: SpotFulfillmentConfigStatus,
+    pub padding: [u8; 4],
+}
+pub const SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] =
+    [65, 160, 197, 112, 239, 168, 103, 185];
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub struct SerumV3FulfillmentConfig {
+    pub pubkey: Pubkey,
+    pub serum_program_id: Pubkey,
+    pub serum_market: Pubkey,
+    pub serum_request_queue: Pubkey,
+    pub serum_event_queue: Pubkey,
+    pub serum_bids: Pubkey,
+    pub serum_asks: Pubkey,
+    pub serum_base_vault: Pubkey,
+    pub serum_quote_vault: Pubkey,
+    pub serum_open_orders: Pubkey,
+    pub serum_signer_nonce: u64,
+    pub market_index: u16,
+    pub fulfillment_type: SpotFulfillmentType,
+    pub status: SpotFulfillmentConfigStatus,
+    pub padding: [u8; 4],
+}
 pub const INSURANCE_FUND_STAKE_ACCOUNT_DISCM: [u8; 8] = [110, 202, 14, 42, 95, 73, 90, 95];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub struct InsuranceFundStake {
@@ -43,7 +77,9 @@ pub struct PerpMarket {
     pub status: MarketStatus,
     pub contract_type: ContractType,
     pub contract_tier: ContractTier,
-    pub padding: [u8; 51],
+    pub padding1: bool,
+    pub quote_spot_market_index: u16,
+    pub padding: [u8; 48],
 }
 pub const SPOT_MARKET_ACCOUNT_DISCM: [u8; 8] = [100, 177, 8, 107, 168, 65, 65, 39];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
@@ -95,27 +131,11 @@ pub struct SpotMarket {
     pub oracle_source: OracleSource,
     pub status: MarketStatus,
     pub asset_tier: AssetTier,
-    pub padding: [u8; 86],
-}
-pub const SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] =
-    [65, 160, 197, 112, 239, 168, 103, 185];
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
-pub struct SerumV3FulfillmentConfig {
-    pub pubkey: Pubkey,
-    pub serum_program_id: Pubkey,
-    pub serum_market: Pubkey,
-    pub serum_request_queue: Pubkey,
-    pub serum_event_queue: Pubkey,
-    pub serum_bids: Pubkey,
-    pub serum_asks: Pubkey,
-    pub serum_base_vault: Pubkey,
-    pub serum_quote_vault: Pubkey,
-    pub serum_open_orders: Pubkey,
-    pub serum_signer_nonce: u64,
-    pub market_index: u16,
-    pub fulfillment_type: SpotFulfillmentType,
-    pub status: SpotFulfillmentConfigStatus,
-    pub padding: [u8; 4],
+    pub padding1: [u8; 6],
+    pub flash_loan_amount: u64,
+    pub flash_loan_initial_token_amount: u64,
+    pub total_swap_fee: u64,
+    pub padding: [u8; 56],
 }
 pub const STATE_ACCOUNT_DISCM: [u8; 8] = [216, 146, 107, 94, 104, 75, 182, 177];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
@@ -139,7 +159,7 @@ pub struct State {
     pub min_perp_auction_duration: u8,
     pub default_market_order_time_in_force: u8,
     pub default_spot_auction_duration: u8,
-    pub exchange_status: ExchangeStatus,
+    pub exchange_status: u8,
     pub liquidation_duration: u8,
     pub initial_pct_to_liquidate: u16,
     pub padding: [u8; 14],
@@ -161,14 +181,19 @@ pub struct User {
     pub cumulative_spot_fees: i64,
     pub cumulative_perp_funding: i64,
     pub liquidation_margin_freed: u64,
-    pub liquidation_start_slot: u64,
+    pub last_active_slot: u64,
     pub next_order_id: u32,
     pub max_margin_ratio: u32,
     pub next_liquidation_id: u16,
     pub sub_account_id: u16,
     pub status: UserStatus,
     pub is_margin_trading_enabled: bool,
-    pub padding: [u8; 26],
+    pub idle: bool,
+    pub open_orders: u8,
+    pub has_open_order: bool,
+    pub open_auctions: u8,
+    pub has_open_auction: bool,
+    pub padding: [u8; 21],
 }
 pub const USER_STATS_ACCOUNT_DISCM: [u8; 8] = [176, 223, 136, 27, 122, 79, 32, 227];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
@@ -188,4 +213,12 @@ pub struct UserStats {
     pub number_of_sub_accounts_created: u16,
     pub is_referrer: bool,
     pub padding: [u8; 51],
+}
+pub const REFERRER_NAME_ACCOUNT_DISCM: [u8; 8] = [105, 133, 170, 110, 52, 42, 28, 182];
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub struct ReferrerName {
+    pub authority: Pubkey,
+    pub user: Pubkey,
+    pub user_stats: Pubkey,
+    pub name: [u8; 32],
 }

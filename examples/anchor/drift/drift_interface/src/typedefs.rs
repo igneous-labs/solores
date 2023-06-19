@@ -10,7 +10,7 @@ pub struct OrderParams {
     pub price: u64,
     pub market_index: u16,
     pub reduce_only: bool,
-    pub post_only: bool,
+    pub post_only: PostOnlyParam,
     pub immediate_or_cancel: bool,
     pub max_ts: Option<i64>,
     pub trigger_price: Option<u64>,
@@ -19,6 +19,23 @@ pub struct OrderParams {
     pub auction_duration: Option<u8>,
     pub auction_start_price: Option<i64>,
     pub auction_end_price: Option<i64>,
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub struct ModifyOrderParams {
+    pub direction: Option<PositionDirection>,
+    pub base_asset_amount: Option<u64>,
+    pub price: Option<u64>,
+    pub reduce_only: Option<bool>,
+    pub post_only: Option<PostOnlyParam>,
+    pub immediate_or_cancel: Option<bool>,
+    pub max_ts: Option<i64>,
+    pub trigger_price: Option<u64>,
+    pub trigger_condition: Option<OrderTriggerCondition>,
+    pub oracle_price_offset: Option<i32>,
+    pub auction_duration: Option<u8>,
+    pub auction_start_price: Option<i64>,
+    pub auction_end_price: Option<i64>,
+    pub policy: Option<ModifyOrderPolicy>,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub struct LiquidatePerpRecord {
@@ -96,7 +113,7 @@ pub struct HistoricalIndexData {
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub struct InsuranceClaim {
-    pub revenue_withdraw_since_last_settle: u64,
+    pub revenue_withdraw_since_last_settle: i64,
     pub max_revenue_withdraw_per_period: u64,
     pub quote_max_insurance: u64,
     pub quote_settled_insurance: u64,
@@ -185,7 +202,8 @@ pub struct AMM {
     pub amm_jit_intensity: u8,
     pub oracle_source: OracleSource,
     pub last_oracle_valid: bool,
-    pub padding: [u8; 48],
+    pub target_base_asset_amount_per_lp: i32,
+    pub padding: [u8; 44],
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub struct InsuranceFund {
@@ -311,6 +329,11 @@ pub enum SwapDirection {
     Remove,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub enum ModifyOrderId {
+    UserOrderId(u8),
+    OrderId(u32),
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum PositionDirection {
     Long,
     Short,
@@ -318,7 +341,24 @@ pub enum PositionDirection {
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum SpotFulfillmentType {
     SerumV3,
+    Match,
+    PhoenixV1,
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub enum PostOnlyParam {
     None,
+    MustPostOnly,
+    TryPostOnly,
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub enum ModifyOrderPolicy {
+    TryModify,
+    MustModify,
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub enum SwapReduceOnly {
+    In,
+    Out,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum TwapPeriod {
@@ -400,6 +440,9 @@ pub enum OrderActionExplanation {
     ReduceOnlyOrderIncreasedPosition,
     OrderFillWithSerum,
     NoBorrowLiquidity,
+    OrderFillWithPhoenix,
+    OrderFilledWithAmmJitLpSplit,
+    OrderFilledWithLpJit,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum LPAction {
@@ -431,11 +474,11 @@ pub enum StakeAction {
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum PerpFulfillmentMethod {
     Amm(Option<u64>),
-    Match,
+    Match(Pubkey, u16),
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum SpotFulfillmentMethod {
-    SerumV3,
+    ExternalMarket,
     Match,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
@@ -443,6 +486,9 @@ pub enum OracleSource {
     Pyth,
     Switchboard,
     QuoteAsset,
+    Pyth1K,
+    Pyth1M,
+    PythStableCoin,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum MarketStatus {
@@ -470,6 +516,12 @@ pub enum ContractTier {
     Isolated,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+pub enum AMMLiquiditySplit {
+    ProtocolOwned,
+    LpOwned,
+    Shared,
+}
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum SpotBalanceType {
     Deposit,
     Borrow,
@@ -489,13 +541,13 @@ pub enum AssetTier {
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum ExchangeStatus {
-    Active,
-    FundingPaused,
+    DepositPaused,
+    WithdrawPaused,
     AmmPaused,
     FillPaused,
     LiqPaused,
-    WithdrawPaused,
-    Paused,
+    FundingPaused,
+    SettlePnlPaused,
 }
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
 pub enum UserStatus {
