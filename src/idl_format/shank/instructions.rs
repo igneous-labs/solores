@@ -193,6 +193,7 @@ impl ToTokens for NamedInstruction {
         let args_fields = self.args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
             #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             pub struct #ix_args_ident {
                 #(#args_fields),*
             }

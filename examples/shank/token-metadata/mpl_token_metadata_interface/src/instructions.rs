@@ -95,6 +95,7 @@ impl<'a> From<&CreateMetadataAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMetadataAccountIxArgs {
     pub create_metadata_account_args: CreateMetadataAccountArgs,
 }
@@ -185,6 +186,7 @@ impl<'a> From<&UpdateMetadataAccountAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateMetadataAccountIxArgs {
     pub update_metadata_account_args: UpdateMetadataAccountArgs,
 }
@@ -448,6 +450,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedCreateMasterEditionIxArgs {
     pub create_master_edition_args: CreateMasterEditionArgs,
 }
@@ -782,6 +785,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData<'me>(
@@ -938,6 +942,7 @@ impl<'a> From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePrimarySaleHappenedViaTokenIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePrimarySaleHappenedViaTokenIxData<'me>(
@@ -1053,6 +1058,7 @@ impl<'a> From<&DeprecatedSetReservationListAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedSetReservationListIxArgs {
     pub set_reservation_list_args: SetReservationListArgs,
 }
@@ -1213,6 +1219,7 @@ impl<'a> From<&DeprecatedCreateReservationListAccounts<'_, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedCreateReservationListIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedCreateReservationListIxData<'me>(
@@ -1313,6 +1320,7 @@ impl<'a> From<&SignMetadataAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SignMetadataIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SignMetadataIxData<'me>(pub &'me SignMetadataIxArgs);
@@ -1494,6 +1502,7 @@ impl<'a> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
     pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
 }
@@ -1652,6 +1661,7 @@ impl<'a> From<&DeprecatedMintPrintingTokensAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintPrintingTokensIxArgs {
     pub mint_printing_tokens_via_token_args: MintPrintingTokensViaTokenArgs,
 }
@@ -1818,6 +1828,7 @@ impl<'a> From<&CreateMasterEditionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMasterEditionIxArgs {
     pub create_master_edition_args: CreateMasterEditionArgs,
 }
@@ -2087,6 +2098,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
     pub mint_new_edition_from_master_edition_via_token_args:
         MintNewEditionFromMasterEditionViaTokenArgs,
@@ -2237,6 +2249,7 @@ impl<'a> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConvertMasterEditionV1ToV2IxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ConvertMasterEditionV1ToV2IxData<'me>(pub &'me ConvertMasterEditionV1ToV2IxArgs);
@@ -2545,6 +2558,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
     pub mint_new_edition_from_master_edition_via_token_args:
         MintNewEditionFromMasterEditionViaTokenArgs,
@@ -2677,6 +2691,7 @@ impl<'a> From<&PuffMetadataAccounts<'_, 'a>> for [AccountInfo<'a>; PUFF_METADATA
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PuffMetadataIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct PuffMetadataIxData<'me>(pub &'me PuffMetadataIxArgs);
@@ -2764,6 +2779,7 @@ impl<'a> From<&UpdateMetadataAccountV2Accounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateMetadataAccountV2IxArgs {
     pub update_metadata_account_args_v2: UpdateMetadataAccountArgsV2,
 }
@@ -2907,6 +2923,7 @@ impl<'a> From<&CreateMetadataAccountV2Accounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMetadataAccountV2IxArgs {
     pub create_metadata_account_args_v2: CreateMetadataAccountArgsV2,
 }
@@ -3068,6 +3085,7 @@ impl<'a> From<&CreateMasterEditionV3Accounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMasterEditionV3IxArgs {
     pub create_master_edition_args: CreateMasterEditionArgs,
 }
@@ -3190,6 +3208,7 @@ impl<'a> From<&VerifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VerifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct VerifyCollectionIxData<'me>(pub &'me VerifyCollectionIxArgs);
@@ -3354,6 +3373,7 @@ impl<'a> From<&UtilizeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UtilizeIxArgs {
     pub utilize_args: UtilizeArgs,
 }
@@ -3526,6 +3546,7 @@ impl<'a> From<&ApproveUseAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveUseAuthorityIxArgs {
     pub approve_use_authority_args: ApproveUseAuthorityArgs,
 }
@@ -3683,6 +3704,7 @@ impl<'a> From<&RevokeUseAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevokeUseAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeUseAuthorityIxData<'me>(pub &'me RevokeUseAuthorityIxArgs);
@@ -3812,6 +3834,7 @@ impl<'a> From<&UnverifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnverifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UnverifyCollectionIxData<'me>(pub &'me UnverifyCollectionIxArgs);
@@ -3963,6 +3986,7 @@ impl<'a> From<&ApproveCollectionAuthorityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveCollectionAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveCollectionAuthorityIxData<'me>(pub &'me ApproveCollectionAuthorityIxArgs);
@@ -4074,6 +4098,7 @@ impl<'a> From<&RevokeCollectionAuthorityAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevokeCollectionAuthorityIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeCollectionAuthorityIxData<'me>(pub &'me RevokeCollectionAuthorityIxArgs);
@@ -4225,6 +4250,7 @@ impl<'a> From<&SetAndVerifyCollectionAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetAndVerifyCollectionIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SetAndVerifyCollectionIxData<'me>(pub &'me SetAndVerifyCollectionIxArgs);
@@ -4341,6 +4367,7 @@ impl<'a> From<&FreezeDelegatedAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDelegatedAccountIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct FreezeDelegatedAccountIxData<'me>(pub &'me FreezeDelegatedAccountIxArgs);
@@ -4455,6 +4482,7 @@ impl<'a> From<&ThawDelegatedAccountAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ThawDelegatedAccountIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ThawDelegatedAccountIxData<'me>(pub &'me ThawDelegatedAccountIxArgs);
@@ -4545,6 +4573,7 @@ impl<'a> From<&RemoveCreatorVerificationAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveCreatorVerificationIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveCreatorVerificationIxData<'me>(pub &'me RemoveCreatorVerificationIxArgs);
