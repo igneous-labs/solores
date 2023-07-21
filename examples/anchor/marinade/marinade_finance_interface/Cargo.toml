@@ -4,5 +4,5 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-borsh = "^0.10"
-solana-program = "^1.16"
+borsh = "^0.9"
+solana-program = "^1.9,<1.16"

@@ -1,7 +1,0 @@
-[workspace]
-members = [
-    "anchor/drift/*",
-    "anchor/marinade/*",
-    "anchor/unstake-it/*",
-    "shank/token-metadata/*",
-]
