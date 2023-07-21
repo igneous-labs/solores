@@ -196,3 +196,4 @@ Please check the repo's issues list for more.
 
 - Does not handle account namespaces
 - Does not handle the state instruction namespace
+- There's no convenience function for deserializing an on-chain account along with verifying its discriminator together that is generated

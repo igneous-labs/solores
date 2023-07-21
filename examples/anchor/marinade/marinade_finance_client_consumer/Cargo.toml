@@ -1,0 +1,15 @@
+[package]
+name = "marinade_finance_client_consumer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]
+borsh = "0.9"
+lazy_static = "^1"
+marinade_finance_interface = { path = "../marinade_finance_interface", features = ["serde"] }
+serde_json = "^1"
+solana-client = "1.14"
+solana-sdk = "1.14"
+tokio = { version = "^1", features = ["rt-multi-thread", "macros"] }
