@@ -1,6 +1,7 @@
 use std::io::Write;
 
 use serde::Serialize;
+use toml::map::Map;
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
@@ -37,11 +38,11 @@ impl<'a> CargoToml<'a> {
                 edition: "2021",
             },
             dependencies: GeneratedCrateDependencies {
-                borsh: &args.borsh_vers,
-                solana_program: &args.solana_program_vers,
-                thiserror,
-                num_derive,
-                num_traits,
+                borsh: DependencyValue(&args.borsh_vers),
+                solana_program: DependencyValue(&args.solana_program_vers),
+                thiserror: thiserror.map(DependencyValue),
+                num_derive: num_derive.map(DependencyValue),
+                num_traits: num_traits.map(DependencyValue),
             },
         }
     }
@@ -56,16 +57,30 @@ struct Package<'a> {
 
 #[derive(Serialize)]
 struct GeneratedCrateDependencies<'a> {
-    borsh: &'a str,
+    borsh: DependencyValue<'a>,
 
     #[serde(rename = "solana-program")]
-    solana_program: &'a str,
+    solana_program: DependencyValue<'a>,
 
-    thiserror: Option<&'a str>,
+    thiserror: Option<DependencyValue<'a>>,
 
     #[serde(rename = "num-derive")]
-    num_derive: Option<&'a str>,
+    num_derive: Option<DependencyValue<'a>>,
 
     #[serde(rename = "num-traits")]
-    num_traits: Option<&'a str>,
+    num_traits: Option<DependencyValue<'a>>,
+}
+
+struct DependencyValue<'a>(&'a str);
+
+impl Serialize for DependencyValue<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match toml::from_str::<Map<_, _>>(self.0) {
+            Ok(v) => v.serialize(serializer), // "workspace = true"
+            Err(_) => self.0.serialize(serializer),
+        }
+    }
 }

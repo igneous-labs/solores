@@ -83,11 +83,6 @@ pub struct Args {
     pub num_traits_vers: String,
 }
 
-fn check_valid_semver_req(arg: &str, arg_name: &str) {
-    semver::VersionReq::parse(arg)
-        .unwrap_or_else(|_| panic!("Invalid version req '{}' for {}", arg, arg_name));
-}
-
 fn main() {
     if env::var(RUST_LOG_ENV_VAR).is_err() {
         env::set_var(RUST_LOG_ENV_VAR, "info")
@@ -96,9 +91,6 @@ fn main() {
     log_panics::init();
 
     let mut args = Args::parse();
-
-    check_valid_semver_req(&args.solana_program_vers, "solana-program");
-    check_valid_semver_req(&args.borsh_vers, "borsh");
 
     let mut file = OpenOptions::new().read(true).open(&args.idl_path).unwrap();
 
