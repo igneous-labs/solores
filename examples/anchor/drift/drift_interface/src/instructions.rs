@@ -79,6 +79,7 @@ impl<'a> From<&InitializeUserAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeUserIxArgs {
     pub sub_account_id: u16,
     pub name: [u8; 32],
@@ -196,6 +197,7 @@ impl<'a> From<&InitializeUserStatsAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeUserStatsIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserStatsIxData<'me>(pub &'me InitializeUserStatsIxArgs);
@@ -319,6 +321,7 @@ impl<'a> From<&InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeReferrerNameIxArgs {
     pub name: [u8; 32],
 }
@@ -442,6 +445,7 @@ impl<'a> From<&DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIxArgs {
     pub market_index: u16,
     pub amount: u64,
@@ -570,6 +574,7 @@ impl<'a> From<&WithdrawAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawIxArgs {
     pub market_index: u16,
     pub amount: u64,
@@ -679,6 +684,7 @@ impl<'a> From<&TransferDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferDepositIxArgs {
     pub market_index: u16,
     pub amount: u64,
@@ -771,6 +777,7 @@ impl<'a> From<&PlacePerpOrderAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlacePerpOrderIxArgs {
     pub params: OrderParams,
 }
@@ -862,6 +869,7 @@ impl<'a> From<&CancelOrderAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrderIxArgs {
     pub order_id: Option<u32>,
 }
@@ -953,6 +961,7 @@ impl<'a> From<&CancelOrderByUserIdAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrderByUserIdIxArgs {
     pub user_order_id: u8,
 }
@@ -1047,6 +1056,7 @@ impl<'a> From<&CancelOrdersAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrdersIxArgs {
     pub market_type: Option<MarketType>,
     pub market_index: Option<u16>,
@@ -1140,6 +1150,7 @@ impl<'a> From<&ModifyOrderAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderIxArgs {
     pub order_id: Option<u32>,
     pub modify_order_params: ModifyOrderParams,
@@ -1232,6 +1243,7 @@ impl<'a> From<&ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderByUserIdIxArgs {
     pub user_order_id: u8,
     pub modify_order_params: ModifyOrderParams,
@@ -1332,6 +1344,7 @@ impl<'a> From<&PlaceAndTakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndTakePerpOrderIxArgs {
     pub params: OrderParams,
     pub maker_order_id: Option<u32>,
@@ -1454,6 +1467,7 @@ impl<'a> From<&PlaceAndMakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndMakePerpOrderIxArgs {
     pub params: OrderParams,
     pub taker_order_id: u32,
@@ -1551,6 +1565,7 @@ impl<'a> From<&PlaceSpotOrderAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceSpotOrderIxArgs {
     pub params: OrderParams,
 }
@@ -1647,6 +1662,7 @@ impl<'a> From<&PlaceAndTakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndTakeSpotOrderIxArgs {
     pub params: OrderParams,
     pub fulfillment_type: Option<SpotFulfillmentType>,
@@ -1770,6 +1786,7 @@ impl<'a> From<&PlaceAndMakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndMakeSpotOrderIxArgs {
     pub params: OrderParams,
     pub taker_order_id: u32,
@@ -1923,6 +1940,7 @@ impl<'a> From<&BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BeginSwapIxArgs {
     pub in_market_index: u16,
     pub out_market_index: u16,
@@ -2069,6 +2087,7 @@ impl<'a> From<&EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EndSwapIxArgs {
     pub in_market_index: u16,
     pub out_market_index: u16,
@@ -2163,6 +2182,7 @@ impl<'a> From<&AddPerpLpSharesAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddPerpLpSharesIxArgs {
     pub n_shares: u64,
     pub market_index: u16,
@@ -2255,6 +2275,7 @@ impl<'a> From<&RemovePerpLpSharesAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemovePerpLpSharesIxArgs {
     pub shares_to_burn: u64,
     pub market_index: u16,
@@ -2346,6 +2367,7 @@ impl<'a> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemovePerpLpSharesInExpiringMarketIxArgs {
     pub shares_to_burn: u64,
     pub market_index: u16,
@@ -2447,6 +2469,7 @@ impl<'a> From<&UpdateUserNameAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserNameIxArgs {
     pub sub_account_id: u16,
     pub name: [u8; 32],
@@ -2535,6 +2558,7 @@ impl<'a> From<&UpdateUserCustomMarginRatioAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserCustomMarginRatioIxArgs {
     pub sub_account_id: u16,
     pub margin_ratio: u32,
@@ -2631,6 +2655,7 @@ impl<'a> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserMarginTradingEnabledIxArgs {
     pub sub_account_id: u16,
     pub margin_trading_enabled: bool,
@@ -2729,6 +2754,7 @@ impl<'a> From<&UpdateUserDelegateAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserDelegateIxArgs {
     pub sub_account_id: u16,
     pub delegate: Pubkey,
@@ -2829,6 +2855,7 @@ impl<'a> From<&DeleteUserAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteUserIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteUserIxData<'me>(pub &'me DeleteUserIxArgs);
@@ -2933,6 +2960,7 @@ impl<'a> From<&FillPerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillPerpOrderIxArgs {
     pub order_id: Option<u32>,
     pub maker_order_id: Option<u32>,
@@ -3030,6 +3058,7 @@ impl<'a> From<&RevertFillAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevertFillIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct RevertFillIxData<'me>(pub &'me RevertFillIxArgs);
@@ -3134,6 +3163,7 @@ impl<'a> From<&FillSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillSpotOrderIxArgs {
     pub order_id: Option<u32>,
     pub fulfillment_type: Option<SpotFulfillmentType>,
@@ -3232,6 +3262,7 @@ impl<'a> From<&TriggerOrderAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriggerOrderIxArgs {
     pub order_id: u32,
 }
@@ -3328,6 +3359,7 @@ impl<'a> From<&ForceCancelOrdersAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ForceCancelOrdersIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ForceCancelOrdersIxData<'me>(pub &'me ForceCancelOrdersIxArgs);
@@ -3422,6 +3454,7 @@ impl<'a> From<&UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserIdleIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserIdleIxData<'me>(pub &'me UpdateUserIdleIxArgs);
@@ -3520,6 +3553,7 @@ impl<'a> From<&UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserOpenOrdersCountIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserOpenOrdersCountIxData<'me>(pub &'me UpdateUserOpenOrdersCountIxArgs);
@@ -3619,6 +3653,7 @@ impl<'a> From<&SettlePnlAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettlePnlIxArgs {
     pub market_index: u16,
 }
@@ -3702,6 +3737,7 @@ impl<'a> From<&SettleFundingPaymentAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleFundingPaymentIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SettleFundingPaymentIxData<'me>(pub &'me SettleFundingPaymentIxArgs);
@@ -3784,6 +3820,7 @@ impl<'a> From<&SettleLpAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; SETTLE_LP_IX_
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleLpIxArgs {
     pub market_index: u16,
 }
@@ -3867,6 +3904,7 @@ impl<'a> From<&SettleExpiredMarketAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleExpiredMarketIxArgs {
     pub market_index: u16,
 }
@@ -3976,6 +4014,7 @@ impl<'a> From<&LiquidatePerpAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpIxArgs {
     pub market_index: u16,
     pub liquidator_max_base_asset_amount: u64,
@@ -4084,6 +4123,7 @@ impl<'a> From<&LiquidateSpotAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateSpotIxArgs {
     pub asset_market_index: u16,
     pub liability_market_index: u16,
@@ -4205,6 +4245,7 @@ impl<'a> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateBorrowForPerpPnlIxArgs {
     pub perp_market_index: u16,
     pub spot_market_index: u16,
@@ -4331,6 +4372,7 @@ impl<'a> From<&LiquidatePerpPnlForDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpPnlForDepositIxArgs {
     pub perp_market_index: u16,
     pub spot_market_index: u16,
@@ -4458,6 +4500,7 @@ impl<'a> From<&ResolvePerpPnlDeficitAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolvePerpPnlDeficitIxArgs {
     pub spot_market_index: u16,
     pub perp_market_index: u16,
@@ -4606,6 +4649,7 @@ impl<'a> From<&ResolvePerpBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolvePerpBankruptcyIxArgs {
     pub quote_spot_market_index: u16,
     pub market_index: u16,
@@ -4754,6 +4798,7 @@ impl<'a> From<&ResolveSpotBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolveSpotBankruptcyIxArgs {
     pub market_index: u16,
 }
@@ -4875,6 +4920,7 @@ impl<'a> From<&SettleRevenueToInsuranceFundAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleRevenueToInsuranceFundIxArgs {
     pub spot_market_index: u16,
 }
@@ -4977,6 +5023,7 @@ impl<'a> From<&UpdateFundingRateAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateFundingRateIxArgs {
     pub market_index: u16,
 }
@@ -5072,6 +5119,7 @@ impl<'a> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketCumulativeInterestIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketCumulativeInterestIxData<'me>(
@@ -5168,6 +5216,7 @@ impl<'a> From<&UpdateAmmsAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; UPDATE_AMMS
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAmmsIxArgs {
     pub market_indexes: [u16; 5],
 }
@@ -5261,6 +5310,7 @@ impl<'a> From<&UpdateSpotMarketExpiryAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketExpiryIxArgs {
     pub expiry_ts: i64,
 }
@@ -5388,6 +5438,7 @@ impl<'a> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserQuoteAssetInsuranceStakeIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserQuoteAssetInsuranceStakeIxData<'me>(
@@ -5537,6 +5588,7 @@ impl<'a> From<&InitializeInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeInsuranceFundStakeIxArgs {
     pub market_index: u16,
 }
@@ -5691,6 +5743,7 @@ impl<'a> From<&AddInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddInsuranceFundStakeIxArgs {
     pub market_index: u16,
     pub amount: u64,
@@ -5807,6 +5860,7 @@ impl<'a> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RequestRemoveInsuranceFundStakeIxArgs {
     pub market_index: u16,
     pub amount: u64,
@@ -5940,6 +5994,7 @@ impl<'a> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelRequestRemoveInsuranceFundStakeIxArgs {
     pub market_index: u16,
 }
@@ -6097,6 +6152,7 @@ impl<'a> From<&RemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveInsuranceFundStakeIxArgs {
     pub market_index: u16,
 }
@@ -6222,6 +6278,7 @@ impl<'a> From<&InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeIxData<'me>(pub &'me InitializeIxArgs);
@@ -6370,6 +6427,7 @@ impl<'a> From<&InitializeSpotMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeSpotMarketIxArgs {
     pub optimal_utilization: u32,
     pub optimal_borrow_rate: u32,
@@ -6564,6 +6622,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeSerumFulfillmentConfigIxArgs {
     pub market_index: u16,
 }
@@ -6701,6 +6760,7 @@ impl<'a> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSerumFulfillmentConfigStatusIxArgs {
     pub status: SpotFulfillmentConfigStatus,
 }
@@ -6890,6 +6950,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializePhoenixFulfillmentConfigIxArgs {
     pub market_index: u16,
 }
@@ -7026,6 +7087,7 @@ impl<'a> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoenixFulfillmentConfigStatusIxArgs {
     pub status: SpotFulfillmentConfigStatus,
 }
@@ -7130,6 +7192,7 @@ impl<'a> From<&UpdateSerumVaultAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSerumVaultIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumVaultIxData<'me>(pub &'me UpdateSerumVaultIxArgs);
@@ -7244,6 +7307,7 @@ impl<'a> From<&InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializePerpMarketIxArgs {
     pub market_index: u16,
     pub amm_base_asset_reserve: u128,
@@ -7352,6 +7416,7 @@ impl<'a> From<&DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteInitializedPerpMarketIxArgs {
     pub market_index: u16,
 }
@@ -7451,6 +7516,7 @@ impl<'a> From<&MoveAmmPriceAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MoveAmmPriceIxArgs {
     pub base_asset_reserve: u128,
     pub quote_asset_reserve: u128,
@@ -7546,6 +7612,7 @@ impl<'a> From<&UpdatePerpMarketExpiryAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketExpiryIxArgs {
     pub expiry_ts: i64,
 }
@@ -7657,6 +7724,7 @@ impl<'a> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'a, 'a, 'a, 'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleExpiredMarketPoolsToRevenuePoolIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct SettleExpiredMarketPoolsToRevenuePoolIxData<'me>(
@@ -7806,6 +7874,7 @@ impl<'a> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIntoPerpMarketFeePoolIxArgs {
     pub amount: u64,
 }
@@ -7912,6 +7981,7 @@ impl<'a> From<&RepegAmmCurveAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RepegAmmCurveIxArgs {
     pub new_peg_candidate: u128,
 }
@@ -8012,6 +8082,7 @@ impl<'a> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketAmmOracleTwapIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketAmmOracleTwapIxData<'me>(pub &'me UpdatePerpMarketAmmOracleTwapIxArgs);
@@ -8124,6 +8195,7 @@ impl<'a> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResetPerpMarketAmmOracleTwapIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ResetPerpMarketAmmOracleTwapIxData<'me>(pub &'me ResetPerpMarketAmmOracleTwapIxArgs);
@@ -8229,6 +8301,7 @@ impl<'a> From<&UpdateKAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateKIxArgs {
     pub sqrt_k: u128,
 }
@@ -8324,6 +8397,7 @@ impl<'a> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMarginRatioIxArgs {
     pub margin_ratio_initial: u32,
     pub margin_ratio_maintenance: u32,
@@ -8429,6 +8503,7 @@ impl<'a> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxImbalancesIxArgs {
     pub unrealized_max_imbalance: u64,
     pub max_revenue_withdraw_per_period: u64,
@@ -8539,6 +8614,7 @@ impl<'a> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketLiquidationFeeIxArgs {
     pub liquidator_fee: u32,
     pub if_liquidation_fee: u32,
@@ -8648,6 +8724,7 @@ impl<'a> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateInsuranceFundUnstakingPeriodIxArgs {
     pub insurance_fund_unstaking_period: i64,
 }
@@ -8760,6 +8837,7 @@ impl<'a> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketLiquidationFeeIxArgs {
     pub liquidator_fee: u32,
     pub if_liquidation_fee: u32,
@@ -8870,6 +8948,7 @@ impl<'a> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWithdrawGuardThresholdIxArgs {
     pub withdraw_guard_threshold: u64,
 }
@@ -8975,6 +9054,7 @@ impl<'a> From<&UpdateSpotMarketIfFactorAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketIfFactorIxArgs {
     pub spot_market_index: u16,
     pub user_if_factor: u32,
@@ -9077,6 +9157,7 @@ impl<'a> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketRevenueSettlePeriodIxArgs {
     pub revenue_settle_period: i64,
 }
@@ -9187,6 +9268,7 @@ impl<'a> From<&UpdateSpotMarketStatusAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketStatusIxArgs {
     pub status: MarketStatus,
 }
@@ -9287,6 +9369,7 @@ impl<'a> From<&UpdateSpotMarketAssetTierAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketAssetTierIxArgs {
     pub asset_tier: AssetTier,
 }
@@ -9387,6 +9470,7 @@ impl<'a> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMarginWeightsIxArgs {
     pub initial_asset_weight: u32,
     pub maintenance_asset_weight: u32,
@@ -9499,6 +9583,7 @@ impl<'a> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketBorrowRateIxArgs {
     pub optimal_utilization: u32,
     pub optimal_borrow_rate: u32,
@@ -9604,6 +9689,7 @@ impl<'a> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMaxTokenDepositsIxArgs {
     pub max_token_deposits: u64,
 }
@@ -9721,6 +9807,7 @@ impl<'a> From<&UpdateSpotMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOracleIxArgs {
     pub oracle: Pubkey,
     pub oracle_source: OracleSource,
@@ -9822,6 +9909,7 @@ impl<'a> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketStepSizeAndTickSizeIxArgs {
     pub step_size: u64,
     pub tick_size: u64,
@@ -9935,6 +10023,7 @@ impl<'a> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMinOrderSizeIxArgs {
     pub order_size: u64,
 }
@@ -10040,6 +10129,7 @@ impl<'a> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOrdersEnabledIxArgs {
     pub orders_enabled: bool,
 }
@@ -10145,6 +10235,7 @@ impl<'a> From<&UpdateSpotMarketNameAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketNameIxArgs {
     pub name: [u8; 32],
 }
@@ -10241,6 +10332,7 @@ impl<'a> From<&UpdatePerpMarketStatusAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketStatusIxArgs {
     pub status: MarketStatus,
 }
@@ -10341,6 +10433,7 @@ impl<'a> From<&UpdatePerpMarketContractTierAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketContractTierIxArgs {
     pub contract_tier: ContractTier,
 }
@@ -10447,6 +10540,7 @@ impl<'a> From<&UpdatePerpMarketImfFactorAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketImfFactorIxArgs {
     pub imf_factor: u32,
     pub unrealized_pnl_imf_factor: u32,
@@ -10548,6 +10642,7 @@ impl<'a> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketUnrealizedAssetWeightIxArgs {
     pub unrealized_initial_asset_weight: u32,
     pub unrealized_maintenance_asset_weight: u32,
@@ -10661,6 +10756,7 @@ impl<'a> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketConcentrationCoefIxArgs {
     pub concentration_scale: u128,
 }
@@ -10773,6 +10869,7 @@ impl<'a> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketCurveUpdateIntensityIxArgs {
     pub curve_update_intensity: u8,
 }
@@ -10887,6 +10984,7 @@ impl<'a> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs {
     pub target_base_asset_amount_per_lp: i32,
 }
@@ -10987,6 +11085,7 @@ impl<'a> From<&UpdateLpCooldownTimeAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLpCooldownTimeIxArgs {
     pub lp_cooldown_time: u64,
 }
@@ -11075,6 +11174,7 @@ impl<'a> From<&UpdatePerpFeeStructureAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpFeeStructureIxArgs {
     pub fee_structure: FeeStructure,
 }
@@ -11165,6 +11265,7 @@ impl<'a> From<&UpdateSpotFeeStructureAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotFeeStructureIxArgs {
     pub fee_structure: FeeStructure,
 }
@@ -11257,6 +11358,7 @@ impl<'a> From<&UpdateInitialPctToLiquidateAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateInitialPctToLiquidateIxArgs {
     pub initial_pct_to_liquidate: u16,
 }
@@ -11351,6 +11453,7 @@ impl<'a> From<&UpdateLiquidationDurationAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLiquidationDurationIxArgs {
     pub liquidation_duration: u8,
 }
@@ -11441,6 +11544,7 @@ impl<'a> From<&UpdateOracleGuardRailsAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateOracleGuardRailsIxArgs {
     pub oracle_guard_rails: OracleGuardRails,
 }
@@ -11533,6 +11637,7 @@ impl<'a> From<&UpdateStateSettlementDurationAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateStateSettlementDurationIxArgs {
     pub settlement_duration: u16,
 }
@@ -11643,6 +11748,7 @@ impl<'a> From<&UpdatePerpMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketOracleIxArgs {
     pub oracle: Pubkey,
     pub oracle_source: OracleSource,
@@ -11744,6 +11850,7 @@ impl<'a> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketBaseSpreadIxArgs {
     pub base_spread: u32,
 }
@@ -11843,6 +11950,7 @@ impl<'a> From<&UpdateAmmJitIntensityAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAmmJitIntensityIxArgs {
     pub amm_jit_intensity: u8,
 }
@@ -11941,6 +12049,7 @@ impl<'a> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxSpreadIxArgs {
     pub max_spread: u32,
 }
@@ -12041,6 +12150,7 @@ impl<'a> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketStepSizeAndTickSizeIxArgs {
     pub step_size: u64,
     pub tick_size: u64,
@@ -12150,6 +12260,7 @@ impl<'a> From<&UpdatePerpMarketNameAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketNameIxArgs {
     pub name: [u8; 32],
 }
@@ -12248,6 +12359,7 @@ impl<'a> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMinOrderSizeIxArgs {
     pub order_size: u64,
 }
@@ -12353,6 +12465,7 @@ impl<'a> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxSlippageRatioIxArgs {
     pub max_slippage_ratio: u16,
 }
@@ -12465,6 +12578,7 @@ impl<'a> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxFillReserveFractionIxArgs {
     pub max_fill_reserve_fraction: u16,
 }
@@ -12577,6 +12691,7 @@ impl<'a> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxOpenInterestIxArgs {
     pub max_open_interest: u128,
 }
@@ -12676,6 +12791,7 @@ impl<'a> From<&UpdateAdminAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAdminIxArgs {
     pub admin: Pubkey,
 }
@@ -12759,6 +12875,7 @@ impl<'a> From<&UpdateWhitelistMintAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWhitelistMintIxArgs {
     pub whitelist_mint: Pubkey,
 }
@@ -12845,6 +12962,7 @@ impl<'a> From<&UpdateDiscountMintAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateDiscountMintIxArgs {
     pub discount_mint: Pubkey,
 }
@@ -12931,6 +13049,7 @@ impl<'a> From<&UpdateExchangeStatusAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateExchangeStatusIxArgs {
     pub exchange_status: u8,
 }
@@ -13019,6 +13138,7 @@ impl<'a> From<&UpdatePerpAuctionDurationAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpAuctionDurationIxArgs {
     pub min_perp_auction_duration: u8,
 }
@@ -13109,6 +13229,7 @@ impl<'a> From<&UpdateSpotAuctionDurationAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotAuctionDurationIxArgs {
     pub default_spot_auction_duration: u8,
 }
@@ -13242,6 +13363,7 @@ impl<'a> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a,
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AdminRemoveInsuranceFundStakeIxArgs {
     pub market_index: u16,
     pub amount: u64,

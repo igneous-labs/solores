@@ -81,6 +81,13 @@ pub struct Args {
         default_value = "^0.2"
     )]
     pub num_traits_vers: String,
+
+    #[arg(
+        long,
+        help = "serde dependency version for generated crate",
+        default_value = "^1.0"
+    )]
+    pub serde_vers: String,
 }
 
 fn main() {

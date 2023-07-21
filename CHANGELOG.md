@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Added
+
+- `--serde-vers` to configure `serde` as an optional dependency for the generated crate
+
 ### Changed
 
 - Allow toml maps to be passed to the various `--*-vers` options to allow for values like `"workspace = true"`

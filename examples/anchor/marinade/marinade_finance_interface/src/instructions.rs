@@ -121,6 +121,7 @@ impl<'a> From<&InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeIxArgs {
     pub data: InitializeData,
 }
@@ -204,6 +205,7 @@ impl<'a> From<&ChangeAuthorityAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ChangeAuthorityIxArgs {
     pub data: ChangeAuthorityData,
 }
@@ -338,6 +340,7 @@ impl<'a> From<&AddValidatorAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddValidatorIxArgs {
     pub score: u32,
 }
@@ -439,6 +442,7 @@ impl<'a> From<&RemoveValidatorAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveValidatorIxArgs {
     pub index: u32,
     pub validator_vote: Pubkey,
@@ -531,6 +535,7 @@ impl<'a> From<&SetValidatorScoreAccounts<'_, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetValidatorScoreIxArgs {
     pub index: u32,
     pub validator_vote: Pubkey,
@@ -616,6 +621,7 @@ impl<'a> From<&ConfigValidatorSystemAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConfigValidatorSystemIxArgs {
     pub extra_runs: u32,
 }
@@ -763,6 +769,7 @@ impl<'a> From<&DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIxArgs {
     pub lamports: u64,
 }
@@ -1009,6 +1016,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositStakeAccountIxArgs {
     pub validator_index: u32,
 }
@@ -1186,6 +1194,7 @@ impl<'a> From<&LiquidUnstakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidUnstakeIxArgs {
     pub msol_amount: u64,
 }
@@ -1320,6 +1329,7 @@ impl<'a> From<&AddLiquidityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddLiquidityIxArgs {
     pub lamports: u64,
 }
@@ -1470,6 +1480,7 @@ impl<'a> From<&RemoveLiquidityAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveLiquidityIxArgs {
     pub tokens: u64,
 }
@@ -1553,6 +1564,7 @@ impl<'a> From<&SetLpParamsAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetLpParamsIxArgs {
     pub min_fee: Fee,
     pub max_fee: Fee,
@@ -1638,6 +1650,7 @@ impl<'a> From<&ConfigMarinadeAccounts<'_, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConfigMarinadeIxArgs {
     pub params: ConfigMarinadeParams,
 }
@@ -1764,6 +1777,7 @@ impl<'a> From<&OrderUnstakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrderUnstakeIxArgs {
     pub msol_amount: u64,
 }
@@ -1870,6 +1884,7 @@ impl<'a> From<&ClaimAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ClaimIxArgs {}
 #[derive(Copy, Clone, Debug)]
 pub struct ClaimIxData<'me>(pub &'me ClaimIxArgs);
@@ -2052,6 +2067,7 @@ impl<'a> From<&StakeReserveAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StakeReserveIxArgs {
     pub validator_index: u32,
 }
@@ -2214,6 +2230,7 @@ impl<'a> From<&UpdateActiveAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateActiveIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
@@ -2417,6 +2434,7 @@ impl<'a>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateDeactivatedIxArgs {
     pub stake_index: u32,
 }
@@ -2650,6 +2668,7 @@ impl<'a> From<&DeactivateStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeactivateStakeIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
@@ -2779,6 +2798,7 @@ impl<'a> From<&EmergencyUnstakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EmergencyUnstakeIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
@@ -2930,6 +2950,7 @@ impl<'a> From<&MergeStakesAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, '
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MergeStakesIxArgs {
     pub destination_stake_index: u32,
     pub source_stake_index: u32,
