@@ -3,7 +3,7 @@ use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
-use syn::{Generics, Lifetime, LifetimeDef, LitBool, LitInt};
+use syn::{LitBool, LitInt};
 
 use crate::utils::unique_by_report_dups;
 
@@ -67,41 +67,6 @@ impl ToTokens for NamedInstruction {
         });
 
         // impl Accounts
-
-        let anon_lifetime_def = LifetimeDef::new(Lifetime::new("'_", Span::call_site()));
-        let me_lifetime_def = LifetimeDef::new(Lifetime::new("'me", Span::call_site()));
-        let info_lifetime_def = LifetimeDef::new(Lifetime::new("'info", Span::call_site()));
-
-        // <'me, 'info>
-        let mut accounts_lifetimes_full = Generics::default();
-        accounts_lifetimes_full
-            .params
-            .push(me_lifetime_def.clone().into());
-        accounts_lifetimes_full
-            .params
-            .push(info_lifetime_def.clone().into());
-
-        // <'_, '_>
-        let mut account_lifetimes_all_anon = Generics::default();
-        for _i in 0..2 {
-            account_lifetimes_all_anon
-                .params
-                .push(anon_lifetime_def.clone().into());
-        }
-
-        // <'_, 'info>
-        let mut account_lifetimes_me_anon = Generics::default();
-        account_lifetimes_me_anon
-            .params
-            .push(anon_lifetime_def.into());
-        account_lifetimes_me_anon
-            .params
-            .push(info_lifetime_def.clone().into());
-
-        // <'info>
-        let mut account_info_lifetime = Generics::default();
-        account_info_lifetime.params.push(info_lifetime_def.into());
-
         let accounts_fields = unique_accounts.iter().map(|acc| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
             let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
@@ -111,12 +76,12 @@ impl ToTokens for NamedInstruction {
             });
             quote! {
                 #maybe_doc_comment
-                pub #account_name: &'me AccountInfo #account_info_lifetime
+                pub #account_name: &'me AccountInfo<'info>
             }
         });
         tokens.extend(quote! {
             #[derive(Copy, Clone, Debug)]
-            pub struct #accounts_ident #accounts_lifetimes_full {
+            pub struct #accounts_ident<'me, 'info> {
                 #(#accounts_fields),*
             }
         });
@@ -149,7 +114,7 @@ impl ToTokens for NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl From<&#accounts_ident #account_lifetimes_all_anon> for #keys_ident {
+            impl From<&#accounts_ident<'_, '_>> for #keys_ident {
                 fn from(accounts: &#accounts_ident) -> Self {
                     Self {
                         #(#from_keys_fields),*
@@ -196,8 +161,8 @@ impl ToTokens for NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl<'info> From<&#accounts_ident #account_lifetimes_me_anon> for [AccountInfo<'info>; #accounts_len_ident] {
-                fn from(accounts: &#accounts_ident #account_lifetimes_me_anon) -> Self {
+            impl<'info> From<&#accounts_ident<'_, 'info>> for [AccountInfo<'info>; #accounts_len_ident] {
+                fn from(accounts: &#accounts_ident<'_, 'info>) -> Self {
                     [
                         #(#account_info_clone),*
                     ]
@@ -258,7 +223,7 @@ impl ToTokens for NamedInstruction {
         // impl _invoke()
         tokens.extend(quote! {
             pub fn #invoke_fn_ident<'info, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident #account_lifetimes_me_anon,
+                accounts: &#accounts_ident<'_, 'info>,
                 args: A,
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
@@ -270,7 +235,7 @@ impl ToTokens for NamedInstruction {
         // impl _invoke_signed()
         tokens.extend(quote! {
             pub fn #invoke_signed_fn_ident<'info, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident #account_lifetimes_me_anon,
+                accounts: &#accounts_ident<'_, 'info>,
                 args: A,
                 seeds: &[&[&[u8]]],
             ) -> ProgramResult {
