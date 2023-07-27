@@ -19,6 +19,5 @@ async fn test_read_serde_marinade_state() {
 
     let discm = <[u8; 8]>::deserialize(&mut reader).unwrap();
     assert_eq!(discm, STATE_ACCOUNT_DISCM);
-    let state = State::deserialize(&mut reader).unwrap();
-    println!("{}", serde_json::to_string(&state).unwrap());
+    State::deserialize(&mut reader).unwrap();
 }

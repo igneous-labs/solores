@@ -1,11 +1,14 @@
-#![cfg(test)]
+//! NB: Running these tests generate ~20GB of rust target/ output because
+//! we can't put the examples into the same workspace since they use
+//! different vers of borsh and solana
 
-use test_utils::{check_example, gen_example};
+use test_utils::{check_example, gen_example, test_consumer};
 
 #[test]
 fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "shank/token-metadata";
     gen_example(
-        "shank/token-metadata",
+        EXAMPLE_PATH,
         &[
             "--solana-program-vers",
             "^1.9,<1.16",
@@ -13,13 +16,16 @@ fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
             "^0.9",
         ],
     )?;
-    check_example("shank/token-metadata", "mpl_token_metadata_interface")
+    check_example(EXAMPLE_PATH, "mpl_token_metadata_interface")?;
+    test_consumer(EXAMPLE_PATH, "mpl_token_metadata_onchain_consumer")?;
+    test_consumer(EXAMPLE_PATH, "mpl_token_metadata_client_consumer")
 }
 
 #[test]
 fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "anchor/unstake-it";
     gen_example(
-        "anchor/unstake-it",
+        EXAMPLE_PATH,
         &[
             "--solana-program-vers",
             "^1.9,<1.16",
@@ -27,13 +33,14 @@ fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
             "^0.9",
         ],
     )?;
-    check_example("anchor/unstake-it", "unstake_interface")
+    check_example(EXAMPLE_PATH, "unstake_interface")
 }
 
 #[test]
 fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "anchor/marinade";
     gen_example(
-        "anchor/marinade",
+        EXAMPLE_PATH,
         &[
             "--solana-program-vers",
             "^1.9,<1.16",
@@ -41,11 +48,13 @@ fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
             "^0.9",
         ],
     )?;
-    check_example("anchor/marinade", "marinade_finance_interface")
+    check_example(EXAMPLE_PATH, "marinade_finance_interface")?;
+    test_consumer(EXAMPLE_PATH, "marinade_finance_client_consumer")
 }
 
 #[test]
 fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
-    gen_example("anchor/drift", &[])?;
-    check_example("anchor/drift", "drift_interface")
+    const EXAMPLE_PATH: &str = "anchor/drift";
+    gen_example(EXAMPLE_PATH, &[])?;
+    check_example(EXAMPLE_PATH, "drift_interface")
 }
