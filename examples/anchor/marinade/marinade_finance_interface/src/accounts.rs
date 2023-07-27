@@ -3,6 +3,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
 pub const STATE_ACCOUNT_DISCM: [u8; 8] = [216, 146, 107, 94, 104, 75, 182, 177];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct State {
     pub msol_mint: Pubkey,
     pub admin_authority: Pubkey,
@@ -28,6 +29,7 @@ pub struct State {
 }
 pub const TICKET_ACCOUNT_DATA_ACCOUNT_DISCM: [u8; 8] = [133, 77, 18, 98, 211, 1, 231, 3];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TicketAccountData {
     pub state_address: Pubkey,
     pub beneficiary: Pubkey,

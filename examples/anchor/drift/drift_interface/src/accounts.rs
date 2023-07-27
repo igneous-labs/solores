@@ -3,6 +3,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
 pub const PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] = [233, 45, 62, 40, 35, 129, 48, 72];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoenixV1FulfillmentConfig {
     pub pubkey: Pubkey,
     pub phoenix_program_id: Pubkey,
@@ -18,6 +19,7 @@ pub struct PhoenixV1FulfillmentConfig {
 pub const SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] =
     [65, 160, 197, 112, 239, 168, 103, 185];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SerumV3FulfillmentConfig {
     pub pubkey: Pubkey,
     pub serum_program_id: Pubkey,
@@ -37,6 +39,7 @@ pub struct SerumV3FulfillmentConfig {
 }
 pub const INSURANCE_FUND_STAKE_ACCOUNT_DISCM: [u8; 8] = [110, 202, 14, 42, 95, 73, 90, 95];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsuranceFundStake {
     pub authority: Pubkey,
     pub if_shares: u128,
@@ -51,6 +54,7 @@ pub struct InsuranceFundStake {
 }
 pub const PERP_MARKET_ACCOUNT_DISCM: [u8; 8] = [10, 223, 12, 44, 107, 245, 55, 247];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PerpMarket {
     pub pubkey: Pubkey,
     pub amm: AMM,
@@ -83,6 +87,7 @@ pub struct PerpMarket {
 }
 pub const SPOT_MARKET_ACCOUNT_DISCM: [u8; 8] = [100, 177, 8, 107, 168, 65, 65, 39];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpotMarket {
     pub pubkey: Pubkey,
     pub oracle: Pubkey,
@@ -139,6 +144,7 @@ pub struct SpotMarket {
 }
 pub const STATE_ACCOUNT_DISCM: [u8; 8] = [216, 146, 107, 94, 104, 75, 182, 177];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct State {
     pub admin: Pubkey,
     pub whitelist_mint: Pubkey,
@@ -166,6 +172,7 @@ pub struct State {
 }
 pub const USER_ACCOUNT_DISCM: [u8; 8] = [159, 117, 95, 227, 239, 151, 58, 236];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct User {
     pub authority: Pubkey,
     pub delegate: Pubkey,
@@ -197,6 +204,7 @@ pub struct User {
 }
 pub const USER_STATS_ACCOUNT_DISCM: [u8; 8] = [176, 223, 136, 27, 122, 79, 32, 227];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UserStats {
     pub authority: Pubkey,
     pub referrer: Pubkey,
@@ -216,6 +224,7 @@ pub struct UserStats {
 }
 pub const REFERRER_NAME_ACCOUNT_DISCM: [u8; 8] = [105, 133, 170, 110, 52, 42, 28, 182];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ReferrerName {
     pub authority: Pubkey,
     pub user: Pubkey,
