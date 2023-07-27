@@ -82,6 +82,21 @@ impl<'info> From<&InitializeUserAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN]>
+    for InitializeUserAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: &arr[0],
+            user_stats: &arr[1],
+            state: &arr[2],
+            authority: &arr[3],
+            payer: &arr[4],
+            rent: &arr[5],
+            system_program: &arr[6],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeUserIxArgs {
@@ -200,6 +215,20 @@ impl<'info> From<&InitializeUserStatsAccounts<'_, 'info>>
             accounts.rent.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]>
+    for InitializeUserStatsAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user_stats: &arr[0],
+            state: &arr[1],
+            authority: &arr[2],
+            payer: &arr[3],
+            rent: &arr[4],
+            system_program: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -328,6 +357,21 @@ impl<'info> From<&InitializeReferrerNameAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]>
+    for InitializeReferrerNameAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            referrer_name: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            payer: &arr[4],
+            rent: &arr[5],
+            system_program: &arr[6],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeReferrerNameIxArgs {
@@ -454,6 +498,21 @@ impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_I
             accounts.user_token_account.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]>
+    for DepositAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            spot_market_vault: &arr[4],
+            user_token_account: &arr[5],
+            token_program: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -587,6 +646,22 @@ impl<'info> From<&WithdrawAccounts<'_, 'info>> for [AccountInfo<'info>; WITHDRAW
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN]>
+    for WithdrawAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            spot_market_vault: &arr[4],
+            drift_signer: &arr[5],
+            user_token_account: &arr[6],
+            token_program: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawIxArgs {
@@ -708,6 +783,20 @@ impl<'info> From<&TransferDepositAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]>
+    for TransferDepositAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            from_user: &arr[0],
+            to_user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            state: &arr[4],
+            spot_market_vault: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferDepositIxArgs {
@@ -808,6 +897,17 @@ impl<'info> From<&PlacePerpOrderAccounts<'_, 'info>>
             accounts.user.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]>
+    for PlacePerpOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -911,6 +1011,17 @@ impl<'info> From<&CancelOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN]>
+    for CancelOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrderIxArgs {
@@ -1010,6 +1121,17 @@ impl<'info> From<&CancelOrderByUserIdAccounts<'_, 'info>>
             accounts.user.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]>
+    for CancelOrderByUserIdAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1118,6 +1240,17 @@ impl<'info> From<&CancelOrdersAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]>
+    for CancelOrdersAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrdersIxArgs {
@@ -1221,6 +1354,17 @@ impl<'info> From<&ModifyOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN]>
+    for ModifyOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderIxArgs {
@@ -1321,6 +1465,17 @@ impl<'info> From<&ModifyOrderByUserIdAccounts<'_, 'info>>
             accounts.user.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]>
+    for ModifyOrderByUserIdAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1434,6 +1589,18 @@ impl<'info> From<&PlaceAndTakePerpOrderAccounts<'_, 'info>>
             accounts.user_stats.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]>
+    for PlaceAndTakePerpOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1561,6 +1728,20 @@ impl<'info> From<&PlaceAndMakePerpOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]>
+    for PlaceAndMakePerpOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            taker: &arr[3],
+            taker_stats: &arr[4],
+            authority: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndMakePerpOrderIxArgs {
@@ -1668,6 +1849,17 @@ impl<'info> From<&PlaceSpotOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]>
+    for PlaceSpotOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceSpotOrderIxArgs {
@@ -1773,6 +1965,18 @@ impl<'info> From<&PlaceAndTakeSpotOrderAccounts<'_, 'info>>
             accounts.user_stats.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]>
+    for PlaceAndTakeSpotOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1899,6 +2103,20 @@ impl<'info> From<&PlaceAndMakeSpotOrderAccounts<'_, 'info>>
             accounts.taker_stats.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]>
+    for PlaceAndMakeSpotOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            taker: &arr[3],
+            taker_stats: &arr[4],
+            authority: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2057,6 +2275,25 @@ impl<'info> From<&BeginSwapAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN]>
+    for BeginSwapAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            out_spot_market_vault: &arr[4],
+            in_spot_market_vault: &arr[5],
+            out_token_account: &arr[6],
+            in_token_account: &arr[7],
+            token_program: &arr[8],
+            drift_signer: &arr[9],
+            instructions: &arr[10],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BeginSwapIxArgs {
@@ -2206,6 +2443,25 @@ impl<'info> From<&EndSwapAccounts<'_, 'info>> for [AccountInfo<'info>; END_SWAP_
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN]>
+    for EndSwapAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            out_spot_market_vault: &arr[4],
+            in_spot_market_vault: &arr[5],
+            out_token_account: &arr[6],
+            in_token_account: &arr[7],
+            token_program: &arr[8],
+            drift_signer: &arr[9],
+            instructions: &arr[10],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EndSwapIxArgs {
@@ -2310,6 +2566,17 @@ impl<'info> From<&AddPerpLpSharesAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]>
+    for AddPerpLpSharesAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddPerpLpSharesIxArgs {
@@ -2412,6 +2679,17 @@ impl<'info> From<&RemovePerpLpSharesAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]>
+    for RemovePerpLpSharesAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemovePerpLpSharesIxArgs {
@@ -2512,6 +2790,19 @@ impl<'info> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>>
 {
     fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]>
+    for RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2624,6 +2915,16 @@ impl<'info> From<&UpdateUserNameAccounts<'_, 'info>>
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]>
+    for UpdateUserNameAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: &arr[0],
+            authority: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserNameIxArgs {
@@ -2719,6 +3020,18 @@ impl<'info> From<&UpdateUserCustomMarginRatioAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdateUserCustomMarginRatioAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            user: &arr[0],
+            authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2826,6 +3139,18 @@ impl<'info> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'info>>
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]>
+    for UpdateUserMarginTradingEnabledAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            user: &arr[0],
+            authority: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserMarginTradingEnabledIxArgs {
@@ -2931,6 +3256,16 @@ impl<'info> From<&UpdateUserDelegateAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateUserDelegateAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]>
+    for UpdateUserDelegateAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: &arr[0],
+            authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3042,6 +3377,18 @@ impl<'info> From<&DeleteUserAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]>
+    for DeleteUserAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: &arr[0],
+            user_stats: &arr[1],
+            state: &arr[2],
+            authority: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3161,6 +3508,20 @@ impl<'info> From<&FillPerpOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]>
+    for FillPerpOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            filler_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillPerpOrderIxArgs {
@@ -3267,6 +3628,18 @@ impl<'info> From<&RevertFillAccounts<'_, 'info>>
             accounts.filler.clone(),
             accounts.filler_stats.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]>
+    for RevertFillAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            filler_stats: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3386,6 +3759,20 @@ impl<'info> From<&FillSpotOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]>
+    for FillSpotOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            filler_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillSpotOrderIxArgs {
@@ -3495,6 +3882,18 @@ impl<'info> From<&TriggerOrderAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]>
+    for TriggerOrderAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            user: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriggerOrderIxArgs {
@@ -3602,6 +4001,18 @@ impl<'info> From<&ForceCancelOrdersAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]>
+    for ForceCancelOrdersAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            user: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ForceCancelOrdersIxArgs {}
@@ -3705,6 +4116,18 @@ impl<'info> From<&UpdateUserIdleAccounts<'_, 'info>>
             accounts.filler.clone(),
             accounts.user.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]>
+    for UpdateUserIdleAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            user: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3814,6 +4237,18 @@ impl<'info> From<&UpdateUserOpenOrdersCountAccounts<'_, 'info>>
             accounts.filler.clone(),
             accounts.user.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]>
+    for UpdateUserOpenOrdersCountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            filler: &arr[2],
+            user: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3929,6 +4364,18 @@ impl<'info> From<&SettlePnlAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN]>
+    for SettlePnlAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+            authority: &arr[2],
+            spot_market_vault: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettlePnlIxArgs {
@@ -4019,6 +4466,16 @@ impl<'info> From<&SettleFundingPaymentAccounts<'_, 'info>>
 {
     fn from(accounts: &SettleFundingPaymentAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]>
+    for SettleFundingPaymentAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4114,6 +4571,16 @@ impl<'info> From<&SettleLpAccounts<'_, 'info>> for [AccountInfo<'info>; SETTLE_L
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN]>
+    for SettleLpAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            user: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleLpIxArgs {
@@ -4204,6 +4671,16 @@ impl<'info> From<&SettleExpiredMarketAccounts<'_, 'info>>
 {
     fn from(accounts: &SettleExpiredMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]>
+    for SettleExpiredMarketAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4328,6 +4805,20 @@ impl<'info> From<&LiquidatePerpAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]>
+    for LiquidatePerpAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpIxArgs {
@@ -4447,6 +4938,20 @@ impl<'info> From<&LiquidateSpotAccounts<'_, 'info>>
             accounts.user.clone(),
             accounts.user_stats.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]>
+    for LiquidateSpotAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4573,6 +5078,20 @@ impl<'info> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'info>>
             accounts.user.clone(),
             accounts.user_stats.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]>
+    for LiquidateBorrowForPerpPnlAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4709,6 +5228,22 @@ impl<'info> From<&LiquidatePerpPnlForDepositAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]>
+    for LiquidatePerpPnlForDepositAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpPnlForDepositIxArgs {
@@ -4837,6 +5372,20 @@ impl<'info> From<&ResolvePerpPnlDeficitAccounts<'_, 'info>>
             accounts.drift_signer.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]>
+    for ResolvePerpPnlDeficitAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            spot_market_vault: &arr[2],
+            insurance_fund_vault: &arr[3],
+            drift_signer: &arr[4],
+            token_program: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4988,6 +5537,24 @@ impl<'info> From<&ResolvePerpBankruptcyAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]>
+    for ResolvePerpBankruptcyAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+            spot_market_vault: &arr[6],
+            insurance_fund_vault: &arr[7],
+            drift_signer: &arr[8],
+            token_program: &arr[9],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolvePerpBankruptcyIxArgs {
@@ -5137,6 +5704,24 @@ impl<'info> From<&ResolveSpotBankruptcyAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]>
+    for ResolveSpotBankruptcyAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+            liquidator: &arr[2],
+            liquidator_stats: &arr[3],
+            user: &arr[4],
+            user_stats: &arr[5],
+            spot_market_vault: &arr[6],
+            insurance_fund_vault: &arr[7],
+            drift_signer: &arr[8],
+            token_program: &arr[9],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolveSpotBankruptcyIxArgs {
@@ -5265,6 +5850,22 @@ impl<'info> From<&SettleRevenueToInsuranceFundAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]>
+    for SettleRevenueToInsuranceFundAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            spot_market: &arr[1],
+            spot_market_vault: &arr[2],
+            drift_signer: &arr[3],
+            insurance_fund_vault: &arr[4],
+            token_program: &arr[5],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleRevenueToInsuranceFundIxArgs {
@@ -5380,6 +5981,17 @@ impl<'info> From<&UpdateFundingRateAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]>
+    for UpdateFundingRateAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            oracle: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateFundingRateIxArgs {
@@ -5485,6 +6097,20 @@ impl<'info> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>>
             accounts.spot_market.clone(),
             accounts.oracle.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketCumulativeInterestAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            spot_market: &arr[1],
+            oracle: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -5594,6 +6220,16 @@ impl<'info> From<&UpdateAmmsAccounts<'_, 'info>>
         [accounts.state.clone(), accounts.authority.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN]>
+    for UpdateAmmsAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            authority: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAmmsIxArgs {
@@ -5695,6 +6331,17 @@ impl<'info> From<&UpdateSpotMarketExpiryAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketExpiryAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -5825,6 +6472,23 @@ impl<'info> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>>
             accounts.authority.clone(),
             accounts.insurance_fund_vault.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]>
+    for UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            spot_market: &arr[1],
+            insurance_fund_stake: &arr[2],
+            user_stats: &arr[3],
+            authority: &arr[4],
+            insurance_fund_vault: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -5975,6 +6639,24 @@ impl<'info> From<&InitializeInsuranceFundStakeAccounts<'_, 'info>>
             accounts.rent.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for InitializeInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            spot_market: &arr[0],
+            insurance_fund_stake: &arr[1],
+            user_stats: &arr[2],
+            state: &arr[3],
+            authority: &arr[4],
+            payer: &arr[5],
+            rent: &arr[6],
+            system_program: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -6133,6 +6815,24 @@ impl<'info> From<&AddInsuranceFundStakeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for AddInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            spot_market: &arr[1],
+            insurance_fund_stake: &arr[2],
+            user_stats: &arr[3],
+            authority: &arr[4],
+            spot_market_vault: &arr[5],
+            insurance_fund_vault: &arr[6],
+            drift_signer: &arr[7],
+            user_token_account: &arr[8],
+            token_program: &arr[9],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddInsuranceFundStakeIxArgs {
@@ -6256,6 +6956,22 @@ impl<'info> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
             accounts.authority.clone(),
             accounts.insurance_fund_vault.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for RequestRemoveInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            spot_market: &arr[0],
+            insurance_fund_stake: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            insurance_fund_vault: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -6392,6 +7108,22 @@ impl<'info> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
             accounts.authority.clone(),
             accounts.insurance_fund_vault.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            spot_market: &arr[0],
+            insurance_fund_stake: &arr[1],
+            user_stats: &arr[2],
+            authority: &arr[3],
+            insurance_fund_vault: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -6550,6 +7282,23 @@ impl<'info> From<&RemoveInsuranceFundStakeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for RemoveInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            spot_market: &arr[1],
+            insurance_fund_stake: &arr[2],
+            user_stats: &arr[3],
+            authority: &arr[4],
+            insurance_fund_vault: &arr[5],
+            drift_signer: &arr[6],
+            user_token_account: &arr[7],
+            token_program: &arr[8],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveInsuranceFundStakeIxArgs {
@@ -6678,6 +7427,21 @@ impl<'info> From<&InitializeAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]>
+    for InitializeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            quote_asset_mint: &arr[2],
+            drift_signer: &arr[3],
+            rent: &arr[4],
+            system_program: &arr[5],
+            token_program: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -6825,6 +7589,25 @@ impl<'info> From<&InitializeSpotMarketAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]>
+    for InitializeSpotMarketAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            spot_market: &arr[0],
+            spot_market_mint: &arr[1],
+            spot_market_vault: &arr[2],
+            insurance_fund_vault: &arr[3],
+            drift_signer: &arr[4],
+            state: &arr[5],
+            oracle: &arr[6],
+            admin: &arr[7],
+            rent: &arr[8],
+            system_program: &arr[9],
+            token_program: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -6998,6 +7781,28 @@ impl<'info> From<&InitializeSerumFulfillmentConfigAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
+    for InitializeSerumFulfillmentConfigAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            base_spot_market: &arr[0],
+            quote_spot_market: &arr[1],
+            state: &arr[2],
+            serum_program: &arr[3],
+            serum_market: &arr[4],
+            serum_open_orders: &arr[5],
+            drift_signer: &arr[6],
+            serum_fulfillment_config: &arr[7],
+            admin: &arr[8],
+            rent: &arr[9],
+            system_program: &arr[10],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeSerumFulfillmentConfigIxArgs {
@@ -7119,6 +7924,20 @@ impl<'info> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>>
             accounts.serum_fulfillment_config.clone(),
             accounts.admin.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
+    for UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            serum_fulfillment_config: &arr[1],
+            admin: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -7287,6 +8106,27 @@ impl<'info> From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
+    for InitializePhoenixFulfillmentConfigAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            base_spot_market: &arr[0],
+            quote_spot_market: &arr[1],
+            state: &arr[2],
+            phoenix_program: &arr[3],
+            phoenix_market: &arr[4],
+            drift_signer: &arr[5],
+            phoenix_fulfillment_config: &arr[6],
+            admin: &arr[7],
+            rent: &arr[8],
+            system_program: &arr[9],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializePhoenixFulfillmentConfigIxArgs {
@@ -7409,6 +8249,19 @@ impl<'info> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
+    for PhoenixFulfillmentConfigStatusAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            phoenix_fulfillment_config: &arr[1],
+            admin: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoenixFulfillmentConfigStatusIxArgs {
@@ -7521,6 +8374,17 @@ impl<'info> From<&UpdateSerumVaultAccounts<'_, 'info>>
             accounts.admin.clone(),
             accounts.srm_vault.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]>
+    for UpdateSerumVaultAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            admin: &arr[1],
+            srm_vault: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -7638,6 +8502,20 @@ impl<'info> From<&InitializePerpMarketAccounts<'_, 'info>>
             accounts.rent.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]>
+    for InitializePerpMarketAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+            oracle: &arr[3],
+            rent: &arr[4],
+            system_program: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -7760,6 +8638,19 @@ impl<'info> From<&DeleteInitializedPerpMarketAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]>
+    for DeleteInitializedPerpMarketAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteInitializedPerpMarketIxArgs {
@@ -7869,6 +8760,17 @@ impl<'info> From<&MoveAmmPriceAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]>
+    for MoveAmmPriceAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MoveAmmPriceIxArgs {
@@ -7972,6 +8874,17 @@ impl<'info> From<&UpdatePerpMarketExpiryAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketExpiryAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -8092,6 +9005,21 @@ impl<'info> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>>
             accounts.spot_market.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]>
+    for SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            admin: &arr[1],
+            spot_market: &arr[2],
+            perp_market: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -8244,6 +9172,24 @@ impl<'info> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]>
+    for DepositIntoPerpMarketFeePoolAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            admin: &arr[2],
+            source_vault: &arr[3],
+            drift_signer: &arr[4],
+            quote_spot_market: &arr[5],
+            spot_market_vault: &arr[6],
+            token_program: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIntoPerpMarketFeePoolIxArgs {
@@ -8364,6 +9310,18 @@ impl<'info> From<&RepegAmmCurveAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]>
+    for RepegAmmCurveAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            oracle: &arr[2],
+            admin: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RepegAmmCurveIxArgs {
@@ -8473,6 +9431,20 @@ impl<'info> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>>
             accounts.oracle.clone(),
             accounts.admin.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            oracle: &arr[2],
+            admin: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -8598,6 +9570,20 @@ impl<'info> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
+    for ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            oracle: &arr[2],
+            admin: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResetPerpMarketAmmOracleTwapIxArgs {}
@@ -8715,6 +9701,18 @@ impl<'info> From<&UpdateKAccounts<'_, 'info>> for [AccountInfo<'info>; UPDATE_K_
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN]>
+    for UpdateKAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+            oracle: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateKIxArgs {
@@ -8818,6 +9816,19 @@ impl<'info> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMarginRatioAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -8933,6 +9944,19 @@ impl<'info> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -9055,6 +10079,19 @@ impl<'info> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketLiquidationFeeIxArgs {
@@ -9174,6 +10211,20 @@ impl<'info> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]>
+    for UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -9298,6 +10349,19 @@ impl<'info> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketLiquidationFeeIxArgs {
@@ -9418,6 +10482,19 @@ impl<'info> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]>
+    for UpdateWithdrawGuardThresholdAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWithdrawGuardThresholdIxArgs {
@@ -9532,6 +10609,17 @@ impl<'info> From<&UpdateSpotMarketIfFactorAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketIfFactorAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -9649,6 +10737,20 @@ impl<'info> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -9771,6 +10873,17 @@ impl<'info> From<&UpdateSpotMarketStatusAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketStatusAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketStatusIxArgs {
@@ -9879,6 +10992,17 @@ impl<'info> From<&UpdateSpotMarketAssetTierAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketAssetTierAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -9992,6 +11116,19 @@ impl<'info> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMarginWeightsAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -10116,6 +11253,19 @@ impl<'info> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketBorrowRateAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketBorrowRateIxArgs {
@@ -10231,6 +11381,20 @@ impl<'info> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -10359,6 +11523,18 @@ impl<'info> From<&UpdateSpotMarketOracleAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketOracleAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+            oracle: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOracleIxArgs {
@@ -10470,6 +11646,20 @@ impl<'info> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.spot_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -10595,6 +11785,19 @@ impl<'info> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMinOrderSizeIxArgs {
@@ -10713,6 +11916,19 @@ impl<'info> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOrdersEnabledIxArgs {
@@ -10828,6 +12044,17 @@ impl<'info> From<&UpdateSpotMarketNameAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketNameAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketNameIxArgs {
@@ -10934,6 +12161,17 @@ impl<'info> From<&UpdatePerpMarketStatusAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketStatusAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -11044,6 +12282,19 @@ impl<'info> From<&UpdatePerpMarketContractTierAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketContractTierAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -11165,6 +12416,17 @@ impl<'info> From<&UpdatePerpMarketImfFactorAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketImfFactorAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketImfFactorIxArgs {
@@ -11279,6 +12541,20 @@ impl<'info> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -11406,6 +12682,20 @@ impl<'info> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketConcentrationCoefIxArgs {
@@ -11528,6 +12818,20 @@ impl<'info> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -11656,6 +12960,23 @@ impl<'info> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<
+        &'me [AccountInfo<'info>;
+                 UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN],
+    > for UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs {
@@ -11765,6 +13086,16 @@ impl<'info> From<&UpdateLpCooldownTimeAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]>
+    for UpdateLpCooldownTimeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLpCooldownTimeIxArgs {
@@ -11862,6 +13193,16 @@ impl<'info> From<&UpdatePerpFeeStructureAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpFeeStructureAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -11963,6 +13304,16 @@ impl<'info> From<&UpdateSpotFeeStructureAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotFeeStructureAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotFeeStructureIxArgs {
@@ -12062,6 +13413,18 @@ impl<'info> From<&UpdateInitialPctToLiquidateAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]>
+    for UpdateInitialPctToLiquidateAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -12167,6 +13530,16 @@ impl<'info> From<&UpdateLiquidationDurationAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdateLiquidationDurationAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLiquidationDurationIxArgs {
@@ -12269,6 +13642,16 @@ impl<'info> From<&UpdateOracleGuardRailsAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]>
+    for UpdateOracleGuardRailsAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateOracleGuardRailsIxArgs {
@@ -12368,6 +13751,18 @@ impl<'info> From<&UpdateStateSettlementDurationAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdateStateSettlementDurationAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -12492,6 +13887,18 @@ impl<'info> From<&UpdatePerpMarketOracleAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketOracleAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            perp_market: &arr[1],
+            oracle: &arr[2],
+            admin: &arr[3],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketOracleIxArgs {
@@ -12603,6 +14010,19 @@ impl<'info> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketBaseSpreadAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketBaseSpreadIxArgs {
@@ -12710,6 +14130,17 @@ impl<'info> From<&UpdateAmmJitIntensityAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]>
+    for UpdateAmmJitIntensityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -12820,6 +14251,17 @@ impl<'info> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxSpreadAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -12935,6 +14377,20 @@ impl<'info> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -13056,6 +14512,17 @@ impl<'info> From<&UpdatePerpMarketNameAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketNameAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketNameIxArgs {
@@ -13164,6 +14631,19 @@ impl<'info> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -13284,6 +14764,20 @@ impl<'info> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>>
             accounts.state.clone(),
             accounts.perp_market.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -13412,6 +14906,21 @@ impl<'info> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxFillReserveFractionIxArgs {
@@ -13536,6 +15045,20 @@ impl<'info> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            perp_market: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxOpenInterestIxArgs {
@@ -13644,6 +15167,16 @@ impl<'info> From<&UpdateAdminAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]>
+    for UpdateAdminAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAdminIxArgs {
@@ -13734,6 +15267,16 @@ impl<'info> From<&UpdateWhitelistMintAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateWhitelistMintAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]>
+    for UpdateWhitelistMintAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -13831,6 +15374,16 @@ impl<'info> From<&UpdateDiscountMintAccounts<'_, 'info>>
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]>
+    for UpdateDiscountMintAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateDiscountMintIxArgs {
@@ -13924,6 +15477,16 @@ impl<'info> From<&UpdateExchangeStatusAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateExchangeStatusAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]>
+    for UpdateExchangeStatusAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -14025,6 +15588,16 @@ impl<'info> From<&UpdatePerpAuctionDurationAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdatePerpAuctionDurationAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -14129,6 +15702,16 @@ impl<'info> From<&UpdateSpotAuctionDurationAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdateSpotAuctionDurationAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -14266,6 +15849,23 @@ impl<'info> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'info>>
             accounts.admin_token_account.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for AdminRemoveInsuranceFundStakeAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: &arr[0],
+            state: &arr[1],
+            spot_market: &arr[2],
+            insurance_fund_vault: &arr[3],
+            drift_signer: &arr[4],
+            admin_token_account: &arr[5],
+            token_program: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]

@@ -96,6 +96,21 @@ impl<'info> From<&CreateMetadataAccountAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for CreateMetadataAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            mint: &arr[1],
+            mint_authority: &arr[2],
+            payer: &arr[3],
+            update_authority: &arr[4],
+            system_program: &arr[5],
+            rent: &arr[6],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMetadataAccountIxArgs {
@@ -195,6 +210,16 @@ impl<'info> From<&UpdateMetadataAccountAccounts<'_, 'info>>
 {
     fn from(accounts: &UpdateMetadataAccountAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for UpdateMetadataAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            update_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -397,6 +422,29 @@ impl<'info> From<&DeprecatedCreateMasterEditionAccounts<'_, 'info>>
                 .one_time_printing_authorization_mint_authority
                 .clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateMasterEditionAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            printing_mint: &arr[2],
+            one_time_printing_authorization_mint: &arr[3],
+            update_authority: &arr[4],
+            printing_mint_authority: &arr[5],
+            mint_authority: &arr[6],
+            metadata: &arr[7],
+            payer: &arr[8],
+            token_program: &arr[9],
+            system_program: &arr[10],
+            rent: &arr[11],
+            one_time_printing_authorization_mint_authority: &arr[12],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -639,6 +687,37 @@ impl<'info> From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccou
         ]
     }
 }
+impl<'me, 'info>
+    From<
+        &'me [AccountInfo<'info>;
+                 DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    > for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<
+            'info,
+        >; DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            metadata: &arr[0],
+            edition: &arr[1],
+            master_edition: &arr[2],
+            mint: &arr[3],
+            mint_authority: &arr[4],
+            printing_mint: &arr[5],
+            master_token_account: &arr[6],
+            edition_marker: &arr[7],
+            burn_authority: &arr[8],
+            payer: &arr[9],
+            master_update_authority: &arr[10],
+            master_metadata: &arr[11],
+            token_program: &arr[12],
+            system_program: &arr[13],
+            rent: &arr[14],
+            reservation_list: &arr[15],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
@@ -771,6 +850,20 @@ impl<'info> From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            metadata: &arr[0],
+            owner: &arr[1],
+            token: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePrimarySaleHappenedViaTokenIxArgs {}
@@ -894,6 +987,19 @@ impl<'info> From<&DeprecatedSetReservationListAccounts<'_, 'info>>
             accounts.reservation_list.clone(),
             accounts.resource.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedSetReservationListAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            master_edition: &arr[0],
+            reservation_list: &arr[1],
+            resource: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1062,6 +1168,24 @@ impl<'info> From<&DeprecatedCreateReservationListAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateReservationListAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            reservation_list: &arr[0],
+            payer: &arr[1],
+            update_authority: &arr[2],
+            master_edition: &arr[3],
+            resource: &arr[4],
+            metadata: &arr[5],
+            system_program: &arr[6],
+            rent: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedCreateReservationListIxArgs {}
@@ -1169,6 +1293,16 @@ impl<'info> From<&SignMetadataAccounts<'_, 'info>>
 {
     fn from(accounts: &SignMetadataAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]>
+    for SignMetadataAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            creator: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1332,6 +1466,26 @@ impl<'info> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            destination: &arr[0],
+            token: &arr[1],
+            one_time_printing_authorization_mint: &arr[2],
+            printing_mint: &arr[3],
+            burn_authority: &arr[4],
+            metadata: &arr[5],
+            master_edition: &arr[6],
+            token_program: &arr[7],
+            rent: &arr[8],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
@@ -1489,6 +1643,23 @@ impl<'info> From<&DeprecatedMintPrintingTokensAccounts<'_, 'info>>
             accounts.token_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            destination: &arr[0],
+            printing_mint: &arr[1],
+            update_authority: &arr[2],
+            metadata: &arr[3],
+            master_edition: &arr[4],
+            token_program: &arr[5],
+            rent: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1657,6 +1828,23 @@ impl<'info> From<&CreateMasterEditionAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
+    for CreateMasterEditionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            update_authority: &arr[2],
+            mint_authority: &arr[3],
+            payer: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1865,6 +2053,32 @@ impl<'info> From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: &arr[0],
+            new_edition: &arr[1],
+            master_edition: &arr[2],
+            new_mint: &arr[3],
+            edition_mark_pda: &arr[4],
+            new_mint_authority: &arr[5],
+            payer: &arr[6],
+            token_account_owner: &arr[7],
+            token_account: &arr[8],
+            new_metadata_update_authority: &arr[9],
+            metadata: &arr[10],
+            token_program: &arr[11],
+            system_program: &arr[12],
+            rent: &arr[13],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
@@ -1991,6 +2205,19 @@ impl<'info> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'info>>
             accounts.one_time_auth.clone(),
             accounts.printing_mint.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]>
+    for ConvertMasterEditionV1ToV2Accounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            master_edition: &arr[0],
+            one_time_auth: &arr[1],
+            printing_mint: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2226,6 +2453,37 @@ impl<'info> From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info
         ]
     }
 }
+impl<'me, 'info>
+    From<
+        &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN],
+    > for MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: &arr[0],
+            new_edition: &arr[1],
+            master_edition: &arr[2],
+            new_mint: &arr[3],
+            edition_mark_pda: &arr[4],
+            new_mint_authority: &arr[5],
+            payer: &arr[6],
+            vault_authority: &arr[7],
+            safety_deposit_store: &arr[8],
+            safety_deposit_box: &arr[9],
+            vault: &arr[10],
+            new_metadata_update_authority: &arr[11],
+            metadata: &arr[12],
+            token_program: &arr[13],
+            token_vault_program: &arr[14],
+            system_program: &arr[15],
+            rent: &arr[16],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
@@ -2330,6 +2588,13 @@ impl<'info> From<&PuffMetadataAccounts<'_, 'info>>
         [accounts.metadata.clone()]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]>
+    for PuffMetadataAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self { metadata: &arr[0] }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PuffMetadataIxArgs {}
@@ -2424,6 +2689,16 @@ impl<'info> From<&UpdateMetadataAccountV2Accounts<'_, 'info>>
 {
     fn from(accounts: &UpdateMetadataAccountV2Accounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]>
+    for UpdateMetadataAccountV2Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            update_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2570,6 +2845,21 @@ impl<'info> From<&CreateMetadataAccountV2Accounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]>
+    for CreateMetadataAccountV2Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            mint: &arr[1],
+            mint_authority: &arr[2],
+            payer: &arr[3],
+            update_authority: &arr[4],
+            system_program: &arr[5],
+            rent: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2732,6 +3022,23 @@ impl<'info> From<&CreateMasterEditionV3Accounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]>
+    for CreateMasterEditionV3Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            update_authority: &arr[2],
+            mint_authority: &arr[3],
+            payer: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMasterEditionV3IxArgs {
@@ -2866,6 +3173,20 @@ impl<'info> From<&VerifyCollectionAccounts<'_, 'info>>
             accounts.collection.clone(),
             accounts.collection_master_edition_account.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for VerifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            payer: &arr[2],
+            collection_mint: &arr[3],
+            collection: &arr[4],
+            collection_master_edition_account: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3033,6 +3354,25 @@ impl<'info> From<&UtilizeAccounts<'_, 'info>> for [AccountInfo<'info>; UTILIZE_I
             accounts.use_authority_record.clone(),
             accounts.burner.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN]>
+    for UtilizeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            token_account: &arr[1],
+            mint: &arr[2],
+            use_authority: &arr[3],
+            owner: &arr[4],
+            token_program: &arr[5],
+            ata_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+            use_authority_record: &arr[9],
+            burner: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3206,6 +3546,25 @@ impl<'info> From<&ApproveUseAuthorityAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ApproveUseAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: &arr[0],
+            owner: &arr[1],
+            payer: &arr[2],
+            user: &arr[3],
+            owner_token_account: &arr[4],
+            metadata: &arr[5],
+            mint: &arr[6],
+            burner: &arr[7],
+            token_program: &arr[8],
+            system_program: &arr[9],
+            rent: &arr[10],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveUseAuthorityIxArgs {
@@ -3364,6 +3723,23 @@ impl<'info> From<&RevokeUseAuthorityAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for RevokeUseAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: &arr[0],
+            owner: &arr[1],
+            user: &arr[2],
+            owner_token_account: &arr[3],
+            mint: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevokeUseAuthorityIxArgs {}
@@ -3494,6 +3870,20 @@ impl<'info> From<&UnverifyCollectionAccounts<'_, 'info>>
             accounts.collection_master_edition_account.clone(),
             accounts.collection_authority_record.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for UnverifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            collection_mint: &arr[2],
+            collection: &arr[3],
+            collection_master_edition_account: &arr[4],
+            collection_authority_record: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3648,6 +4038,22 @@ impl<'info> From<&ApproveCollectionAuthorityAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ApproveCollectionAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: &arr[0],
+            new_collection_authority: &arr[1],
+            update_authority: &arr[2],
+            payer: &arr[3],
+            metadata: &arr[4],
+            mint: &arr[5],
+            system_program: &arr[6],
+            rent: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveCollectionAuthorityIxArgs {}
@@ -3769,6 +4175,18 @@ impl<'info> From<&RevokeCollectionAuthorityAccounts<'_, 'info>>
             accounts.metadata.clone(),
             accounts.mint.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for RevokeCollectionAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: &arr[0],
+            update_authority: &arr[1],
+            metadata: &arr[2],
+            mint: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3926,6 +4344,22 @@ impl<'info> From<&SetAndVerifyCollectionAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for SetAndVerifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            payer: &arr[2],
+            update_authority: &arr[3],
+            collection_mint: &arr[4],
+            collection: &arr[5],
+            collection_master_edition_account: &arr[6],
+            collection_authority_record: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetAndVerifyCollectionIxArgs {}
@@ -4050,6 +4484,19 @@ impl<'info> From<&FreezeDelegatedAccountAccounts<'_, 'info>>
             accounts.mint.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for FreezeDelegatedAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: &arr[0],
+            token_account: &arr[1],
+            edition: &arr[2],
+            mint: &arr[3],
+            token_program: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -4178,6 +4625,19 @@ impl<'info> From<&ThawDelegatedAccountAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for ThawDelegatedAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: &arr[0],
+            token_account: &arr[1],
+            edition: &arr[2],
+            mint: &arr[3],
+            token_program: &arr[4],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ThawDelegatedAccountIxArgs {}
@@ -4277,6 +4737,16 @@ impl<'info> From<&RemoveCreatorVerificationAccounts<'_, 'info>>
 {
     fn from(accounts: &RemoveCreatorVerificationAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]>
+    for RemoveCreatorVerificationAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            creator: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]

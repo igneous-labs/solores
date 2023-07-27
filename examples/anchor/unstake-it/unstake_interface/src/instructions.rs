@@ -58,6 +58,17 @@ impl<'info> From<&InitProtocolFeeAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN]>
+    for InitProtocolFeeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            payer: &arr[0],
+            protocol_fee_account: &arr[1],
+            system_program: &arr[2],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitProtocolFeeIxArgs {}
@@ -149,6 +160,16 @@ impl<'info> From<&SetProtocolFeeAccounts<'_, 'info>>
             accounts.authority.clone(),
             accounts.protocol_fee_account.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN]>
+    for SetProtocolFeeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            authority: &arr[0],
+            protocol_fee_account: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -288,6 +309,23 @@ impl<'info> From<&CreatePoolAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN]>
+    for CreatePoolAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            payer: &arr[0],
+            fee_authority: &arr[1],
+            pool_account: &arr[2],
+            pool_sol_reserves: &arr[3],
+            fee_account: &arr[4],
+            lp_mint: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreatePoolIxArgs {
@@ -411,6 +449,21 @@ impl<'info> From<&AddLiquidityAccounts<'_, 'info>>
             accounts.token_program.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]>
+    for AddLiquidityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            from: &arr[0],
+            pool_account: &arr[1],
+            pool_sol_reserves: &arr[2],
+            lp_mint: &arr[3],
+            mint_lp_tokens_to: &arr[4],
+            token_program: &arr[5],
+            system_program: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -544,6 +597,22 @@ impl<'info> From<&RemoveLiquidityAccounts<'_, 'info>>
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]>
+    for RemoveLiquidityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            burn_lp_tokens_from_authority: &arr[0],
+            to: &arr[1],
+            pool_account: &arr[2],
+            pool_sol_reserves: &arr[3],
+            lp_mint: &arr[4],
+            burn_lp_tokens_from: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveLiquidityIxArgs {
@@ -655,6 +724,19 @@ impl<'info> From<&SetFeeAccounts<'_, 'info>> for [AccountInfo<'info>; SET_FEE_IX
         ]
     }
 }
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN]>
+    for SetFeeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            fee_authority: &arr[0],
+            pool_account: &arr[1],
+            fee_account: &arr[2],
+            system_program: &arr[3],
+            rent: &arr[4],
+        }
+    }
+}
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetFeeIxArgs {
@@ -754,6 +836,17 @@ impl<'info> From<&SetFeeAuthorityAccounts<'_, 'info>>
             accounts.pool_account.clone(),
             accounts.new_fee_authority.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for SetFeeAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            fee_authority: &arr[0],
+            pool_account: &arr[1],
+            new_fee_authority: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -865,6 +958,19 @@ impl<'info> From<&DeactivateStakeAccountAccounts<'_, 'info>>
             accounts.clock.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for DeactivateStakeAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            stake_account: &arr[0],
+            pool_account: &arr[1],
+            pool_sol_reserves: &arr[2],
+            clock: &arr[3],
+            stake_program: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -993,6 +1099,21 @@ impl<'info> From<&ReclaimStakeAccountAccounts<'_, 'info>>
             accounts.stake_history.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for ReclaimStakeAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            stake_account: &arr[0],
+            pool_account: &arr[1],
+            pool_sol_reserves: &arr[2],
+            stake_account_record_account: &arr[3],
+            clock: &arr[4],
+            stake_history: &arr[5],
+            stake_program: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1153,6 +1274,27 @@ impl<'info> From<&UnstakeAccounts<'_, 'info>> for [AccountInfo<'info>; UNSTAKE_I
             accounts.stake_program.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN]>
+    for UnstakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            payer: &arr[0],
+            unstaker: &arr[1],
+            stake_account: &arr[2],
+            destination: &arr[3],
+            pool_account: &arr[4],
+            pool_sol_reserves: &arr[5],
+            fee_account: &arr[6],
+            stake_account_record_account: &arr[7],
+            protocol_fee_account: &arr[8],
+            protocol_fee_destination: &arr[9],
+            clock: &arr[10],
+            stake_program: &arr[11],
+            system_program: &arr[12],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1318,6 +1460,28 @@ impl<'info> From<&UnstakeWsolAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]>
+    for UnstakeWsolAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            payer: &arr[0],
+            unstaker: &arr[1],
+            stake_account: &arr[2],
+            destination: &arr[3],
+            pool_account: &arr[4],
+            pool_sol_reserves: &arr[5],
+            fee_account: &arr[6],
+            stake_account_record_account: &arr[7],
+            protocol_fee_account: &arr[8],
+            protocol_fee_destination: &arr[9],
+            clock: &arr[10],
+            stake_program: &arr[11],
+            system_program: &arr[12],
+            token_program: &arr[13],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]

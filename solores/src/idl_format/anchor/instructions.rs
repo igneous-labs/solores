@@ -179,6 +179,24 @@ impl ToTokens for NamedInstruction {
             }
         });
 
+        // impl From [AccountInfo] for Accounts
+        let from_account_info_fields = accounts.iter().enumerate().map(|(i, acc)| {
+            let account_ident = format_ident!("{}", &acc.name.to_snake_case());
+            let index_lit = LitInt::new(&i.to_string(), Span::call_site());
+            quote! {
+               #account_ident: &arr[#index_lit]
+            }
+        });
+        tokens.extend(quote! {
+            impl<'me, 'info> From<&'me [AccountInfo<'info>; #accounts_len_ident]> for #accounts_ident<'me, 'info> {
+                fn from(arr: &'me [AccountInfo<'info>; #accounts_len_ident]) -> Self {
+                    Self {
+                        #(#from_account_info_fields),*
+                    }
+                }
+            }
+        });
+
         // impl Args
         let args_fields = self.args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
