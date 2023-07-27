@@ -7,7 +7,7 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
-pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 13usize;
+pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeAccounts<'me, 'info> {
     pub creator_authority: &'me AccountInfo<'info>,
@@ -78,6 +78,25 @@ impl From<&InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; INITIALIZE_IX_ACCOUNTS_LEN]> for InitializeKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            creator_authority: pubkeys[0],
+            state: pubkeys[1],
+            reserve_pda: pubkeys[2],
+            stake_list: pubkeys[3],
+            validator_list: pubkeys[4],
+            msol_mint: pubkeys[5],
+            operational_sol_account: pubkeys[6],
+            liq_pool_lp_mint: pubkeys[7],
+            liq_pool_sol_leg_pda: pubkeys[8],
+            liq_pool_msol_leg: pubkeys[9],
+            treasury_msol_account: pubkeys[10],
+            clock: pubkeys[11],
+            rent: pubkeys[12],
+        }
+    }
+}
 impl<'info> From<&InitializeAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]
 {
@@ -97,6 +116,27 @@ impl<'info> From<&InitializeAccounts<'_, 'info>>
             accounts.clock.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]>
+    for InitializeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            creator_authority: &arr[0],
+            state: &arr[1],
+            reserve_pda: &arr[2],
+            stake_list: &arr[3],
+            validator_list: &arr[4],
+            msol_mint: &arr[5],
+            operational_sol_account: &arr[6],
+            liq_pool_lp_mint: &arr[7],
+            liq_pool_sol_leg_pda: &arr[8],
+            liq_pool_msol_leg: &arr[9],
+            treasury_msol_account: &arr[10],
+            clock: &arr[11],
+            rent: &arr[12],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -149,7 +189,7 @@ pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CHANGE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const CHANGE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ChangeAuthorityAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -176,11 +216,29 @@ impl From<&ChangeAuthorityKeys> for [AccountMeta; CHANGE_AUTHORITY_IX_ACCOUNTS_L
         ]
     }
 }
+impl From<[Pubkey; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN]> for ChangeAuthorityKeys {
+    fn from(pubkeys: [Pubkey; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            admin_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&ChangeAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &ChangeAuthorityAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.admin_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ChangeAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            admin_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -233,7 +291,7 @@ pub fn change_authority_invoke_signed<'info, A: Into<ChangeAuthorityIxArgs>>(
     let account_info: [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ADD_VALIDATOR_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const ADD_VALIDATOR_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct AddValidatorAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -288,6 +346,21 @@ impl From<&AddValidatorKeys> for [AccountMeta; ADD_VALIDATOR_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; ADD_VALIDATOR_IX_ACCOUNTS_LEN]> for AddValidatorKeys {
+    fn from(pubkeys: [Pubkey; ADD_VALIDATOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            manager_authority: pubkeys[1],
+            validator_list: pubkeys[2],
+            validator_vote: pubkeys[3],
+            duplication_flag: pubkeys[4],
+            rent_payer: pubkeys[5],
+            clock: pubkeys[6],
+            rent: pubkeys[7],
+            system_program: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&AddValidatorAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN]
 {
@@ -303,6 +376,23 @@ impl<'info> From<&AddValidatorAccounts<'_, 'info>>
             accounts.rent.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN]>
+    for AddValidatorAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            manager_authority: &arr[1],
+            validator_list: &arr[2],
+            validator_vote: &arr[3],
+            duplication_flag: &arr[4],
+            rent_payer: &arr[5],
+            clock: &arr[6],
+            rent: &arr[7],
+            system_program: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -355,7 +445,7 @@ pub fn add_validator_invoke_signed<'info, A: Into<AddValidatorIxArgs>>(
     let account_info: [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_VALIDATOR_IX_ACCOUNTS_LEN: usize = 5usize;
+pub const REMOVE_VALIDATOR_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveValidatorAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -394,6 +484,17 @@ impl From<&RemoveValidatorKeys> for [AccountMeta; REMOVE_VALIDATOR_IX_ACCOUNTS_L
         ]
     }
 }
+impl From<[Pubkey; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN]> for RemoveValidatorKeys {
+    fn from(pubkeys: [Pubkey; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            manager_authority: pubkeys[1],
+            validator_list: pubkeys[2],
+            duplication_flag: pubkeys[3],
+            operational_sol_account: pubkeys[4],
+        }
+    }
+}
 impl<'info> From<&RemoveValidatorAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN]
 {
@@ -405,6 +506,19 @@ impl<'info> From<&RemoveValidatorAccounts<'_, 'info>>
             accounts.duplication_flag.clone(),
             accounts.operational_sol_account.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN]>
+    for RemoveValidatorAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            manager_authority: &arr[1],
+            validator_list: &arr[2],
+            duplication_flag: &arr[3],
+            operational_sol_account: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -458,7 +572,7 @@ pub fn remove_validator_invoke_signed<'info, A: Into<RemoveValidatorIxArgs>>(
     let account_info: [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct SetValidatorScoreAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -489,6 +603,15 @@ impl From<&SetValidatorScoreKeys> for [AccountMeta; SET_VALIDATOR_SCORE_IX_ACCOU
         ]
     }
 }
+impl From<[Pubkey; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN]> for SetValidatorScoreKeys {
+    fn from(pubkeys: [Pubkey; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            manager_authority: pubkeys[1],
+            validator_list: pubkeys[2],
+        }
+    }
+}
 impl<'info> From<&SetValidatorScoreAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN]
 {
@@ -498,6 +621,17 @@ impl<'info> From<&SetValidatorScoreAccounts<'_, 'info>>
             accounts.manager_authority.clone(),
             accounts.validator_list.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN]>
+    for SetValidatorScoreAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            manager_authority: &arr[1],
+            validator_list: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -552,7 +686,7 @@ pub fn set_validator_score_invoke_signed<'info, A: Into<SetValidatorScoreIxArgs>
     let account_info: [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ConfigValidatorSystemAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -579,11 +713,29 @@ impl From<&ConfigValidatorSystemKeys> for [AccountMeta; CONFIG_VALIDATOR_SYSTEM_
         ]
     }
 }
+impl From<[Pubkey; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN]> for ConfigValidatorSystemKeys {
+    fn from(pubkeys: [Pubkey; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            manager_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&ConfigValidatorSystemAccounts<'_, 'info>>
     for [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &ConfigValidatorSystemAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.manager_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN]>
+    for ConfigValidatorSystemAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            manager_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -641,7 +793,7 @@ pub fn config_validator_system_invoke_signed<'info, A: Into<ConfigValidatorSyste
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -704,6 +856,23 @@ impl From<&DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; DEPOSIT_IX_ACCOUNTS_LEN]> for DepositKeys {
+    fn from(pubkeys: [Pubkey; DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            msol_mint: pubkeys[1],
+            liq_pool_sol_leg_pda: pubkeys[2],
+            liq_pool_msol_leg: pubkeys[3],
+            liq_pool_msol_leg_authority: pubkeys[4],
+            reserve_pda: pubkeys[5],
+            transfer_from: pubkeys[6],
+            mint_to: pubkeys[7],
+            msol_mint_authority: pubkeys[8],
+            system_program: pubkeys[9],
+            token_program: pubkeys[10],
+        }
+    }
+}
 impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] {
     fn from(accounts: &DepositAccounts<'_, 'info>) -> Self {
         [
@@ -719,6 +888,25 @@ impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_I
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]>
+    for DepositAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            msol_mint: &arr[1],
+            liq_pool_sol_leg_pda: &arr[2],
+            liq_pool_msol_leg: &arr[3],
+            liq_pool_msol_leg_authority: &arr[4],
+            reserve_pda: &arr[5],
+            transfer_from: &arr[6],
+            mint_to: &arr[7],
+            msol_mint_authority: &arr[8],
+            system_program: &arr[9],
+            token_program: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -771,7 +959,7 @@ pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN: usize = 15usize;
+pub const DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN: usize = 15;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositStakeAccountAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -850,6 +1038,27 @@ impl From<&DepositStakeAccountKeys> for [AccountMeta; DEPOSIT_STAKE_ACCOUNT_IX_A
         ]
     }
 }
+impl From<[Pubkey; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]> for DepositStakeAccountKeys {
+    fn from(pubkeys: [Pubkey; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            validator_list: pubkeys[1],
+            stake_list: pubkeys[2],
+            stake_account: pubkeys[3],
+            stake_authority: pubkeys[4],
+            duplication_flag: pubkeys[5],
+            rent_payer: pubkeys[6],
+            msol_mint: pubkeys[7],
+            mint_to: pubkeys[8],
+            msol_mint_authority: pubkeys[9],
+            clock: pubkeys[10],
+            rent: pubkeys[11],
+            system_program: pubkeys[12],
+            token_program: pubkeys[13],
+            stake_program: pubkeys[14],
+        }
+    }
+}
 impl<'info> From<&DepositStakeAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]
 {
@@ -871,6 +1080,29 @@ impl<'info> From<&DepositStakeAccountAccounts<'_, 'info>>
             accounts.token_program.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for DepositStakeAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            validator_list: &arr[1],
+            stake_list: &arr[2],
+            stake_account: &arr[3],
+            stake_authority: &arr[4],
+            duplication_flag: &arr[5],
+            rent_payer: &arr[6],
+            msol_mint: &arr[7],
+            mint_to: &arr[8],
+            msol_mint_authority: &arr[9],
+            clock: &arr[10],
+            rent: &arr[11],
+            system_program: &arr[12],
+            token_program: &arr[13],
+            stake_program: &arr[14],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -926,7 +1158,7 @@ pub fn deposit_stake_account_invoke_signed<'info, A: Into<DepositStakeAccountIxA
     let account_info: [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const LIQUID_UNSTAKE_IX_ACCOUNTS_LEN: usize = 10usize;
+pub const LIQUID_UNSTAKE_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidUnstakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -985,6 +1217,22 @@ impl From<&LiquidUnstakeKeys> for [AccountMeta; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] 
         ]
     }
 }
+impl From<[Pubkey; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]> for LiquidUnstakeKeys {
+    fn from(pubkeys: [Pubkey; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            msol_mint: pubkeys[1],
+            liq_pool_sol_leg_pda: pubkeys[2],
+            liq_pool_msol_leg: pubkeys[3],
+            treasury_msol_account: pubkeys[4],
+            get_msol_from: pubkeys[5],
+            get_msol_from_authority: pubkeys[6],
+            transfer_sol_to: pubkeys[7],
+            system_program: pubkeys[8],
+            token_program: pubkeys[9],
+        }
+    }
+}
 impl<'info> From<&LiquidUnstakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]
 {
@@ -1001,6 +1249,24 @@ impl<'info> From<&LiquidUnstakeAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]>
+    for LiquidUnstakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            msol_mint: &arr[1],
+            liq_pool_sol_leg_pda: &arr[2],
+            liq_pool_msol_leg: &arr[3],
+            treasury_msol_account: &arr[4],
+            get_msol_from: &arr[5],
+            get_msol_from_authority: &arr[6],
+            transfer_sol_to: &arr[7],
+            system_program: &arr[8],
+            token_program: &arr[9],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1053,7 +1319,7 @@ pub fn liquid_unstake_invoke_signed<'info, A: Into<LiquidUnstakeIxArgs>>(
     let account_info: [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ADD_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const ADD_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct AddLiquidityAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1108,6 +1374,21 @@ impl From<&AddLiquidityKeys> for [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]> for AddLiquidityKeys {
+    fn from(pubkeys: [Pubkey; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            lp_mint: pubkeys[1],
+            lp_mint_authority: pubkeys[2],
+            liq_pool_msol_leg: pubkeys[3],
+            liq_pool_sol_leg_pda: pubkeys[4],
+            transfer_from: pubkeys[5],
+            mint_to: pubkeys[6],
+            system_program: pubkeys[7],
+            token_program: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&AddLiquidityAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]
 {
@@ -1123,6 +1404,23 @@ impl<'info> From<&AddLiquidityAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]>
+    for AddLiquidityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            lp_mint: &arr[1],
+            lp_mint_authority: &arr[2],
+            liq_pool_msol_leg: &arr[3],
+            liq_pool_sol_leg_pda: &arr[4],
+            transfer_from: &arr[5],
+            mint_to: &arr[6],
+            system_program: &arr[7],
+            token_program: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1175,7 +1473,7 @@ pub fn add_liquidity_invoke_signed<'info, A: Into<AddLiquidityIxArgs>>(
     let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveLiquidityAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1238,6 +1536,23 @@ impl From<&RemoveLiquidityKeys> for [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_L
         ]
     }
 }
+impl From<[Pubkey; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]> for RemoveLiquidityKeys {
+    fn from(pubkeys: [Pubkey; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            lp_mint: pubkeys[1],
+            burn_from: pubkeys[2],
+            burn_from_authority: pubkeys[3],
+            transfer_sol_to: pubkeys[4],
+            transfer_msol_to: pubkeys[5],
+            liq_pool_sol_leg_pda: pubkeys[6],
+            liq_pool_msol_leg: pubkeys[7],
+            liq_pool_msol_leg_authority: pubkeys[8],
+            system_program: pubkeys[9],
+            token_program: pubkeys[10],
+        }
+    }
+}
 impl<'info> From<&RemoveLiquidityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]
 {
@@ -1255,6 +1570,25 @@ impl<'info> From<&RemoveLiquidityAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]>
+    for RemoveLiquidityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            lp_mint: &arr[1],
+            burn_from: &arr[2],
+            burn_from_authority: &arr[3],
+            transfer_sol_to: &arr[4],
+            transfer_msol_to: &arr[5],
+            liq_pool_sol_leg_pda: &arr[6],
+            liq_pool_msol_leg: &arr[7],
+            liq_pool_msol_leg_authority: &arr[8],
+            system_program: &arr[9],
+            token_program: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1307,7 +1641,7 @@ pub fn remove_liquidity_invoke_signed<'info, A: Into<RemoveLiquidityIxArgs>>(
     let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SET_LP_PARAMS_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const SET_LP_PARAMS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SetLpParamsAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1334,11 +1668,29 @@ impl From<&SetLpParamsKeys> for [AccountMeta; SET_LP_PARAMS_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; SET_LP_PARAMS_IX_ACCOUNTS_LEN]> for SetLpParamsKeys {
+    fn from(pubkeys: [Pubkey; SET_LP_PARAMS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            admin_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&SetLpParamsAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &SetLpParamsAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.admin_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN]>
+    for SetLpParamsAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            admin_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1393,7 +1745,7 @@ pub fn set_lp_params_invoke_signed<'info, A: Into<SetLpParamsIxArgs>>(
     let account_info: [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CONFIG_MARINADE_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const CONFIG_MARINADE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ConfigMarinadeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1420,11 +1772,29 @@ impl From<&ConfigMarinadeKeys> for [AccountMeta; CONFIG_MARINADE_IX_ACCOUNTS_LEN
         ]
     }
 }
+impl From<[Pubkey; CONFIG_MARINADE_IX_ACCOUNTS_LEN]> for ConfigMarinadeKeys {
+    fn from(pubkeys: [Pubkey; CONFIG_MARINADE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            admin_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&ConfigMarinadeAccounts<'_, 'info>>
     for [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &ConfigMarinadeAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.admin_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN]>
+    for ConfigMarinadeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            admin_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1477,7 +1847,7 @@ pub fn config_marinade_invoke_signed<'info, A: Into<ConfigMarinadeIxArgs>>(
     let account_info: [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ORDER_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const ORDER_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct OrderUnstakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1528,6 +1898,20 @@ impl From<&OrderUnstakeKeys> for [AccountMeta; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]> for OrderUnstakeKeys {
+    fn from(pubkeys: [Pubkey; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            msol_mint: pubkeys[1],
+            burn_msol_from: pubkeys[2],
+            burn_msol_authority: pubkeys[3],
+            new_ticket_account: pubkeys[4],
+            clock: pubkeys[5],
+            rent: pubkeys[6],
+            token_program: pubkeys[7],
+        }
+    }
+}
 impl<'info> From<&OrderUnstakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]
 {
@@ -1542,6 +1926,22 @@ impl<'info> From<&OrderUnstakeAccounts<'_, 'info>>
             accounts.rent.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]>
+    for OrderUnstakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            msol_mint: &arr[1],
+            burn_msol_from: &arr[2],
+            burn_msol_authority: &arr[3],
+            new_ticket_account: &arr[4],
+            clock: &arr[5],
+            rent: &arr[6],
+            token_program: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1594,7 +1994,7 @@ pub fn order_unstake_invoke_signed<'info, A: Into<OrderUnstakeIxArgs>>(
     let account_info: [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CLAIM_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const CLAIM_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct ClaimAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1637,6 +2037,18 @@ impl From<&ClaimKeys> for [AccountMeta; CLAIM_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; CLAIM_IX_ACCOUNTS_LEN]> for ClaimKeys {
+    fn from(pubkeys: [Pubkey; CLAIM_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            reserve_pda: pubkeys[1],
+            ticket_account: pubkeys[2],
+            transfer_sol_to: pubkeys[3],
+            clock: pubkeys[4],
+            system_program: pubkeys[5],
+        }
+    }
+}
 impl<'info> From<&ClaimAccounts<'_, 'info>> for [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] {
     fn from(accounts: &ClaimAccounts<'_, 'info>) -> Self {
         [
@@ -1647,6 +2059,20 @@ impl<'info> From<&ClaimAccounts<'_, 'info>> for [AccountInfo<'info>; CLAIM_IX_AC
             accounts.clock.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN]>
+    for ClaimAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            reserve_pda: &arr[1],
+            ticket_account: &arr[2],
+            transfer_sol_to: &arr[3],
+            clock: &arr[4],
+            system_program: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1697,7 +2123,7 @@ pub fn claim_invoke_signed<'info, A: Into<ClaimIxArgs>>(
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const STAKE_RESERVE_IX_ACCOUNTS_LEN: usize = 14usize;
+pub const STAKE_RESERVE_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
 pub struct StakeReserveAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1772,6 +2198,26 @@ impl From<&StakeReserveKeys> for [AccountMeta; STAKE_RESERVE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; STAKE_RESERVE_IX_ACCOUNTS_LEN]> for StakeReserveKeys {
+    fn from(pubkeys: [Pubkey; STAKE_RESERVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            validator_list: pubkeys[1],
+            stake_list: pubkeys[2],
+            validator_vote: pubkeys[3],
+            reserve_pda: pubkeys[4],
+            stake_account: pubkeys[5],
+            stake_deposit_authority: pubkeys[6],
+            clock: pubkeys[7],
+            epoch_schedule: pubkeys[8],
+            rent: pubkeys[9],
+            stake_history: pubkeys[10],
+            stake_config: pubkeys[11],
+            system_program: pubkeys[12],
+            stake_program: pubkeys[13],
+        }
+    }
+}
 impl<'info> From<&StakeReserveAccounts<'_, 'info>>
     for [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN]
 {
@@ -1792,6 +2238,28 @@ impl<'info> From<&StakeReserveAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN]>
+    for StakeReserveAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            validator_list: &arr[1],
+            stake_list: &arr[2],
+            validator_vote: &arr[3],
+            reserve_pda: &arr[4],
+            stake_account: &arr[5],
+            stake_deposit_authority: &arr[6],
+            clock: &arr[7],
+            epoch_schedule: &arr[8],
+            rent: &arr[9],
+            stake_history: &arr[10],
+            stake_config: &arr[11],
+            system_program: &arr[12],
+            stake_program: &arr[13],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1844,7 +2312,7 @@ pub fn stake_reserve_invoke_signed<'info, A: Into<StakeReserveIxArgs>>(
     let account_info: [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_ACTIVE_IX_ACCOUNTS_LEN: usize = 13usize;
+pub const UPDATE_ACTIVE_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateActiveAccounts<'me, 'info> {
     pub common_state: &'me AccountInfo<'info>,
@@ -1915,6 +2383,25 @@ impl From<&UpdateActiveKeys> for [AccountMeta; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]> for UpdateActiveKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            common_state: pubkeys[0],
+            common_stake_list: pubkeys[1],
+            common_stake_account: pubkeys[2],
+            common_stake_withdraw_authority: pubkeys[3],
+            common_reserve_pda: pubkeys[4],
+            common_msol_mint: pubkeys[5],
+            common_msol_mint_authority: pubkeys[6],
+            common_treasury_msol_account: pubkeys[7],
+            common_clock: pubkeys[8],
+            common_stake_history: pubkeys[9],
+            common_stake_program: pubkeys[10],
+            common_token_program: pubkeys[11],
+            validator_list: pubkeys[12],
+        }
+    }
+}
 impl<'info> From<&UpdateActiveAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]
 {
@@ -1934,6 +2421,27 @@ impl<'info> From<&UpdateActiveAccounts<'_, 'info>>
             accounts.common_token_program.clone(),
             accounts.validator_list.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]>
+    for UpdateActiveAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            common_state: &arr[0],
+            common_stake_list: &arr[1],
+            common_stake_account: &arr[2],
+            common_stake_withdraw_authority: &arr[3],
+            common_reserve_pda: &arr[4],
+            common_msol_mint: &arr[5],
+            common_msol_mint_authority: &arr[6],
+            common_treasury_msol_account: &arr[7],
+            common_clock: &arr[8],
+            common_stake_history: &arr[9],
+            common_stake_program: &arr[10],
+            common_token_program: &arr[11],
+            validator_list: &arr[12],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1987,7 +2495,7 @@ pub fn update_active_invoke_signed<'info, A: Into<UpdateActiveIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN: usize = 14usize;
+pub const UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateDeactivatedAccounts<'me, 'info> {
     pub common_state: &'me AccountInfo<'info>,
@@ -2062,6 +2570,26 @@ impl From<&UpdateDeactivatedKeys> for [AccountMeta; UPDATE_DEACTIVATED_IX_ACCOUN
         ]
     }
 }
+impl From<[Pubkey; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN]> for UpdateDeactivatedKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            common_state: pubkeys[0],
+            common_stake_list: pubkeys[1],
+            common_stake_account: pubkeys[2],
+            common_stake_withdraw_authority: pubkeys[3],
+            common_reserve_pda: pubkeys[4],
+            common_msol_mint: pubkeys[5],
+            common_msol_mint_authority: pubkeys[6],
+            common_treasury_msol_account: pubkeys[7],
+            common_clock: pubkeys[8],
+            common_stake_history: pubkeys[9],
+            common_stake_program: pubkeys[10],
+            common_token_program: pubkeys[11],
+            operational_sol_account: pubkeys[12],
+            system_program: pubkeys[13],
+        }
+    }
+}
 impl<'info> From<&UpdateDeactivatedAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN]
 {
@@ -2082,6 +2610,28 @@ impl<'info> From<&UpdateDeactivatedAccounts<'_, 'info>>
             accounts.operational_sol_account.clone(),
             accounts.system_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN]>
+    for UpdateDeactivatedAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            common_state: &arr[0],
+            common_stake_list: &arr[1],
+            common_stake_account: &arr[2],
+            common_stake_withdraw_authority: &arr[3],
+            common_reserve_pda: &arr[4],
+            common_msol_mint: &arr[5],
+            common_msol_mint_authority: &arr[6],
+            common_treasury_msol_account: &arr[7],
+            common_clock: &arr[8],
+            common_stake_history: &arr[9],
+            common_stake_program: &arr[10],
+            common_token_program: &arr[11],
+            operational_sol_account: &arr[12],
+            system_program: &arr[13],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2134,7 +2684,7 @@ pub fn update_deactivated_invoke_signed<'info, A: Into<UpdateDeactivatedIxArgs>>
     let account_info: [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEACTIVATE_STAKE_IX_ACCOUNTS_LEN: usize = 14usize;
+pub const DEACTIVATE_STAKE_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
 pub struct DeactivateStakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2209,6 +2759,26 @@ impl From<&DeactivateStakeKeys> for [AccountMeta; DEACTIVATE_STAKE_IX_ACCOUNTS_L
         ]
     }
 }
+impl From<[Pubkey; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN]> for DeactivateStakeKeys {
+    fn from(pubkeys: [Pubkey; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            reserve_pda: pubkeys[1],
+            validator_list: pubkeys[2],
+            stake_list: pubkeys[3],
+            stake_account: pubkeys[4],
+            stake_deposit_authority: pubkeys[5],
+            split_stake_account: pubkeys[6],
+            split_stake_rent_payer: pubkeys[7],
+            clock: pubkeys[8],
+            rent: pubkeys[9],
+            epoch_schedule: pubkeys[10],
+            stake_history: pubkeys[11],
+            system_program: pubkeys[12],
+            stake_program: pubkeys[13],
+        }
+    }
+}
 impl<'info> From<&DeactivateStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN]
 {
@@ -2229,6 +2799,28 @@ impl<'info> From<&DeactivateStakeAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN]>
+    for DeactivateStakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            reserve_pda: &arr[1],
+            validator_list: &arr[2],
+            stake_list: &arr[3],
+            stake_account: &arr[4],
+            stake_deposit_authority: &arr[5],
+            split_stake_account: &arr[6],
+            split_stake_rent_payer: &arr[7],
+            clock: &arr[8],
+            rent: &arr[9],
+            epoch_schedule: &arr[10],
+            stake_history: &arr[11],
+            system_program: &arr[12],
+            stake_program: &arr[13],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2282,7 +2874,7 @@ pub fn deactivate_stake_invoke_signed<'info, A: Into<DeactivateStakeIxArgs>>(
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct EmergencyUnstakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2333,6 +2925,20 @@ impl From<&EmergencyUnstakeKeys> for [AccountMeta; EMERGENCY_UNSTAKE_IX_ACCOUNTS
         ]
     }
 }
+impl From<[Pubkey; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN]> for EmergencyUnstakeKeys {
+    fn from(pubkeys: [Pubkey; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            validator_manager_authority: pubkeys[1],
+            validator_list: pubkeys[2],
+            stake_list: pubkeys[3],
+            stake_account: pubkeys[4],
+            stake_deposit_authority: pubkeys[5],
+            clock: pubkeys[6],
+            stake_program: pubkeys[7],
+        }
+    }
+}
 impl<'info> From<&EmergencyUnstakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN]
 {
@@ -2347,6 +2953,22 @@ impl<'info> From<&EmergencyUnstakeAccounts<'_, 'info>>
             accounts.clock.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN]>
+    for EmergencyUnstakeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            validator_manager_authority: &arr[1],
+            validator_list: &arr[2],
+            stake_list: &arr[3],
+            stake_account: &arr[4],
+            stake_deposit_authority: &arr[5],
+            clock: &arr[6],
+            stake_program: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2400,7 +3022,7 @@ pub fn emergency_unstake_invoke_signed<'info, A: Into<EmergencyUnstakeIxArgs>>(
     let account_info: [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MERGE_STAKES_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const MERGE_STAKES_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct MergeStakesAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2463,6 +3085,23 @@ impl From<&MergeStakesKeys> for [AccountMeta; MERGE_STAKES_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; MERGE_STAKES_IX_ACCOUNTS_LEN]> for MergeStakesKeys {
+    fn from(pubkeys: [Pubkey; MERGE_STAKES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            stake_list: pubkeys[1],
+            validator_list: pubkeys[2],
+            destination_stake: pubkeys[3],
+            source_stake: pubkeys[4],
+            stake_deposit_authority: pubkeys[5],
+            stake_withdraw_authority: pubkeys[6],
+            operational_sol_account: pubkeys[7],
+            clock: pubkeys[8],
+            stake_history: pubkeys[9],
+            stake_program: pubkeys[10],
+        }
+    }
+}
 impl<'info> From<&MergeStakesAccounts<'_, 'info>>
     for [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN]
 {
@@ -2480,6 +3119,25 @@ impl<'info> From<&MergeStakesAccounts<'_, 'info>>
             accounts.stake_history.clone(),
             accounts.stake_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN]>
+    for MergeStakesAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: &arr[0],
+            stake_list: &arr[1],
+            validator_list: &arr[2],
+            destination_stake: &arr[3],
+            source_stake: &arr[4],
+            stake_deposit_authority: &arr[5],
+            stake_withdraw_authority: &arr[6],
+            operational_sol_account: &arr[7],
+            clock: &arr[8],
+            stake_history: &arr[9],
+            stake_program: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]

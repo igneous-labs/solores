@@ -7,7 +7,7 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
-pub const CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountAccounts<'me, 'info> {
     ///Metadata key (pda of ['metadata', program id, mint id])
@@ -68,6 +68,19 @@ impl From<&CreateMetadataAccountKeys> for [AccountMeta; CREATE_METADATA_ACCOUNT_
         ]
     }
 }
+impl From<[Pubkey; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]> for CreateMetadataAccountKeys {
+    fn from(pubkeys: [Pubkey; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            mint: pubkeys[1],
+            mint_authority: pubkeys[2],
+            payer: pubkeys[3],
+            update_authority: pubkeys[4],
+            system_program: pubkeys[5],
+            rent: pubkeys[6],
+        }
+    }
+}
 impl<'info> From<&CreateMetadataAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]
 {
@@ -81,6 +94,21 @@ impl<'info> From<&CreateMetadataAccountAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for CreateMetadataAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            mint: &arr[1],
+            mint_authority: &arr[2],
+            payer: &arr[3],
+            update_authority: &arr[4],
+            system_program: &arr[5],
+            rent: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -138,7 +166,7 @@ pub fn create_metadata_account_invoke_signed<'info, A: Into<CreateMetadataAccoun
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountAccounts<'me, 'info> {
     ///Metadata account
@@ -169,11 +197,29 @@ impl From<&UpdateMetadataAccountKeys> for [AccountMeta; UPDATE_METADATA_ACCOUNT_
         ]
     }
 }
+impl From<[Pubkey; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]> for UpdateMetadataAccountKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            update_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&UpdateMetadataAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &UpdateMetadataAccountAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for UpdateMetadataAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            update_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -231,7 +277,7 @@ pub fn update_metadata_account_invoke_signed<'info, A: Into<UpdateMetadataAccoun
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 13usize;
+pub const DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedCreateMasterEditionAccounts<'me, 'info> {
     ///Unallocated edition V1 account with address as pda of ['metadata', program id, mint, 'edition']
@@ -334,6 +380,27 @@ impl From<&DeprecatedCreateMasterEditionKeys>
         ]
     }
 }
+impl From<[Pubkey; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateMasterEditionKeys
+{
+    fn from(pubkeys: [Pubkey; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: pubkeys[0],
+            mint: pubkeys[1],
+            printing_mint: pubkeys[2],
+            one_time_printing_authorization_mint: pubkeys[3],
+            update_authority: pubkeys[4],
+            printing_mint_authority: pubkeys[5],
+            mint_authority: pubkeys[6],
+            metadata: pubkeys[7],
+            payer: pubkeys[8],
+            token_program: pubkeys[9],
+            system_program: pubkeys[10],
+            rent: pubkeys[11],
+            one_time_printing_authorization_mint_authority: pubkeys[12],
+        }
+    }
+}
 impl<'info> From<&DeprecatedCreateMasterEditionAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]
 {
@@ -355,6 +422,29 @@ impl<'info> From<&DeprecatedCreateMasterEditionAccounts<'_, 'info>>
                 .one_time_printing_authorization_mint_authority
                 .clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateMasterEditionAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            printing_mint: &arr[2],
+            one_time_printing_authorization_mint: &arr[3],
+            update_authority: &arr[4],
+            printing_mint_authority: &arr[5],
+            mint_authority: &arr[6],
+            metadata: &arr[7],
+            payer: &arr[8],
+            token_program: &arr[9],
+            system_program: &arr[10],
+            rent: &arr[11],
+            one_time_printing_authorization_mint_authority: &arr[12],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -421,7 +511,7 @@ pub fn deprecated_create_master_edition_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN:
-    usize = 16usize;
+    usize = 16;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info> {
     ///New Metadata key (pda of ['metadata', program id, mint id])
@@ -541,6 +631,35 @@ impl From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>
         ]
     }
 }
+impl
+    From<
+        [Pubkey;
+            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    > for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys
+{
+    fn from(
+        pubkeys: [Pubkey; DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            edition: pubkeys[1],
+            master_edition: pubkeys[2],
+            mint: pubkeys[3],
+            mint_authority: pubkeys[4],
+            printing_mint: pubkeys[5],
+            master_token_account: pubkeys[6],
+            edition_marker: pubkeys[7],
+            burn_authority: pubkeys[8],
+            payer: pubkeys[9],
+            master_update_authority: pubkeys[10],
+            master_metadata: pubkeys[11],
+            token_program: pubkeys[12],
+            system_program: pubkeys[13],
+            rent: pubkeys[14],
+            reservation_list: pubkeys[15],
+        }
+    }
+}
 impl<'info> From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN]
@@ -566,6 +685,37 @@ impl<'info> From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccou
             accounts.rent.clone(),
             accounts.reservation_list.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<
+        &'me [AccountInfo<'info>;
+                 DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    > for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<
+            'info,
+        >; DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            metadata: &arr[0],
+            edition: &arr[1],
+            master_edition: &arr[2],
+            mint: &arr[3],
+            mint_authority: &arr[4],
+            printing_mint: &arr[5],
+            master_token_account: &arr[6],
+            edition_marker: &arr[7],
+            burn_authority: &arr[8],
+            payer: &arr[9],
+            master_update_authority: &arr[10],
+            master_metadata: &arr[11],
+            token_program: &arr[12],
+            system_program: &arr[13],
+            rent: &arr[14],
+            reservation_list: &arr[15],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -637,7 +787,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info> {
     ///Metadata key (pda of ['metadata', program id, mint id])
@@ -678,6 +828,17 @@ impl From<&UpdatePrimarySaleHappenedViaTokenKeys>
         ]
     }
 }
+impl From<[Pubkey; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for UpdatePrimarySaleHappenedViaTokenKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            owner: pubkeys[1],
+            token: pubkeys[2],
+        }
+    }
+}
 impl<'info> From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
@@ -687,6 +848,20 @@ impl<'info> From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>>
             accounts.owner.clone(),
             accounts.token.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            metadata: &arr[0],
+            owner: &arr[1],
+            token: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -753,7 +928,7 @@ pub fn update_primary_sale_happened_via_token_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedSetReservationListAccounts<'me, 'info> {
     ///Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition'])
@@ -792,6 +967,17 @@ impl From<&DeprecatedSetReservationListKeys>
         ]
     }
 }
+impl From<[Pubkey; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedSetReservationListKeys
+{
+    fn from(pubkeys: [Pubkey; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            master_edition: pubkeys[0],
+            reservation_list: pubkeys[1],
+            resource: pubkeys[2],
+        }
+    }
+}
 impl<'info> From<&DeprecatedSetReservationListAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
@@ -801,6 +987,19 @@ impl<'info> From<&DeprecatedSetReservationListAccounts<'_, 'info>>
             accounts.reservation_list.clone(),
             accounts.resource.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedSetReservationListAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            master_edition: &arr[0],
+            reservation_list: &arr[1],
+            resource: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -866,7 +1065,7 @@ pub fn deprecated_set_reservation_list_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedCreateReservationListAccounts<'me, 'info> {
     ///PDA for ReservationList of ['metadata', program id, master edition key, 'reservation', resource-key]
@@ -937,6 +1136,22 @@ impl From<&DeprecatedCreateReservationListKeys>
         ]
     }
 }
+impl From<[Pubkey; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateReservationListKeys
+{
+    fn from(pubkeys: [Pubkey; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            reservation_list: pubkeys[0],
+            payer: pubkeys[1],
+            update_authority: pubkeys[2],
+            master_edition: pubkeys[3],
+            resource: pubkeys[4],
+            metadata: pubkeys[5],
+            system_program: pubkeys[6],
+            rent: pubkeys[7],
+        }
+    }
+}
 impl<'info> From<&DeprecatedCreateReservationListAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
@@ -951,6 +1166,24 @@ impl<'info> From<&DeprecatedCreateReservationListAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
+    for DeprecatedCreateReservationListAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            reservation_list: &arr[0],
+            payer: &arr[1],
+            update_authority: &arr[2],
+            master_edition: &arr[3],
+            resource: &arr[4],
+            metadata: &arr[5],
+            system_program: &arr[6],
+            rent: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1016,7 +1249,7 @@ pub fn deprecated_create_reservation_list_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SIGN_METADATA_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const SIGN_METADATA_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SignMetadataAccounts<'me, 'info> {
     ///Metadata (pda of ['metadata', program id, mint id])
@@ -1047,11 +1280,29 @@ impl From<&SignMetadataKeys> for [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; SIGN_METADATA_IX_ACCOUNTS_LEN]> for SignMetadataKeys {
+    fn from(pubkeys: [Pubkey; SIGN_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            creator: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&SignMetadataAccounts<'_, 'info>>
     for [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &SignMetadataAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]>
+    for SignMetadataAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            creator: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1102,7 +1353,7 @@ pub fn sign_metadata_invoke_signed<'info, A: Into<SignMetadataIxArgs>>(
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info> {
     ///Destination account
@@ -1181,6 +1432,23 @@ impl From<&DeprecatedMintPrintingTokensViaTokenKeys>
         ]
     }
 }
+impl From<[Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensViaTokenKeys
+{
+    fn from(pubkeys: [Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            destination: pubkeys[0],
+            token: pubkeys[1],
+            one_time_printing_authorization_mint: pubkeys[2],
+            printing_mint: pubkeys[3],
+            burn_authority: pubkeys[4],
+            metadata: pubkeys[5],
+            master_edition: pubkeys[6],
+            token_program: pubkeys[7],
+            rent: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
@@ -1196,6 +1464,26 @@ impl<'info> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>>
             accounts.token_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            destination: &arr[0],
+            token: &arr[1],
+            one_time_printing_authorization_mint: &arr[2],
+            printing_mint: &arr[3],
+            burn_authority: &arr[4],
+            metadata: &arr[5],
+            master_edition: &arr[6],
+            token_program: &arr[7],
+            rent: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1264,7 +1552,7 @@ pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<
         DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensAccounts<'me, 'info> {
     ///Destination account
@@ -1327,6 +1615,21 @@ impl From<&DeprecatedMintPrintingTokensKeys>
         ]
     }
 }
+impl From<[Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensKeys
+{
+    fn from(pubkeys: [Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            destination: pubkeys[0],
+            printing_mint: pubkeys[1],
+            update_authority: pubkeys[2],
+            metadata: pubkeys[3],
+            master_edition: pubkeys[4],
+            token_program: pubkeys[5],
+            rent: pubkeys[6],
+        }
+    }
+}
 impl<'info> From<&DeprecatedMintPrintingTokensAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]
 {
@@ -1340,6 +1643,23 @@ impl<'info> From<&DeprecatedMintPrintingTokensAccounts<'_, 'info>>
             accounts.token_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]>
+    for DeprecatedMintPrintingTokensAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            destination: &arr[0],
+            printing_mint: &arr[1],
+            update_authority: &arr[2],
+            metadata: &arr[3],
+            master_edition: &arr[4],
+            token_program: &arr[5],
+            rent: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1405,7 +1725,7 @@ pub fn deprecated_mint_printing_tokens_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionAccounts<'me, 'info> {
     ///Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition']
@@ -1478,6 +1798,21 @@ impl From<&CreateMasterEditionKeys> for [AccountMeta; CREATE_MASTER_EDITION_IX_A
         ]
     }
 }
+impl From<[Pubkey; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]> for CreateMasterEditionKeys {
+    fn from(pubkeys: [Pubkey; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: pubkeys[0],
+            mint: pubkeys[1],
+            update_authority: pubkeys[2],
+            mint_authority: pubkeys[3],
+            payer: pubkeys[4],
+            metadata: pubkeys[5],
+            token_program: pubkeys[6],
+            system_program: pubkeys[7],
+            rent: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&CreateMasterEditionAccounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]
 {
@@ -1493,6 +1828,23 @@ impl<'info> From<&CreateMasterEditionAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
+    for CreateMasterEditionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            update_authority: &arr[2],
+            mint_authority: &arr[3],
+            payer: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1548,7 +1900,7 @@ pub fn create_master_edition_invoke_signed<'info, A: Into<CreateMasterEditionIxA
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 14usize;
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
 pub struct MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info> {
     ///New Metadata key (pda of ['metadata', program id, mint id])
@@ -1655,6 +2007,30 @@ impl From<&MintNewEditionFromMasterEditionViaTokenKeys>
         ]
     }
 }
+impl From<[Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for MintNewEditionFromMasterEditionViaTokenKeys
+{
+    fn from(
+        pubkeys: [Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: pubkeys[0],
+            new_edition: pubkeys[1],
+            master_edition: pubkeys[2],
+            new_mint: pubkeys[3],
+            edition_mark_pda: pubkeys[4],
+            new_mint_authority: pubkeys[5],
+            payer: pubkeys[6],
+            token_account_owner: pubkeys[7],
+            token_account: pubkeys[8],
+            new_metadata_update_authority: pubkeys[9],
+            metadata: pubkeys[10],
+            token_program: pubkeys[11],
+            system_program: pubkeys[12],
+            rent: pubkeys[13],
+        }
+    }
+}
 impl<'info> From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
@@ -1675,6 +2051,32 @@ impl<'info> From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<&'me [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]>
+    for MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: &arr[0],
+            new_edition: &arr[1],
+            master_edition: &arr[2],
+            new_mint: &arr[3],
+            edition_mark_pda: &arr[4],
+            new_mint_authority: &arr[5],
+            payer: &arr[6],
+            token_account_owner: &arr[7],
+            token_account: &arr[8],
+            new_metadata_update_authority: &arr[9],
+            metadata: &arr[10],
+            token_program: &arr[11],
+            system_program: &arr[12],
+            rent: &arr[13],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1744,7 +2146,7 @@ pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct ConvertMasterEditionV1ToV2Accounts<'me, 'info> {
     ///Master Record Edition V1 (pda of ['metadata', program id, master metadata mint id, 'edition'])
@@ -1783,6 +2185,17 @@ impl From<&ConvertMasterEditionV1ToV2Keys>
         ]
     }
 }
+impl From<[Pubkey; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]>
+    for ConvertMasterEditionV1ToV2Keys
+{
+    fn from(pubkeys: [Pubkey; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            master_edition: pubkeys[0],
+            one_time_auth: pubkeys[1],
+            printing_mint: pubkeys[2],
+        }
+    }
+}
 impl<'info> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]
 {
@@ -1792,6 +2205,19 @@ impl<'info> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'info>>
             accounts.one_time_auth.clone(),
             accounts.printing_mint.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]>
+    for ConvertMasterEditionV1ToV2Accounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            master_edition: &arr[0],
+            one_time_auth: &arr[1],
+            printing_mint: &arr[2],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -1850,7 +2276,7 @@ pub fn convert_master_edition_v1_to_v2_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN: usize = 17usize;
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN: usize = 17;
 #[derive(Copy, Clone, Debug)]
 pub struct MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info> {
     ///New Metadata key (pda of ['metadata', program id, mint id])
@@ -1975,6 +2401,33 @@ impl From<&MintNewEditionFromMasterEditionViaVaultProxyKeys>
         ]
     }
 }
+impl From<[Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN]>
+    for MintNewEditionFromMasterEditionViaVaultProxyKeys
+{
+    fn from(
+        pubkeys: [Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: pubkeys[0],
+            new_edition: pubkeys[1],
+            master_edition: pubkeys[2],
+            new_mint: pubkeys[3],
+            edition_mark_pda: pubkeys[4],
+            new_mint_authority: pubkeys[5],
+            payer: pubkeys[6],
+            vault_authority: pubkeys[7],
+            safety_deposit_store: pubkeys[8],
+            safety_deposit_box: pubkeys[9],
+            vault: pubkeys[10],
+            new_metadata_update_authority: pubkeys[11],
+            metadata: pubkeys[12],
+            token_program: pubkeys[13],
+            token_vault_program: pubkeys[14],
+            system_program: pubkeys[15],
+            rent: pubkeys[16],
+        }
+    }
+}
 impl<'info> From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>>
     for [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN]
 {
@@ -1998,6 +2451,37 @@ impl<'info> From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info>
+    From<
+        &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN],
+    > for MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>
+{
+    fn from(
+        arr: &'me [AccountInfo<'info>;
+                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            new_metadata: &arr[0],
+            new_edition: &arr[1],
+            master_edition: &arr[2],
+            new_mint: &arr[3],
+            edition_mark_pda: &arr[4],
+            new_mint_authority: &arr[5],
+            payer: &arr[6],
+            vault_authority: &arr[7],
+            safety_deposit_store: &arr[8],
+            safety_deposit_box: &arr[9],
+            vault: &arr[10],
+            new_metadata_update_authority: &arr[11],
+            metadata: &arr[12],
+            token_program: &arr[13],
+            token_vault_program: &arr[14],
+            system_program: &arr[15],
+            rent: &arr[16],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2067,7 +2551,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PUFF_METADATA_IX_ACCOUNTS_LEN: usize = 1usize;
+pub const PUFF_METADATA_IX_ACCOUNTS_LEN: usize = 1;
 #[derive(Copy, Clone, Debug)]
 pub struct PuffMetadataAccounts<'me, 'info> {
     ///Metadata account
@@ -2090,11 +2574,25 @@ impl From<&PuffMetadataKeys> for [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] {
         [AccountMeta::new(keys.metadata, false)]
     }
 }
+impl From<[Pubkey; PUFF_METADATA_IX_ACCOUNTS_LEN]> for PuffMetadataKeys {
+    fn from(pubkeys: [Pubkey; PUFF_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+        }
+    }
+}
 impl<'info> From<&PuffMetadataAccounts<'_, 'info>>
     for [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &PuffMetadataAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]>
+    for PuffMetadataAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]) -> Self {
+        Self { metadata: &arr[0] }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2145,7 +2643,7 @@ pub fn puff_metadata_invoke_signed<'info, A: Into<PuffMetadataIxArgs>>(
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountV2Accounts<'me, 'info> {
     ///Metadata account
@@ -2178,11 +2676,29 @@ impl From<&UpdateMetadataAccountV2Keys>
         ]
     }
 }
+impl From<[Pubkey; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]> for UpdateMetadataAccountV2Keys {
+    fn from(pubkeys: [Pubkey; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            update_authority: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&UpdateMetadataAccountV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &UpdateMetadataAccountV2Accounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]>
+    for UpdateMetadataAccountV2Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            update_authority: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2240,7 +2756,7 @@ pub fn update_metadata_account_v2_invoke_signed<'info, A: Into<UpdateMetadataAcc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountV2Accounts<'me, 'info> {
     ///Metadata key (pda of ['metadata', program id, mint id])
@@ -2303,6 +2819,19 @@ impl From<&CreateMetadataAccountV2Keys>
         ]
     }
 }
+impl From<[Pubkey; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]> for CreateMetadataAccountV2Keys {
+    fn from(pubkeys: [Pubkey; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            mint: pubkeys[1],
+            mint_authority: pubkeys[2],
+            payer: pubkeys[3],
+            update_authority: pubkeys[4],
+            system_program: pubkeys[5],
+            rent: pubkeys[6],
+        }
+    }
+}
 impl<'info> From<&CreateMetadataAccountV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
@@ -2316,6 +2845,21 @@ impl<'info> From<&CreateMetadataAccountV2Accounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]>
+    for CreateMetadataAccountV2Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            mint: &arr[1],
+            mint_authority: &arr[2],
+            payer: &arr[3],
+            update_authority: &arr[4],
+            system_program: &arr[5],
+            rent: &arr[6],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2373,7 +2917,7 @@ pub fn create_metadata_account_v2_invoke_signed<'info, A: Into<CreateMetadataAcc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMasterEditionV3Accounts<'me, 'info> {
     ///Unallocated edition V2 account with address as pda of ['metadata', program id, mint, 'edition']
@@ -2446,6 +2990,21 @@ impl From<&CreateMasterEditionV3Keys> for [AccountMeta; CREATE_MASTER_EDITION_V3
         ]
     }
 }
+impl From<[Pubkey; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]> for CreateMasterEditionV3Keys {
+    fn from(pubkeys: [Pubkey; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: pubkeys[0],
+            mint: pubkeys[1],
+            update_authority: pubkeys[2],
+            mint_authority: pubkeys[3],
+            payer: pubkeys[4],
+            metadata: pubkeys[5],
+            token_program: pubkeys[6],
+            system_program: pubkeys[7],
+            rent: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&CreateMasterEditionV3Accounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]
 {
@@ -2461,6 +3020,23 @@ impl<'info> From<&CreateMasterEditionV3Accounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]>
+    for CreateMasterEditionV3Accounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            edition: &arr[0],
+            mint: &arr[1],
+            update_authority: &arr[2],
+            mint_authority: &arr[3],
+            payer: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2518,7 +3094,7 @@ pub fn create_master_edition_v3_invoke_signed<'info, A: Into<CreateMasterEdition
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct VerifyCollectionAccounts<'me, 'info> {
     ///Metadata account
@@ -2573,6 +3149,18 @@ impl From<&VerifyCollectionKeys> for [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS
         ]
     }
 }
+impl From<[Pubkey; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for VerifyCollectionKeys {
+    fn from(pubkeys: [Pubkey; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            collection_authority: pubkeys[1],
+            payer: pubkeys[2],
+            collection_mint: pubkeys[3],
+            collection: pubkeys[4],
+            collection_master_edition_account: pubkeys[5],
+        }
+    }
+}
 impl<'info> From<&VerifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
@@ -2585,6 +3173,20 @@ impl<'info> From<&VerifyCollectionAccounts<'_, 'info>>
             accounts.collection.clone(),
             accounts.collection_master_edition_account.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for VerifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            payer: &arr[2],
+            collection_mint: &arr[3],
+            collection: &arr[4],
+            collection_master_edition_account: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2635,7 +3237,7 @@ pub fn verify_collection_invoke_signed<'info, A: Into<VerifyCollectionIxArgs>>(
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UTILIZE_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const UTILIZE_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct UtilizeAccounts<'me, 'info> {
     ///Metadata account
@@ -2720,6 +3322,23 @@ impl From<&UtilizeKeys> for [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
+impl From<[Pubkey; UTILIZE_IX_ACCOUNTS_LEN]> for UtilizeKeys {
+    fn from(pubkeys: [Pubkey; UTILIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            token_account: pubkeys[1],
+            mint: pubkeys[2],
+            use_authority: pubkeys[3],
+            owner: pubkeys[4],
+            token_program: pubkeys[5],
+            ata_program: pubkeys[6],
+            system_program: pubkeys[7],
+            rent: pubkeys[8],
+            use_authority_record: pubkeys[9],
+            burner: pubkeys[10],
+        }
+    }
+}
 impl<'info> From<&UtilizeAccounts<'_, 'info>> for [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] {
     fn from(accounts: &UtilizeAccounts<'_, 'info>) -> Self {
         [
@@ -2735,6 +3354,25 @@ impl<'info> From<&UtilizeAccounts<'_, 'info>> for [AccountInfo<'info>; UTILIZE_I
             accounts.use_authority_record.clone(),
             accounts.burner.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN]>
+    for UtilizeAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            token_account: &arr[1],
+            mint: &arr[2],
+            use_authority: &arr[3],
+            owner: &arr[4],
+            token_program: &arr[5],
+            ata_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+            use_authority_record: &arr[9],
+            burner: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2787,7 +3425,7 @@ pub fn utilize_invoke_signed<'info, A: Into<UtilizeIxArgs>>(
     let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveUseAuthorityAccounts<'me, 'info> {
     ///Use Authority Record PDA
@@ -2872,6 +3510,23 @@ impl From<&ApproveUseAuthorityKeys> for [AccountMeta; APPROVE_USE_AUTHORITY_IX_A
         ]
     }
 }
+impl From<[Pubkey; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]> for ApproveUseAuthorityKeys {
+    fn from(pubkeys: [Pubkey; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: pubkeys[0],
+            owner: pubkeys[1],
+            payer: pubkeys[2],
+            user: pubkeys[3],
+            owner_token_account: pubkeys[4],
+            metadata: pubkeys[5],
+            mint: pubkeys[6],
+            burner: pubkeys[7],
+            token_program: pubkeys[8],
+            system_program: pubkeys[9],
+            rent: pubkeys[10],
+        }
+    }
+}
 impl<'info> From<&ApproveUseAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
@@ -2889,6 +3544,25 @@ impl<'info> From<&ApproveUseAuthorityAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ApproveUseAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: &arr[0],
+            owner: &arr[1],
+            payer: &arr[2],
+            user: &arr[3],
+            owner_token_account: &arr[4],
+            metadata: &arr[5],
+            mint: &arr[6],
+            burner: &arr[7],
+            token_program: &arr[8],
+            system_program: &arr[9],
+            rent: &arr[10],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -2944,7 +3618,7 @@ pub fn approve_use_authority_invoke_signed<'info, A: Into<ApproveUseAuthorityIxA
     let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeUseAuthorityAccounts<'me, 'info> {
     ///Use Authority Record PDA
@@ -3017,6 +3691,21 @@ impl From<&RevokeUseAuthorityKeys> for [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACC
         ]
     }
 }
+impl From<[Pubkey; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]> for RevokeUseAuthorityKeys {
+    fn from(pubkeys: [Pubkey; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: pubkeys[0],
+            owner: pubkeys[1],
+            user: pubkeys[2],
+            owner_token_account: pubkeys[3],
+            mint: pubkeys[4],
+            metadata: pubkeys[5],
+            token_program: pubkeys[6],
+            system_program: pubkeys[7],
+            rent: pubkeys[8],
+        }
+    }
+}
 impl<'info> From<&RevokeUseAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
@@ -3032,6 +3721,23 @@ impl<'info> From<&RevokeUseAuthorityAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for RevokeUseAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            use_authority_record: &arr[0],
+            owner: &arr[1],
+            user: &arr[2],
+            owner_token_account: &arr[3],
+            mint: &arr[4],
+            metadata: &arr[5],
+            token_program: &arr[6],
+            system_program: &arr[7],
+            rent: &arr[8],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3085,7 +3791,7 @@ pub fn revoke_use_authority_invoke_signed<'info, A: Into<RevokeUseAuthorityIxArg
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct UnverifyCollectionAccounts<'me, 'info> {
     ///Metadata account
@@ -3140,6 +3846,18 @@ impl From<&UnverifyCollectionKeys> for [AccountMeta; UNVERIFY_COLLECTION_IX_ACCO
         ]
     }
 }
+impl From<[Pubkey; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for UnverifyCollectionKeys {
+    fn from(pubkeys: [Pubkey; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            collection_authority: pubkeys[1],
+            collection_mint: pubkeys[2],
+            collection: pubkeys[3],
+            collection_master_edition_account: pubkeys[4],
+            collection_authority_record: pubkeys[5],
+        }
+    }
+}
 impl<'info> From<&UnverifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
@@ -3152,6 +3870,20 @@ impl<'info> From<&UnverifyCollectionAccounts<'_, 'info>>
             accounts.collection_master_edition_account.clone(),
             accounts.collection_authority_record.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for UnverifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            collection_mint: &arr[2],
+            collection: &arr[3],
+            collection_master_edition_account: &arr[4],
+            collection_authority_record: &arr[5],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3205,7 +3937,7 @@ pub fn unverify_collection_invoke_signed<'info, A: Into<UnverifyCollectionIxArgs
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct ApproveCollectionAuthorityAccounts<'me, 'info> {
     ///Collection Authority Record PDA
@@ -3274,6 +4006,22 @@ impl From<&ApproveCollectionAuthorityKeys>
         ]
     }
 }
+impl From<[Pubkey; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ApproveCollectionAuthorityKeys
+{
+    fn from(pubkeys: [Pubkey; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: pubkeys[0],
+            new_collection_authority: pubkeys[1],
+            update_authority: pubkeys[2],
+            payer: pubkeys[3],
+            metadata: pubkeys[4],
+            mint: pubkeys[5],
+            system_program: pubkeys[6],
+            rent: pubkeys[7],
+        }
+    }
+}
 impl<'info> From<&ApproveCollectionAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
@@ -3288,6 +4036,22 @@ impl<'info> From<&ApproveCollectionAuthorityAccounts<'_, 'info>>
             accounts.system_program.clone(),
             accounts.rent.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for ApproveCollectionAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: &arr[0],
+            new_collection_authority: &arr[1],
+            update_authority: &arr[2],
+            payer: &arr[3],
+            metadata: &arr[4],
+            mint: &arr[5],
+            system_program: &arr[6],
+            rent: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3346,7 +4110,7 @@ pub fn approve_collection_authority_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeCollectionAuthorityAccounts<'me, 'info> {
     ///Collection Authority Record PDA
@@ -3391,6 +4155,16 @@ impl From<&RevokeCollectionAuthorityKeys>
         ]
     }
 }
+impl From<[Pubkey; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]> for RevokeCollectionAuthorityKeys {
+    fn from(pubkeys: [Pubkey; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: pubkeys[0],
+            update_authority: pubkeys[1],
+            metadata: pubkeys[2],
+            mint: pubkeys[3],
+        }
+    }
+}
 impl<'info> From<&RevokeCollectionAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
@@ -3401,6 +4175,18 @@ impl<'info> From<&RevokeCollectionAuthorityAccounts<'_, 'info>>
             accounts.metadata.clone(),
             accounts.mint.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
+    for RevokeCollectionAuthorityAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            collection_authority_record: &arr[0],
+            update_authority: &arr[1],
+            metadata: &arr[2],
+            mint: &arr[3],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3459,7 +4245,7 @@ pub fn revoke_collection_authority_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct SetAndVerifyCollectionAccounts<'me, 'info> {
     ///Metadata account
@@ -3528,6 +4314,20 @@ impl From<&SetAndVerifyCollectionKeys>
         ]
     }
 }
+impl From<[Pubkey; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for SetAndVerifyCollectionKeys {
+    fn from(pubkeys: [Pubkey; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            collection_authority: pubkeys[1],
+            payer: pubkeys[2],
+            update_authority: pubkeys[3],
+            collection_mint: pubkeys[4],
+            collection: pubkeys[5],
+            collection_master_edition_account: pubkeys[6],
+            collection_authority_record: pubkeys[7],
+        }
+    }
+}
 impl<'info> From<&SetAndVerifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
@@ -3542,6 +4342,22 @@ impl<'info> From<&SetAndVerifyCollectionAccounts<'_, 'info>>
             accounts.collection_master_edition_account.clone(),
             accounts.collection_authority_record.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]>
+    for SetAndVerifyCollectionAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            collection_authority: &arr[1],
+            payer: &arr[2],
+            update_authority: &arr[3],
+            collection_mint: &arr[4],
+            collection: &arr[5],
+            collection_master_edition_account: &arr[6],
+            collection_authority_record: &arr[7],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3597,7 +4413,7 @@ pub fn set_and_verify_collection_invoke_signed<'info, A: Into<SetAndVerifyCollec
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5usize;
+pub const FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct FreezeDelegatedAccountAccounts<'me, 'info> {
     ///Delegate
@@ -3646,6 +4462,17 @@ impl From<&FreezeDelegatedAccountKeys> for [AccountMeta; FREEZE_DELEGATED_ACCOUN
         ]
     }
 }
+impl From<[Pubkey; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]> for FreezeDelegatedAccountKeys {
+    fn from(pubkeys: [Pubkey; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: pubkeys[0],
+            token_account: pubkeys[1],
+            edition: pubkeys[2],
+            mint: pubkeys[3],
+            token_program: pubkeys[4],
+        }
+    }
+}
 impl<'info> From<&FreezeDelegatedAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]
 {
@@ -3657,6 +4484,19 @@ impl<'info> From<&FreezeDelegatedAccountAccounts<'_, 'info>>
             accounts.mint.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for FreezeDelegatedAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: &arr[0],
+            token_account: &arr[1],
+            edition: &arr[2],
+            mint: &arr[3],
+            token_program: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3712,7 +4552,7 @@ pub fn freeze_delegated_account_invoke_signed<'info, A: Into<FreezeDelegatedAcco
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5usize;
+pub const THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct ThawDelegatedAccountAccounts<'me, 'info> {
     ///Delegate
@@ -3761,6 +4601,17 @@ impl From<&ThawDelegatedAccountKeys> for [AccountMeta; THAW_DELEGATED_ACCOUNT_IX
         ]
     }
 }
+impl From<[Pubkey; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]> for ThawDelegatedAccountKeys {
+    fn from(pubkeys: [Pubkey; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: pubkeys[0],
+            token_account: pubkeys[1],
+            edition: pubkeys[2],
+            mint: pubkeys[3],
+            token_program: pubkeys[4],
+        }
+    }
+}
 impl<'info> From<&ThawDelegatedAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]
 {
@@ -3772,6 +4623,19 @@ impl<'info> From<&ThawDelegatedAccountAccounts<'_, 'info>>
             accounts.mint.clone(),
             accounts.token_program.clone(),
         ]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]>
+    for ThawDelegatedAccountAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            delegate: &arr[0],
+            token_account: &arr[1],
+            edition: &arr[2],
+            mint: &arr[3],
+            token_program: &arr[4],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -3827,7 +4691,7 @@ pub fn thaw_delegated_account_invoke_signed<'info, A: Into<ThawDelegatedAccountI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveCreatorVerificationAccounts<'me, 'info> {
     ///Metadata (pda of ['metadata', program id, mint id])
@@ -3860,11 +4724,29 @@ impl From<&RemoveCreatorVerificationKeys>
         ]
     }
 }
+impl From<[Pubkey; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]> for RemoveCreatorVerificationKeys {
+    fn from(pubkeys: [Pubkey; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: pubkeys[0],
+            creator: pubkeys[1],
+        }
+    }
+}
 impl<'info> From<&RemoveCreatorVerificationAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]
 {
     fn from(accounts: &RemoveCreatorVerificationAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
+    }
+}
+impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]>
+    for RemoveCreatorVerificationAccounts<'me, 'info>
+{
+    fn from(arr: &'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            metadata: &arr[0],
+            creator: &arr[1],
+        }
     }
 }
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]

@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed variable lifetimes from the various `AccountInfo`s in `*Accounts`. They all now share the same lifetime `'info`
 
+### Added
+
+- `impl From<[Pubkey; *_IX_ACCOUNTS_LEN]> for *Keys` for easier indexing
+- `impl From<&[AccountInfo; *_IX_ACCOUNTS_LEN]> for *Accounts` for easier CPIs
+
 ## [0.1.4] - 2023-07-21
 
 ### Added
