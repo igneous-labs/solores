@@ -7,7 +7,7 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
-pub const INITIALIZE_USER_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const INITIALIZE_USER_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -52,6 +52,19 @@ impl From<&InitializeUserKeys> for [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_USER_IX_ACCOUNTS_LEN]> for InitializeUserKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_USER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            user_stats: pubkeys[1],
+            state: pubkeys[2],
+            authority: pubkeys[3],
+            payer: pubkeys[4],
+            rent: pubkeys[5],
+            system_program: pubkeys[6],
+        }
     }
 }
 impl<'info> From<&InitializeUserAccounts<'_, 'info>>
@@ -120,7 +133,7 @@ pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserStatsAccounts<'me, 'info> {
     pub user_stats: &'me AccountInfo<'info>,
@@ -161,6 +174,18 @@ impl From<&InitializeUserStatsKeys> for [AccountMeta; INITIALIZE_USER_STATS_IX_A
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]> for InitializeUserStatsKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user_stats: pubkeys[0],
+            state: pubkeys[1],
+            authority: pubkeys[2],
+            payer: pubkeys[3],
+            rent: pubkeys[4],
+            system_program: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&InitializeUserStatsAccounts<'_, 'info>>
@@ -228,7 +253,7 @@ pub fn initialize_user_stats_invoke_signed<'info, A: Into<InitializeUserStatsIxA
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeReferrerNameAccounts<'me, 'info> {
     pub referrer_name: &'me AccountInfo<'info>,
@@ -273,6 +298,19 @@ impl From<&InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAM
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]> for InitializeReferrerNameKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            referrer_name: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            payer: pubkeys[4],
+            rent: pubkeys[5],
+            system_program: pubkeys[6],
+        }
     }
 }
 impl<'info> From<&InitializeReferrerNameAccounts<'_, 'info>>
@@ -345,7 +383,7 @@ pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerN
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -390,6 +428,19 @@ impl From<&DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.user_token_account, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; DEPOSIT_IX_ACCOUNTS_LEN]> for DepositKeys {
+    fn from(pubkeys: [Pubkey; DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            spot_market_vault: pubkeys[4],
+            user_token_account: pubkeys[5],
+            token_program: pubkeys[6],
+        }
     }
 }
 impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] {
@@ -457,7 +508,7 @@ pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const WITHDRAW_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const WITHDRAW_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct WithdrawAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -506,6 +557,20 @@ impl From<&WithdrawKeys> for [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.user_token_account, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; WITHDRAW_IX_ACCOUNTS_LEN]> for WithdrawKeys {
+    fn from(pubkeys: [Pubkey; WITHDRAW_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            spot_market_vault: pubkeys[4],
+            drift_signer: pubkeys[5],
+            user_token_account: pubkeys[6],
+            token_program: pubkeys[7],
+        }
     }
 }
 impl<'info> From<&WithdrawAccounts<'_, 'info>> for [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] {
@@ -574,7 +639,7 @@ pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
     let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct TransferDepositAccounts<'me, 'info> {
     pub from_user: &'me AccountInfo<'info>,
@@ -615,6 +680,18 @@ impl From<&TransferDepositKeys> for [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_L
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new_readonly(keys.spot_market_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]> for TransferDepositKeys {
+    fn from(pubkeys: [Pubkey; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            from_user: pubkeys[0],
+            to_user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            state: pubkeys[4],
+            spot_market_vault: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&TransferDepositAccounts<'_, 'info>>
@@ -682,7 +759,7 @@ pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
     let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const PLACE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PlacePerpOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -711,6 +788,15 @@ impl From<&PlacePerpOrderKeys> for [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LE
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlacePerpOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&PlacePerpOrderAccounts<'_, 'info>>
@@ -774,7 +860,7 @@ pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CANCEL_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const CANCEL_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -803,6 +889,15 @@ impl From<&CancelOrderKeys> for [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; CANCEL_ORDER_IX_ACCOUNTS_LEN]> for CancelOrderKeys {
+    fn from(pubkeys: [Pubkey; CANCEL_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&CancelOrderAccounts<'_, 'info>>
@@ -866,7 +961,7 @@ pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrderByUserIdAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -895,6 +990,15 @@ impl From<&CancelOrderByUserIdKeys> for [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]> for CancelOrderByUserIdKeys {
+    fn from(pubkeys: [Pubkey; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&CancelOrderByUserIdAccounts<'_, 'info>>
@@ -963,7 +1067,7 @@ pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrdersAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -992,6 +1096,15 @@ impl From<&CancelOrdersKeys> for [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; CANCEL_ORDERS_IX_ACCOUNTS_LEN]> for CancelOrdersKeys {
+    fn from(pubkeys: [Pubkey; CANCEL_ORDERS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&CancelOrdersAccounts<'_, 'info>>
@@ -1057,7 +1170,7 @@ pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
     let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct ModifyOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1086,6 +1199,15 @@ impl From<&ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; MODIFY_ORDER_IX_ACCOUNTS_LEN]> for ModifyOrderKeys {
+    fn from(pubkeys: [Pubkey; MODIFY_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&ModifyOrderAccounts<'_, 'info>>
@@ -1150,7 +1272,7 @@ pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct ModifyOrderByUserIdAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1179,6 +1301,15 @@ impl From<&ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]> for ModifyOrderByUserIdKeys {
+    fn from(pubkeys: [Pubkey; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&ModifyOrderByUserIdAccounts<'_, 'info>>
@@ -1248,7 +1379,7 @@ pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndTakePerpOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1281,6 +1412,16 @@ impl From<&PlaceAndTakePerpOrderKeys> for [AccountMeta; PLACE_AND_TAKE_PERP_ORDE
             AccountMeta::new(keys.user_stats, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndTakePerpOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&PlaceAndTakePerpOrderAccounts<'_, 'info>>
@@ -1351,7 +1492,7 @@ pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndMakePerpOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1392,6 +1533,18 @@ impl From<&PlaceAndMakePerpOrderKeys> for [AccountMeta; PLACE_AND_MAKE_PERP_ORDE
             AccountMeta::new(keys.taker_stats, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndMakePerpOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            taker: pubkeys[3],
+            taker_stats: pubkeys[4],
+            authority: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&PlaceAndMakePerpOrderAccounts<'_, 'info>>
@@ -1464,7 +1617,7 @@ pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceSpotOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1493,6 +1646,15 @@ impl From<&PlaceSpotOrderKeys> for [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LE
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceSpotOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&PlaceSpotOrderAccounts<'_, 'info>>
@@ -1556,7 +1718,7 @@ pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndTakeSpotOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1589,6 +1751,16 @@ impl From<&PlaceAndTakeSpotOrderKeys> for [AccountMeta; PLACE_AND_TAKE_SPOT_ORDE
             AccountMeta::new(keys.user_stats, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndTakeSpotOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&PlaceAndTakeSpotOrderAccounts<'_, 'info>>
@@ -1660,7 +1832,7 @@ pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndMakeSpotOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1701,6 +1873,18 @@ impl From<&PlaceAndMakeSpotOrderKeys> for [AccountMeta; PLACE_AND_MAKE_SPOT_ORDE
             AccountMeta::new(keys.taker_stats, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndMakeSpotOrderKeys {
+    fn from(pubkeys: [Pubkey; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            taker: pubkeys[3],
+            taker_stats: pubkeys[4],
+            authority: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&PlaceAndMakeSpotOrderAccounts<'_, 'info>>
@@ -1774,7 +1958,7 @@ pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct BeginSwapAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1835,6 +2019,23 @@ impl From<&BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.drift_signer, false),
             AccountMeta::new_readonly(keys.instructions, false),
         ]
+    }
+}
+impl From<[Pubkey; BEGIN_SWAP_IX_ACCOUNTS_LEN]> for BeginSwapKeys {
+    fn from(pubkeys: [Pubkey; BEGIN_SWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            out_spot_market_vault: pubkeys[4],
+            in_spot_market_vault: pubkeys[5],
+            out_token_account: pubkeys[6],
+            in_token_account: pubkeys[7],
+            token_program: pubkeys[8],
+            drift_signer: pubkeys[9],
+            instructions: pubkeys[10],
+        }
     }
 }
 impl<'info> From<&BeginSwapAccounts<'_, 'info>>
@@ -1908,7 +2109,7 @@ pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
     let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct EndSwapAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -1969,6 +2170,23 @@ impl From<&EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.drift_signer, false),
             AccountMeta::new_readonly(keys.instructions, false),
         ]
+    }
+}
+impl From<[Pubkey; END_SWAP_IX_ACCOUNTS_LEN]> for EndSwapKeys {
+    fn from(pubkeys: [Pubkey; END_SWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            out_spot_market_vault: pubkeys[4],
+            in_spot_market_vault: pubkeys[5],
+            out_token_account: pubkeys[6],
+            in_token_account: pubkeys[7],
+            token_program: pubkeys[8],
+            drift_signer: pubkeys[9],
+            instructions: pubkeys[10],
+        }
     }
 }
 impl<'info> From<&EndSwapAccounts<'_, 'info>> for [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] {
@@ -2041,7 +2259,7 @@ pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
     let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct AddPerpLpSharesAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2070,6 +2288,15 @@ impl From<&AddPerpLpSharesKeys> for [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]> for AddPerpLpSharesKeys {
+    fn from(pubkeys: [Pubkey; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&AddPerpLpSharesAccounts<'_, 'info>>
@@ -2134,7 +2361,7 @@ pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
     let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct RemovePerpLpSharesAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2163,6 +2390,15 @@ impl From<&RemovePerpLpSharesKeys> for [AccountMeta; REMOVE_PERP_LP_SHARES_IX_AC
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]> for RemovePerpLpSharesKeys {
+    fn from(pubkeys: [Pubkey; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&RemovePerpLpSharesAccounts<'_, 'info>>
@@ -2230,7 +2466,7 @@ pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxAr
     let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2259,6 +2495,16 @@ impl From<&RemovePerpLpSharesInExpiringMarketKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]>
+    for RemovePerpLpSharesInExpiringMarketKeys
+{
+    fn from(pubkeys: [Pubkey; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>>
@@ -2336,7 +2582,7 @@ pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
         REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_NAME_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_USER_NAME_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserNameAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -2361,6 +2607,14 @@ impl From<&UpdateUserNameKeys> for [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LE
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]> for UpdateUserNameKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateUserNameAccounts<'_, 'info>>
@@ -2421,7 +2675,7 @@ pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserCustomMarginRatioAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -2448,6 +2702,16 @@ impl From<&UpdateUserCustomMarginRatioKeys>
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdateUserCustomMarginRatioKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateUserCustomMarginRatioAccounts<'_, 'info>>
@@ -2516,7 +2780,7 @@ pub fn update_user_custom_margin_ratio_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserMarginTradingEnabledAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -2543,6 +2807,16 @@ impl From<&UpdateUserMarginTradingEnabledKeys>
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]>
+    for UpdateUserMarginTradingEnabledKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'info>>
@@ -2617,7 +2891,7 @@ pub fn update_user_margin_trading_enabled_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserDelegateAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -2642,6 +2916,14 @@ impl From<&UpdateUserDelegateKeys> for [AccountMeta; UPDATE_USER_DELEGATE_IX_ACC
             AccountMeta::new(keys.user, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]> for UpdateUserDelegateKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateUserDelegateAccounts<'_, 'info>>
@@ -2705,7 +2987,7 @@ pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArg
     let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DELETE_USER_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const DELETE_USER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteUserAccounts<'me, 'info> {
     pub user: &'me AccountInfo<'info>,
@@ -2738,6 +3020,16 @@ impl From<&DeleteUserKeys> for [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.state, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; DELETE_USER_IX_ACCOUNTS_LEN]> for DeleteUserKeys {
+    fn from(pubkeys: [Pubkey; DELETE_USER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            user: pubkeys[0],
+            user_stats: pubkeys[1],
+            state: pubkeys[2],
+            authority: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&DeleteUserAccounts<'_, 'info>>
@@ -2800,7 +3092,7 @@ pub fn delete_user_invoke_signed<'info, A: Into<DeleteUserIxArgs>>(
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const FILL_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const FILL_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct FillPerpOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2841,6 +3133,18 @@ impl From<&FillPerpOrderKeys> for [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]> for FillPerpOrderKeys {
+    fn from(pubkeys: [Pubkey; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            filler_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&FillPerpOrderAccounts<'_, 'info>>
@@ -2908,7 +3212,7 @@ pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RevertFillAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -2941,6 +3245,16 @@ impl From<&RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.filler, false),
             AccountMeta::new(keys.filler_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; REVERT_FILL_IX_ACCOUNTS_LEN]> for RevertFillKeys {
+    fn from(pubkeys: [Pubkey; REVERT_FILL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            filler_stats: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&RevertFillAccounts<'_, 'info>>
@@ -3003,7 +3317,7 @@ pub fn revert_fill_invoke_signed<'info, A: Into<RevertFillIxArgs>>(
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct FillSpotOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3044,6 +3358,18 @@ impl From<&FillSpotOrderKeys> for [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]> for FillSpotOrderKeys {
+    fn from(pubkeys: [Pubkey; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            filler_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&FillSpotOrderAccounts<'_, 'info>>
@@ -3112,7 +3438,7 @@ pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const TRIGGER_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const TRIGGER_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct TriggerOrderAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3145,6 +3471,16 @@ impl From<&TriggerOrderKeys> for [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.filler, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; TRIGGER_ORDER_IX_ACCOUNTS_LEN]> for TriggerOrderKeys {
+    fn from(pubkeys: [Pubkey; TRIGGER_ORDER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            user: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&TriggerOrderAccounts<'_, 'info>>
@@ -3209,7 +3545,7 @@ pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct ForceCancelOrdersAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3242,6 +3578,16 @@ impl From<&ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOU
             AccountMeta::new(keys.filler, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]> for ForceCancelOrdersKeys {
+    fn from(pubkeys: [Pubkey; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            user: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&ForceCancelOrdersAccounts<'_, 'info>>
@@ -3304,7 +3650,7 @@ pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserIdleAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3337,6 +3683,16 @@ impl From<&UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LE
             AccountMeta::new(keys.filler, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]> for UpdateUserIdleKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            user: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdateUserIdleAccounts<'_, 'info>>
@@ -3399,7 +3755,7 @@ pub fn update_user_idle_invoke_signed<'info, A: Into<UpdateUserIdleIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserOpenOrdersCountAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3434,6 +3790,18 @@ impl From<&UpdateUserOpenOrdersCountKeys>
             AccountMeta::new(keys.filler, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]>
+    for UpdateUserOpenOrdersCountKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            filler: pubkeys[2],
+            user: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdateUserOpenOrdersCountAccounts<'_, 'info>>
@@ -3504,7 +3872,7 @@ pub fn update_user_open_orders_count_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct SettlePnlAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3537,6 +3905,16 @@ impl From<&SettlePnlKeys> for [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.authority, true),
             AccountMeta::new_readonly(keys.spot_market_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_PNL_IX_ACCOUNTS_LEN]> for SettlePnlKeys {
+    fn from(pubkeys: [Pubkey; SETTLE_PNL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+            authority: pubkeys[2],
+            spot_market_vault: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&SettlePnlAccounts<'_, 'info>>
@@ -3601,7 +3979,7 @@ pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
     let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleFundingPaymentAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3626,6 +4004,14 @@ impl From<&SettleFundingPaymentKeys> for [AccountMeta; SETTLE_FUNDING_PAYMENT_IX
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]> for SettleFundingPaymentKeys {
+    fn from(pubkeys: [Pubkey; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&SettleFundingPaymentAccounts<'_, 'info>>
@@ -3688,7 +4074,7 @@ pub fn settle_funding_payment_invoke_signed<'info, A: Into<SettleFundingPaymentI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_LP_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const SETTLE_LP_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleLpAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3713,6 +4099,14 @@ impl From<&SettleLpKeys> for [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.user, false),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_LP_IX_ACCOUNTS_LEN]> for SettleLpKeys {
+    fn from(pubkeys: [Pubkey; SETTLE_LP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            user: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&SettleLpAccounts<'_, 'info>> for [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] {
@@ -3770,7 +4164,7 @@ pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
     let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleExpiredMarketAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3795,6 +4189,14 @@ impl From<&SettleExpiredMarketKeys> for [AccountMeta; SETTLE_EXPIRED_MARKET_IX_A
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]> for SettleExpiredMarketKeys {
+    fn from(pubkeys: [Pubkey; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&SettleExpiredMarketAccounts<'_, 'info>>
@@ -3857,7 +4259,7 @@ pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxA
     let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const LIQUIDATE_PERP_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const LIQUIDATE_PERP_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidatePerpAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -3898,6 +4300,18 @@ impl From<&LiquidatePerpKeys> for [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] 
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]> for LiquidatePerpKeys {
+    fn from(pubkeys: [Pubkey; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&LiquidatePerpAccounts<'_, 'info>>
@@ -3966,7 +4380,7 @@ pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const LIQUIDATE_SPOT_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const LIQUIDATE_SPOT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidateSpotAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4007,6 +4421,18 @@ impl From<&LiquidateSpotKeys> for [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] 
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]> for LiquidateSpotKeys {
+    fn from(pubkeys: [Pubkey; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&LiquidateSpotAccounts<'_, 'info>>
@@ -4076,7 +4502,7 @@ pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
     let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidateBorrowForPerpPnlAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4119,6 +4545,20 @@ impl From<&LiquidateBorrowForPerpPnlKeys>
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]>
+    for LiquidateBorrowForPerpPnlKeys
+{
+    fn from(pubkeys: [Pubkey; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'info>>
@@ -4196,7 +4636,7 @@ pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidatePerpPnlForDepositAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4239,6 +4679,20 @@ impl From<&LiquidatePerpPnlForDepositKeys>
             AccountMeta::new(keys.user, false),
             AccountMeta::new(keys.user_stats, false),
         ]
+    }
+}
+impl From<[Pubkey; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]>
+    for LiquidatePerpPnlForDepositKeys
+{
+    fn from(pubkeys: [Pubkey; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&LiquidatePerpPnlForDepositAccounts<'_, 'info>>
@@ -4316,7 +4770,7 @@ pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct ResolvePerpPnlDeficitAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4357,6 +4811,18 @@ impl From<&ResolvePerpPnlDeficitKeys> for [AccountMeta; RESOLVE_PERP_PNL_DEFICIT
             AccountMeta::new_readonly(keys.drift_signer, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]> for ResolvePerpPnlDeficitKeys {
+    fn from(pubkeys: [Pubkey; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            spot_market_vault: pubkeys[2],
+            insurance_fund_vault: pubkeys[3],
+            drift_signer: pubkeys[4],
+            token_program: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&ResolvePerpPnlDeficitAccounts<'_, 'info>>
@@ -4429,7 +4895,7 @@ pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDefic
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10usize;
+pub const RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct ResolvePerpBankruptcyAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4486,6 +4952,22 @@ impl From<&ResolvePerpBankruptcyKeys> for [AccountMeta; RESOLVE_PERP_BANKRUPTCY_
             AccountMeta::new_readonly(keys.drift_signer, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]> for ResolvePerpBankruptcyKeys {
+    fn from(pubkeys: [Pubkey; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+            spot_market_vault: pubkeys[6],
+            insurance_fund_vault: pubkeys[7],
+            drift_signer: pubkeys[8],
+            token_program: pubkeys[9],
+        }
     }
 }
 impl<'info> From<&ResolvePerpBankruptcyAccounts<'_, 'info>>
@@ -4562,7 +5044,7 @@ pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10usize;
+pub const RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct ResolveSpotBankruptcyAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4619,6 +5101,22 @@ impl From<&ResolveSpotBankruptcyKeys> for [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_
             AccountMeta::new_readonly(keys.drift_signer, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]> for ResolveSpotBankruptcyKeys {
+    fn from(pubkeys: [Pubkey; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+            liquidator: pubkeys[2],
+            liquidator_stats: pubkeys[3],
+            user: pubkeys[4],
+            user_stats: pubkeys[5],
+            spot_market_vault: pubkeys[6],
+            insurance_fund_vault: pubkeys[7],
+            drift_signer: pubkeys[8],
+            token_program: pubkeys[9],
+        }
     }
 }
 impl<'info> From<&ResolveSpotBankruptcyAccounts<'_, 'info>>
@@ -4694,7 +5192,7 @@ pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleRevenueToInsuranceFundAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4737,6 +5235,20 @@ impl From<&SettleRevenueToInsuranceFundKeys>
             AccountMeta::new(keys.insurance_fund_vault, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]>
+    for SettleRevenueToInsuranceFundKeys
+{
+    fn from(pubkeys: [Pubkey; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            spot_market: pubkeys[1],
+            spot_market_vault: pubkeys[2],
+            drift_signer: pubkeys[3],
+            insurance_fund_vault: pubkeys[4],
+            token_program: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&SettleRevenueToInsuranceFundAccounts<'_, 'info>>
@@ -4817,7 +5329,7 @@ pub fn settle_revenue_to_insurance_fund_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateFundingRateAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4846,6 +5358,15 @@ impl From<&UpdateFundingRateKeys> for [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOU
             AccountMeta::new(keys.perp_market, false),
             AccountMeta::new_readonly(keys.oracle, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]> for UpdateFundingRateKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            oracle: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateFundingRateAccounts<'_, 'info>>
@@ -4909,7 +5430,7 @@ pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>
     let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketCumulativeInterestAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -4942,6 +5463,17 @@ impl From<&UpdateSpotMarketCumulativeInterestKeys>
             AccountMeta::new(keys.spot_market, false),
             AccountMeta::new_readonly(keys.oracle, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketCumulativeInterestKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            spot_market: pubkeys[1],
+            oracle: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>>
@@ -5020,7 +5552,7 @@ pub fn update_spot_market_cumulative_interest_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_AMMS_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_AMMS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmsAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -5045,6 +5577,14 @@ impl From<&UpdateAmmsKeys> for [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new_readonly(keys.authority, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_AMMS_IX_ACCOUNTS_LEN]> for UpdateAmmsKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_AMMS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            authority: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateAmmsAccounts<'_, 'info>>
@@ -5104,7 +5644,7 @@ pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketExpiryAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -5135,6 +5675,15 @@ impl From<&UpdateSpotMarketExpiryKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]> for UpdateSpotMarketExpiryKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketExpiryAccounts<'_, 'info>>
@@ -5203,7 +5752,7 @@ pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketEx
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -5248,6 +5797,20 @@ impl From<&UpdateUserQuoteAssetInsuranceStakeKeys>
             AccountMeta::new_readonly(keys.authority, true),
             AccountMeta::new(keys.insurance_fund_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]>
+    for UpdateUserQuoteAssetInsuranceStakeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            spot_market: pubkeys[1],
+            insurance_fund_stake: pubkeys[2],
+            user_stats: pubkeys[3],
+            authority: pubkeys[4],
+            insurance_fund_vault: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>>
@@ -5329,7 +5892,7 @@ pub fn update_user_quote_asset_insurance_stake_invoke_signed<
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeInsuranceFundStakeAccounts<'me, 'info> {
     pub spot_market: &'me AccountInfo<'info>,
@@ -5380,6 +5943,22 @@ impl From<&InitializeInsuranceFundStakeKeys>
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for InitializeInsuranceFundStakeKeys
+{
+    fn from(pubkeys: [Pubkey; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            spot_market: pubkeys[0],
+            insurance_fund_stake: pubkeys[1],
+            user_stats: pubkeys[2],
+            state: pubkeys[3],
+            authority: pubkeys[4],
+            payer: pubkeys[5],
+            rent: pubkeys[6],
+            system_program: pubkeys[7],
+        }
     }
 }
 impl<'info> From<&InitializeInsuranceFundStakeAccounts<'_, 'info>>
@@ -5461,7 +6040,7 @@ pub fn initialize_insurance_fund_stake_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 10usize;
+pub const ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct AddInsuranceFundStakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -5518,6 +6097,22 @@ impl From<&AddInsuranceFundStakeKeys> for [AccountMeta; ADD_INSURANCE_FUND_STAKE
             AccountMeta::new(keys.user_token_account, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]> for AddInsuranceFundStakeKeys {
+    fn from(pubkeys: [Pubkey; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            spot_market: pubkeys[1],
+            insurance_fund_stake: pubkeys[2],
+            user_stats: pubkeys[3],
+            authority: pubkeys[4],
+            spot_market_vault: pubkeys[5],
+            insurance_fund_vault: pubkeys[6],
+            drift_signer: pubkeys[7],
+            user_token_account: pubkeys[8],
+            token_program: pubkeys[9],
+        }
     }
 }
 impl<'info> From<&AddInsuranceFundStakeAccounts<'_, 'info>>
@@ -5594,7 +6189,7 @@ pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundSta
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5usize;
+pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct RequestRemoveInsuranceFundStakeAccounts<'me, 'info> {
     pub spot_market: &'me AccountInfo<'info>,
@@ -5635,6 +6230,19 @@ impl From<&RequestRemoveInsuranceFundStakeKeys>
             AccountMeta::new_readonly(keys.authority, true),
             AccountMeta::new(keys.insurance_fund_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for RequestRemoveInsuranceFundStakeKeys
+{
+    fn from(pubkeys: [Pubkey; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            spot_market: pubkeys[0],
+            insurance_fund_stake: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            insurance_fund_vault: pubkeys[4],
+        }
     }
 }
 impl<'info> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
@@ -5717,7 +6325,7 @@ pub fn request_remove_insurance_fund_stake_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5usize;
+pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info> {
     pub spot_market: &'me AccountInfo<'info>,
@@ -5758,6 +6366,19 @@ impl From<&CancelRequestRemoveInsuranceFundStakeKeys>
             AccountMeta::new_readonly(keys.authority, true),
             AccountMeta::new(keys.insurance_fund_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for CancelRequestRemoveInsuranceFundStakeKeys
+{
+    fn from(pubkeys: [Pubkey; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            spot_market: pubkeys[0],
+            insurance_fund_stake: pubkeys[1],
+            user_stats: pubkeys[2],
+            authority: pubkeys[3],
+            insurance_fund_vault: pubkeys[4],
+        }
     }
 }
 impl<'info> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
@@ -5840,7 +6461,7 @@ pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 9usize;
+pub const REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveInsuranceFundStakeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -5895,6 +6516,21 @@ impl From<&RemoveInsuranceFundStakeKeys>
             AccountMeta::new(keys.user_token_account, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]> for RemoveInsuranceFundStakeKeys {
+    fn from(pubkeys: [Pubkey; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            spot_market: pubkeys[1],
+            insurance_fund_stake: pubkeys[2],
+            user_stats: pubkeys[3],
+            authority: pubkeys[4],
+            insurance_fund_vault: pubkeys[5],
+            drift_signer: pubkeys[6],
+            user_token_account: pubkeys[7],
+            token_program: pubkeys[8],
+        }
     }
 }
 impl<'info> From<&RemoveInsuranceFundStakeAccounts<'_, 'info>>
@@ -5969,7 +6605,7 @@ pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceF
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -6014,6 +6650,19 @@ impl From<&InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.system_program, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_IX_ACCOUNTS_LEN]> for InitializeKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            quote_asset_mint: pubkeys[2],
+            drift_signer: pubkeys[3],
+            rent: pubkeys[4],
+            system_program: pubkeys[5],
+            token_program: pubkeys[6],
+        }
     }
 }
 impl<'info> From<&InitializeAccounts<'_, 'info>>
@@ -6079,7 +6728,7 @@ pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeSpotMarketAccounts<'me, 'info> {
     pub spot_market: &'me AccountInfo<'info>,
@@ -6140,6 +6789,23 @@ impl From<&InitializeSpotMarketKeys> for [AccountMeta; INITIALIZE_SPOT_MARKET_IX
             AccountMeta::new_readonly(keys.system_program, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]> for InitializeSpotMarketKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            spot_market: pubkeys[0],
+            spot_market_mint: pubkeys[1],
+            spot_market_vault: pubkeys[2],
+            insurance_fund_vault: pubkeys[3],
+            drift_signer: pubkeys[4],
+            state: pubkeys[5],
+            oracle: pubkeys[6],
+            admin: pubkeys[7],
+            rent: pubkeys[8],
+            system_program: pubkeys[9],
+            token_program: pubkeys[10],
+        }
     }
 }
 impl<'info> From<&InitializeSpotMarketAccounts<'_, 'info>>
@@ -6227,7 +6893,7 @@ pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 11usize;
+pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeSerumFulfillmentConfigAccounts<'me, 'info> {
     pub base_spot_market: &'me AccountInfo<'info>,
@@ -6292,6 +6958,25 @@ impl From<&InitializeSerumFulfillmentConfigKeys>
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
+    for InitializeSerumFulfillmentConfigKeys
+{
+    fn from(pubkeys: [Pubkey; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            base_spot_market: pubkeys[0],
+            quote_spot_market: pubkeys[1],
+            state: pubkeys[2],
+            serum_program: pubkeys[3],
+            serum_market: pubkeys[4],
+            serum_open_orders: pubkeys[5],
+            drift_signer: pubkeys[6],
+            serum_fulfillment_config: pubkeys[7],
+            admin: pubkeys[8],
+            rent: pubkeys[9],
+            system_program: pubkeys[10],
+        }
     }
 }
 impl<'info> From<&InitializeSerumFulfillmentConfigAccounts<'_, 'info>>
@@ -6379,7 +7064,7 @@ pub fn initialize_serum_fulfillment_config_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -6412,6 +7097,17 @@ impl From<&UpdateSerumFulfillmentConfigStatusKeys>
             AccountMeta::new(keys.serum_fulfillment_config, false),
             AccountMeta::new(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
+    for UpdateSerumFulfillmentConfigStatusKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            serum_fulfillment_config: pubkeys[1],
+            admin: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>>
@@ -6492,7 +7188,7 @@ pub fn update_serum_fulfillment_config_status_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10usize;
+pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializePhoenixFulfillmentConfigAccounts<'me, 'info> {
     pub base_spot_market: &'me AccountInfo<'info>,
@@ -6553,6 +7249,24 @@ impl From<&InitializePhoenixFulfillmentConfigKeys>
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
+    for InitializePhoenixFulfillmentConfigKeys
+{
+    fn from(pubkeys: [Pubkey; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            base_spot_market: pubkeys[0],
+            quote_spot_market: pubkeys[1],
+            state: pubkeys[2],
+            phoenix_program: pubkeys[3],
+            phoenix_market: pubkeys[4],
+            drift_signer: pubkeys[5],
+            phoenix_fulfillment_config: pubkeys[6],
+            admin: pubkeys[7],
+            rent: pubkeys[8],
+            system_program: pubkeys[9],
+        }
     }
 }
 impl<'info> From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'info>>
@@ -6640,7 +7354,7 @@ pub fn initialize_phoenix_fulfillment_config_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PhoenixFulfillmentConfigStatusAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -6671,6 +7385,17 @@ impl From<&PhoenixFulfillmentConfigStatusKeys>
             AccountMeta::new(keys.phoenix_fulfillment_config, false),
             AccountMeta::new(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
+    for PhoenixFulfillmentConfigStatusKeys
+{
+    fn from(pubkeys: [Pubkey; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            phoenix_fulfillment_config: pubkeys[1],
+            admin: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'info>>
@@ -6747,7 +7472,7 @@ pub fn phoenix_fulfillment_config_status_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumVaultAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -6776,6 +7501,15 @@ impl From<&UpdateSerumVaultKeys> for [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNT
             AccountMeta::new(keys.admin, true),
             AccountMeta::new_readonly(keys.srm_vault, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]> for UpdateSerumVaultKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            admin: pubkeys[1],
+            srm_vault: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSerumVaultAccounts<'_, 'info>>
@@ -6837,7 +7571,7 @@ pub fn update_serum_vault_invoke_signed<'info, A: Into<UpdateSerumVaultIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 6usize;
+pub const INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializePerpMarketAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -6878,6 +7612,18 @@ impl From<&InitializePerpMarketKeys> for [AccountMeta; INITIALIZE_PERP_MARKET_IX
             AccountMeta::new_readonly(keys.rent, false),
             AccountMeta::new_readonly(keys.system_program, false),
         ]
+    }
+}
+impl From<[Pubkey; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]> for InitializePerpMarketKeys {
+    fn from(pubkeys: [Pubkey; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+            oracle: pubkeys[3],
+            rent: pubkeys[4],
+            system_program: pubkeys[5],
+        }
     }
 }
 impl<'info> From<&InitializePerpMarketAccounts<'_, 'info>>
@@ -6959,7 +7705,7 @@ pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteInitializedPerpMarketAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -6990,6 +7736,17 @@ impl From<&DeleteInitializedPerpMarketKeys>
             AccountMeta::new(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]>
+    for DeleteInitializedPerpMarketKeys
+{
+    fn from(pubkeys: [Pubkey; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&DeleteInitializedPerpMarketAccounts<'_, 'info>>
@@ -7061,7 +7818,7 @@ pub fn delete_initialized_perp_market_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct MoveAmmPriceAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -7090,6 +7847,15 @@ impl From<&MoveAmmPriceKeys> for [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]> for MoveAmmPriceKeys {
+    fn from(pubkeys: [Pubkey; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&MoveAmmPriceAccounts<'_, 'info>>
@@ -7155,7 +7921,7 @@ pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
     let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketExpiryAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -7186,6 +7952,15 @@ impl From<&UpdatePerpMarketExpiryKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]> for UpdatePerpMarketExpiryKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketExpiryAccounts<'_, 'info>>
@@ -7254,7 +8029,7 @@ pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketEx
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -7291,6 +8066,20 @@ impl From<&SettleExpiredMarketPoolsToRevenuePoolKeys>
             AccountMeta::new(keys.spot_market, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]>
+    for SettleExpiredMarketPoolsToRevenuePoolKeys
+{
+    fn from(
+        pubkeys: [Pubkey; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            state: pubkeys[0],
+            admin: pubkeys[1],
+            spot_market: pubkeys[2],
+            perp_market: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>>
@@ -7370,7 +8159,7 @@ pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN: usize = 8usize;
+pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositIntoPerpMarketFeePoolAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -7421,6 +8210,22 @@ impl From<&DepositIntoPerpMarketFeePoolKeys>
             AccountMeta::new(keys.spot_market_vault, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]>
+    for DepositIntoPerpMarketFeePoolKeys
+{
+    fn from(pubkeys: [Pubkey; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            admin: pubkeys[2],
+            source_vault: pubkeys[3],
+            drift_signer: pubkeys[4],
+            quote_spot_market: pubkeys[5],
+            spot_market_vault: pubkeys[6],
+            token_program: pubkeys[7],
+        }
     }
 }
 impl<'info> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'info>>
@@ -7502,7 +8307,7 @@ pub fn deposit_into_perp_market_fee_pool_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const REPEG_AMM_CURVE_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const REPEG_AMM_CURVE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RepegAmmCurveAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -7535,6 +8340,16 @@ impl From<&RepegAmmCurveKeys> for [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
             AccountMeta::new_readonly(keys.oracle, false),
             AccountMeta::new_readonly(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]> for RepegAmmCurveKeys {
+    fn from(pubkeys: [Pubkey; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            oracle: pubkeys[2],
+            admin: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&RepegAmmCurveAccounts<'_, 'info>>
@@ -7599,7 +8414,7 @@ pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
     let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -7634,6 +8449,18 @@ impl From<&UpdatePerpMarketAmmOracleTwapKeys>
             AccountMeta::new_readonly(keys.oracle, false),
             AccountMeta::new_readonly(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketAmmOracleTwapKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            oracle: pubkeys[2],
+            admin: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>>
@@ -7710,7 +8537,7 @@ pub fn update_perp_market_amm_oracle_twap_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct ResetPerpMarketAmmOracleTwapAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -7745,6 +8572,18 @@ impl From<&ResetPerpMarketAmmOracleTwapKeys>
             AccountMeta::new_readonly(keys.oracle, false),
             AccountMeta::new_readonly(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
+    for ResetPerpMarketAmmOracleTwapKeys
+{
+    fn from(pubkeys: [Pubkey; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            oracle: pubkeys[2],
+            admin: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>>
@@ -7821,7 +8660,7 @@ pub fn reset_perp_market_amm_oracle_twap_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_K_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_K_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateKAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -7854,6 +8693,16 @@ impl From<&UpdateKKeys> for [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] {
             AccountMeta::new(keys.perp_market, false),
             AccountMeta::new_readonly(keys.oracle, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_K_IX_ACCOUNTS_LEN]> for UpdateKKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_K_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+            oracle: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdateKAccounts<'_, 'info>> for [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] {
@@ -7916,7 +8765,7 @@ pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMarginRatioAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -7947,6 +8796,17 @@ impl From<&UpdatePerpMarketMarginRatioKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMarginRatioKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'info>>
@@ -8020,7 +8880,7 @@ pub fn update_perp_market_margin_ratio_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxImbalancesAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8051,6 +8911,17 @@ impl From<&UpdatePerpMarketMaxImbalancesKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxImbalancesKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>>
@@ -8129,7 +9000,7 @@ pub fn update_perp_market_max_imbalances_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketLiquidationFeeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8160,6 +9031,17 @@ impl From<&UpdatePerpMarketLiquidationFeeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketLiquidationFeeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>>
@@ -8237,7 +9119,7 @@ pub fn update_perp_market_liquidation_fee_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8270,6 +9152,17 @@ impl From<&UpdateInsuranceFundUnstakingPeriodKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]>
+    for UpdateInsuranceFundUnstakingPeriodKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>>
@@ -8350,7 +9243,7 @@ pub fn update_insurance_fund_unstaking_period_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketLiquidationFeeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8381,6 +9274,17 @@ impl From<&UpdateSpotMarketLiquidationFeeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketLiquidationFeeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>>
@@ -8459,7 +9363,7 @@ pub fn update_spot_market_liquidation_fee_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateWithdrawGuardThresholdAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8490,6 +9394,17 @@ impl From<&UpdateWithdrawGuardThresholdKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]>
+    for UpdateWithdrawGuardThresholdKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'info>>
@@ -8566,7 +9481,7 @@ pub fn update_withdraw_guard_threshold_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketIfFactorAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8597,6 +9512,15 @@ impl From<&UpdateSpotMarketIfFactorKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]> for UpdateSpotMarketIfFactorKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketIfFactorAccounts<'_, 'info>>
@@ -8670,7 +9594,7 @@ pub fn update_spot_market_if_factor_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8703,6 +9627,17 @@ impl From<&UpdateSpotMarketRevenueSettlePeriodKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketRevenueSettlePeriodKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>>
@@ -8783,7 +9718,7 @@ pub fn update_spot_market_revenue_settle_period_invoke_signed<
         UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketStatusAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8814,6 +9749,15 @@ impl From<&UpdateSpotMarketStatusKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]> for UpdateSpotMarketStatusKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketStatusAccounts<'_, 'info>>
@@ -8882,7 +9826,7 @@ pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketSt
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketAssetTierAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -8913,6 +9857,17 @@ impl From<&UpdateSpotMarketAssetTierKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketAssetTierKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketAssetTierAccounts<'_, 'info>>
@@ -8984,7 +9939,7 @@ pub fn update_spot_market_asset_tier_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMarginWeightsAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9015,6 +9970,17 @@ impl From<&UpdateSpotMarketMarginWeightsKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMarginWeightsKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'info>>
@@ -9095,7 +10061,7 @@ pub fn update_spot_market_margin_weights_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketBorrowRateAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9126,6 +10092,17 @@ impl From<&UpdateSpotMarketBorrowRateKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketBorrowRateKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'info>>
@@ -9199,7 +10176,7 @@ pub fn update_spot_market_borrow_rate_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9232,6 +10209,17 @@ impl From<&UpdateSpotMarketMaxTokenDepositsKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMaxTokenDepositsKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>>
@@ -9312,7 +10300,7 @@ pub fn update_spot_market_max_token_deposits_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketOracleAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9347,6 +10335,16 @@ impl From<&UpdateSpotMarketOracleKeys>
             AccountMeta::new(keys.spot_market, false),
             AccountMeta::new_readonly(keys.oracle, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]> for UpdateSpotMarketOracleKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+            oracle: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketOracleAccounts<'_, 'info>>
@@ -9417,7 +10415,7 @@ pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9450,6 +10448,17 @@ impl From<&UpdateSpotMarketStepSizeAndTickSizeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketStepSizeAndTickSizeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>>
@@ -9531,7 +10540,7 @@ pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMinOrderSizeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9562,6 +10571,17 @@ impl From<&UpdateSpotMarketMinOrderSizeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketMinOrderSizeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>>
@@ -9638,7 +10658,7 @@ pub fn update_spot_market_min_order_size_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketOrdersEnabledAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9669,6 +10689,17 @@ impl From<&UpdateSpotMarketOrdersEnabledKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]>
+    for UpdateSpotMarketOrdersEnabledKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>>
@@ -9746,7 +10777,7 @@ pub fn update_spot_market_orders_enabled_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketNameAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9775,6 +10806,15 @@ impl From<&UpdateSpotMarketNameKeys> for [AccountMeta; UPDATE_SPOT_MARKET_NAME_I
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.spot_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]> for UpdateSpotMarketNameKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateSpotMarketNameAccounts<'_, 'info>>
@@ -9843,7 +10883,7 @@ pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketName
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketStatusAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9874,6 +10914,15 @@ impl From<&UpdatePerpMarketStatusKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]> for UpdatePerpMarketStatusKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketStatusAccounts<'_, 'info>>
@@ -9942,7 +10991,7 @@ pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketSt
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketContractTierAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -9973,6 +11022,17 @@ impl From<&UpdatePerpMarketContractTierKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketContractTierKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketContractTierAccounts<'_, 'info>>
@@ -10050,7 +11110,7 @@ pub fn update_perp_market_contract_tier_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketImfFactorAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10081,6 +11141,17 @@ impl From<&UpdatePerpMarketImfFactorKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketImfFactorKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketImfFactorAccounts<'_, 'info>>
@@ -10153,7 +11224,7 @@ pub fn update_perp_market_imf_factor_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10186,6 +11257,17 @@ impl From<&UpdatePerpMarketUnrealizedAssetWeightKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketUnrealizedAssetWeightKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>>
@@ -10267,7 +11349,7 @@ pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketConcentrationCoefAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10300,6 +11382,17 @@ impl From<&UpdatePerpMarketConcentrationCoefKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketConcentrationCoefKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>>
@@ -10380,7 +11473,7 @@ pub fn update_perp_market_concentration_coef_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10413,6 +11506,17 @@ impl From<&UpdatePerpMarketCurveUpdateIntensityKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketCurveUpdateIntensityKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>>
@@ -10493,7 +11597,7 @@ pub fn update_perp_market_curve_update_intensity_invoke_signed<
         UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10526,6 +11630,19 @@ impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketTargetBaseAssetAmountPerLpKeys
+{
+    fn from(
+        pubkeys: [Pubkey; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>>
@@ -10606,7 +11723,7 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLpCooldownTimeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10631,6 +11748,14 @@ impl From<&UpdateLpCooldownTimeKeys> for [AccountMeta; UPDATE_LP_COOLDOWN_TIME_I
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]> for UpdateLpCooldownTimeKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateLpCooldownTimeAccounts<'_, 'info>>
@@ -10695,7 +11820,7 @@ pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTime
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpFeeStructureAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10722,6 +11847,14 @@ impl From<&UpdatePerpFeeStructureKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]> for UpdatePerpFeeStructureKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdatePerpFeeStructureAccounts<'_, 'info>>
@@ -10786,7 +11919,7 @@ pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStruc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotFeeStructureAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10813,6 +11946,14 @@ impl From<&UpdateSpotFeeStructureKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]> for UpdateSpotFeeStructureKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateSpotFeeStructureAccounts<'_, 'info>>
@@ -10877,7 +12018,7 @@ pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStruc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateInitialPctToLiquidateAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10904,6 +12045,16 @@ impl From<&UpdateInitialPctToLiquidateKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]>
+    for UpdateInitialPctToLiquidateKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateInitialPctToLiquidateAccounts<'_, 'info>>
@@ -10972,7 +12123,7 @@ pub fn update_initial_pct_to_liquidate_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLiquidationDurationAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -10999,6 +12150,14 @@ impl From<&UpdateLiquidationDurationKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]> for UpdateLiquidationDurationKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateLiquidationDurationAccounts<'_, 'info>>
@@ -11066,7 +12225,7 @@ pub fn update_liquidation_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateOracleGuardRailsAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11093,6 +12252,14 @@ impl From<&UpdateOracleGuardRailsKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]> for UpdateOracleGuardRailsKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateOracleGuardRailsAccounts<'_, 'info>>
@@ -11157,7 +12324,7 @@ pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardR
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateStateSettlementDurationAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11184,6 +12351,16 @@ impl From<&UpdateStateSettlementDurationKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdateStateSettlementDurationKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateStateSettlementDurationAccounts<'_, 'info>>
@@ -11256,7 +12433,7 @@ pub fn update_state_settlement_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4usize;
+pub const UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketOracleAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
@@ -11291,6 +12468,16 @@ impl From<&UpdatePerpMarketOracleKeys>
             AccountMeta::new_readonly(keys.oracle, false),
             AccountMeta::new_readonly(keys.admin, true),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]> for UpdatePerpMarketOracleKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            state: pubkeys[0],
+            perp_market: pubkeys[1],
+            oracle: pubkeys[2],
+            admin: pubkeys[3],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketOracleAccounts<'_, 'info>>
@@ -11361,7 +12548,7 @@ pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketBaseSpreadAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11392,6 +12579,17 @@ impl From<&UpdatePerpMarketBaseSpreadKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketBaseSpreadKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'info>>
@@ -11463,7 +12661,7 @@ pub fn update_perp_market_base_spread_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmJitIntensityAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11492,6 +12690,15 @@ impl From<&UpdateAmmJitIntensityKeys> for [AccountMeta; UPDATE_AMM_JIT_INTENSITY
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]> for UpdateAmmJitIntensityKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdateAmmJitIntensityAccounts<'_, 'info>>
@@ -11560,7 +12767,7 @@ pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensi
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxSpreadAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11591,6 +12798,17 @@ impl From<&UpdatePerpMarketMaxSpreadKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxSpreadKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'info>>
@@ -11662,7 +12880,7 @@ pub fn update_perp_market_max_spread_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11695,6 +12913,17 @@ impl From<&UpdatePerpMarketStepSizeAndTickSizeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketStepSizeAndTickSizeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>>
@@ -11776,7 +13005,7 @@ pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketNameAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11805,6 +13034,15 @@ impl From<&UpdatePerpMarketNameKeys> for [AccountMeta; UPDATE_PERP_MARKET_NAME_I
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]> for UpdatePerpMarketNameKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketNameAccounts<'_, 'info>>
@@ -11873,7 +13111,7 @@ pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketName
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMinOrderSizeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -11904,6 +13142,17 @@ impl From<&UpdatePerpMarketMinOrderSizeKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMinOrderSizeKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>>
@@ -11980,7 +13229,7 @@ pub fn update_perp_market_min_order_size_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12013,6 +13262,17 @@ impl From<&UpdatePerpMarketMaxSlippageRatioKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxSlippageRatioKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>>
@@ -12093,7 +13353,7 @@ pub fn update_perp_market_max_slippage_ratio_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12126,6 +13386,19 @@ impl From<&UpdatePerpMarketMaxFillReserveFractionKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxFillReserveFractionKeys
+{
+    fn from(
+        pubkeys: [Pubkey; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN],
+    ) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>>
@@ -12206,7 +13479,7 @@ pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN: usize = 3usize;
+pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12239,6 +13512,17 @@ impl From<&UpdatePerpMarketMaxOpenInterestKeys>
             AccountMeta::new_readonly(keys.state, false),
             AccountMeta::new(keys.perp_market, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]>
+    for UpdatePerpMarketMaxOpenInterestKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            perp_market: pubkeys[2],
+        }
     }
 }
 impl<'info> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>>
@@ -12318,7 +13602,7 @@ pub fn update_perp_market_max_open_interest_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_ADMIN_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_ADMIN_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAdminAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12343,6 +13627,14 @@ impl From<&UpdateAdminKeys> for [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] {
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_ADMIN_IX_ACCOUNTS_LEN]> for UpdateAdminKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_ADMIN_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateAdminAccounts<'_, 'info>>
@@ -12402,7 +13694,7 @@ pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
     let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateWhitelistMintAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12427,6 +13719,14 @@ impl From<&UpdateWhitelistMintKeys> for [AccountMeta; UPDATE_WHITELIST_MINT_IX_A
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]> for UpdateWhitelistMintKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateWhitelistMintAccounts<'_, 'info>>
@@ -12489,7 +13789,7 @@ pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxA
     let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateDiscountMintAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12514,6 +13814,14 @@ impl From<&UpdateDiscountMintKeys> for [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACC
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]> for UpdateDiscountMintKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateDiscountMintAccounts<'_, 'info>>
@@ -12576,7 +13884,7 @@ pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArg
     let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateExchangeStatusAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12601,6 +13909,14 @@ impl From<&UpdateExchangeStatusKeys> for [AccountMeta; UPDATE_EXCHANGE_STATUS_IX
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]> for UpdateExchangeStatusKeys {
+    fn from(pubkeys: [Pubkey; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateExchangeStatusAccounts<'_, 'info>>
@@ -12665,7 +13981,7 @@ pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpAuctionDurationAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12692,6 +14008,16 @@ impl From<&UpdatePerpAuctionDurationKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdatePerpAuctionDurationKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdatePerpAuctionDurationAccounts<'_, 'info>>
@@ -12759,7 +14085,7 @@ pub fn update_perp_auction_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
+pub const UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotAuctionDurationAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12786,6 +14112,16 @@ impl From<&UpdateSpotAuctionDurationKeys>
             AccountMeta::new_readonly(keys.admin, true),
             AccountMeta::new(keys.state, false),
         ]
+    }
+}
+impl From<[Pubkey; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
+    for UpdateSpotAuctionDurationKeys
+{
+    fn from(pubkeys: [Pubkey; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+        }
     }
 }
 impl<'info> From<&UpdateSpotAuctionDurationAccounts<'_, 'info>>
@@ -12853,7 +14189,7 @@ pub fn update_spot_auction_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
-pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 7usize;
+pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct AdminRemoveInsuranceFundStakeAccounts<'me, 'info> {
     pub admin: &'me AccountInfo<'info>,
@@ -12900,6 +14236,21 @@ impl From<&AdminRemoveInsuranceFundStakeKeys>
             AccountMeta::new(keys.admin_token_account, false),
             AccountMeta::new_readonly(keys.token_program, false),
         ]
+    }
+}
+impl From<[Pubkey; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
+    for AdminRemoveInsuranceFundStakeKeys
+{
+    fn from(pubkeys: [Pubkey; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]) -> Self {
+        Self {
+            admin: pubkeys[0],
+            state: pubkeys[1],
+            spot_market: pubkeys[2],
+            insurance_fund_vault: pubkeys[3],
+            drift_signer: pubkeys[4],
+            admin_token_account: pubkeys[5],
+            token_program: pubkeys[6],
+        }
     }
 }
 impl<'info> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'info>>

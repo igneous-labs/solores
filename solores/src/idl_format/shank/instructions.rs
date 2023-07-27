@@ -3,7 +3,7 @@ use itertools::Itertools;
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
-use syn::{Generics, Lifetime, LifetimeDef, LitBool};
+use syn::{Generics, Lifetime, LifetimeDef, LitBool, LitInt};
 
 use crate::utils::unique_by_report_dups;
 
@@ -61,8 +61,9 @@ impl ToTokens for NamedInstruction {
         let unique_accounts = &accounts_dedup.unique;
 
         // export accounts_len as const
+        let n_accounts_lit = LitInt::new(&n_accounts.to_string(), Span::call_site());
         tokens.extend(quote! {
-            pub const #accounts_len_ident: usize = #n_accounts;
+            pub const #accounts_len_ident: usize = #n_accounts_lit;
         });
 
         // impl Accounts
@@ -165,6 +166,24 @@ impl ToTokens for NamedInstruction {
                     [
                         #(#from_keys_meta),*
                     ]
+                }
+            }
+        });
+
+        // impl From [Pubkey] for Keys
+        let from_pubkey_arr_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
+            let account_ident = format_ident!("{}", &acc.name.to_snake_case());
+            let index_lit = LitInt::new(&i.to_string(), Span::call_site());
+            quote! {
+                #account_ident: pubkeys[#index_lit]
+            }
+        });
+        tokens.extend(quote! {
+            impl From<[Pubkey; #accounts_len_ident]> for #keys_ident {
+                fn from(pubkeys: [Pubkey; #accounts_len_ident]) -> Self {
+                    Self {
+                        #(#from_pubkey_arr_fields),*
+                    }
                 }
             }
         });

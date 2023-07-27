@@ -72,6 +72,7 @@ pub struct UniqueByReportDupsResult<'a, T> {
     pub duplicates: Vec<&'a T>,
 }
 
+/// Preserves order of vals
 pub fn unique_by_report_dups<'a, I, T, V, F>(vals: I, mut f: F) -> UniqueByReportDupsResult<'a, T>
 where
     I: Iterator<Item = &'a T>,
