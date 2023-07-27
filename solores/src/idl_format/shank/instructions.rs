@@ -59,7 +59,6 @@ impl ToTokens for NamedInstruction {
             );
         }
         let unique_accounts = &accounts_dedup.unique;
-        let n_unique_accounts = unique_accounts.len();
 
         // export accounts_len as const
         tokens.extend(quote! {
@@ -67,23 +66,43 @@ impl ToTokens for NamedInstruction {
         });
 
         // impl Accounts
-        let mut accounts_lifetimes = Generics::default();
-        let struct_lifetime = LifetimeDef::new(Lifetime::new("'me", Span::call_site()));
-        accounts_lifetimes.params.push(struct_lifetime.into());
-        for i in 0..n_unique_accounts {
-            let mut account_info_lifetime =
-                LifetimeDef::new(Lifetime::new(&format!("'a{}", i), Span::call_site()));
-            account_info_lifetime
-                .bounds
-                .push(Lifetime::new("'me", Span::call_site()));
-            accounts_lifetimes.params.push(account_info_lifetime.into());
+
+        let anon_lifetime_def = LifetimeDef::new(Lifetime::new("'_", Span::call_site()));
+        let me_lifetime_def = LifetimeDef::new(Lifetime::new("'me", Span::call_site()));
+        let info_lifetime_def = LifetimeDef::new(Lifetime::new("'info", Span::call_site()));
+
+        // <'me, 'info>
+        let mut accounts_lifetimes_full = Generics::default();
+        accounts_lifetimes_full
+            .params
+            .push(me_lifetime_def.clone().into());
+        accounts_lifetimes_full
+            .params
+            .push(info_lifetime_def.clone().into());
+
+        // <'_, '_>
+        let mut account_lifetimes_all_anon = Generics::default();
+        for _i in 0..2 {
+            account_lifetimes_all_anon
+                .params
+                .push(anon_lifetime_def.clone().into());
         }
-        let accounts_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
+
+        // <'_, 'info>
+        let mut account_lifetimes_me_anon = Generics::default();
+        account_lifetimes_me_anon
+            .params
+            .push(anon_lifetime_def.into());
+        account_lifetimes_me_anon
+            .params
+            .push(info_lifetime_def.clone().into());
+
+        // <'info>
+        let mut account_info_lifetime = Generics::default();
+        account_info_lifetime.params.push(info_lifetime_def.into());
+
+        let accounts_fields = unique_accounts.iter().map(|acc| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
-            let mut account_info_lifetime = Generics::default();
-            account_info_lifetime.params.push(
-                LifetimeDef::new(Lifetime::new(&format!("'a{}", i), Span::call_site())).into(),
-            );
             let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
                 quote! {
                     #[doc = #desc]
@@ -96,7 +115,7 @@ impl ToTokens for NamedInstruction {
         });
         tokens.extend(quote! {
             #[derive(Copy, Clone, Debug)]
-            pub struct #accounts_ident #accounts_lifetimes {
+            pub struct #accounts_ident #accounts_lifetimes_full {
                 #(#accounts_fields),*
             }
         });
@@ -121,17 +140,6 @@ impl ToTokens for NamedInstruction {
             }
         });
 
-        // <'me, '_, '_, ... '_>
-        let mut from_accounts_generics = Generics::default();
-        from_accounts_generics
-            .params
-            .push(LifetimeDef::new(Lifetime::new("'me", Span::call_site())).into());
-        for _i in 0..n_unique_accounts {
-            from_accounts_generics
-                .params
-                .push(LifetimeDef::new(Lifetime::new("'_", Span::call_site())).into());
-        }
-
         // impl From &Accounts for Keys
         let from_keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
@@ -140,8 +148,8 @@ impl ToTokens for NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl<'me> From<&#accounts_ident #from_accounts_generics> for #keys_ident {
-                fn from(accounts: &#accounts_ident #from_accounts_generics) -> Self {
+            impl From<&#accounts_ident #account_lifetimes_all_anon> for #keys_ident {
+                fn from(accounts: &#accounts_ident) -> Self {
                     Self {
                         #(#from_keys_fields),*
                     }
@@ -161,17 +169,6 @@ impl ToTokens for NamedInstruction {
             }
         });
 
-        // <'_, 'a, 'a, ..., 'a>
-        let mut account_infos_lifetime_intersection_generics = Generics::default();
-        account_infos_lifetime_intersection_generics
-            .params
-            .push(LifetimeDef::new(Lifetime::new("'_", Span::call_site())).into());
-        for _i in 0..n_unique_accounts {
-            account_infos_lifetime_intersection_generics
-                .params
-                .push(LifetimeDef::new(Lifetime::new("'a", Span::call_site())).into());
-        }
-
         // impl From Accounts for [AccountInfo]
         let account_info_clone = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
@@ -180,8 +177,8 @@ impl ToTokens for NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl<'a> From<&#accounts_ident #account_infos_lifetime_intersection_generics> for [AccountInfo<'a>; #accounts_len_ident] {
-                fn from(accounts: &#accounts_ident #account_infos_lifetime_intersection_generics) -> Self {
+            impl<'info> From<&#accounts_ident #account_lifetimes_me_anon> for [AccountInfo<'info>; #accounts_len_ident] {
+                fn from(accounts: &#accounts_ident #account_lifetimes_me_anon) -> Self {
                     [
                         #(#account_info_clone),*
                     ]
@@ -241,25 +238,25 @@ impl ToTokens for NamedInstruction {
 
         // impl _invoke()
         tokens.extend(quote! {
-            pub fn #invoke_fn_ident<'a, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident #account_infos_lifetime_intersection_generics,
+            pub fn #invoke_fn_ident<'info, A: Into<#ix_args_ident>>(
+                accounts: &#accounts_ident #account_lifetimes_me_anon,
                 args: A,
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
-                let account_info: [AccountInfo<'a>; #accounts_len_ident] = accounts.into();
+                let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke(&ix, &account_info)
             }
         });
 
         // impl _invoke_signed()
         tokens.extend(quote! {
-            pub fn #invoke_signed_fn_ident<'a, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident #account_infos_lifetime_intersection_generics,
+            pub fn #invoke_signed_fn_ident<'info, A: Into<#ix_args_ident>>(
+                accounts: &#accounts_ident #account_lifetimes_me_anon,
                 args: A,
                 seeds: &[&[&[u8]]],
             ) -> ProgramResult {
                 let ix = #ix_fn_ident(accounts, args)?;
-                let account_info: [AccountInfo<'a>; #accounts_len_ident] = accounts.into();
+                let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke_signed(&ix, &account_info, seeds)
             }
         });

@@ -9,23 +9,14 @@ use solana_program::{
 };
 pub const INITIALIZE_USER_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeUserAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-> {
-    pub user: &'me AccountInfo<'a0>,
-    pub user_stats: &'me AccountInfo<'a1>,
-    pub state: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub payer: &'me AccountInfo<'a4>,
-    pub rent: &'me AccountInfo<'a5>,
-    pub system_program: &'me AccountInfo<'a6>,
+pub struct InitializeUserAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub payer: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserKeys {
@@ -37,8 +28,8 @@ pub struct InitializeUserKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me> From<&InitializeUserAccounts<'me, '_, '_, '_, '_, '_, '_, '_>> for InitializeUserKeys {
-    fn from(accounts: &InitializeUserAccounts<'me, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&InitializeUserAccounts<'_, '_>> for InitializeUserKeys {
+    fn from(accounts: &InitializeUserAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             user_stats: *accounts.user_stats.key,
@@ -63,10 +54,10 @@ impl From<&InitializeUserKeys> for [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN
         ]
     }
 }
-impl<'a> From<&InitializeUserAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_USER_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeUserAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeUserAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &InitializeUserAccounts<'_, 'info>) -> Self {
         [
             accounts.user.clone(),
             accounts.user_stats.clone(),
@@ -112,40 +103,32 @@ pub fn initialize_user_ix<K: Into<InitializeUserKeys>, A: Into<InitializeUserIxA
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_user_invoke<'a, A: Into<InitializeUserIxArgs>>(
-    accounts: &InitializeUserAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_user_invoke<'info, A: Into<InitializeUserIxArgs>>(
+    accounts: &InitializeUserAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_user_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_user_invoke_signed<'a, A: Into<InitializeUserIxArgs>>(
-    accounts: &InitializeUserAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
+    accounts: &InitializeUserAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_user_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeUserStatsAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub user_stats: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
-    pub payer: &'me AccountInfo<'a3>,
-    pub rent: &'me AccountInfo<'a4>,
-    pub system_program: &'me AccountInfo<'a5>,
+pub struct InitializeUserStatsAccounts<'me, 'info> {
+    pub user_stats: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub payer: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserStatsKeys {
@@ -156,10 +139,8 @@ pub struct InitializeUserStatsKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me> From<&InitializeUserStatsAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for InitializeUserStatsKeys
-{
-    fn from(accounts: &InitializeUserStatsAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&InitializeUserStatsAccounts<'_, '_>> for InitializeUserStatsKeys {
+    fn from(accounts: &InitializeUserStatsAccounts) -> Self {
         Self {
             user_stats: *accounts.user_stats.key,
             state: *accounts.state.key,
@@ -182,10 +163,10 @@ impl From<&InitializeUserStatsKeys> for [AccountMeta; INITIALIZE_USER_STATS_IX_A
         ]
     }
 }
-impl<'a> From<&InitializeUserStatsAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeUserStatsAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeUserStatsAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &InitializeUserStatsAccounts<'_, 'info>) -> Self {
         [
             accounts.user_stats.clone(),
             accounts.state.clone(),
@@ -230,42 +211,33 @@ pub fn initialize_user_stats_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_user_stats_invoke<'a, A: Into<InitializeUserStatsIxArgs>>(
-    accounts: &InitializeUserStatsAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_user_stats_invoke<'info, A: Into<InitializeUserStatsIxArgs>>(
+    accounts: &InitializeUserStatsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_user_stats_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_user_stats_invoke_signed<'a, A: Into<InitializeUserStatsIxArgs>>(
-    accounts: &InitializeUserStatsAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_user_stats_invoke_signed<'info, A: Into<InitializeUserStatsIxArgs>>(
+    accounts: &InitializeUserStatsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_user_stats_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeReferrerNameAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-> {
-    pub referrer_name: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub payer: &'me AccountInfo<'a4>,
-    pub rent: &'me AccountInfo<'a5>,
-    pub system_program: &'me AccountInfo<'a6>,
+pub struct InitializeReferrerNameAccounts<'me, 'info> {
+    pub referrer_name: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub payer: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeReferrerNameKeys {
@@ -277,10 +249,8 @@ pub struct InitializeReferrerNameKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me> From<&InitializeReferrerNameAccounts<'me, '_, '_, '_, '_, '_, '_, '_>>
-    for InitializeReferrerNameKeys
-{
-    fn from(accounts: &InitializeReferrerNameAccounts<'me, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&InitializeReferrerNameAccounts<'_, '_>> for InitializeReferrerNameKeys {
+    fn from(accounts: &InitializeReferrerNameAccounts) -> Self {
         Self {
             referrer_name: *accounts.referrer_name.key,
             user: *accounts.user.key,
@@ -305,10 +275,10 @@ impl From<&InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAM
         ]
     }
 }
-impl<'a> From<&InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeReferrerNameAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &InitializeReferrerNameAccounts<'_, 'info>) -> Self {
         [
             accounts.referrer_name.clone(),
             accounts.user.clone(),
@@ -356,42 +326,35 @@ pub fn initialize_referrer_name_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_referrer_name_invoke<'a, A: Into<InitializeReferrerNameIxArgs>>(
-    accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_referrer_name_invoke<'info, A: Into<InitializeReferrerNameIxArgs>>(
+    accounts: &InitializeReferrerNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_referrer_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_referrer_name_invoke_signed<'a, A: Into<InitializeReferrerNameIxArgs>>(
-    accounts: &InitializeReferrerNameAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerNameIxArgs>>(
+    accounts: &InitializeReferrerNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_referrer_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
-pub struct DepositAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub spot_market_vault: &'me AccountInfo<'a4>,
-    pub user_token_account: &'me AccountInfo<'a5>,
-    pub token_program: &'me AccountInfo<'a6>,
+pub struct DepositAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub user_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DepositKeys {
@@ -403,8 +366,8 @@ pub struct DepositKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&DepositAccounts<'me, '_, '_, '_, '_, '_, '_, '_>> for DepositKeys {
-    fn from(accounts: &DepositAccounts<'me, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&DepositAccounts<'_, '_>> for DepositKeys {
+    fn from(accounts: &DepositAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -429,10 +392,8 @@ impl From<&DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; DEPOSIT_IX_ACCOUNTS_LEN]
-{
-    fn from(accounts: &DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] {
+    fn from(accounts: &DepositAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -479,44 +440,34 @@ pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_invoke<'a, A: Into<DepositIxArgs>>(
-    accounts: &DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn deposit_invoke<'info, A: Into<DepositIxArgs>>(
+    accounts: &DepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deposit_invoke_signed<'a, A: Into<DepositIxArgs>>(
-    accounts: &DepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
+    accounts: &DepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const WITHDRAW_IX_ACCOUNTS_LEN: usize = 8usize;
 #[derive(Copy, Clone, Debug)]
-pub struct WithdrawAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub spot_market_vault: &'me AccountInfo<'a4>,
-    pub drift_signer: &'me AccountInfo<'a5>,
-    pub user_token_account: &'me AccountInfo<'a6>,
-    pub token_program: &'me AccountInfo<'a7>,
+pub struct WithdrawAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub user_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct WithdrawKeys {
@@ -529,8 +480,8 @@ pub struct WithdrawKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&WithdrawAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>> for WithdrawKeys {
-    fn from(accounts: &WithdrawAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&WithdrawAccounts<'_, '_>> for WithdrawKeys {
+    fn from(accounts: &WithdrawAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -557,10 +508,8 @@ impl From<&WithdrawKeys> for [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&WithdrawAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; WITHDRAW_IX_ACCOUNTS_LEN]
-{
-    fn from(accounts: &WithdrawAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+impl<'info> From<&WithdrawAccounts<'_, 'info>> for [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] {
+    fn from(accounts: &WithdrawAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -608,33 +557,32 @@ pub fn withdraw_ix<K: Into<WithdrawKeys>, A: Into<WithdrawIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn withdraw_invoke<'a, A: Into<WithdrawIxArgs>>(
-    accounts: &WithdrawAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn withdraw_invoke<'info, A: Into<WithdrawIxArgs>>(
+    accounts: &WithdrawAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = withdraw_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn withdraw_invoke_signed<'a, A: Into<WithdrawIxArgs>>(
-    accounts: &WithdrawAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
+    accounts: &WithdrawAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = withdraw_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct TransferDepositAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me>
-{
-    pub from_user: &'me AccountInfo<'a0>,
-    pub to_user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub state: &'me AccountInfo<'a4>,
-    pub spot_market_vault: &'me AccountInfo<'a5>,
+pub struct TransferDepositAccounts<'me, 'info> {
+    pub from_user: &'me AccountInfo<'info>,
+    pub to_user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct TransferDepositKeys {
@@ -645,8 +593,8 @@ pub struct TransferDepositKeys {
     pub state: Pubkey,
     pub spot_market_vault: Pubkey,
 }
-impl<'me> From<&TransferDepositAccounts<'me, '_, '_, '_, '_, '_, '_>> for TransferDepositKeys {
-    fn from(accounts: &TransferDepositAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&TransferDepositAccounts<'_, '_>> for TransferDepositKeys {
+    fn from(accounts: &TransferDepositAccounts) -> Self {
         Self {
             from_user: *accounts.from_user.key,
             to_user: *accounts.to_user.key,
@@ -669,10 +617,10 @@ impl From<&TransferDepositKeys> for [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_L
         ]
     }
 }
-impl<'a> From<&TransferDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]
+impl<'info> From<&TransferDepositAccounts<'_, 'info>>
+    for [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &TransferDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &TransferDepositAccounts<'_, 'info>) -> Self {
         [
             accounts.from_user.clone(),
             accounts.to_user.clone(),
@@ -717,29 +665,29 @@ pub fn transfer_deposit_ix<K: Into<TransferDepositKeys>, A: Into<TransferDeposit
         data: data.try_to_vec()?,
     })
 }
-pub fn transfer_deposit_invoke<'a, A: Into<TransferDepositIxArgs>>(
-    accounts: &TransferDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn transfer_deposit_invoke<'info, A: Into<TransferDepositIxArgs>>(
+    accounts: &TransferDepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = transfer_deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn transfer_deposit_invoke_signed<'a, A: Into<TransferDepositIxArgs>>(
-    accounts: &TransferDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
+    accounts: &TransferDepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = transfer_deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlacePerpOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct PlacePerpOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlacePerpOrderKeys {
@@ -747,8 +695,8 @@ pub struct PlacePerpOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlacePerpOrderAccounts<'me, '_, '_, '_>> for PlacePerpOrderKeys {
-    fn from(accounts: &PlacePerpOrderAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&PlacePerpOrderAccounts<'_, '_>> for PlacePerpOrderKeys {
+    fn from(accounts: &PlacePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -765,10 +713,10 @@ impl From<&PlacePerpOrderKeys> for [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LE
         ]
     }
 }
-impl<'a> From<&PlacePerpOrderAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlacePerpOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlacePerpOrderAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlacePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -809,29 +757,29 @@ pub fn place_perp_order_ix<K: Into<PlacePerpOrderKeys>, A: Into<PlacePerpOrderIx
         data: data.try_to_vec()?,
     })
 }
-pub fn place_perp_order_invoke<'a, A: Into<PlacePerpOrderIxArgs>>(
-    accounts: &PlacePerpOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn place_perp_order_invoke<'info, A: Into<PlacePerpOrderIxArgs>>(
+    accounts: &PlacePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_perp_order_invoke_signed<'a, A: Into<PlacePerpOrderIxArgs>>(
-    accounts: &PlacePerpOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
+    accounts: &PlacePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const CANCEL_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct CancelOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct CancelOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrderKeys {
@@ -839,8 +787,8 @@ pub struct CancelOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&CancelOrderAccounts<'me, '_, '_, '_>> for CancelOrderKeys {
-    fn from(accounts: &CancelOrderAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&CancelOrderAccounts<'_, '_>> for CancelOrderKeys {
+    fn from(accounts: &CancelOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -857,10 +805,10 @@ impl From<&CancelOrderKeys> for [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&CancelOrderAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; CANCEL_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&CancelOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrderAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &CancelOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -901,29 +849,29 @@ pub fn cancel_order_ix<K: Into<CancelOrderKeys>, A: Into<CancelOrderIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_order_invoke<'a, A: Into<CancelOrderIxArgs>>(
-    accounts: &CancelOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_order_invoke<'info, A: Into<CancelOrderIxArgs>>(
+    accounts: &CancelOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_order_invoke_signed<'a, A: Into<CancelOrderIxArgs>>(
-    accounts: &CancelOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
+    accounts: &CancelOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct CancelOrderByUserIdAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct CancelOrderByUserIdAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrderByUserIdKeys {
@@ -931,8 +879,8 @@ pub struct CancelOrderByUserIdKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&CancelOrderByUserIdAccounts<'me, '_, '_, '_>> for CancelOrderByUserIdKeys {
-    fn from(accounts: &CancelOrderByUserIdAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&CancelOrderByUserIdAccounts<'_, '_>> for CancelOrderByUserIdKeys {
+    fn from(accounts: &CancelOrderByUserIdAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -949,10 +897,10 @@ impl From<&CancelOrderByUserIdKeys> for [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX
         ]
     }
 }
-impl<'a> From<&CancelOrderByUserIdAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
+impl<'info> From<&CancelOrderByUserIdAccounts<'_, 'info>>
+    for [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrderByUserIdAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &CancelOrderByUserIdAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -996,29 +944,31 @@ pub fn cancel_order_by_user_id_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_order_by_user_id_invoke<'a, A: Into<CancelOrderByUserIdIxArgs>>(
-    accounts: &CancelOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_order_by_user_id_invoke<'info, A: Into<CancelOrderByUserIdIxArgs>>(
+    accounts: &CancelOrderByUserIdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_order_by_user_id_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_order_by_user_id_invoke_signed<'a, A: Into<CancelOrderByUserIdIxArgs>>(
-    accounts: &CancelOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdIxArgs>>(
+    accounts: &CancelOrderByUserIdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_order_by_user_id_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct CancelOrdersAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct CancelOrdersAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrdersKeys {
@@ -1026,8 +976,8 @@ pub struct CancelOrdersKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&CancelOrdersAccounts<'me, '_, '_, '_>> for CancelOrdersKeys {
-    fn from(accounts: &CancelOrdersAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&CancelOrdersAccounts<'_, '_>> for CancelOrdersKeys {
+    fn from(accounts: &CancelOrdersAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1044,10 +994,10 @@ impl From<&CancelOrdersKeys> for [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&CancelOrdersAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]
+impl<'info> From<&CancelOrdersAccounts<'_, 'info>>
+    for [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrdersAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &CancelOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1090,29 +1040,29 @@ pub fn cancel_orders_ix<K: Into<CancelOrdersKeys>, A: Into<CancelOrdersIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_orders_invoke<'a, A: Into<CancelOrdersIxArgs>>(
-    accounts: &CancelOrdersAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_orders_invoke<'info, A: Into<CancelOrdersIxArgs>>(
+    accounts: &CancelOrdersAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_orders_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_orders_invoke_signed<'a, A: Into<CancelOrdersIxArgs>>(
-    accounts: &CancelOrdersAccounts<'_, 'a, 'a, 'a>,
+pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
+    accounts: &CancelOrdersAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_orders_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ModifyOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct ModifyOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ModifyOrderKeys {
@@ -1120,8 +1070,8 @@ pub struct ModifyOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&ModifyOrderAccounts<'me, '_, '_, '_>> for ModifyOrderKeys {
-    fn from(accounts: &ModifyOrderAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&ModifyOrderAccounts<'_, '_>> for ModifyOrderKeys {
+    fn from(accounts: &ModifyOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1138,10 +1088,10 @@ impl From<&ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&ModifyOrderAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&ModifyOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &ModifyOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1183,29 +1133,29 @@ pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn modify_order_invoke<'a, A: Into<ModifyOrderIxArgs>>(
-    accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn modify_order_invoke<'info, A: Into<ModifyOrderIxArgs>>(
+    accounts: &ModifyOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = modify_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn modify_order_invoke_signed<'a, A: Into<ModifyOrderIxArgs>>(
-    accounts: &ModifyOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
+    accounts: &ModifyOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = modify_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ModifyOrderByUserIdAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct ModifyOrderByUserIdAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ModifyOrderByUserIdKeys {
@@ -1213,8 +1163,8 @@ pub struct ModifyOrderByUserIdKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&ModifyOrderByUserIdAccounts<'me, '_, '_, '_>> for ModifyOrderByUserIdKeys {
-    fn from(accounts: &ModifyOrderByUserIdAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&ModifyOrderByUserIdAccounts<'_, '_>> for ModifyOrderByUserIdKeys {
+    fn from(accounts: &ModifyOrderByUserIdAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1231,10 +1181,10 @@ impl From<&ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX
         ]
     }
 }
-impl<'a> From<&ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
+impl<'info> From<&ModifyOrderByUserIdAccounts<'_, 'info>>
+    for [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &ModifyOrderByUserIdAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1279,30 +1229,32 @@ pub fn modify_order_by_user_id_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn modify_order_by_user_id_invoke<'a, A: Into<ModifyOrderByUserIdIxArgs>>(
-    accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+pub fn modify_order_by_user_id_invoke<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
+    accounts: &ModifyOrderByUserIdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = modify_order_by_user_id_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn modify_order_by_user_id_invoke_signed<'a, A: Into<ModifyOrderByUserIdIxArgs>>(
-    accounts: &ModifyOrderByUserIdAccounts<'_, 'a, 'a, 'a>,
+pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
+    accounts: &ModifyOrderByUserIdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = modify_order_by_user_id_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlaceAndTakePerpOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
+pub struct PlaceAndTakePerpOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndTakePerpOrderKeys {
@@ -1311,8 +1263,8 @@ pub struct PlaceAndTakePerpOrderKeys {
     pub user_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlaceAndTakePerpOrderAccounts<'me, '_, '_, '_, '_>> for PlaceAndTakePerpOrderKeys {
-    fn from(accounts: &PlaceAndTakePerpOrderAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&PlaceAndTakePerpOrderAccounts<'_, '_>> for PlaceAndTakePerpOrderKeys {
+    fn from(accounts: &PlaceAndTakePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1331,10 +1283,10 @@ impl From<&PlaceAndTakePerpOrderKeys> for [AccountMeta; PLACE_AND_TAKE_PERP_ORDE
         ]
     }
 }
-impl<'a> From<&PlaceAndTakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlaceAndTakePerpOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndTakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1380,42 +1332,34 @@ pub fn place_and_take_perp_order_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_take_perp_order_invoke<'a, A: Into<PlaceAndTakePerpOrderIxArgs>>(
-    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn place_and_take_perp_order_invoke<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
+    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_take_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_take_perp_order_invoke_signed<'a, A: Into<PlaceAndTakePerpOrderIxArgs>>(
-    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
+    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_and_take_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlaceAndMakePerpOrderAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub taker: &'me AccountInfo<'a3>,
-    pub taker_stats: &'me AccountInfo<'a4>,
-    pub authority: &'me AccountInfo<'a5>,
+pub struct PlaceAndMakePerpOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub taker: &'me AccountInfo<'info>,
+    pub taker_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndMakePerpOrderKeys {
@@ -1426,10 +1370,8 @@ pub struct PlaceAndMakePerpOrderKeys {
     pub taker_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlaceAndMakePerpOrderAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for PlaceAndMakePerpOrderKeys
-{
-    fn from(accounts: &PlaceAndMakePerpOrderAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&PlaceAndMakePerpOrderAccounts<'_, '_>> for PlaceAndMakePerpOrderKeys {
+    fn from(accounts: &PlaceAndMakePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1452,10 +1394,10 @@ impl From<&PlaceAndMakePerpOrderKeys> for [AccountMeta; PLACE_AND_MAKE_PERP_ORDE
         ]
     }
 }
-impl<'a> From<&PlaceAndMakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlaceAndMakePerpOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndMakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1503,31 +1445,31 @@ pub fn place_and_make_perp_order_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_make_perp_order_invoke<'a, A: Into<PlaceAndMakePerpOrderIxArgs>>(
-    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn place_and_make_perp_order_invoke<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
+    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_make_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_make_perp_order_invoke_signed<'a, A: Into<PlaceAndMakePerpOrderIxArgs>>(
-    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
+    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_and_make_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlaceSpotOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct PlaceSpotOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceSpotOrderKeys {
@@ -1535,8 +1477,8 @@ pub struct PlaceSpotOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlaceSpotOrderAccounts<'me, '_, '_, '_>> for PlaceSpotOrderKeys {
-    fn from(accounts: &PlaceSpotOrderAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&PlaceSpotOrderAccounts<'_, '_>> for PlaceSpotOrderKeys {
+    fn from(accounts: &PlaceSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1553,10 +1495,10 @@ impl From<&PlaceSpotOrderKeys> for [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LE
         ]
     }
 }
-impl<'a> From<&PlaceSpotOrderAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlaceSpotOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceSpotOrderAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlaceSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1597,30 +1539,30 @@ pub fn place_spot_order_ix<K: Into<PlaceSpotOrderKeys>, A: Into<PlaceSpotOrderIx
         data: data.try_to_vec()?,
     })
 }
-pub fn place_spot_order_invoke<'a, A: Into<PlaceSpotOrderIxArgs>>(
-    accounts: &PlaceSpotOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn place_spot_order_invoke<'info, A: Into<PlaceSpotOrderIxArgs>>(
+    accounts: &PlaceSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_spot_order_invoke_signed<'a, A: Into<PlaceSpotOrderIxArgs>>(
-    accounts: &PlaceSpotOrderAccounts<'_, 'a, 'a, 'a>,
+pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
+    accounts: &PlaceSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlaceAndTakeSpotOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
+pub struct PlaceAndTakeSpotOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndTakeSpotOrderKeys {
@@ -1629,8 +1571,8 @@ pub struct PlaceAndTakeSpotOrderKeys {
     pub user_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlaceAndTakeSpotOrderAccounts<'me, '_, '_, '_, '_>> for PlaceAndTakeSpotOrderKeys {
-    fn from(accounts: &PlaceAndTakeSpotOrderAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&PlaceAndTakeSpotOrderAccounts<'_, '_>> for PlaceAndTakeSpotOrderKeys {
+    fn from(accounts: &PlaceAndTakeSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1649,10 +1591,10 @@ impl From<&PlaceAndTakeSpotOrderKeys> for [AccountMeta; PLACE_AND_TAKE_SPOT_ORDE
         ]
     }
 }
-impl<'a> From<&PlaceAndTakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlaceAndTakeSpotOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1699,42 +1641,34 @@ pub fn place_and_take_spot_order_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_take_spot_order_invoke<'a, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn place_and_take_spot_order_invoke<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
+    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_take_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_take_spot_order_invoke_signed<'a, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
+    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_and_take_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PlaceAndMakeSpotOrderAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub taker: &'me AccountInfo<'a3>,
-    pub taker_stats: &'me AccountInfo<'a4>,
-    pub authority: &'me AccountInfo<'a5>,
+pub struct PlaceAndMakeSpotOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub taker: &'me AccountInfo<'info>,
+    pub taker_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceAndMakeSpotOrderKeys {
@@ -1745,10 +1679,8 @@ pub struct PlaceAndMakeSpotOrderKeys {
     pub taker_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&PlaceAndMakeSpotOrderAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for PlaceAndMakeSpotOrderKeys
-{
-    fn from(accounts: &PlaceAndMakeSpotOrderAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&PlaceAndMakeSpotOrderAccounts<'_, '_>> for PlaceAndMakeSpotOrderKeys {
+    fn from(accounts: &PlaceAndMakeSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1771,10 +1703,10 @@ impl From<&PlaceAndMakeSpotOrderKeys> for [AccountMeta; PLACE_AND_MAKE_SPOT_ORDE
         ]
     }
 }
-impl<'a> From<&PlaceAndMakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&PlaceAndMakeSpotOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1823,52 +1755,39 @@ pub fn place_and_make_spot_order_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_make_spot_order_invoke<'a, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn place_and_make_spot_order_invoke<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
+    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_make_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_make_spot_order_invoke_signed<'a, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
+    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = place_and_make_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
 #[derive(Copy, Clone, Debug)]
-pub struct BeginSwapAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-    'a10: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub out_spot_market_vault: &'me AccountInfo<'a4>,
-    pub in_spot_market_vault: &'me AccountInfo<'a5>,
-    pub out_token_account: &'me AccountInfo<'a6>,
-    pub in_token_account: &'me AccountInfo<'a7>,
-    pub token_program: &'me AccountInfo<'a8>,
-    pub drift_signer: &'me AccountInfo<'a9>,
-    pub instructions: &'me AccountInfo<'a10>,
+pub struct BeginSwapAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub out_spot_market_vault: &'me AccountInfo<'info>,
+    pub in_spot_market_vault: &'me AccountInfo<'info>,
+    pub out_token_account: &'me AccountInfo<'info>,
+    pub in_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub instructions: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct BeginSwapKeys {
@@ -1884,10 +1803,8 @@ pub struct BeginSwapKeys {
     pub drift_signer: Pubkey,
     pub instructions: Pubkey,
 }
-impl<'me> From<&BeginSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for BeginSwapKeys
-{
-    fn from(accounts: &BeginSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&BeginSwapAccounts<'_, '_>> for BeginSwapKeys {
+    fn from(accounts: &BeginSwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1920,10 +1837,10 @@ impl From<&BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN]
+impl<'info> From<&BeginSwapAccounts<'_, 'info>>
+    for [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &BeginSwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1974,50 +1891,37 @@ pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn begin_swap_invoke<'a, A: Into<BeginSwapIxArgs>>(
-    accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn begin_swap_invoke<'info, A: Into<BeginSwapIxArgs>>(
+    accounts: &BeginSwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = begin_swap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn begin_swap_invoke_signed<'a, A: Into<BeginSwapIxArgs>>(
-    accounts: &BeginSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
+    accounts: &BeginSwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = begin_swap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11usize;
 #[derive(Copy, Clone, Debug)]
-pub struct EndSwapAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-    'a10: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub out_spot_market_vault: &'me AccountInfo<'a4>,
-    pub in_spot_market_vault: &'me AccountInfo<'a5>,
-    pub out_token_account: &'me AccountInfo<'a6>,
-    pub in_token_account: &'me AccountInfo<'a7>,
-    pub token_program: &'me AccountInfo<'a8>,
-    pub drift_signer: &'me AccountInfo<'a9>,
-    pub instructions: &'me AccountInfo<'a10>,
+pub struct EndSwapAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub out_spot_market_vault: &'me AccountInfo<'info>,
+    pub in_spot_market_vault: &'me AccountInfo<'info>,
+    pub out_token_account: &'me AccountInfo<'info>,
+    pub in_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub instructions: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct EndSwapKeys {
@@ -2033,8 +1937,8 @@ pub struct EndSwapKeys {
     pub drift_signer: Pubkey,
     pub instructions: Pubkey,
 }
-impl<'me> From<&EndSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>> for EndSwapKeys {
-    fn from(accounts: &EndSwapAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&EndSwapAccounts<'_, '_>> for EndSwapKeys {
+    fn from(accounts: &EndSwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2067,10 +1971,8 @@ impl From<&EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN]
-{
-    fn from(accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+impl<'info> From<&EndSwapAccounts<'_, 'info>> for [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(accounts: &EndSwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2122,29 +2024,29 @@ pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn end_swap_invoke<'a, A: Into<EndSwapIxArgs>>(
-    accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn end_swap_invoke<'info, A: Into<EndSwapIxArgs>>(
+    accounts: &EndSwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = end_swap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn end_swap_invoke_signed<'a, A: Into<EndSwapIxArgs>>(
-    accounts: &EndSwapAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
+    accounts: &EndSwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = end_swap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct AddPerpLpSharesAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct AddPerpLpSharesAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct AddPerpLpSharesKeys {
@@ -2152,8 +2054,8 @@ pub struct AddPerpLpSharesKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&AddPerpLpSharesAccounts<'me, '_, '_, '_>> for AddPerpLpSharesKeys {
-    fn from(accounts: &AddPerpLpSharesAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&AddPerpLpSharesAccounts<'_, '_>> for AddPerpLpSharesKeys {
+    fn from(accounts: &AddPerpLpSharesAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2170,10 +2072,10 @@ impl From<&AddPerpLpSharesKeys> for [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS
         ]
     }
 }
-impl<'a> From<&AddPerpLpSharesAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
+impl<'info> From<&AddPerpLpSharesAccounts<'_, 'info>>
+    for [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &AddPerpLpSharesAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &AddPerpLpSharesAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2215,29 +2117,29 @@ pub fn add_perp_lp_shares_ix<K: Into<AddPerpLpSharesKeys>, A: Into<AddPerpLpShar
         data: data.try_to_vec()?,
     })
 }
-pub fn add_perp_lp_shares_invoke<'a, A: Into<AddPerpLpSharesIxArgs>>(
-    accounts: &AddPerpLpSharesAccounts<'_, 'a, 'a, 'a>,
+pub fn add_perp_lp_shares_invoke<'info, A: Into<AddPerpLpSharesIxArgs>>(
+    accounts: &AddPerpLpSharesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = add_perp_lp_shares_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_perp_lp_shares_invoke_signed<'a, A: Into<AddPerpLpSharesIxArgs>>(
-    accounts: &AddPerpLpSharesAccounts<'_, 'a, 'a, 'a>,
+pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
+    accounts: &AddPerpLpSharesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = add_perp_lp_shares_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RemovePerpLpSharesAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
+pub struct RemovePerpLpSharesAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RemovePerpLpSharesKeys {
@@ -2245,8 +2147,8 @@ pub struct RemovePerpLpSharesKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&RemovePerpLpSharesAccounts<'me, '_, '_, '_>> for RemovePerpLpSharesKeys {
-    fn from(accounts: &RemovePerpLpSharesAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&RemovePerpLpSharesAccounts<'_, '_>> for RemovePerpLpSharesKeys {
+    fn from(accounts: &RemovePerpLpSharesAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2263,10 +2165,10 @@ impl From<&RemovePerpLpSharesKeys> for [AccountMeta; REMOVE_PERP_LP_SHARES_IX_AC
         ]
     }
 }
-impl<'a> From<&RemovePerpLpSharesAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
+impl<'info> From<&RemovePerpLpSharesAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemovePerpLpSharesAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &RemovePerpLpSharesAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2311,38 +2213,38 @@ pub fn remove_perp_lp_shares_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_perp_lp_shares_invoke<'a, A: Into<RemovePerpLpSharesIxArgs>>(
-    accounts: &RemovePerpLpSharesAccounts<'_, 'a, 'a, 'a>,
+pub fn remove_perp_lp_shares_invoke<'info, A: Into<RemovePerpLpSharesIxArgs>>(
+    accounts: &RemovePerpLpSharesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_perp_lp_shares_invoke_signed<'a, A: Into<RemovePerpLpSharesIxArgs>>(
-    accounts: &RemovePerpLpSharesAccounts<'_, 'a, 'a, 'a>,
+pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxArgs>>(
+    accounts: &RemovePerpLpSharesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RemovePerpLpSharesInExpiringMarketAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
+pub struct RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RemovePerpLpSharesInExpiringMarketKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&RemovePerpLpSharesInExpiringMarketAccounts<'me, '_, '_>>
+impl From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>>
     for RemovePerpLpSharesInExpiringMarketKeys
 {
-    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'me, '_, '_>) -> Self {
+    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2359,10 +2261,10 @@ impl From<&RemovePerpLpSharesInExpiringMarketKeys>
         ]
     }
 }
-impl<'a> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]
+impl<'info> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -2410,43 +2312,43 @@ pub fn remove_perp_lp_shares_in_expiring_market_ix<
     })
 }
 pub fn remove_perp_lp_shares_in_expiring_market_invoke<
-    'a,
+    'info,
     A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
 >(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'a, 'a>,
+    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_in_expiring_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
-    'a,
+    'info,
     A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
 >(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'a, 'a>,
+    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_in_expiring_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_NAME_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserNameAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub user: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct UpdateUserNameAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserNameKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&UpdateUserNameAccounts<'me, '_, '_>> for UpdateUserNameKeys {
-    fn from(accounts: &UpdateUserNameAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateUserNameAccounts<'_, '_>> for UpdateUserNameKeys {
+    fn from(accounts: &UpdateUserNameAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
@@ -2461,10 +2363,10 @@ impl From<&UpdateUserNameKeys> for [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LE
         ]
     }
 }
-impl<'a> From<&UpdateUserNameAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserNameAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserNameAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserNameAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -2502,38 +2404,36 @@ pub fn update_user_name_ix<K: Into<UpdateUserNameKeys>, A: Into<UpdateUserNameIx
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_name_invoke<'a, A: Into<UpdateUserNameIxArgs>>(
-    accounts: &UpdateUserNameAccounts<'_, 'a, 'a>,
+pub fn update_user_name_invoke<'info, A: Into<UpdateUserNameIxArgs>>(
+    accounts: &UpdateUserNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_name_invoke_signed<'a, A: Into<UpdateUserNameIxArgs>>(
-    accounts: &UpdateUserNameAccounts<'_, 'a, 'a>,
+pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
+    accounts: &UpdateUserNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserCustomMarginRatioAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub user: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct UpdateUserCustomMarginRatioAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserCustomMarginRatioKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&UpdateUserCustomMarginRatioAccounts<'me, '_, '_>>
-    for UpdateUserCustomMarginRatioKeys
-{
-    fn from(accounts: &UpdateUserCustomMarginRatioAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateUserCustomMarginRatioAccounts<'_, '_>> for UpdateUserCustomMarginRatioKeys {
+    fn from(accounts: &UpdateUserCustomMarginRatioAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
@@ -2550,10 +2450,10 @@ impl From<&UpdateUserCustomMarginRatioKeys>
         ]
     }
 }
-impl<'a> From<&UpdateUserCustomMarginRatioAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserCustomMarginRatioAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -2594,43 +2494,41 @@ pub fn update_user_custom_margin_ratio_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_custom_margin_ratio_invoke<'a, A: Into<UpdateUserCustomMarginRatioIxArgs>>(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'a, 'a>,
+pub fn update_user_custom_margin_ratio_invoke<'info, A: Into<UpdateUserCustomMarginRatioIxArgs>>(
+    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_custom_margin_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_user_custom_margin_ratio_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateUserCustomMarginRatioIxArgs>,
 >(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'a, 'a>,
+    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_custom_margin_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserMarginTradingEnabledAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub user: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct UpdateUserMarginTradingEnabledAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserMarginTradingEnabledKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&UpdateUserMarginTradingEnabledAccounts<'me, '_, '_>>
-    for UpdateUserMarginTradingEnabledKeys
-{
-    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateUserMarginTradingEnabledAccounts<'_, '_>> for UpdateUserMarginTradingEnabledKeys {
+    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
@@ -2647,10 +2545,10 @@ impl From<&UpdateUserMarginTradingEnabledKeys>
         ]
     }
 }
-impl<'a> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -2695,43 +2593,43 @@ pub fn update_user_margin_trading_enabled_ix<
     })
 }
 pub fn update_user_margin_trading_enabled_invoke<
-    'a,
+    'info,
     A: Into<UpdateUserMarginTradingEnabledIxArgs>,
 >(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'a, 'a>,
+    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_margin_trading_enabled_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_user_margin_trading_enabled_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateUserMarginTradingEnabledIxArgs>,
 >(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'a, 'a>,
+    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_margin_trading_enabled_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserDelegateAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub user: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct UpdateUserDelegateAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserDelegateKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&UpdateUserDelegateAccounts<'me, '_, '_>> for UpdateUserDelegateKeys {
-    fn from(accounts: &UpdateUserDelegateAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateUserDelegateAccounts<'_, '_>> for UpdateUserDelegateKeys {
+    fn from(accounts: &UpdateUserDelegateAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
@@ -2746,10 +2644,10 @@ impl From<&UpdateUserDelegateKeys> for [AccountMeta; UPDATE_USER_DELEGATE_IX_ACC
         ]
     }
 }
-impl<'a> From<&UpdateUserDelegateAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserDelegateAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserDelegateAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserDelegateAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -2790,30 +2688,30 @@ pub fn update_user_delegate_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_delegate_invoke<'a, A: Into<UpdateUserDelegateIxArgs>>(
-    accounts: &UpdateUserDelegateAccounts<'_, 'a, 'a>,
+pub fn update_user_delegate_invoke<'info, A: Into<UpdateUserDelegateIxArgs>>(
+    accounts: &UpdateUserDelegateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_delegate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_delegate_invoke_signed<'a, A: Into<UpdateUserDelegateIxArgs>>(
-    accounts: &UpdateUserDelegateAccounts<'_, 'a, 'a>,
+pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArgs>>(
+    accounts: &UpdateUserDelegateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_delegate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const DELETE_USER_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct DeleteUserAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub user: &'me AccountInfo<'a0>,
-    pub user_stats: &'me AccountInfo<'a1>,
-    pub state: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
+pub struct DeleteUserAccounts<'me, 'info> {
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteUserKeys {
@@ -2822,8 +2720,8 @@ pub struct DeleteUserKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&DeleteUserAccounts<'me, '_, '_, '_, '_>> for DeleteUserKeys {
-    fn from(accounts: &DeleteUserAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&DeleteUserAccounts<'_, '_>> for DeleteUserKeys {
+    fn from(accounts: &DeleteUserAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             user_stats: *accounts.user_stats.key,
@@ -2842,10 +2740,10 @@ impl From<&DeleteUserKeys> for [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&DeleteUserAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; DELETE_USER_IX_ACCOUNTS_LEN]
+impl<'info> From<&DeleteUserAccounts<'_, 'info>>
+    for [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeleteUserAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &DeleteUserAccounts<'_, 'info>) -> Self {
         [
             accounts.user.clone(),
             accounts.user_stats.clone(),
@@ -2885,32 +2783,32 @@ pub fn delete_user_ix<K: Into<DeleteUserKeys>, A: Into<DeleteUserIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn delete_user_invoke<'a, A: Into<DeleteUserIxArgs>>(
-    accounts: &DeleteUserAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn delete_user_invoke<'info, A: Into<DeleteUserIxArgs>>(
+    accounts: &DeleteUserAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = delete_user_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn delete_user_invoke_signed<'a, A: Into<DeleteUserIxArgs>>(
-    accounts: &DeleteUserAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn delete_user_invoke_signed<'info, A: Into<DeleteUserIxArgs>>(
+    accounts: &DeleteUserAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = delete_user_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const FILL_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct FillPerpOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub filler_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct FillPerpOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub filler_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct FillPerpOrderKeys {
@@ -2921,8 +2819,8 @@ pub struct FillPerpOrderKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&FillPerpOrderAccounts<'me, '_, '_, '_, '_, '_, '_>> for FillPerpOrderKeys {
-    fn from(accounts: &FillPerpOrderAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&FillPerpOrderAccounts<'_, '_>> for FillPerpOrderKeys {
+    fn from(accounts: &FillPerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -2945,10 +2843,10 @@ impl From<&FillPerpOrderKeys> for [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
         ]
     }
 }
-impl<'a> From<&FillPerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&FillPerpOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &FillPerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &FillPerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -2993,30 +2891,30 @@ pub fn fill_perp_order_ix<K: Into<FillPerpOrderKeys>, A: Into<FillPerpOrderIxArg
         data: data.try_to_vec()?,
     })
 }
-pub fn fill_perp_order_invoke<'a, A: Into<FillPerpOrderIxArgs>>(
-    accounts: &FillPerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn fill_perp_order_invoke<'info, A: Into<FillPerpOrderIxArgs>>(
+    accounts: &FillPerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = fill_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn fill_perp_order_invoke_signed<'a, A: Into<FillPerpOrderIxArgs>>(
-    accounts: &FillPerpOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
+    accounts: &FillPerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = fill_perp_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RevertFillAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub filler_stats: &'me AccountInfo<'a3>,
+pub struct RevertFillAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub filler_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RevertFillKeys {
@@ -3025,8 +2923,8 @@ pub struct RevertFillKeys {
     pub filler: Pubkey,
     pub filler_stats: Pubkey,
 }
-impl<'me> From<&RevertFillAccounts<'me, '_, '_, '_, '_>> for RevertFillKeys {
-    fn from(accounts: &RevertFillAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&RevertFillAccounts<'_, '_>> for RevertFillKeys {
+    fn from(accounts: &RevertFillAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3045,10 +2943,10 @@ impl From<&RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&RevertFillAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN]
+impl<'info> From<&RevertFillAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &RevertFillAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3088,32 +2986,32 @@ pub fn revert_fill_ix<K: Into<RevertFillKeys>, A: Into<RevertFillIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn revert_fill_invoke<'a, A: Into<RevertFillIxArgs>>(
-    accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn revert_fill_invoke<'info, A: Into<RevertFillIxArgs>>(
+    accounts: &RevertFillAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = revert_fill_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn revert_fill_invoke_signed<'a, A: Into<RevertFillIxArgs>>(
-    accounts: &RevertFillAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn revert_fill_invoke_signed<'info, A: Into<RevertFillIxArgs>>(
+    accounts: &RevertFillAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = revert_fill_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct FillSpotOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub filler_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct FillSpotOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub filler_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct FillSpotOrderKeys {
@@ -3124,8 +3022,8 @@ pub struct FillSpotOrderKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&FillSpotOrderAccounts<'me, '_, '_, '_, '_, '_, '_>> for FillSpotOrderKeys {
-    fn from(accounts: &FillSpotOrderAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&FillSpotOrderAccounts<'_, '_>> for FillSpotOrderKeys {
+    fn from(accounts: &FillSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3148,10 +3046,10 @@ impl From<&FillSpotOrderKeys> for [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
         ]
     }
 }
-impl<'a> From<&FillSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&FillSpotOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &FillSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &FillSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3197,30 +3095,30 @@ pub fn fill_spot_order_ix<K: Into<FillSpotOrderKeys>, A: Into<FillSpotOrderIxArg
         data: data.try_to_vec()?,
     })
 }
-pub fn fill_spot_order_invoke<'a, A: Into<FillSpotOrderIxArgs>>(
-    accounts: &FillSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn fill_spot_order_invoke<'info, A: Into<FillSpotOrderIxArgs>>(
+    accounts: &FillSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = fill_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn fill_spot_order_invoke_signed<'a, A: Into<FillSpotOrderIxArgs>>(
-    accounts: &FillSpotOrderAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
+    accounts: &FillSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = fill_spot_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const TRIGGER_ORDER_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct TriggerOrderAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub user: &'me AccountInfo<'a3>,
+pub struct TriggerOrderAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct TriggerOrderKeys {
@@ -3229,8 +3127,8 @@ pub struct TriggerOrderKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&TriggerOrderAccounts<'me, '_, '_, '_, '_>> for TriggerOrderKeys {
-    fn from(accounts: &TriggerOrderAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&TriggerOrderAccounts<'_, '_>> for TriggerOrderKeys {
+    fn from(accounts: &TriggerOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3249,10 +3147,10 @@ impl From<&TriggerOrderKeys> for [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&TriggerOrderAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]
+impl<'info> From<&TriggerOrderAccounts<'_, 'info>>
+    for [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &TriggerOrderAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &TriggerOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3294,30 +3192,30 @@ pub fn trigger_order_ix<K: Into<TriggerOrderKeys>, A: Into<TriggerOrderIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn trigger_order_invoke<'a, A: Into<TriggerOrderIxArgs>>(
-    accounts: &TriggerOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn trigger_order_invoke<'info, A: Into<TriggerOrderIxArgs>>(
+    accounts: &TriggerOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = trigger_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn trigger_order_invoke_signed<'a, A: Into<TriggerOrderIxArgs>>(
-    accounts: &TriggerOrderAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
+    accounts: &TriggerOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = trigger_order_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ForceCancelOrdersAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub user: &'me AccountInfo<'a3>,
+pub struct ForceCancelOrdersAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ForceCancelOrdersKeys {
@@ -3326,8 +3224,8 @@ pub struct ForceCancelOrdersKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&ForceCancelOrdersAccounts<'me, '_, '_, '_, '_>> for ForceCancelOrdersKeys {
-    fn from(accounts: &ForceCancelOrdersAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
+    fn from(accounts: &ForceCancelOrdersAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3346,10 +3244,10 @@ impl From<&ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOU
         ]
     }
 }
-impl<'a> From<&ForceCancelOrdersAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]
+impl<'info> From<&ForceCancelOrdersAccounts<'_, 'info>>
+    for [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ForceCancelOrdersAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &ForceCancelOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3389,30 +3287,30 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>, A: Into<ForceCance
         data: data.try_to_vec()?,
     })
 }
-pub fn force_cancel_orders_invoke<'a, A: Into<ForceCancelOrdersIxArgs>>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn force_cancel_orders_invoke<'info, A: Into<ForceCancelOrdersIxArgs>>(
+    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn force_cancel_orders_invoke_signed<'a, A: Into<ForceCancelOrdersIxArgs>>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>>(
+    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserIdleAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub user: &'me AccountInfo<'a3>,
+pub struct UpdateUserIdleAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserIdleKeys {
@@ -3421,8 +3319,8 @@ pub struct UpdateUserIdleKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&UpdateUserIdleAccounts<'me, '_, '_, '_, '_>> for UpdateUserIdleKeys {
-    fn from(accounts: &UpdateUserIdleAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdateUserIdleAccounts<'_, '_>> for UpdateUserIdleKeys {
+    fn from(accounts: &UpdateUserIdleAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3441,10 +3339,10 @@ impl From<&UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LE
         ]
     }
 }
-impl<'a> From<&UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserIdleAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserIdleAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3484,30 +3382,30 @@ pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>, A: Into<UpdateUserIdleIx
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_idle_invoke<'a, A: Into<UpdateUserIdleIxArgs>>(
-    accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_user_idle_invoke<'info, A: Into<UpdateUserIdleIxArgs>>(
+    accounts: &UpdateUserIdleAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_idle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_idle_invoke_signed<'a, A: Into<UpdateUserIdleIxArgs>>(
-    accounts: &UpdateUserIdleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_user_idle_invoke_signed<'info, A: Into<UpdateUserIdleIxArgs>>(
+    accounts: &UpdateUserIdleAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_idle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserOpenOrdersCountAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub filler: &'me AccountInfo<'a2>,
-    pub user: &'me AccountInfo<'a3>,
+pub struct UpdateUserOpenOrdersCountAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub filler: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserOpenOrdersCountKeys {
@@ -3516,10 +3414,8 @@ pub struct UpdateUserOpenOrdersCountKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&UpdateUserOpenOrdersCountAccounts<'me, '_, '_, '_, '_>>
-    for UpdateUserOpenOrdersCountKeys
-{
-    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdateUserOpenOrdersCountAccounts<'_, '_>> for UpdateUserOpenOrdersCountKeys {
+    fn from(accounts: &UpdateUserOpenOrdersCountAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3540,10 +3436,10 @@ impl From<&UpdateUserOpenOrdersCountKeys>
         ]
     }
 }
-impl<'a> From<&UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserOpenOrdersCountAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -3586,32 +3482,35 @@ pub fn update_user_open_orders_count_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_open_orders_count_invoke<'a, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_user_open_orders_count_invoke<'info, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_open_orders_count_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_open_orders_count_invoke_signed<'a, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_user_open_orders_count_invoke_signed<
+    'info,
+    A: Into<UpdateUserOpenOrdersCountIxArgs>,
+>(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_open_orders_count_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettlePnlAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
-    pub authority: &'me AccountInfo<'a2>,
-    pub spot_market_vault: &'me AccountInfo<'a3>,
+pub struct SettlePnlAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettlePnlKeys {
@@ -3620,8 +3519,8 @@ pub struct SettlePnlKeys {
     pub authority: Pubkey,
     pub spot_market_vault: Pubkey,
 }
-impl<'me> From<&SettlePnlAccounts<'me, '_, '_, '_, '_>> for SettlePnlKeys {
-    fn from(accounts: &SettlePnlAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&SettlePnlAccounts<'_, '_>> for SettlePnlKeys {
+    fn from(accounts: &SettlePnlAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3640,10 +3539,10 @@ impl From<&SettlePnlKeys> for [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&SettlePnlAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; SETTLE_PNL_IX_ACCOUNTS_LEN]
+impl<'info> From<&SettlePnlAccounts<'_, 'info>>
+    for [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettlePnlAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &SettlePnlAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3685,36 +3584,36 @@ pub fn settle_pnl_ix<K: Into<SettlePnlKeys>, A: Into<SettlePnlIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_pnl_invoke<'a, A: Into<SettlePnlIxArgs>>(
-    accounts: &SettlePnlAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn settle_pnl_invoke<'info, A: Into<SettlePnlIxArgs>>(
+    accounts: &SettlePnlAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_pnl_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_pnl_invoke_signed<'a, A: Into<SettlePnlIxArgs>>(
-    accounts: &SettlePnlAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
+    accounts: &SettlePnlAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_pnl_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettleFundingPaymentAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
+pub struct SettleFundingPaymentAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettleFundingPaymentKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&SettleFundingPaymentAccounts<'me, '_, '_>> for SettleFundingPaymentKeys {
-    fn from(accounts: &SettleFundingPaymentAccounts<'me, '_, '_>) -> Self {
+impl From<&SettleFundingPaymentAccounts<'_, '_>> for SettleFundingPaymentKeys {
+    fn from(accounts: &SettleFundingPaymentAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3729,10 +3628,10 @@ impl From<&SettleFundingPaymentKeys> for [AccountMeta; SETTLE_FUNDING_PAYMENT_IX
         ]
     }
 }
-impl<'a> From<&SettleFundingPaymentAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]
+impl<'info> From<&SettleFundingPaymentAccounts<'_, 'info>>
+    for [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleFundingPaymentAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &SettleFundingPaymentAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -3770,36 +3669,38 @@ pub fn settle_funding_payment_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_funding_payment_invoke<'a, A: Into<SettleFundingPaymentIxArgs>>(
-    accounts: &SettleFundingPaymentAccounts<'_, 'a, 'a>,
+pub fn settle_funding_payment_invoke<'info, A: Into<SettleFundingPaymentIxArgs>>(
+    accounts: &SettleFundingPaymentAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_funding_payment_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_funding_payment_invoke_signed<'a, A: Into<SettleFundingPaymentIxArgs>>(
-    accounts: &SettleFundingPaymentAccounts<'_, 'a, 'a>,
+pub fn settle_funding_payment_invoke_signed<'info, A: Into<SettleFundingPaymentIxArgs>>(
+    accounts: &SettleFundingPaymentAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_funding_payment_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_LP_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettleLpAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub user: &'me AccountInfo<'a1>,
+pub struct SettleLpAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettleLpKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl<'me> From<&SettleLpAccounts<'me, '_, '_>> for SettleLpKeys {
-    fn from(accounts: &SettleLpAccounts<'me, '_, '_>) -> Self {
+impl From<&SettleLpAccounts<'_, '_>> for SettleLpKeys {
+    fn from(accounts: &SettleLpAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3814,8 +3715,8 @@ impl From<&SettleLpKeys> for [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&SettleLpAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; SETTLE_LP_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &SettleLpAccounts<'_, 'a, 'a>) -> Self {
+impl<'info> From<&SettleLpAccounts<'_, 'info>> for [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] {
+    fn from(accounts: &SettleLpAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -3852,36 +3753,36 @@ pub fn settle_lp_ix<K: Into<SettleLpKeys>, A: Into<SettleLpIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_lp_invoke<'a, A: Into<SettleLpIxArgs>>(
-    accounts: &SettleLpAccounts<'_, 'a, 'a>,
+pub fn settle_lp_invoke<'info, A: Into<SettleLpIxArgs>>(
+    accounts: &SettleLpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_lp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_lp_invoke_signed<'a, A: Into<SettleLpIxArgs>>(
-    accounts: &SettleLpAccounts<'_, 'a, 'a>,
+pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
+    accounts: &SettleLpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_lp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettleExpiredMarketAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct SettleExpiredMarketAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettleExpiredMarketKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&SettleExpiredMarketAccounts<'me, '_, '_>> for SettleExpiredMarketKeys {
-    fn from(accounts: &SettleExpiredMarketAccounts<'me, '_, '_>) -> Self {
+impl From<&SettleExpiredMarketAccounts<'_, '_>> for SettleExpiredMarketKeys {
+    fn from(accounts: &SettleExpiredMarketAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3896,10 +3797,10 @@ impl From<&SettleExpiredMarketKeys> for [AccountMeta; SETTLE_EXPIRED_MARKET_IX_A
         ]
     }
 }
-impl<'a> From<&SettleExpiredMarketAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]
+impl<'info> From<&SettleExpiredMarketAccounts<'_, 'info>>
+    for [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleExpiredMarketAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &SettleExpiredMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.authority.clone()]
     }
 }
@@ -3939,32 +3840,32 @@ pub fn settle_expired_market_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_expired_market_invoke<'a, A: Into<SettleExpiredMarketIxArgs>>(
-    accounts: &SettleExpiredMarketAccounts<'_, 'a, 'a>,
+pub fn settle_expired_market_invoke<'info, A: Into<SettleExpiredMarketIxArgs>>(
+    accounts: &SettleExpiredMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_expired_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_expired_market_invoke_signed<'a, A: Into<SettleExpiredMarketIxArgs>>(
-    accounts: &SettleExpiredMarketAccounts<'_, 'a, 'a>,
+pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxArgs>>(
+    accounts: &SettleExpiredMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_expired_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const LIQUIDATE_PERP_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct LiquidatePerpAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct LiquidatePerpAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidatePerpKeys {
@@ -3975,8 +3876,8 @@ pub struct LiquidatePerpKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&LiquidatePerpAccounts<'me, '_, '_, '_, '_, '_, '_>> for LiquidatePerpKeys {
-    fn from(accounts: &LiquidatePerpAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&LiquidatePerpAccounts<'_, '_>> for LiquidatePerpKeys {
+    fn from(accounts: &LiquidatePerpAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -3999,10 +3900,10 @@ impl From<&LiquidatePerpKeys> for [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] 
         ]
     }
 }
-impl<'a> From<&LiquidatePerpAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]
+impl<'info> From<&LiquidatePerpAccounts<'_, 'info>>
+    for [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidatePerpAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &LiquidatePerpAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4048,32 +3949,32 @@ pub fn liquidate_perp_ix<K: Into<LiquidatePerpKeys>, A: Into<LiquidatePerpIxArgs
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_perp_invoke<'a, A: Into<LiquidatePerpIxArgs>>(
-    accounts: &LiquidatePerpAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_perp_invoke<'info, A: Into<LiquidatePerpIxArgs>>(
+    accounts: &LiquidatePerpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_perp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_perp_invoke_signed<'a, A: Into<LiquidatePerpIxArgs>>(
-    accounts: &LiquidatePerpAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
+    accounts: &LiquidatePerpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = liquidate_perp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const LIQUIDATE_SPOT_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct LiquidateSpotAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me, 'a4: 'me, 'a5: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct LiquidateSpotAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidateSpotKeys {
@@ -4084,8 +3985,8 @@ pub struct LiquidateSpotKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&LiquidateSpotAccounts<'me, '_, '_, '_, '_, '_, '_>> for LiquidateSpotKeys {
-    fn from(accounts: &LiquidateSpotAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&LiquidateSpotAccounts<'_, '_>> for LiquidateSpotKeys {
+    fn from(accounts: &LiquidateSpotAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4108,10 +4009,10 @@ impl From<&LiquidateSpotKeys> for [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] 
         ]
     }
 }
-impl<'a> From<&LiquidateSpotAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]
+impl<'info> From<&LiquidateSpotAccounts<'_, 'info>>
+    for [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidateSpotAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &LiquidateSpotAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4158,40 +4059,32 @@ pub fn liquidate_spot_ix<K: Into<LiquidateSpotKeys>, A: Into<LiquidateSpotIxArgs
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_spot_invoke<'a, A: Into<LiquidateSpotIxArgs>>(
-    accounts: &LiquidateSpotAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_spot_invoke<'info, A: Into<LiquidateSpotIxArgs>>(
+    accounts: &LiquidateSpotAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_spot_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_spot_invoke_signed<'a, A: Into<LiquidateSpotIxArgs>>(
-    accounts: &LiquidateSpotAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
+    accounts: &LiquidateSpotAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = liquidate_spot_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct LiquidateBorrowForPerpPnlAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct LiquidateBorrowForPerpPnlAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidateBorrowForPerpPnlKeys {
@@ -4202,10 +4095,8 @@ pub struct LiquidateBorrowForPerpPnlKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&LiquidateBorrowForPerpPnlAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for LiquidateBorrowForPerpPnlKeys
-{
-    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&LiquidateBorrowForPerpPnlAccounts<'_, '_>> for LiquidateBorrowForPerpPnlKeys {
+    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4230,10 +4121,10 @@ impl From<&LiquidateBorrowForPerpPnlKeys>
         ]
     }
 }
-impl<'a> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]
+impl<'info> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'info>>
+    for [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4283,42 +4174,37 @@ pub fn liquidate_borrow_for_perp_pnl_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_borrow_for_perp_pnl_invoke<'a, A: Into<LiquidateBorrowForPerpPnlIxArgs>>(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_borrow_for_perp_pnl_invoke<'info, A: Into<LiquidateBorrowForPerpPnlIxArgs>>(
+    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_borrow_for_perp_pnl_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_borrow_for_perp_pnl_invoke_signed<'a, A: Into<LiquidateBorrowForPerpPnlIxArgs>>(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
+    'info,
+    A: Into<LiquidateBorrowForPerpPnlIxArgs>,
+>(
+    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = liquidate_borrow_for_perp_pnl_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct LiquidatePerpPnlForDepositAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
+pub struct LiquidatePerpPnlForDepositAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidatePerpPnlForDepositKeys {
@@ -4329,10 +4215,8 @@ pub struct LiquidatePerpPnlForDepositKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl<'me> From<&LiquidatePerpPnlForDepositAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for LiquidatePerpPnlForDepositKeys
-{
-    fn from(accounts: &LiquidatePerpPnlForDepositAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&LiquidatePerpPnlForDepositAccounts<'_, '_>> for LiquidatePerpPnlForDepositKeys {
+    fn from(accounts: &LiquidatePerpPnlForDepositAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4357,10 +4241,10 @@ impl From<&LiquidatePerpPnlForDepositKeys>
         ]
     }
 }
-impl<'a> From<&LiquidatePerpPnlForDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]
+impl<'info> From<&LiquidatePerpPnlForDepositAccounts<'_, 'info>>
+    for [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4410,45 +4294,37 @@ pub fn liquidate_perp_pnl_for_deposit_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_perp_pnl_for_deposit_invoke<'a, A: Into<LiquidatePerpPnlForDepositIxArgs>>(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn liquidate_perp_pnl_for_deposit_invoke<'info, A: Into<LiquidatePerpPnlForDepositIxArgs>>(
+    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_perp_pnl_for_deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
-    'a,
+    'info,
     A: Into<LiquidatePerpPnlForDepositIxArgs>,
 >(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = liquidate_perp_pnl_for_deposit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ResolvePerpPnlDeficitAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub spot_market_vault: &'me AccountInfo<'a2>,
-    pub insurance_fund_vault: &'me AccountInfo<'a3>,
-    pub drift_signer: &'me AccountInfo<'a4>,
-    pub token_program: &'me AccountInfo<'a5>,
+pub struct ResolvePerpPnlDeficitAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ResolvePerpPnlDeficitKeys {
@@ -4459,10 +4335,8 @@ pub struct ResolvePerpPnlDeficitKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&ResolvePerpPnlDeficitAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for ResolvePerpPnlDeficitKeys
-{
-    fn from(accounts: &ResolvePerpPnlDeficitAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&ResolvePerpPnlDeficitAccounts<'_, '_>> for ResolvePerpPnlDeficitKeys {
+    fn from(accounts: &ResolvePerpPnlDeficitAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4485,10 +4359,10 @@ impl From<&ResolvePerpPnlDeficitKeys> for [AccountMeta; RESOLVE_PERP_PNL_DEFICIT
         ]
     }
 }
-impl<'a> From<&ResolvePerpPnlDeficitAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]
+impl<'info> From<&ResolvePerpPnlDeficitAccounts<'_, 'info>>
+    for [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResolvePerpPnlDeficitAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4536,48 +4410,38 @@ pub fn resolve_perp_pnl_deficit_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_perp_pnl_deficit_invoke<'a, A: Into<ResolvePerpPnlDeficitIxArgs>>(
-    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_perp_pnl_deficit_invoke<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
+    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_perp_pnl_deficit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_perp_pnl_deficit_invoke_signed<'a, A: Into<ResolvePerpPnlDeficitIxArgs>>(
-    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
+    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = resolve_perp_pnl_deficit_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ResolvePerpBankruptcyAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
-    pub spot_market_vault: &'me AccountInfo<'a6>,
-    pub insurance_fund_vault: &'me AccountInfo<'a7>,
-    pub drift_signer: &'me AccountInfo<'a8>,
-    pub token_program: &'me AccountInfo<'a9>,
+pub struct ResolvePerpBankruptcyAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ResolvePerpBankruptcyKeys {
@@ -4592,12 +4456,8 @@ pub struct ResolvePerpBankruptcyKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&ResolvePerpBankruptcyAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for ResolvePerpBankruptcyKeys
-{
-    fn from(
-        accounts: &ResolvePerpBankruptcyAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&ResolvePerpBankruptcyAccounts<'_, '_>> for ResolvePerpBankruptcyKeys {
+    fn from(accounts: &ResolvePerpBankruptcyAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4628,12 +4488,10 @@ impl From<&ResolvePerpBankruptcyKeys> for [AccountMeta; RESOLVE_PERP_BANKRUPTCY_
         ]
     }
 }
-impl<'a> From<&ResolvePerpBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]
+impl<'info> From<&ResolvePerpBankruptcyAccounts<'_, 'info>>
+    for [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &ResolvePerpBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4685,48 +4543,38 @@ pub fn resolve_perp_bankruptcy_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_perp_bankruptcy_invoke<'a, A: Into<ResolvePerpBankruptcyIxArgs>>(
-    accounts: &ResolvePerpBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_perp_bankruptcy_invoke<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
+    accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_perp_bankruptcy_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_perp_bankruptcy_invoke_signed<'a, A: Into<ResolvePerpBankruptcyIxArgs>>(
-    accounts: &ResolvePerpBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
+    accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = resolve_perp_bankruptcy_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ResolveSpotBankruptcyAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
-    pub liquidator: &'me AccountInfo<'a2>,
-    pub liquidator_stats: &'me AccountInfo<'a3>,
-    pub user: &'me AccountInfo<'a4>,
-    pub user_stats: &'me AccountInfo<'a5>,
-    pub spot_market_vault: &'me AccountInfo<'a6>,
-    pub insurance_fund_vault: &'me AccountInfo<'a7>,
-    pub drift_signer: &'me AccountInfo<'a8>,
-    pub token_program: &'me AccountInfo<'a9>,
+pub struct ResolveSpotBankruptcyAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub liquidator: &'me AccountInfo<'info>,
+    pub liquidator_stats: &'me AccountInfo<'info>,
+    pub user: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ResolveSpotBankruptcyKeys {
@@ -4741,12 +4589,8 @@ pub struct ResolveSpotBankruptcyKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&ResolveSpotBankruptcyAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for ResolveSpotBankruptcyKeys
-{
-    fn from(
-        accounts: &ResolveSpotBankruptcyAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&ResolveSpotBankruptcyAccounts<'_, '_>> for ResolveSpotBankruptcyKeys {
+    fn from(accounts: &ResolveSpotBankruptcyAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -4777,12 +4621,10 @@ impl From<&ResolveSpotBankruptcyKeys> for [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_
         ]
     }
 }
-impl<'a> From<&ResolveSpotBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]
+impl<'info> From<&ResolveSpotBankruptcyAccounts<'_, 'info>>
+    for [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &ResolveSpotBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -4833,40 +4675,34 @@ pub fn resolve_spot_bankruptcy_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_spot_bankruptcy_invoke<'a, A: Into<ResolveSpotBankruptcyIxArgs>>(
-    accounts: &ResolveSpotBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_spot_bankruptcy_invoke<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
+    accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_spot_bankruptcy_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_spot_bankruptcy_invoke_signed<'a, A: Into<ResolveSpotBankruptcyIxArgs>>(
-    accounts: &ResolveSpotBankruptcyAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
+    accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = resolve_spot_bankruptcy_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettleRevenueToInsuranceFundAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub spot_market: &'me AccountInfo<'a1>,
-    pub spot_market_vault: &'me AccountInfo<'a2>,
-    pub drift_signer: &'me AccountInfo<'a3>,
-    pub insurance_fund_vault: &'me AccountInfo<'a4>,
-    pub token_program: &'me AccountInfo<'a5>,
+pub struct SettleRevenueToInsuranceFundAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettleRevenueToInsuranceFundKeys {
@@ -4877,10 +4713,8 @@ pub struct SettleRevenueToInsuranceFundKeys {
     pub insurance_fund_vault: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&SettleRevenueToInsuranceFundAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for SettleRevenueToInsuranceFundKeys
-{
-    fn from(accounts: &SettleRevenueToInsuranceFundAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&SettleRevenueToInsuranceFundAccounts<'_, '_>> for SettleRevenueToInsuranceFundKeys {
+    fn from(accounts: &SettleRevenueToInsuranceFundAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -4905,10 +4739,10 @@ impl From<&SettleRevenueToInsuranceFundKeys>
         ]
     }
 }
-impl<'a> From<&SettleRevenueToInsuranceFundAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]
+impl<'info> From<&SettleRevenueToInsuranceFundAccounts<'_, 'info>>
+    for [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -4958,34 +4792,37 @@ pub fn settle_revenue_to_insurance_fund_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_revenue_to_insurance_fund_invoke<'a, A: Into<SettleRevenueToInsuranceFundIxArgs>>(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn settle_revenue_to_insurance_fund_invoke<
+    'info,
+    A: Into<SettleRevenueToInsuranceFundIxArgs>,
+>(
+    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_revenue_to_insurance_fund_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn settle_revenue_to_insurance_fund_invoke_signed<
-    'a,
+    'info,
     A: Into<SettleRevenueToInsuranceFundIxArgs>,
 >(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_revenue_to_insurance_fund_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateFundingRateAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
+pub struct UpdateFundingRateAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateFundingRateKeys {
@@ -4993,8 +4830,8 @@ pub struct UpdateFundingRateKeys {
     pub perp_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl<'me> From<&UpdateFundingRateAccounts<'me, '_, '_, '_>> for UpdateFundingRateKeys {
-    fn from(accounts: &UpdateFundingRateAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateFundingRateAccounts<'_, '_>> for UpdateFundingRateKeys {
+    fn from(accounts: &UpdateFundingRateAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -5011,10 +4848,10 @@ impl From<&UpdateFundingRateKeys> for [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOU
         ]
     }
 }
-impl<'a> From<&UpdateFundingRateAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateFundingRateAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateFundingRateAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateFundingRateAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -5055,29 +4892,29 @@ pub fn update_funding_rate_ix<K: Into<UpdateFundingRateKeys>, A: Into<UpdateFund
         data: data.try_to_vec()?,
     })
 }
-pub fn update_funding_rate_invoke<'a, A: Into<UpdateFundingRateIxArgs>>(
-    accounts: &UpdateFundingRateAccounts<'_, 'a, 'a, 'a>,
+pub fn update_funding_rate_invoke<'info, A: Into<UpdateFundingRateIxArgs>>(
+    accounts: &UpdateFundingRateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_funding_rate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_funding_rate_invoke_signed<'a, A: Into<UpdateFundingRateIxArgs>>(
-    accounts: &UpdateFundingRateAccounts<'_, 'a, 'a, 'a>,
+pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>>(
+    accounts: &UpdateFundingRateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_funding_rate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketCumulativeInterestAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub spot_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketCumulativeInterestAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketCumulativeInterestKeys {
@@ -5085,10 +4922,10 @@ pub struct UpdateSpotMarketCumulativeInterestKeys {
     pub spot_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketCumulativeInterestAccounts<'me, '_, '_, '_>>
+impl From<&UpdateSpotMarketCumulativeInterestAccounts<'_, '_>>
     for UpdateSpotMarketCumulativeInterestKeys
 {
-    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -5107,10 +4944,10 @@ impl From<&UpdateSpotMarketCumulativeInterestKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -5159,43 +4996,43 @@ pub fn update_spot_market_cumulative_interest_ix<
     })
 }
 pub fn update_spot_market_cumulative_interest_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketCumulativeInterestIxArgs>,
 >(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_cumulative_interest_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_cumulative_interest_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketCumulativeInterestIxArgs>,
 >(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_cumulative_interest_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_AMMS_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateAmmsAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub authority: &'me AccountInfo<'a1>,
+pub struct UpdateAmmsAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmsKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl<'me> From<&UpdateAmmsAccounts<'me, '_, '_>> for UpdateAmmsKeys {
-    fn from(accounts: &UpdateAmmsAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateAmmsAccounts<'_, '_>> for UpdateAmmsKeys {
+    fn from(accounts: &UpdateAmmsAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -5210,8 +5047,10 @@ impl From<&UpdateAmmsKeys> for [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&UpdateAmmsAccounts<'_, 'a, 'a>> for [AccountInfo<'a>; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &UpdateAmmsAccounts<'_, 'a, 'a>) -> Self {
+impl<'info> From<&UpdateAmmsAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN]
+{
+    fn from(accounts: &UpdateAmmsAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.authority.clone()]
     }
 }
@@ -5248,29 +5087,29 @@ pub fn update_amms_ix<K: Into<UpdateAmmsKeys>, A: Into<UpdateAmmsIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn update_amms_invoke<'a, A: Into<UpdateAmmsIxArgs>>(
-    accounts: &UpdateAmmsAccounts<'_, 'a, 'a>,
+pub fn update_amms_invoke<'info, A: Into<UpdateAmmsIxArgs>>(
+    accounts: &UpdateAmmsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_amms_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_amms_invoke_signed<'a, A: Into<UpdateAmmsIxArgs>>(
-    accounts: &UpdateAmmsAccounts<'_, 'a, 'a>,
+pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
+    accounts: &UpdateAmmsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_amms_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketExpiryAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketExpiryAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketExpiryKeys {
@@ -5278,8 +5117,8 @@ pub struct UpdateSpotMarketExpiryKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketExpiryAccounts<'me, '_, '_, '_>> for UpdateSpotMarketExpiryKeys {
-    fn from(accounts: &UpdateSpotMarketExpiryAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketExpiryAccounts<'_, '_>> for UpdateSpotMarketExpiryKeys {
+    fn from(accounts: &UpdateSpotMarketExpiryAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -5298,10 +5137,10 @@ impl From<&UpdateSpotMarketExpiryKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketExpiryAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketExpiryAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketExpiryAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -5345,42 +5184,34 @@ pub fn update_spot_market_expiry_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_expiry_invoke<'a, A: Into<UpdateSpotMarketExpiryIxArgs>>(
-    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_expiry_invoke<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
+    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_expiry_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_expiry_invoke_signed<'a, A: Into<UpdateSpotMarketExpiryIxArgs>>(
-    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
+    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_expiry_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateUserQuoteAssetInsuranceStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub spot_market: &'me AccountInfo<'a1>,
-    pub insurance_fund_stake: &'me AccountInfo<'a2>,
-    pub user_stats: &'me AccountInfo<'a3>,
-    pub authority: &'me AccountInfo<'a4>,
-    pub insurance_fund_vault: &'me AccountInfo<'a5>,
+pub struct UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserQuoteAssetInsuranceStakeKeys {
@@ -5391,12 +5222,10 @@ pub struct UpdateUserQuoteAssetInsuranceStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl<'me> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'me, '_, '_, '_, '_, '_, '_>>
+impl From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>>
     for UpdateUserQuoteAssetInsuranceStakeKeys
 {
-    fn from(
-        accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'me, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+    fn from(accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -5421,12 +5250,10 @@ impl From<&UpdateUserQuoteAssetInsuranceStakeKeys>
         ]
     }
 }
-impl<'a> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -5478,51 +5305,41 @@ pub fn update_user_quote_asset_insurance_stake_ix<
     })
 }
 pub fn update_user_quote_asset_insurance_stake_invoke<
-    'a,
+    'info,
     A: Into<UpdateUserQuoteAssetInsuranceStakeIxArgs>,
 >(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_quote_asset_insurance_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_user_quote_asset_insurance_stake_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateUserQuoteAssetInsuranceStakeIxArgs>,
 >(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_quote_asset_insurance_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 8usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-> {
-    pub spot_market: &'me AccountInfo<'a0>,
-    pub insurance_fund_stake: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub state: &'me AccountInfo<'a3>,
-    pub authority: &'me AccountInfo<'a4>,
-    pub payer: &'me AccountInfo<'a5>,
-    pub rent: &'me AccountInfo<'a6>,
-    pub system_program: &'me AccountInfo<'a7>,
+pub struct InitializeInsuranceFundStakeAccounts<'me, 'info> {
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub payer: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeInsuranceFundStakeKeys {
@@ -5535,12 +5352,8 @@ pub struct InitializeInsuranceFundStakeKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me> From<&InitializeInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for InitializeInsuranceFundStakeKeys
-{
-    fn from(
-        accounts: &InitializeInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&InitializeInsuranceFundStakeAccounts<'_, '_>> for InitializeInsuranceFundStakeKeys {
+    fn from(accounts: &InitializeInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -5569,12 +5382,10 @@ impl From<&InitializeInsuranceFundStakeKeys>
         ]
     }
 }
-impl<'a> From<&InitializeInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &InitializeInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -5625,53 +5436,44 @@ pub fn initialize_insurance_fund_stake_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_insurance_fund_stake_invoke<'a, A: Into<InitializeInsuranceFundStakeIxArgs>>(
-    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_insurance_fund_stake_invoke<
+    'info,
+    A: Into<InitializeInsuranceFundStakeIxArgs>,
+>(
+    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn initialize_insurance_fund_stake_invoke_signed<
-    'a,
+    'info,
     A: Into<InitializeInsuranceFundStakeIxArgs>,
 >(
-    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 10usize;
 #[derive(Copy, Clone, Debug)]
-pub struct AddInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub spot_market: &'me AccountInfo<'a1>,
-    pub insurance_fund_stake: &'me AccountInfo<'a2>,
-    pub user_stats: &'me AccountInfo<'a3>,
-    pub authority: &'me AccountInfo<'a4>,
-    pub spot_market_vault: &'me AccountInfo<'a5>,
-    pub insurance_fund_vault: &'me AccountInfo<'a6>,
-    pub drift_signer: &'me AccountInfo<'a7>,
-    pub user_token_account: &'me AccountInfo<'a8>,
-    pub token_program: &'me AccountInfo<'a9>,
+pub struct AddInsuranceFundStakeAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub user_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct AddInsuranceFundStakeKeys {
@@ -5686,12 +5488,8 @@ pub struct AddInsuranceFundStakeKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&AddInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for AddInsuranceFundStakeKeys
-{
-    fn from(
-        accounts: &AddInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&AddInsuranceFundStakeAccounts<'_, '_>> for AddInsuranceFundStakeKeys {
+    fn from(accounts: &AddInsuranceFundStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -5722,12 +5520,10 @@ impl From<&AddInsuranceFundStakeKeys> for [AccountMeta; ADD_INSURANCE_FUND_STAKE
         ]
     }
 }
-impl<'a> From<&AddInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&AddInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &AddInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &AddInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -5779,38 +5575,33 @@ pub fn add_insurance_fund_stake_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn add_insurance_fund_stake_invoke<'a, A: Into<AddInsuranceFundStakeIxArgs>>(
-    accounts: &AddInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn add_insurance_fund_stake_invoke<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
+    accounts: &AddInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = add_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_insurance_fund_stake_invoke_signed<'a, A: Into<AddInsuranceFundStakeIxArgs>>(
-    accounts: &AddInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
+    accounts: &AddInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = add_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RequestRemoveInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-> {
-    pub spot_market: &'me AccountInfo<'a0>,
-    pub insurance_fund_stake: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub insurance_fund_vault: &'me AccountInfo<'a4>,
+pub struct RequestRemoveInsuranceFundStakeAccounts<'me, 'info> {
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RequestRemoveInsuranceFundStakeKeys {
@@ -5820,10 +5611,10 @@ pub struct RequestRemoveInsuranceFundStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl<'me> From<&RequestRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_>>
+impl From<&RequestRemoveInsuranceFundStakeAccounts<'_, '_>>
     for RequestRemoveInsuranceFundStakeKeys
 {
-    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_>) -> Self {
+    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -5846,10 +5637,10 @@ impl From<&RequestRemoveInsuranceFundStakeKeys>
         ]
     }
 }
-impl<'a> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -5902,45 +5693,38 @@ pub fn request_remove_insurance_fund_stake_ix<
     })
 }
 pub fn request_remove_insurance_fund_stake_invoke<
-    'a,
+    'info,
     A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = request_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn request_remove_insurance_fund_stake_invoke_signed<
-    'a,
+    'info,
     A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = request_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5usize;
 #[derive(Copy, Clone, Debug)]
-pub struct CancelRequestRemoveInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-> {
-    pub spot_market: &'me AccountInfo<'a0>,
-    pub insurance_fund_stake: &'me AccountInfo<'a1>,
-    pub user_stats: &'me AccountInfo<'a2>,
-    pub authority: &'me AccountInfo<'a3>,
-    pub insurance_fund_vault: &'me AccountInfo<'a4>,
+pub struct CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info> {
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct CancelRequestRemoveInsuranceFundStakeKeys {
@@ -5950,12 +5734,10 @@ pub struct CancelRequestRemoveInsuranceFundStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl<'me> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_>>
+impl From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>>
     for CancelRequestRemoveInsuranceFundStakeKeys
 {
-    fn from(
-        accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_>,
-    ) -> Self {
+    fn from(accounts: &CancelRequestRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -5978,12 +5760,10 @@ impl From<&CancelRequestRemoveInsuranceFundStakeKeys>
         ]
     }
 }
-impl<'a> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -6036,53 +5816,42 @@ pub fn cancel_request_remove_insurance_fund_stake_ix<
     })
 }
 pub fn cancel_request_remove_insurance_fund_stake_invoke<
-    'a,
+    'info,
     A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_request_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
-    'a,
+    'info,
     A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_request_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 9usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RemoveInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub spot_market: &'me AccountInfo<'a1>,
-    pub insurance_fund_stake: &'me AccountInfo<'a2>,
-    pub user_stats: &'me AccountInfo<'a3>,
-    pub authority: &'me AccountInfo<'a4>,
-    pub insurance_fund_vault: &'me AccountInfo<'a5>,
-    pub drift_signer: &'me AccountInfo<'a6>,
-    pub user_token_account: &'me AccountInfo<'a7>,
-    pub token_program: &'me AccountInfo<'a8>,
+pub struct RemoveInsuranceFundStakeAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_stake: &'me AccountInfo<'info>,
+    pub user_stats: &'me AccountInfo<'info>,
+    pub authority: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub user_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveInsuranceFundStakeKeys {
@@ -6096,12 +5865,8 @@ pub struct RemoveInsuranceFundStakeKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&RemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for RemoveInsuranceFundStakeKeys
-{
-    fn from(
-        accounts: &RemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&RemoveInsuranceFundStakeAccounts<'_, '_>> for RemoveInsuranceFundStakeKeys {
+    fn from(accounts: &RemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -6132,12 +5897,10 @@ impl From<&RemoveInsuranceFundStakeKeys>
         ]
     }
 }
-impl<'a> From<&RemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&RemoveInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &RemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -6187,44 +5950,35 @@ pub fn remove_insurance_fund_stake_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_insurance_fund_stake_invoke<'a, A: Into<RemoveInsuranceFundStakeIxArgs>>(
-    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn remove_insurance_fund_stake_invoke<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
+    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_insurance_fund_stake_invoke_signed<'a, A: Into<RemoveInsuranceFundStakeIxArgs>>(
-    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
+    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub quote_asset_mint: &'me AccountInfo<'a2>,
-    pub drift_signer: &'me AccountInfo<'a3>,
-    pub rent: &'me AccountInfo<'a4>,
-    pub system_program: &'me AccountInfo<'a5>,
-    pub token_program: &'me AccountInfo<'a6>,
+pub struct InitializeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub quote_asset_mint: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeKeys {
@@ -6236,8 +5990,8 @@ pub struct InitializeKeys {
     pub system_program: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&InitializeAccounts<'me, '_, '_, '_, '_, '_, '_, '_>> for InitializeKeys {
-    fn from(accounts: &InitializeAccounts<'me, '_, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&InitializeAccounts<'_, '_>> for InitializeKeys {
+    fn from(accounts: &InitializeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -6262,10 +6016,10 @@ impl From<&InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &InitializeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -6308,50 +6062,37 @@ pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_invoke<'a, A: Into<InitializeIxArgs>>(
-    accounts: &InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_invoke<'info, A: Into<InitializeIxArgs>>(
+    accounts: &InitializeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_invoke_signed<'a, A: Into<InitializeIxArgs>>(
-    accounts: &InitializeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
+    accounts: &InitializeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN: usize = 11usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeSpotMarketAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-    'a10: 'me,
-> {
-    pub spot_market: &'me AccountInfo<'a0>,
-    pub spot_market_mint: &'me AccountInfo<'a1>,
-    pub spot_market_vault: &'me AccountInfo<'a2>,
-    pub insurance_fund_vault: &'me AccountInfo<'a3>,
-    pub drift_signer: &'me AccountInfo<'a4>,
-    pub state: &'me AccountInfo<'a5>,
-    pub oracle: &'me AccountInfo<'a6>,
-    pub admin: &'me AccountInfo<'a7>,
-    pub rent: &'me AccountInfo<'a8>,
-    pub system_program: &'me AccountInfo<'a9>,
-    pub token_program: &'me AccountInfo<'a10>,
+pub struct InitializeSpotMarketAccounts<'me, 'info> {
+    pub spot_market: &'me AccountInfo<'info>,
+    pub spot_market_mint: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeSpotMarketKeys {
@@ -6367,12 +6108,8 @@ pub struct InitializeSpotMarketKeys {
     pub system_program: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&InitializeSpotMarketAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for InitializeSpotMarketKeys
-{
-    fn from(
-        accounts: &InitializeSpotMarketAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&InitializeSpotMarketAccounts<'_, '_>> for InitializeSpotMarketKeys {
+    fn from(accounts: &InitializeSpotMarketAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             spot_market_mint: *accounts.spot_market_mint.key,
@@ -6405,12 +6142,10 @@ impl From<&InitializeSpotMarketKeys> for [AccountMeta; INITIALIZE_SPOT_MARKET_IX
         ]
     }
 }
-impl<'a> From<&InitializeSpotMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeSpotMarketAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &InitializeSpotMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &InitializeSpotMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.spot_market_mint.clone(),
@@ -6473,50 +6208,39 @@ pub fn initialize_spot_market_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_spot_market_invoke<'a, A: Into<InitializeSpotMarketIxArgs>>(
-    accounts: &InitializeSpotMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_spot_market_invoke<'info, A: Into<InitializeSpotMarketIxArgs>>(
+    accounts: &InitializeSpotMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_spot_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_spot_market_invoke_signed<'a, A: Into<InitializeSpotMarketIxArgs>>(
-    accounts: &InitializeSpotMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketIxArgs>>(
+    accounts: &InitializeSpotMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_spot_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 11usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializeSerumFulfillmentConfigAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-    'a10: 'me,
-> {
-    pub base_spot_market: &'me AccountInfo<'a0>,
-    pub quote_spot_market: &'me AccountInfo<'a1>,
-    pub state: &'me AccountInfo<'a2>,
-    pub serum_program: &'me AccountInfo<'a3>,
-    pub serum_market: &'me AccountInfo<'a4>,
-    pub serum_open_orders: &'me AccountInfo<'a5>,
-    pub drift_signer: &'me AccountInfo<'a6>,
-    pub serum_fulfillment_config: &'me AccountInfo<'a7>,
-    pub admin: &'me AccountInfo<'a8>,
-    pub rent: &'me AccountInfo<'a9>,
-    pub system_program: &'me AccountInfo<'a10>,
+pub struct InitializeSerumFulfillmentConfigAccounts<'me, 'info> {
+    pub base_spot_market: &'me AccountInfo<'info>,
+    pub quote_spot_market: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub serum_program: &'me AccountInfo<'info>,
+    pub serum_market: &'me AccountInfo<'info>,
+    pub serum_open_orders: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub serum_fulfillment_config: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeSerumFulfillmentConfigKeys {
@@ -6532,26 +6256,10 @@ pub struct InitializeSerumFulfillmentConfigKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me>
-    From<&InitializeSerumFulfillmentConfigAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
+impl From<&InitializeSerumFulfillmentConfigAccounts<'_, '_>>
     for InitializeSerumFulfillmentConfigKeys
 {
-    fn from(
-        accounts: &InitializeSerumFulfillmentConfigAccounts<
-            'me,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-        >,
-    ) -> Self {
+    fn from(accounts: &InitializeSerumFulfillmentConfigAccounts) -> Self {
         Self {
             base_spot_market: *accounts.base_spot_market.key,
             quote_spot_market: *accounts.quote_spot_market.key,
@@ -6586,26 +6294,10 @@ impl From<&InitializeSerumFulfillmentConfigKeys>
         ]
     }
 }
-impl<'a>
-    From<&InitializeSerumFulfillmentConfigAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializeSerumFulfillmentConfigAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &InitializeSerumFulfillmentConfigAccounts<
-            '_,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-        >,
-    ) -> Self {
+    fn from(accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>) -> Self {
         [
             accounts.base_spot_market.clone(),
             accounts.quote_spot_market.clone(),
@@ -6663,62 +6355,36 @@ pub fn initialize_serum_fulfillment_config_ix<
     })
 }
 pub fn initialize_serum_fulfillment_config_invoke<
-    'a,
+    'info,
     A: Into<InitializeSerumFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<
-        '_,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-    >,
+    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_serum_fulfillment_config_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn initialize_serum_fulfillment_config_invoke_signed<
-    'a,
+    'info,
     A: Into<InitializeSerumFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<
-        '_,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-    >,
+    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_serum_fulfillment_config_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSerumFulfillmentConfigStatusAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub serum_fulfillment_config: &'me AccountInfo<'a1>,
-    pub admin: &'me AccountInfo<'a2>,
+pub struct UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub serum_fulfillment_config: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumFulfillmentConfigStatusKeys {
@@ -6726,10 +6392,10 @@ pub struct UpdateSerumFulfillmentConfigStatusKeys {
     pub serum_fulfillment_config: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&UpdateSerumFulfillmentConfigStatusAccounts<'me, '_, '_, '_>>
+impl From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>>
     for UpdateSerumFulfillmentConfigStatusKeys
 {
-    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             serum_fulfillment_config: *accounts.serum_fulfillment_config.key,
@@ -6748,10 +6414,10 @@ impl From<&UpdateSerumFulfillmentConfigStatusKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.serum_fulfillment_config.clone(),
@@ -6802,55 +6468,43 @@ pub fn update_serum_fulfillment_config_status_ix<
     })
 }
 pub fn update_serum_fulfillment_config_status_invoke<
-    'a,
+    'info,
     A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_serum_fulfillment_config_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_serum_fulfillment_config_status_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_serum_fulfillment_config_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializePhoenixFulfillmentConfigAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-    'a8: 'me,
-    'a9: 'me,
-> {
-    pub base_spot_market: &'me AccountInfo<'a0>,
-    pub quote_spot_market: &'me AccountInfo<'a1>,
-    pub state: &'me AccountInfo<'a2>,
-    pub phoenix_program: &'me AccountInfo<'a3>,
-    pub phoenix_market: &'me AccountInfo<'a4>,
-    pub drift_signer: &'me AccountInfo<'a5>,
-    pub phoenix_fulfillment_config: &'me AccountInfo<'a6>,
-    pub admin: &'me AccountInfo<'a7>,
-    pub rent: &'me AccountInfo<'a8>,
-    pub system_program: &'me AccountInfo<'a9>,
+pub struct InitializePhoenixFulfillmentConfigAccounts<'me, 'info> {
+    pub base_spot_market: &'me AccountInfo<'info>,
+    pub quote_spot_market: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub phoenix_program: &'me AccountInfo<'info>,
+    pub phoenix_market: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub phoenix_fulfillment_config: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializePhoenixFulfillmentConfigKeys {
@@ -6865,25 +6519,10 @@ pub struct InitializePhoenixFulfillmentConfigKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me>
-    From<&InitializePhoenixFulfillmentConfigAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_, '_, '_>>
+impl From<&InitializePhoenixFulfillmentConfigAccounts<'_, '_>>
     for InitializePhoenixFulfillmentConfigKeys
 {
-    fn from(
-        accounts: &InitializePhoenixFulfillmentConfigAccounts<
-            'me,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-            '_,
-        >,
-    ) -> Self {
+    fn from(accounts: &InitializePhoenixFulfillmentConfigAccounts) -> Self {
         Self {
             base_spot_market: *accounts.base_spot_market.key,
             quote_spot_market: *accounts.quote_spot_market.key,
@@ -6916,25 +6555,10 @@ impl From<&InitializePhoenixFulfillmentConfigKeys>
         ]
     }
 }
-impl<'a>
-    From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &InitializePhoenixFulfillmentConfigAccounts<
-            '_,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-            'a,
-        >,
-    ) -> Self {
+    fn from(accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>) -> Self {
         [
             accounts.base_spot_market.clone(),
             accounts.quote_spot_market.clone(),
@@ -6992,60 +6616,36 @@ pub fn initialize_phoenix_fulfillment_config_ix<
     })
 }
 pub fn initialize_phoenix_fulfillment_config_invoke<
-    'a,
+    'info,
     A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<
-        '_,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-    >,
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn initialize_phoenix_fulfillment_config_invoke_signed<
-    'a,
+    'info,
     A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<
-        '_,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-        'a,
-    >,
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct PhoenixFulfillmentConfigStatusAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub phoenix_fulfillment_config: &'me AccountInfo<'a1>,
-    pub admin: &'me AccountInfo<'a2>,
+pub struct PhoenixFulfillmentConfigStatusAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub phoenix_fulfillment_config: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct PhoenixFulfillmentConfigStatusKeys {
@@ -7053,10 +6653,8 @@ pub struct PhoenixFulfillmentConfigStatusKeys {
     pub phoenix_fulfillment_config: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&PhoenixFulfillmentConfigStatusAccounts<'me, '_, '_, '_>>
-    for PhoenixFulfillmentConfigStatusKeys
-{
-    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&PhoenixFulfillmentConfigStatusAccounts<'_, '_>> for PhoenixFulfillmentConfigStatusKeys {
+    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             phoenix_fulfillment_config: *accounts.phoenix_fulfillment_config.key,
@@ -7075,10 +6673,10 @@ impl From<&PhoenixFulfillmentConfigStatusKeys>
         ]
     }
 }
-impl<'a> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
+impl<'info> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'info>>
+    for [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.phoenix_fulfillment_config.clone(),
@@ -7125,36 +6723,36 @@ pub fn phoenix_fulfillment_config_status_ix<
     })
 }
 pub fn phoenix_fulfillment_config_status_invoke<
-    'a,
+    'info,
     A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn phoenix_fulfillment_config_status_invoke_signed<
-    'a,
+    'info,
     A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'a, 'a, 'a>,
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSerumVaultAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub admin: &'me AccountInfo<'a1>,
-    pub srm_vault: &'me AccountInfo<'a2>,
+pub struct UpdateSerumVaultAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub srm_vault: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumVaultKeys {
@@ -7162,8 +6760,8 @@ pub struct UpdateSerumVaultKeys {
     pub admin: Pubkey,
     pub srm_vault: Pubkey,
 }
-impl<'me> From<&UpdateSerumVaultAccounts<'me, '_, '_, '_>> for UpdateSerumVaultKeys {
-    fn from(accounts: &UpdateSerumVaultAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSerumVaultAccounts<'_, '_>> for UpdateSerumVaultKeys {
+    fn from(accounts: &UpdateSerumVaultAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             admin: *accounts.admin.key,
@@ -7180,10 +6778,10 @@ impl From<&UpdateSerumVaultKeys> for [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNT
         ]
     }
 }
-impl<'a> From<&UpdateSerumVaultAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSerumVaultAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSerumVaultAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSerumVaultAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.admin.clone(),
@@ -7222,40 +6820,32 @@ pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>, A: Into<UpdateSerumV
         data: data.try_to_vec()?,
     })
 }
-pub fn update_serum_vault_invoke<'a, A: Into<UpdateSerumVaultIxArgs>>(
-    accounts: &UpdateSerumVaultAccounts<'_, 'a, 'a, 'a>,
+pub fn update_serum_vault_invoke<'info, A: Into<UpdateSerumVaultIxArgs>>(
+    accounts: &UpdateSerumVaultAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_serum_vault_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_serum_vault_invoke_signed<'a, A: Into<UpdateSerumVaultIxArgs>>(
-    accounts: &UpdateSerumVaultAccounts<'_, 'a, 'a, 'a>,
+pub fn update_serum_vault_invoke_signed<'info, A: Into<UpdateSerumVaultIxArgs>>(
+    accounts: &UpdateSerumVaultAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_serum_vault_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 6usize;
 #[derive(Copy, Clone, Debug)]
-pub struct InitializePerpMarketAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
-    pub oracle: &'me AccountInfo<'a3>,
-    pub rent: &'me AccountInfo<'a4>,
-    pub system_program: &'me AccountInfo<'a5>,
+pub struct InitializePerpMarketAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub rent: &'me AccountInfo<'info>,
+    pub system_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct InitializePerpMarketKeys {
@@ -7266,10 +6856,8 @@ pub struct InitializePerpMarketKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl<'me> From<&InitializePerpMarketAccounts<'me, '_, '_, '_, '_, '_, '_>>
-    for InitializePerpMarketKeys
-{
-    fn from(accounts: &InitializePerpMarketAccounts<'me, '_, '_, '_, '_, '_, '_>) -> Self {
+impl From<&InitializePerpMarketAccounts<'_, '_>> for InitializePerpMarketKeys {
+    fn from(accounts: &InitializePerpMarketAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -7292,10 +6880,10 @@ impl From<&InitializePerpMarketKeys> for [AccountMeta; INITIALIZE_PERP_MARKET_IX
         ]
     }
 }
-impl<'a> From<&InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]
+impl<'info> From<&InitializePerpMarketAccounts<'_, 'info>>
+    for [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &InitializePerpMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -7352,29 +6940,31 @@ pub fn initialize_perp_market_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_perp_market_invoke<'a, A: Into<InitializePerpMarketIxArgs>>(
-    accounts: &InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_perp_market_invoke<'info, A: Into<InitializePerpMarketIxArgs>>(
+    accounts: &InitializePerpMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_perp_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_perp_market_invoke_signed<'a, A: Into<InitializePerpMarketIxArgs>>(
-    accounts: &InitializePerpMarketAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketIxArgs>>(
+    accounts: &InitializePerpMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_perp_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct DeleteInitializedPerpMarketAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct DeleteInitializedPerpMarketAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteInitializedPerpMarketKeys {
@@ -7382,10 +6972,8 @@ pub struct DeleteInitializedPerpMarketKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&DeleteInitializedPerpMarketAccounts<'me, '_, '_, '_>>
-    for DeleteInitializedPerpMarketKeys
-{
-    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&DeleteInitializedPerpMarketAccounts<'_, '_>> for DeleteInitializedPerpMarketKeys {
+    fn from(accounts: &DeleteInitializedPerpMarketAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -7404,10 +6992,10 @@ impl From<&DeleteInitializedPerpMarketKeys>
         ]
     }
 }
-impl<'a> From<&DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
+impl<'info> From<&DeleteInitializedPerpMarketAccounts<'_, 'info>>
+    for [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -7451,34 +7039,34 @@ pub fn delete_initialized_perp_market_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn delete_initialized_perp_market_invoke<'a, A: Into<DeleteInitializedPerpMarketIxArgs>>(
-    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>,
+pub fn delete_initialized_perp_market_invoke<'info, A: Into<DeleteInitializedPerpMarketIxArgs>>(
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = delete_initialized_perp_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn delete_initialized_perp_market_invoke_signed<
-    'a,
+    'info,
     A: Into<DeleteInitializedPerpMarketIxArgs>,
 >(
-    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'a, 'a, 'a>,
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = delete_initialized_perp_market_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct MoveAmmPriceAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct MoveAmmPriceAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct MoveAmmPriceKeys {
@@ -7486,8 +7074,8 @@ pub struct MoveAmmPriceKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&MoveAmmPriceAccounts<'me, '_, '_, '_>> for MoveAmmPriceKeys {
-    fn from(accounts: &MoveAmmPriceAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&MoveAmmPriceAccounts<'_, '_>> for MoveAmmPriceKeys {
+    fn from(accounts: &MoveAmmPriceAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -7504,10 +7092,10 @@ impl From<&MoveAmmPriceKeys> for [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&MoveAmmPriceAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]
+impl<'info> From<&MoveAmmPriceAccounts<'_, 'info>>
+    for [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &MoveAmmPriceAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &MoveAmmPriceAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -7550,29 +7138,29 @@ pub fn move_amm_price_ix<K: Into<MoveAmmPriceKeys>, A: Into<MoveAmmPriceIxArgs>>
         data: data.try_to_vec()?,
     })
 }
-pub fn move_amm_price_invoke<'a, A: Into<MoveAmmPriceIxArgs>>(
-    accounts: &MoveAmmPriceAccounts<'_, 'a, 'a, 'a>,
+pub fn move_amm_price_invoke<'info, A: Into<MoveAmmPriceIxArgs>>(
+    accounts: &MoveAmmPriceAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = move_amm_price_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn move_amm_price_invoke_signed<'a, A: Into<MoveAmmPriceIxArgs>>(
-    accounts: &MoveAmmPriceAccounts<'_, 'a, 'a, 'a>,
+pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
+    accounts: &MoveAmmPriceAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = move_amm_price_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketExpiryAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketExpiryAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketExpiryKeys {
@@ -7580,8 +7168,8 @@ pub struct UpdatePerpMarketExpiryKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketExpiryAccounts<'me, '_, '_, '_>> for UpdatePerpMarketExpiryKeys {
-    fn from(accounts: &UpdatePerpMarketExpiryAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketExpiryAccounts<'_, '_>> for UpdatePerpMarketExpiryKeys {
+    fn from(accounts: &UpdatePerpMarketExpiryAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -7600,10 +7188,10 @@ impl From<&UpdatePerpMarketExpiryKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketExpiryAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketExpiryAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketExpiryAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -7647,38 +7235,32 @@ pub fn update_perp_market_expiry_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_expiry_invoke<'a, A: Into<UpdatePerpMarketExpiryIxArgs>>(
-    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_expiry_invoke<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
+    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_expiry_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_expiry_invoke_signed<'a, A: Into<UpdatePerpMarketExpiryIxArgs>>(
-    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
+    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_expiry_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct SettleExpiredMarketPoolsToRevenuePoolAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub admin: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
-    pub perp_market: &'me AccountInfo<'a3>,
+pub struct SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct SettleExpiredMarketPoolsToRevenuePoolKeys {
@@ -7687,10 +7269,10 @@ pub struct SettleExpiredMarketPoolsToRevenuePoolKeys {
     pub spot_market: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, '_, '_, '_, '_>>
+impl From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>>
     for SettleExpiredMarketPoolsToRevenuePoolKeys
 {
-    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, '_, '_, '_, '_>) -> Self {
+    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             admin: *accounts.admin.key,
@@ -7711,10 +7293,10 @@ impl From<&SettleExpiredMarketPoolsToRevenuePoolKeys>
         ]
     }
 }
-impl<'a> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]
+impl<'info> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>>
+    for [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.admin.clone(),
@@ -7764,51 +7346,41 @@ pub fn settle_expired_market_pools_to_revenue_pool_ix<
     })
 }
 pub fn settle_expired_market_pools_to_revenue_pool_invoke<
-    'a,
+    'info,
     A: Into<SettleExpiredMarketPoolsToRevenuePoolIxArgs>,
 >(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'a, 'a, 'a, 'a>,
+    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<
-    'a,
+    'info,
     A: Into<SettleExpiredMarketPoolsToRevenuePoolIxArgs>,
 >(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'a, 'a, 'a, 'a>,
+    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN: usize = 8usize;
 #[derive(Copy, Clone, Debug)]
-pub struct DepositIntoPerpMarketFeePoolAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-    'a7: 'me,
-> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub admin: &'me AccountInfo<'a2>,
-    pub source_vault: &'me AccountInfo<'a3>,
-    pub drift_signer: &'me AccountInfo<'a4>,
-    pub quote_spot_market: &'me AccountInfo<'a5>,
-    pub spot_market_vault: &'me AccountInfo<'a6>,
-    pub token_program: &'me AccountInfo<'a7>,
+pub struct DepositIntoPerpMarketFeePoolAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
+    pub source_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub quote_spot_market: &'me AccountInfo<'info>,
+    pub spot_market_vault: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct DepositIntoPerpMarketFeePoolKeys {
@@ -7821,12 +7393,8 @@ pub struct DepositIntoPerpMarketFeePoolKeys {
     pub spot_market_vault: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&DepositIntoPerpMarketFeePoolAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>>
-    for DepositIntoPerpMarketFeePoolKeys
-{
-    fn from(
-        accounts: &DepositIntoPerpMarketFeePoolAccounts<'me, '_, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&DepositIntoPerpMarketFeePoolAccounts<'_, '_>> for DepositIntoPerpMarketFeePoolKeys {
+    fn from(accounts: &DepositIntoPerpMarketFeePoolAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -7855,12 +7423,10 @@ impl From<&DepositIntoPerpMarketFeePoolKeys>
         ]
     }
 }
-impl<'a> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]
+impl<'info> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'info>>
+    for [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -7911,35 +7477,38 @@ pub fn deposit_into_perp_market_fee_pool_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_into_perp_market_fee_pool_invoke<'a, A: Into<DepositIntoPerpMarketFeePoolIxArgs>>(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+pub fn deposit_into_perp_market_fee_pool_invoke<
+    'info,
+    A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
+>(
+    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deposit_into_perp_market_fee_pool_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn deposit_into_perp_market_fee_pool_invoke_signed<
-    'a,
+    'info,
     A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
 >(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = deposit_into_perp_market_fee_pool_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const REPEG_AMM_CURVE_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct RepegAmmCurveAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
-    pub admin: &'me AccountInfo<'a3>,
+pub struct RepegAmmCurveAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct RepegAmmCurveKeys {
@@ -7948,8 +7517,8 @@ pub struct RepegAmmCurveKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&RepegAmmCurveAccounts<'me, '_, '_, '_, '_>> for RepegAmmCurveKeys {
-    fn from(accounts: &RepegAmmCurveAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&RepegAmmCurveAccounts<'_, '_>> for RepegAmmCurveKeys {
+    fn from(accounts: &RepegAmmCurveAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -7968,10 +7537,10 @@ impl From<&RepegAmmCurveKeys> for [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
         ]
     }
 }
-impl<'a> From<&RepegAmmCurveAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
+impl<'info> From<&RepegAmmCurveAccounts<'_, 'info>>
+    for [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RepegAmmCurveAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &RepegAmmCurveAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -8013,30 +7582,30 @@ pub fn repeg_amm_curve_ix<K: Into<RepegAmmCurveKeys>, A: Into<RepegAmmCurveIxArg
         data: data.try_to_vec()?,
     })
 }
-pub fn repeg_amm_curve_invoke<'a, A: Into<RepegAmmCurveIxArgs>>(
-    accounts: &RepegAmmCurveAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn repeg_amm_curve_invoke<'info, A: Into<RepegAmmCurveIxArgs>>(
+    accounts: &RepegAmmCurveAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = repeg_amm_curve_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn repeg_amm_curve_invoke_signed<'a, A: Into<RepegAmmCurveIxArgs>>(
-    accounts: &RepegAmmCurveAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
+    accounts: &RepegAmmCurveAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = repeg_amm_curve_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketAmmOracleTwapAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
-    pub admin: &'me AccountInfo<'a3>,
+pub struct UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketAmmOracleTwapKeys {
@@ -8045,10 +7614,8 @@ pub struct UpdatePerpMarketAmmOracleTwapKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketAmmOracleTwapAccounts<'me, '_, '_, '_, '_>>
-    for UpdatePerpMarketAmmOracleTwapKeys
-{
-    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>> for UpdatePerpMarketAmmOracleTwapKeys {
+    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -8069,10 +7636,10 @@ impl From<&UpdatePerpMarketAmmOracleTwapKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -8119,37 +7686,37 @@ pub fn update_perp_market_amm_oracle_twap_ix<
     })
 }
 pub fn update_perp_market_amm_oracle_twap_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketAmmOracleTwapIxArgs>,
 >(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_amm_oracle_twap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_amm_oracle_twap_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketAmmOracleTwapIxArgs>,
 >(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_amm_oracle_twap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct ResetPerpMarketAmmOracleTwapAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
-    pub admin: &'me AccountInfo<'a3>,
+pub struct ResetPerpMarketAmmOracleTwapAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct ResetPerpMarketAmmOracleTwapKeys {
@@ -8158,10 +7725,8 @@ pub struct ResetPerpMarketAmmOracleTwapKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&ResetPerpMarketAmmOracleTwapAccounts<'me, '_, '_, '_, '_>>
-    for ResetPerpMarketAmmOracleTwapKeys
-{
-    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&ResetPerpMarketAmmOracleTwapAccounts<'_, '_>> for ResetPerpMarketAmmOracleTwapKeys {
+    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -8182,10 +7747,10 @@ impl From<&ResetPerpMarketAmmOracleTwapKeys>
         ]
     }
 }
-impl<'a> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
+impl<'info> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>>
+    for [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -8231,35 +7796,38 @@ pub fn reset_perp_market_amm_oracle_twap_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn reset_perp_market_amm_oracle_twap_invoke<'a, A: Into<ResetPerpMarketAmmOracleTwapIxArgs>>(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn reset_perp_market_amm_oracle_twap_invoke<
+    'info,
+    A: Into<ResetPerpMarketAmmOracleTwapIxArgs>,
+>(
+    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = reset_perp_market_amm_oracle_twap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn reset_perp_market_amm_oracle_twap_invoke_signed<
-    'a,
+    'info,
     A: Into<ResetPerpMarketAmmOracleTwapIxArgs>,
 >(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'a, 'a, 'a, 'a>,
+    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = reset_perp_market_amm_oracle_twap_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_K_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateKAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
-    pub oracle: &'me AccountInfo<'a3>,
+pub struct UpdateKAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateKKeys {
@@ -8268,8 +7836,8 @@ pub struct UpdateKKeys {
     pub perp_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl<'me> From<&UpdateKAccounts<'me, '_, '_, '_, '_>> for UpdateKKeys {
-    fn from(accounts: &UpdateKAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdateKAccounts<'_, '_>> for UpdateKKeys {
+    fn from(accounts: &UpdateKAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8288,10 +7856,8 @@ impl From<&UpdateKKeys> for [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&UpdateKAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_K_IX_ACCOUNTS_LEN]
-{
-    fn from(accounts: &UpdateKAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+impl<'info> From<&UpdateKAccounts<'_, 'info>> for [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] {
+    fn from(accounts: &UpdateKAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8333,29 +7899,29 @@ pub fn update_k_ix<K: Into<UpdateKKeys>, A: Into<UpdateKIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn update_k_invoke<'a, A: Into<UpdateKIxArgs>>(
-    accounts: &UpdateKAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_k_invoke<'info, A: Into<UpdateKIxArgs>>(
+    accounts: &UpdateKAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_k_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_k_invoke_signed<'a, A: Into<UpdateKIxArgs>>(
-    accounts: &UpdateKAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
+    accounts: &UpdateKAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_k_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMarginRatioAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMarginRatioAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMarginRatioKeys {
@@ -8363,10 +7929,8 @@ pub struct UpdatePerpMarketMarginRatioKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMarginRatioAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketMarginRatioKeys
-{
-    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketMarginRatioAccounts<'_, '_>> for UpdatePerpMarketMarginRatioKeys {
+    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8385,10 +7949,10 @@ impl From<&UpdatePerpMarketMarginRatioKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8434,34 +7998,34 @@ pub fn update_perp_market_margin_ratio_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_margin_ratio_invoke<'a, A: Into<UpdatePerpMarketMarginRatioIxArgs>>(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_margin_ratio_invoke<'info, A: Into<UpdatePerpMarketMarginRatioIxArgs>>(
+    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_margin_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_margin_ratio_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMarginRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_margin_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMaxImbalancesAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMaxImbalancesAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxImbalancesKeys {
@@ -8469,10 +8033,8 @@ pub struct UpdatePerpMarketMaxImbalancesKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMaxImbalancesAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketMaxImbalancesKeys
-{
-    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketMaxImbalancesAccounts<'_, '_>> for UpdatePerpMarketMaxImbalancesKeys {
+    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8491,10 +8053,10 @@ impl From<&UpdatePerpMarketMaxImbalancesKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8543,36 +8105,36 @@ pub fn update_perp_market_max_imbalances_ix<
     })
 }
 pub fn update_perp_market_max_imbalances_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_imbalances_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_max_imbalances_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_max_imbalances_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketLiquidationFeeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketLiquidationFeeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketLiquidationFeeKeys {
@@ -8580,10 +8142,8 @@ pub struct UpdatePerpMarketLiquidationFeeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketLiquidationFeeAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketLiquidationFeeKeys
-{
-    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketLiquidationFeeAccounts<'_, '_>> for UpdatePerpMarketLiquidationFeeKeys {
+    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8602,10 +8162,10 @@ impl From<&UpdatePerpMarketLiquidationFeeKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8653,36 +8213,36 @@ pub fn update_perp_market_liquidation_fee_ix<
     })
 }
 pub fn update_perp_market_liquidation_fee_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_liquidation_fee_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_liquidation_fee_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_liquidation_fee_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateInsuranceFundUnstakingPeriodKeys {
@@ -8690,10 +8250,10 @@ pub struct UpdateInsuranceFundUnstakingPeriodKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'me, '_, '_, '_>>
+impl From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>>
     for UpdateInsuranceFundUnstakingPeriodKeys
 {
-    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8712,10 +8272,10 @@ impl From<&UpdateInsuranceFundUnstakingPeriodKeys>
         ]
     }
 }
-impl<'a> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8766,36 +8326,36 @@ pub fn update_insurance_fund_unstaking_period_ix<
     })
 }
 pub fn update_insurance_fund_unstaking_period_invoke<
-    'a,
+    'info,
     A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
 >(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_insurance_fund_unstaking_period_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_insurance_fund_unstaking_period_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
 >(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_insurance_fund_unstaking_period_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketLiquidationFeeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketLiquidationFeeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketLiquidationFeeKeys {
@@ -8803,10 +8363,8 @@ pub struct UpdateSpotMarketLiquidationFeeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketLiquidationFeeAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketLiquidationFeeKeys
-{
-    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketLiquidationFeeAccounts<'_, '_>> for UpdateSpotMarketLiquidationFeeKeys {
+    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8825,10 +8383,10 @@ impl From<&UpdateSpotMarketLiquidationFeeKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8877,36 +8435,36 @@ pub fn update_spot_market_liquidation_fee_ix<
     })
 }
 pub fn update_spot_market_liquidation_fee_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_liquidation_fee_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_liquidation_fee_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_liquidation_fee_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateWithdrawGuardThresholdAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateWithdrawGuardThresholdAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateWithdrawGuardThresholdKeys {
@@ -8914,10 +8472,8 @@ pub struct UpdateWithdrawGuardThresholdKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateWithdrawGuardThresholdAccounts<'me, '_, '_, '_>>
-    for UpdateWithdrawGuardThresholdKeys
-{
-    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateWithdrawGuardThresholdAccounts<'_, '_>> for UpdateWithdrawGuardThresholdKeys {
+    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -8936,10 +8492,10 @@ impl From<&UpdateWithdrawGuardThresholdKeys>
         ]
     }
 }
-impl<'a> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -8985,34 +8541,37 @@ pub fn update_withdraw_guard_threshold_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_withdraw_guard_threshold_invoke<'a, A: Into<UpdateWithdrawGuardThresholdIxArgs>>(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'a, 'a, 'a>,
+pub fn update_withdraw_guard_threshold_invoke<
+    'info,
+    A: Into<UpdateWithdrawGuardThresholdIxArgs>,
+>(
+    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_withdraw_guard_threshold_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_withdraw_guard_threshold_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateWithdrawGuardThresholdIxArgs>,
 >(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_withdraw_guard_threshold_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketIfFactorAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketIfFactorAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketIfFactorKeys {
@@ -9020,10 +8579,8 @@ pub struct UpdateSpotMarketIfFactorKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketIfFactorAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketIfFactorKeys
-{
-    fn from(accounts: &UpdateSpotMarketIfFactorAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketIfFactorAccounts<'_, '_>> for UpdateSpotMarketIfFactorKeys {
+    fn from(accounts: &UpdateSpotMarketIfFactorAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9042,10 +8599,10 @@ impl From<&UpdateSpotMarketIfFactorKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketIfFactorAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketIfFactorAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9091,31 +8648,34 @@ pub fn update_spot_market_if_factor_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_if_factor_invoke<'a, A: Into<UpdateSpotMarketIfFactorIxArgs>>(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_if_factor_invoke<'info, A: Into<UpdateSpotMarketIfFactorIxArgs>>(
+    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_if_factor_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_if_factor_invoke_signed<'a, A: Into<UpdateSpotMarketIfFactorIxArgs>>(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_if_factor_invoke_signed<
+    'info,
+    A: Into<UpdateSpotMarketIfFactorIxArgs>,
+>(
+    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_if_factor_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketRevenueSettlePeriodKeys {
@@ -9123,10 +8683,10 @@ pub struct UpdateSpotMarketRevenueSettlePeriodKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'me, '_, '_, '_>>
+impl From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>>
     for UpdateSpotMarketRevenueSettlePeriodKeys
 {
-    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9145,10 +8705,10 @@ impl From<&UpdateSpotMarketRevenueSettlePeriodKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9199,36 +8759,36 @@ pub fn update_spot_market_revenue_settle_period_ix<
     })
 }
 pub fn update_spot_market_revenue_settle_period_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
 >(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_revenue_settle_period_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_revenue_settle_period_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
 >(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_revenue_settle_period_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketStatusAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketStatusAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketStatusKeys {
@@ -9236,8 +8796,8 @@ pub struct UpdateSpotMarketStatusKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketStatusAccounts<'me, '_, '_, '_>> for UpdateSpotMarketStatusKeys {
-    fn from(accounts: &UpdateSpotMarketStatusAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketStatusAccounts<'_, '_>> for UpdateSpotMarketStatusKeys {
+    fn from(accounts: &UpdateSpotMarketStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9256,10 +8816,10 @@ impl From<&UpdateSpotMarketStatusKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketStatusAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketStatusAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketStatusAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9303,31 +8863,31 @@ pub fn update_spot_market_status_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_status_invoke<'a, A: Into<UpdateSpotMarketStatusIxArgs>>(
-    accounts: &UpdateSpotMarketStatusAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_status_invoke<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
+    accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_status_invoke_signed<'a, A: Into<UpdateSpotMarketStatusIxArgs>>(
-    accounts: &UpdateSpotMarketStatusAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
+    accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketAssetTierAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketAssetTierAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketAssetTierKeys {
@@ -9335,10 +8895,8 @@ pub struct UpdateSpotMarketAssetTierKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketAssetTierAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketAssetTierKeys
-{
-    fn from(accounts: &UpdateSpotMarketAssetTierAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketAssetTierAccounts<'_, '_>> for UpdateSpotMarketAssetTierKeys {
+    fn from(accounts: &UpdateSpotMarketAssetTierAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9357,10 +8915,10 @@ impl From<&UpdateSpotMarketAssetTierKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketAssetTierAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketAssetTierAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9404,31 +8962,34 @@ pub fn update_spot_market_asset_tier_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_asset_tier_invoke<'a, A: Into<UpdateSpotMarketAssetTierIxArgs>>(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_asset_tier_invoke<'info, A: Into<UpdateSpotMarketAssetTierIxArgs>>(
+    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_asset_tier_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_asset_tier_invoke_signed<'a, A: Into<UpdateSpotMarketAssetTierIxArgs>>(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_asset_tier_invoke_signed<
+    'info,
+    A: Into<UpdateSpotMarketAssetTierIxArgs>,
+>(
+    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_asset_tier_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketMarginWeightsAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketMarginWeightsAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMarginWeightsKeys {
@@ -9436,10 +8997,8 @@ pub struct UpdateSpotMarketMarginWeightsKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketMarginWeightsAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketMarginWeightsKeys
-{
-    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketMarginWeightsAccounts<'_, '_>> for UpdateSpotMarketMarginWeightsKeys {
+    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9458,10 +9017,10 @@ impl From<&UpdateSpotMarketMarginWeightsKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9512,36 +9071,36 @@ pub fn update_spot_market_margin_weights_ix<
     })
 }
 pub fn update_spot_market_margin_weights_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_margin_weights_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_margin_weights_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_margin_weights_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketBorrowRateAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketBorrowRateAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketBorrowRateKeys {
@@ -9549,10 +9108,8 @@ pub struct UpdateSpotMarketBorrowRateKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketBorrowRateAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketBorrowRateKeys
-{
-    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketBorrowRateAccounts<'_, '_>> for UpdateSpotMarketBorrowRateKeys {
+    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9571,10 +9128,10 @@ impl From<&UpdateSpotMarketBorrowRateKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9620,34 +9177,34 @@ pub fn update_spot_market_borrow_rate_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_borrow_rate_invoke<'a, A: Into<UpdateSpotMarketBorrowRateIxArgs>>(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_borrow_rate_invoke<'info, A: Into<UpdateSpotMarketBorrowRateIxArgs>>(
+    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_borrow_rate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_borrow_rate_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketBorrowRateIxArgs>,
 >(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_borrow_rate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMaxTokenDepositsKeys {
@@ -9655,10 +9212,10 @@ pub struct UpdateSpotMarketMaxTokenDepositsKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'me, '_, '_, '_>>
+impl From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>>
     for UpdateSpotMarketMaxTokenDepositsKeys
 {
-    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9677,10 +9234,10 @@ impl From<&UpdateSpotMarketMaxTokenDepositsKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9731,37 +9288,37 @@ pub fn update_spot_market_max_token_deposits_ix<
     })
 }
 pub fn update_spot_market_max_token_deposits_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_max_token_deposits_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_max_token_deposits_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_max_token_deposits_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketOracleAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
-    pub oracle: &'me AccountInfo<'a3>,
+pub struct UpdateSpotMarketOracleAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketOracleKeys {
@@ -9770,10 +9327,8 @@ pub struct UpdateSpotMarketOracleKeys {
     pub spot_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketOracleAccounts<'me, '_, '_, '_, '_>>
-    for UpdateSpotMarketOracleKeys
-{
-    fn from(accounts: &UpdateSpotMarketOracleAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketOracleAccounts<'_, '_>> for UpdateSpotMarketOracleKeys {
+    fn from(accounts: &UpdateSpotMarketOracleAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9794,10 +9349,10 @@ impl From<&UpdateSpotMarketOracleKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketOracleAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9843,31 +9398,31 @@ pub fn update_spot_market_oracle_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_oracle_invoke<'a, A: Into<UpdateSpotMarketOracleIxArgs>>(
-    accounts: &UpdateSpotMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_spot_market_oracle_invoke<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
+    accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_oracle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_oracle_invoke_signed<'a, A: Into<UpdateSpotMarketOracleIxArgs>>(
-    accounts: &UpdateSpotMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
+    accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_oracle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketStepSizeAndTickSizeKeys {
@@ -9875,10 +9430,10 @@ pub struct UpdateSpotMarketStepSizeAndTickSizeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, '_, '_, '_>>
+impl From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>>
     for UpdateSpotMarketStepSizeAndTickSizeKeys
 {
-    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -9897,10 +9452,10 @@ impl From<&UpdateSpotMarketStepSizeAndTickSizeKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -9952,36 +9507,36 @@ pub fn update_spot_market_step_size_and_tick_size_ix<
     })
 }
 pub fn update_spot_market_step_size_and_tick_size_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_step_size_and_tick_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_step_size_and_tick_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketMinOrderSizeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketMinOrderSizeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMinOrderSizeKeys {
@@ -9989,10 +9544,8 @@ pub struct UpdateSpotMarketMinOrderSizeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketMinOrderSizeAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketMinOrderSizeKeys
-{
-    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketMinOrderSizeAccounts<'_, '_>> for UpdateSpotMarketMinOrderSizeKeys {
+    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10011,10 +9564,10 @@ impl From<&UpdateSpotMarketMinOrderSizeKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10060,34 +9613,37 @@ pub fn update_spot_market_min_order_size_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_min_order_size_invoke<'a, A: Into<UpdateSpotMarketMinOrderSizeIxArgs>>(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_min_order_size_invoke<
+    'info,
+    A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
+>(
+    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_min_order_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_min_order_size_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_min_order_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketOrdersEnabledAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketOrdersEnabledAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketOrdersEnabledKeys {
@@ -10095,10 +9651,8 @@ pub struct UpdateSpotMarketOrdersEnabledKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketOrdersEnabledAccounts<'me, '_, '_, '_>>
-    for UpdateSpotMarketOrdersEnabledKeys
-{
-    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketOrdersEnabledAccounts<'_, '_>> for UpdateSpotMarketOrdersEnabledKeys {
+    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10117,10 +9671,10 @@ impl From<&UpdateSpotMarketOrdersEnabledKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10168,36 +9722,36 @@ pub fn update_spot_market_orders_enabled_ix<
     })
 }
 pub fn update_spot_market_orders_enabled_invoke<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
 >(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_orders_enabled_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_orders_enabled_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
 >(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_orders_enabled_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotMarketNameAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
+pub struct UpdateSpotMarketNameAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketNameKeys {
@@ -10205,8 +9759,8 @@ pub struct UpdateSpotMarketNameKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl<'me> From<&UpdateSpotMarketNameAccounts<'me, '_, '_, '_>> for UpdateSpotMarketNameKeys {
-    fn from(accounts: &UpdateSpotMarketNameAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateSpotMarketNameAccounts<'_, '_>> for UpdateSpotMarketNameKeys {
+    fn from(accounts: &UpdateSpotMarketNameAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10223,10 +9777,10 @@ impl From<&UpdateSpotMarketNameKeys> for [AccountMeta; UPDATE_SPOT_MARKET_NAME_I
         ]
     }
 }
-impl<'a> From<&UpdateSpotMarketNameAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotMarketNameAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketNameAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotMarketNameAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10270,29 +9824,31 @@ pub fn update_spot_market_name_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_name_invoke<'a, A: Into<UpdateSpotMarketNameIxArgs>>(
-    accounts: &UpdateSpotMarketNameAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_name_invoke<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
+    accounts: &UpdateSpotMarketNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_name_invoke_signed<'a, A: Into<UpdateSpotMarketNameIxArgs>>(
-    accounts: &UpdateSpotMarketNameAccounts<'_, 'a, 'a, 'a>,
+pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
+    accounts: &UpdateSpotMarketNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketStatusAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketStatusAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketStatusKeys {
@@ -10300,8 +9856,8 @@ pub struct UpdatePerpMarketStatusKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketStatusAccounts<'me, '_, '_, '_>> for UpdatePerpMarketStatusKeys {
-    fn from(accounts: &UpdatePerpMarketStatusAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketStatusAccounts<'_, '_>> for UpdatePerpMarketStatusKeys {
+    fn from(accounts: &UpdatePerpMarketStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10320,10 +9876,10 @@ impl From<&UpdatePerpMarketStatusKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketStatusAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketStatusAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketStatusAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10367,31 +9923,31 @@ pub fn update_perp_market_status_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_status_invoke<'a, A: Into<UpdatePerpMarketStatusIxArgs>>(
-    accounts: &UpdatePerpMarketStatusAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_status_invoke<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
+    accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_status_invoke_signed<'a, A: Into<UpdatePerpMarketStatusIxArgs>>(
-    accounts: &UpdatePerpMarketStatusAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
+    accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketContractTierAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketContractTierAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketContractTierKeys {
@@ -10399,10 +9955,8 @@ pub struct UpdatePerpMarketContractTierKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketContractTierAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketContractTierKeys
-{
-    fn from(accounts: &UpdatePerpMarketContractTierAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketContractTierAccounts<'_, '_>> for UpdatePerpMarketContractTierKeys {
+    fn from(accounts: &UpdatePerpMarketContractTierAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10421,10 +9975,10 @@ impl From<&UpdatePerpMarketContractTierKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketContractTierAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketContractTierAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketContractTierAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10471,34 +10025,37 @@ pub fn update_perp_market_contract_tier_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_contract_tier_invoke<'a, A: Into<UpdatePerpMarketContractTierIxArgs>>(
-    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_contract_tier_invoke<
+    'info,
+    A: Into<UpdatePerpMarketContractTierIxArgs>,
+>(
+    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_contract_tier_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_contract_tier_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketContractTierIxArgs>,
 >(
-    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_contract_tier_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketImfFactorAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketImfFactorAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketImfFactorKeys {
@@ -10506,10 +10063,8 @@ pub struct UpdatePerpMarketImfFactorKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketImfFactorAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketImfFactorKeys
-{
-    fn from(accounts: &UpdatePerpMarketImfFactorAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketImfFactorAccounts<'_, '_>> for UpdatePerpMarketImfFactorKeys {
+    fn from(accounts: &UpdatePerpMarketImfFactorAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10528,10 +10083,10 @@ impl From<&UpdatePerpMarketImfFactorKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketImfFactorAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketImfFactorAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10576,31 +10131,34 @@ pub fn update_perp_market_imf_factor_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_imf_factor_invoke<'a, A: Into<UpdatePerpMarketImfFactorIxArgs>>(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_imf_factor_invoke<'info, A: Into<UpdatePerpMarketImfFactorIxArgs>>(
+    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_imf_factor_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_imf_factor_invoke_signed<'a, A: Into<UpdatePerpMarketImfFactorIxArgs>>(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_imf_factor_invoke_signed<
+    'info,
+    A: Into<UpdatePerpMarketImfFactorIxArgs>,
+>(
+    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_imf_factor_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketUnrealizedAssetWeightKeys {
@@ -10608,10 +10166,10 @@ pub struct UpdatePerpMarketUnrealizedAssetWeightKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>>
     for UpdatePerpMarketUnrealizedAssetWeightKeys
 {
-    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10630,10 +10188,10 @@ impl From<&UpdatePerpMarketUnrealizedAssetWeightKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10685,36 +10243,36 @@ pub fn update_perp_market_unrealized_asset_weight_ix<
     })
 }
 pub fn update_perp_market_unrealized_asset_weight_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
 >(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_unrealized_asset_weight_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
 >(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_unrealized_asset_weight_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketConcentrationCoefAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketConcentrationCoefAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketConcentrationCoefKeys {
@@ -10722,10 +10280,10 @@ pub struct UpdatePerpMarketConcentrationCoefKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketConcentrationCoefAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketConcentrationCoefAccounts<'_, '_>>
     for UpdatePerpMarketConcentrationCoefKeys
 {
-    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10744,10 +10302,10 @@ impl From<&UpdatePerpMarketConcentrationCoefKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10798,36 +10356,36 @@ pub fn update_perp_market_concentration_coef_ix<
     })
 }
 pub fn update_perp_market_concentration_coef_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
 >(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_concentration_coef_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_concentration_coef_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
 >(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_concentration_coef_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketCurveUpdateIntensityKeys {
@@ -10835,10 +10393,10 @@ pub struct UpdatePerpMarketCurveUpdateIntensityKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>>
     for UpdatePerpMarketCurveUpdateIntensityKeys
 {
-    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10857,10 +10415,10 @@ impl From<&UpdatePerpMarketCurveUpdateIntensityKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10911,36 +10469,36 @@ pub fn update_perp_market_curve_update_intensity_ix<
     })
 }
 pub fn update_perp_market_curve_update_intensity_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
 >(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_curve_update_intensity_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_curve_update_intensity_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
 >(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_curve_update_intensity_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
+    let account_info: [AccountInfo<'info>;
+        UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpKeys {
@@ -10948,12 +10506,10 @@ pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>>
     for UpdatePerpMarketTargetBaseAssetAmountPerLpKeys
 {
-    fn from(
-        accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, '_, '_, '_>,
-    ) -> Self {
+    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10972,10 +10528,10 @@ impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -11026,43 +10582,43 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_ix<
     })
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
 >(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
 >(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateLpCooldownTimeAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateLpCooldownTimeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLpCooldownTimeKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateLpCooldownTimeAccounts<'me, '_, '_>> for UpdateLpCooldownTimeKeys {
-    fn from(accounts: &UpdateLpCooldownTimeAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateLpCooldownTimeAccounts<'_, '_>> for UpdateLpCooldownTimeKeys {
+    fn from(accounts: &UpdateLpCooldownTimeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11077,10 +10633,10 @@ impl From<&UpdateLpCooldownTimeKeys> for [AccountMeta; UPDATE_LP_COOLDOWN_TIME_I
         ]
     }
 }
-impl<'a> From<&UpdateLpCooldownTimeAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateLpCooldownTimeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateLpCooldownTimeAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11120,36 +10676,38 @@ pub fn update_lp_cooldown_time_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_lp_cooldown_time_invoke<'a, A: Into<UpdateLpCooldownTimeIxArgs>>(
-    accounts: &UpdateLpCooldownTimeAccounts<'_, 'a, 'a>,
+pub fn update_lp_cooldown_time_invoke<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
+    accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_lp_cooldown_time_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_lp_cooldown_time_invoke_signed<'a, A: Into<UpdateLpCooldownTimeIxArgs>>(
-    accounts: &UpdateLpCooldownTimeAccounts<'_, 'a, 'a>,
+pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
+    accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_lp_cooldown_time_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpFeeStructureAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdatePerpFeeStructureAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpFeeStructureKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdatePerpFeeStructureAccounts<'me, '_, '_>> for UpdatePerpFeeStructureKeys {
-    fn from(accounts: &UpdatePerpFeeStructureAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdatePerpFeeStructureAccounts<'_, '_>> for UpdatePerpFeeStructureKeys {
+    fn from(accounts: &UpdatePerpFeeStructureAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11166,10 +10724,10 @@ impl From<&UpdatePerpFeeStructureKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpFeeStructureAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpFeeStructureAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpFeeStructureAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11209,38 +10767,38 @@ pub fn update_perp_fee_structure_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_fee_structure_invoke<'a, A: Into<UpdatePerpFeeStructureIxArgs>>(
-    accounts: &UpdatePerpFeeStructureAccounts<'_, 'a, 'a>,
+pub fn update_perp_fee_structure_invoke<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
+    accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_fee_structure_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_fee_structure_invoke_signed<'a, A: Into<UpdatePerpFeeStructureIxArgs>>(
-    accounts: &UpdatePerpFeeStructureAccounts<'_, 'a, 'a>,
+pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
+    accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_fee_structure_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotFeeStructureAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateSpotFeeStructureAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotFeeStructureKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateSpotFeeStructureAccounts<'me, '_, '_>> for UpdateSpotFeeStructureKeys {
-    fn from(accounts: &UpdateSpotFeeStructureAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateSpotFeeStructureAccounts<'_, '_>> for UpdateSpotFeeStructureKeys {
+    fn from(accounts: &UpdateSpotFeeStructureAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11257,10 +10815,10 @@ impl From<&UpdateSpotFeeStructureKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotFeeStructureAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotFeeStructureAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotFeeStructureAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11300,40 +10858,38 @@ pub fn update_spot_fee_structure_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_fee_structure_invoke<'a, A: Into<UpdateSpotFeeStructureIxArgs>>(
-    accounts: &UpdateSpotFeeStructureAccounts<'_, 'a, 'a>,
+pub fn update_spot_fee_structure_invoke<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
+    accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_fee_structure_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_fee_structure_invoke_signed<'a, A: Into<UpdateSpotFeeStructureIxArgs>>(
-    accounts: &UpdateSpotFeeStructureAccounts<'_, 'a, 'a>,
+pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
+    accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_fee_structure_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateInitialPctToLiquidateAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateInitialPctToLiquidateAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateInitialPctToLiquidateKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateInitialPctToLiquidateAccounts<'me, '_, '_>>
-    for UpdateInitialPctToLiquidateKeys
-{
-    fn from(accounts: &UpdateInitialPctToLiquidateAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateInitialPctToLiquidateAccounts<'_, '_>> for UpdateInitialPctToLiquidateKeys {
+    fn from(accounts: &UpdateInitialPctToLiquidateAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11350,10 +10906,10 @@ impl From<&UpdateInitialPctToLiquidateKeys>
         ]
     }
 }
-impl<'a> From<&UpdateInitialPctToLiquidateAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateInitialPctToLiquidateAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11394,41 +10950,41 @@ pub fn update_initial_pct_to_liquidate_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_initial_pct_to_liquidate_invoke<'a, A: Into<UpdateInitialPctToLiquidateIxArgs>>(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'a, 'a>,
+pub fn update_initial_pct_to_liquidate_invoke<'info, A: Into<UpdateInitialPctToLiquidateIxArgs>>(
+    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_initial_pct_to_liquidate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_initial_pct_to_liquidate_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateInitialPctToLiquidateIxArgs>,
 >(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'a, 'a>,
+    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_initial_pct_to_liquidate_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateLiquidationDurationAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateLiquidationDurationAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLiquidationDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateLiquidationDurationAccounts<'me, '_, '_>> for UpdateLiquidationDurationKeys {
-    fn from(accounts: &UpdateLiquidationDurationAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateLiquidationDurationAccounts<'_, '_>> for UpdateLiquidationDurationKeys {
+    fn from(accounts: &UpdateLiquidationDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11445,10 +11001,10 @@ impl From<&UpdateLiquidationDurationKeys>
         ]
     }
 }
-impl<'a> From<&UpdateLiquidationDurationAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateLiquidationDurationAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateLiquidationDurationAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateLiquidationDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11488,38 +11044,41 @@ pub fn update_liquidation_duration_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_liquidation_duration_invoke<'a, A: Into<UpdateLiquidationDurationIxArgs>>(
-    accounts: &UpdateLiquidationDurationAccounts<'_, 'a, 'a>,
+pub fn update_liquidation_duration_invoke<'info, A: Into<UpdateLiquidationDurationIxArgs>>(
+    accounts: &UpdateLiquidationDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_liquidation_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_liquidation_duration_invoke_signed<'a, A: Into<UpdateLiquidationDurationIxArgs>>(
-    accounts: &UpdateLiquidationDurationAccounts<'_, 'a, 'a>,
+pub fn update_liquidation_duration_invoke_signed<
+    'info,
+    A: Into<UpdateLiquidationDurationIxArgs>,
+>(
+    accounts: &UpdateLiquidationDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_liquidation_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateOracleGuardRailsAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateOracleGuardRailsAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateOracleGuardRailsKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateOracleGuardRailsAccounts<'me, '_, '_>> for UpdateOracleGuardRailsKeys {
-    fn from(accounts: &UpdateOracleGuardRailsAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateOracleGuardRailsAccounts<'_, '_>> for UpdateOracleGuardRailsKeys {
+    fn from(accounts: &UpdateOracleGuardRailsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11536,10 +11095,10 @@ impl From<&UpdateOracleGuardRailsKeys>
         ]
     }
 }
-impl<'a> From<&UpdateOracleGuardRailsAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateOracleGuardRailsAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateOracleGuardRailsAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11579,40 +11138,38 @@ pub fn update_oracle_guard_rails_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_oracle_guard_rails_invoke<'a, A: Into<UpdateOracleGuardRailsIxArgs>>(
-    accounts: &UpdateOracleGuardRailsAccounts<'_, 'a, 'a>,
+pub fn update_oracle_guard_rails_invoke<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
+    accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_oracle_guard_rails_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_oracle_guard_rails_invoke_signed<'a, A: Into<UpdateOracleGuardRailsIxArgs>>(
-    accounts: &UpdateOracleGuardRailsAccounts<'_, 'a, 'a>,
+pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
+    accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_oracle_guard_rails_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateStateSettlementDurationAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateStateSettlementDurationAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateStateSettlementDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateStateSettlementDurationAccounts<'me, '_, '_>>
-    for UpdateStateSettlementDurationKeys
-{
-    fn from(accounts: &UpdateStateSettlementDurationAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateStateSettlementDurationAccounts<'_, '_>> for UpdateStateSettlementDurationKeys {
+    fn from(accounts: &UpdateStateSettlementDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11629,10 +11186,10 @@ impl From<&UpdateStateSettlementDurationKeys>
         ]
     }
 }
-impl<'a> From<&UpdateStateSettlementDurationAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateStateSettlementDurationAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateStateSettlementDurationAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -11674,35 +11231,38 @@ pub fn update_state_settlement_duration_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_state_settlement_duration_invoke<'a, A: Into<UpdateStateSettlementDurationIxArgs>>(
-    accounts: &UpdateStateSettlementDurationAccounts<'_, 'a, 'a>,
+pub fn update_state_settlement_duration_invoke<
+    'info,
+    A: Into<UpdateStateSettlementDurationIxArgs>,
+>(
+    accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_state_settlement_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_state_settlement_duration_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdateStateSettlementDurationIxArgs>,
 >(
-    accounts: &UpdateStateSettlementDurationAccounts<'_, 'a, 'a>,
+    accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_state_settlement_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketOracleAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me, 'a3: 'me> {
-    pub state: &'me AccountInfo<'a0>,
-    pub perp_market: &'me AccountInfo<'a1>,
-    pub oracle: &'me AccountInfo<'a2>,
-    pub admin: &'me AccountInfo<'a3>,
+pub struct UpdatePerpMarketOracleAccounts<'me, 'info> {
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
+    pub oracle: &'me AccountInfo<'info>,
+    pub admin: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketOracleKeys {
@@ -11711,10 +11271,8 @@ pub struct UpdatePerpMarketOracleKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketOracleAccounts<'me, '_, '_, '_, '_>>
-    for UpdatePerpMarketOracleKeys
-{
-    fn from(accounts: &UpdatePerpMarketOracleAccounts<'me, '_, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketOracleAccounts<'_, '_>> for UpdatePerpMarketOracleKeys {
+    fn from(accounts: &UpdatePerpMarketOracleAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -11735,10 +11293,10 @@ impl From<&UpdatePerpMarketOracleKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketOracleAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -11784,31 +11342,31 @@ pub fn update_perp_market_oracle_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_oracle_invoke<'a, A: Into<UpdatePerpMarketOracleIxArgs>>(
-    accounts: &UpdatePerpMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_perp_market_oracle_invoke<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
+    accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_oracle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_oracle_invoke_signed<'a, A: Into<UpdatePerpMarketOracleIxArgs>>(
-    accounts: &UpdatePerpMarketOracleAccounts<'_, 'a, 'a, 'a, 'a>,
+pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
+    accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_oracle_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketBaseSpreadAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketBaseSpreadAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketBaseSpreadKeys {
@@ -11816,10 +11374,8 @@ pub struct UpdatePerpMarketBaseSpreadKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketBaseSpreadAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketBaseSpreadKeys
-{
-    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketBaseSpreadAccounts<'_, '_>> for UpdatePerpMarketBaseSpreadKeys {
+    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11838,10 +11394,10 @@ impl From<&UpdatePerpMarketBaseSpreadKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -11885,34 +11441,34 @@ pub fn update_perp_market_base_spread_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_base_spread_invoke<'a, A: Into<UpdatePerpMarketBaseSpreadIxArgs>>(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_base_spread_invoke<'info, A: Into<UpdatePerpMarketBaseSpreadIxArgs>>(
+    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_base_spread_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_base_spread_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketBaseSpreadIxArgs>,
 >(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_base_spread_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateAmmJitIntensityAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdateAmmJitIntensityAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmJitIntensityKeys {
@@ -11920,8 +11476,8 @@ pub struct UpdateAmmJitIntensityKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdateAmmJitIntensityAccounts<'me, '_, '_, '_>> for UpdateAmmJitIntensityKeys {
-    fn from(accounts: &UpdateAmmJitIntensityAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdateAmmJitIntensityAccounts<'_, '_>> for UpdateAmmJitIntensityKeys {
+    fn from(accounts: &UpdateAmmJitIntensityAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -11938,10 +11494,10 @@ impl From<&UpdateAmmJitIntensityKeys> for [AccountMeta; UPDATE_AMM_JIT_INTENSITY
         ]
     }
 }
-impl<'a> From<&UpdateAmmJitIntensityAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateAmmJitIntensityAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateAmmJitIntensityAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -11985,29 +11541,31 @@ pub fn update_amm_jit_intensity_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_amm_jit_intensity_invoke<'a, A: Into<UpdateAmmJitIntensityIxArgs>>(
-    accounts: &UpdateAmmJitIntensityAccounts<'_, 'a, 'a, 'a>,
+pub fn update_amm_jit_intensity_invoke<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
+    accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_amm_jit_intensity_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_amm_jit_intensity_invoke_signed<'a, A: Into<UpdateAmmJitIntensityIxArgs>>(
-    accounts: &UpdateAmmJitIntensityAccounts<'_, 'a, 'a, 'a>,
+pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
+    accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_amm_jit_intensity_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMaxSpreadAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMaxSpreadAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxSpreadKeys {
@@ -12015,10 +11573,8 @@ pub struct UpdatePerpMarketMaxSpreadKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMaxSpreadAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketMaxSpreadKeys
-{
-    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketMaxSpreadAccounts<'_, '_>> for UpdatePerpMarketMaxSpreadKeys {
+    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12037,10 +11593,10 @@ impl From<&UpdatePerpMarketMaxSpreadKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12084,31 +11640,34 @@ pub fn update_perp_market_max_spread_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_spread_invoke<'a, A: Into<UpdatePerpMarketMaxSpreadIxArgs>>(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_max_spread_invoke<'info, A: Into<UpdatePerpMarketMaxSpreadIxArgs>>(
+    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_spread_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_spread_invoke_signed<'a, A: Into<UpdatePerpMarketMaxSpreadIxArgs>>(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_max_spread_invoke_signed<
+    'info,
+    A: Into<UpdatePerpMarketMaxSpreadIxArgs>,
+>(
+    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_max_spread_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketStepSizeAndTickSizeKeys {
@@ -12116,10 +11675,10 @@ pub struct UpdatePerpMarketStepSizeAndTickSizeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>>
     for UpdatePerpMarketStepSizeAndTickSizeKeys
 {
-    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12138,10 +11697,10 @@ impl From<&UpdatePerpMarketStepSizeAndTickSizeKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12193,36 +11752,36 @@ pub fn update_perp_market_step_size_and_tick_size_ix<
     })
 }
 pub fn update_perp_market_step_size_and_tick_size_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_step_size_and_tick_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_step_size_and_tick_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketNameAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketNameAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketNameKeys {
@@ -12230,8 +11789,8 @@ pub struct UpdatePerpMarketNameKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketNameAccounts<'me, '_, '_, '_>> for UpdatePerpMarketNameKeys {
-    fn from(accounts: &UpdatePerpMarketNameAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketNameAccounts<'_, '_>> for UpdatePerpMarketNameKeys {
+    fn from(accounts: &UpdatePerpMarketNameAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12248,10 +11807,10 @@ impl From<&UpdatePerpMarketNameKeys> for [AccountMeta; UPDATE_PERP_MARKET_NAME_I
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketNameAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketNameAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketNameAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketNameAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12295,29 +11854,31 @@ pub fn update_perp_market_name_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_name_invoke<'a, A: Into<UpdatePerpMarketNameIxArgs>>(
-    accounts: &UpdatePerpMarketNameAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_name_invoke<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
+    accounts: &UpdatePerpMarketNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_name_invoke_signed<'a, A: Into<UpdatePerpMarketNameIxArgs>>(
-    accounts: &UpdatePerpMarketNameAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
+    accounts: &UpdatePerpMarketNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_name_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMinOrderSizeAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMinOrderSizeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMinOrderSizeKeys {
@@ -12325,10 +11886,8 @@ pub struct UpdatePerpMarketMinOrderSizeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMinOrderSizeAccounts<'me, '_, '_, '_>>
-    for UpdatePerpMarketMinOrderSizeKeys
-{
-    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts<'me, '_, '_, '_>) -> Self {
+impl From<&UpdatePerpMarketMinOrderSizeAccounts<'_, '_>> for UpdatePerpMarketMinOrderSizeKeys {
+    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12347,10 +11906,10 @@ impl From<&UpdatePerpMarketMinOrderSizeKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12396,34 +11955,37 @@ pub fn update_perp_market_min_order_size_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_min_order_size_invoke<'a, A: Into<UpdatePerpMarketMinOrderSizeIxArgs>>(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>,
+pub fn update_perp_market_min_order_size_invoke<
+    'info,
+    A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
+>(
+    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_min_order_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_min_order_size_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_min_order_size_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxSlippageRatioKeys {
@@ -12431,10 +11993,10 @@ pub struct UpdatePerpMarketMaxSlippageRatioKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>>
     for UpdatePerpMarketMaxSlippageRatioKeys
 {
-    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12453,10 +12015,10 @@ impl From<&UpdatePerpMarketMaxSlippageRatioKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12507,36 +12069,36 @@ pub fn update_perp_market_max_slippage_ratio_ix<
     })
 }
 pub fn update_perp_market_max_slippage_ratio_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_slippage_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_max_slippage_ratio_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_max_slippage_ratio_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxFillReserveFractionKeys {
@@ -12544,10 +12106,10 @@ pub struct UpdatePerpMarketMaxFillReserveFractionKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>>
     for UpdatePerpMarketMaxFillReserveFractionKeys
 {
-    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12566,10 +12128,10 @@ impl From<&UpdatePerpMarketMaxFillReserveFractionKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12620,36 +12182,36 @@ pub fn update_perp_market_max_fill_reserve_fraction_ix<
     })
 }
 pub fn update_perp_market_max_fill_reserve_fraction_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_fill_reserve_fraction_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_max_fill_reserve_fraction_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>;
+    let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN: usize = 3usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpMarketMaxOpenInterestAccounts<'me, 'a0: 'me, 'a1: 'me, 'a2: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub perp_market: &'me AccountInfo<'a2>,
+pub struct UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub perp_market: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxOpenInterestKeys {
@@ -12657,10 +12219,10 @@ pub struct UpdatePerpMarketMaxOpenInterestKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl<'me> From<&UpdatePerpMarketMaxOpenInterestAccounts<'me, '_, '_, '_>>
+impl From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>>
     for UpdatePerpMarketMaxOpenInterestKeys
 {
-    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'me, '_, '_, '_>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12679,10 +12241,10 @@ impl From<&UpdatePerpMarketMaxOpenInterestKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'a, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12732,43 +12294,43 @@ pub fn update_perp_market_max_open_interest_ix<
     })
 }
 pub fn update_perp_market_max_open_interest_invoke<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_open_interest_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_max_open_interest_invoke_signed<
-    'a,
+    'info,
     A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'a, 'a, 'a>,
+    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_max_open_interest_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_ADMIN_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateAdminAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateAdminAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAdminKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateAdminAccounts<'me, '_, '_>> for UpdateAdminKeys {
-    fn from(accounts: &UpdateAdminAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateAdminAccounts<'_, '_>> for UpdateAdminKeys {
+    fn from(accounts: &UpdateAdminAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12783,10 +12345,10 @@ impl From<&UpdateAdminKeys> for [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] {
         ]
     }
 }
-impl<'a> From<&UpdateAdminAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateAdminAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateAdminAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateAdminAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -12823,36 +12385,36 @@ pub fn update_admin_ix<K: Into<UpdateAdminKeys>, A: Into<UpdateAdminIxArgs>>(
         data: data.try_to_vec()?,
     })
 }
-pub fn update_admin_invoke<'a, A: Into<UpdateAdminIxArgs>>(
-    accounts: &UpdateAdminAccounts<'_, 'a, 'a>,
+pub fn update_admin_invoke<'info, A: Into<UpdateAdminIxArgs>>(
+    accounts: &UpdateAdminAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_admin_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_admin_invoke_signed<'a, A: Into<UpdateAdminIxArgs>>(
-    accounts: &UpdateAdminAccounts<'_, 'a, 'a>,
+pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
+    accounts: &UpdateAdminAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_admin_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateWhitelistMintAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateWhitelistMintAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateWhitelistMintKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateWhitelistMintAccounts<'me, '_, '_>> for UpdateWhitelistMintKeys {
-    fn from(accounts: &UpdateWhitelistMintAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateWhitelistMintAccounts<'_, '_>> for UpdateWhitelistMintKeys {
+    fn from(accounts: &UpdateWhitelistMintAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12867,10 +12429,10 @@ impl From<&UpdateWhitelistMintKeys> for [AccountMeta; UPDATE_WHITELIST_MINT_IX_A
         ]
     }
 }
-impl<'a> From<&UpdateWhitelistMintAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateWhitelistMintAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateWhitelistMintAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateWhitelistMintAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -12910,36 +12472,36 @@ pub fn update_whitelist_mint_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_whitelist_mint_invoke<'a, A: Into<UpdateWhitelistMintIxArgs>>(
-    accounts: &UpdateWhitelistMintAccounts<'_, 'a, 'a>,
+pub fn update_whitelist_mint_invoke<'info, A: Into<UpdateWhitelistMintIxArgs>>(
+    accounts: &UpdateWhitelistMintAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_whitelist_mint_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_whitelist_mint_invoke_signed<'a, A: Into<UpdateWhitelistMintIxArgs>>(
-    accounts: &UpdateWhitelistMintAccounts<'_, 'a, 'a>,
+pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxArgs>>(
+    accounts: &UpdateWhitelistMintAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_whitelist_mint_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateDiscountMintAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateDiscountMintAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateDiscountMintKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateDiscountMintAccounts<'me, '_, '_>> for UpdateDiscountMintKeys {
-    fn from(accounts: &UpdateDiscountMintAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateDiscountMintAccounts<'_, '_>> for UpdateDiscountMintKeys {
+    fn from(accounts: &UpdateDiscountMintAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12954,10 +12516,10 @@ impl From<&UpdateDiscountMintKeys> for [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACC
         ]
     }
 }
-impl<'a> From<&UpdateDiscountMintAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateDiscountMintAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateDiscountMintAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateDiscountMintAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -12997,36 +12559,36 @@ pub fn update_discount_mint_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_discount_mint_invoke<'a, A: Into<UpdateDiscountMintIxArgs>>(
-    accounts: &UpdateDiscountMintAccounts<'_, 'a, 'a>,
+pub fn update_discount_mint_invoke<'info, A: Into<UpdateDiscountMintIxArgs>>(
+    accounts: &UpdateDiscountMintAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_discount_mint_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_discount_mint_invoke_signed<'a, A: Into<UpdateDiscountMintIxArgs>>(
-    accounts: &UpdateDiscountMintAccounts<'_, 'a, 'a>,
+pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArgs>>(
+    accounts: &UpdateDiscountMintAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_discount_mint_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateExchangeStatusAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateExchangeStatusAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateExchangeStatusKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateExchangeStatusAccounts<'me, '_, '_>> for UpdateExchangeStatusKeys {
-    fn from(accounts: &UpdateExchangeStatusAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateExchangeStatusAccounts<'_, '_>> for UpdateExchangeStatusKeys {
+    fn from(accounts: &UpdateExchangeStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -13041,10 +12603,10 @@ impl From<&UpdateExchangeStatusKeys> for [AccountMeta; UPDATE_EXCHANGE_STATUS_IX
         ]
     }
 }
-impl<'a> From<&UpdateExchangeStatusAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateExchangeStatusAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateExchangeStatusAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateExchangeStatusAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -13084,36 +12646,38 @@ pub fn update_exchange_status_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_exchange_status_invoke<'a, A: Into<UpdateExchangeStatusIxArgs>>(
-    accounts: &UpdateExchangeStatusAccounts<'_, 'a, 'a>,
+pub fn update_exchange_status_invoke<'info, A: Into<UpdateExchangeStatusIxArgs>>(
+    accounts: &UpdateExchangeStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_exchange_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_exchange_status_invoke_signed<'a, A: Into<UpdateExchangeStatusIxArgs>>(
-    accounts: &UpdateExchangeStatusAccounts<'_, 'a, 'a>,
+pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusIxArgs>>(
+    accounts: &UpdateExchangeStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_exchange_status_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
+    let account_info: [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] =
+        accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdatePerpAuctionDurationAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdatePerpAuctionDurationAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpAuctionDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdatePerpAuctionDurationAccounts<'me, '_, '_>> for UpdatePerpAuctionDurationKeys {
-    fn from(accounts: &UpdatePerpAuctionDurationAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdatePerpAuctionDurationAccounts<'_, '_>> for UpdatePerpAuctionDurationKeys {
+    fn from(accounts: &UpdatePerpAuctionDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -13130,10 +12694,10 @@ impl From<&UpdatePerpAuctionDurationKeys>
         ]
     }
 }
-impl<'a> From<&UpdatePerpAuctionDurationAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdatePerpAuctionDurationAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpAuctionDurationAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -13173,38 +12737,41 @@ pub fn update_perp_auction_duration_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_auction_duration_invoke<'a, A: Into<UpdatePerpAuctionDurationIxArgs>>(
-    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'a, 'a>,
+pub fn update_perp_auction_duration_invoke<'info, A: Into<UpdatePerpAuctionDurationIxArgs>>(
+    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_auction_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_auction_duration_invoke_signed<'a, A: Into<UpdatePerpAuctionDurationIxArgs>>(
-    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'a, 'a>,
+pub fn update_perp_auction_duration_invoke_signed<
+    'info,
+    A: Into<UpdatePerpAuctionDurationIxArgs>,
+>(
+    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_auction_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2usize;
 #[derive(Copy, Clone, Debug)]
-pub struct UpdateSpotAuctionDurationAccounts<'me, 'a0: 'me, 'a1: 'me> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
+pub struct UpdateSpotAuctionDurationAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotAuctionDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl<'me> From<&UpdateSpotAuctionDurationAccounts<'me, '_, '_>> for UpdateSpotAuctionDurationKeys {
-    fn from(accounts: &UpdateSpotAuctionDurationAccounts<'me, '_, '_>) -> Self {
+impl From<&UpdateSpotAuctionDurationAccounts<'_, '_>> for UpdateSpotAuctionDurationKeys {
+    fn from(accounts: &UpdateSpotAuctionDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -13221,10 +12788,10 @@ impl From<&UpdateSpotAuctionDurationKeys>
         ]
     }
 }
-impl<'a> From<&UpdateSpotAuctionDurationAccounts<'_, 'a, 'a>>
-    for [AccountInfo<'a>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]
+impl<'info> From<&UpdateSpotAuctionDurationAccounts<'_, 'info>>
+    for [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotAuctionDurationAccounts<'_, 'a, 'a>) -> Self {
+    fn from(accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -13264,44 +12831,38 @@ pub fn update_spot_auction_duration_ix<
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_auction_duration_invoke<'a, A: Into<UpdateSpotAuctionDurationIxArgs>>(
-    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'a, 'a>,
+pub fn update_spot_auction_duration_invoke<'info, A: Into<UpdateSpotAuctionDurationIxArgs>>(
+    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_auction_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_auction_duration_invoke_signed<'a, A: Into<UpdateSpotAuctionDurationIxArgs>>(
-    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'a, 'a>,
+pub fn update_spot_auction_duration_invoke_signed<
+    'info,
+    A: Into<UpdateSpotAuctionDurationIxArgs>,
+>(
+    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_auction_duration_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
 pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 7usize;
 #[derive(Copy, Clone, Debug)]
-pub struct AdminRemoveInsuranceFundStakeAccounts<
-    'me,
-    'a0: 'me,
-    'a1: 'me,
-    'a2: 'me,
-    'a3: 'me,
-    'a4: 'me,
-    'a5: 'me,
-    'a6: 'me,
-> {
-    pub admin: &'me AccountInfo<'a0>,
-    pub state: &'me AccountInfo<'a1>,
-    pub spot_market: &'me AccountInfo<'a2>,
-    pub insurance_fund_vault: &'me AccountInfo<'a3>,
-    pub drift_signer: &'me AccountInfo<'a4>,
-    pub admin_token_account: &'me AccountInfo<'a5>,
-    pub token_program: &'me AccountInfo<'a6>,
+pub struct AdminRemoveInsuranceFundStakeAccounts<'me, 'info> {
+    pub admin: &'me AccountInfo<'info>,
+    pub state: &'me AccountInfo<'info>,
+    pub spot_market: &'me AccountInfo<'info>,
+    pub insurance_fund_vault: &'me AccountInfo<'info>,
+    pub drift_signer: &'me AccountInfo<'info>,
+    pub admin_token_account: &'me AccountInfo<'info>,
+    pub token_program: &'me AccountInfo<'info>,
 }
 #[derive(Copy, Clone, Debug)]
 pub struct AdminRemoveInsuranceFundStakeKeys {
@@ -13313,12 +12874,8 @@ pub struct AdminRemoveInsuranceFundStakeKeys {
     pub admin_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl<'me> From<&AdminRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_>>
-    for AdminRemoveInsuranceFundStakeKeys
-{
-    fn from(
-        accounts: &AdminRemoveInsuranceFundStakeAccounts<'me, '_, '_, '_, '_, '_, '_, '_>,
-    ) -> Self {
+impl From<&AdminRemoveInsuranceFundStakeAccounts<'_, '_>> for AdminRemoveInsuranceFundStakeKeys {
+    fn from(accounts: &AdminRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -13345,12 +12902,10 @@ impl From<&AdminRemoveInsuranceFundStakeKeys>
         ]
     }
 }
-impl<'a> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>>
-    for [AccountInfo<'a>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
+impl<'info> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'info>>
+    for [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(
-        accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
-    ) -> Self {
+    fn from(accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -13403,27 +12958,27 @@ pub fn admin_remove_insurance_fund_stake_ix<
     })
 }
 pub fn admin_remove_insurance_fund_stake_invoke<
-    'a,
+    'info,
     A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = admin_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn admin_remove_insurance_fund_stake_invoke_signed<
-    'a,
+    'info,
     A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'a, 'a, 'a, 'a, 'a, 'a, 'a>,
+    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = admin_remove_insurance_fund_stake_ix(accounts, args)?;
-    let account_info: [AccountInfo<'a>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
+    let account_info: [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
