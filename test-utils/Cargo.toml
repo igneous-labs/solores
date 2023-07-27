@@ -1,0 +1,11 @@
+[package]
+name = "test-utils"
+publish = false
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+name = "test_utils"
+
+[dependencies]
+assert_cmd = "2.0.7"

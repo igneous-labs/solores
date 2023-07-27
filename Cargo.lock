@@ -438,18 +438,18 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.47"
+version = "1.0.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ea3d908b0e36316caf9e9e2c4625cdde190a7e6f440d794667ed17a1855e725"
+checksum = "18fb31db3f9bddb2ea821cde30a9f70117e3f119938b5ee630b7403aa6e2ead9"
 dependencies = [
  "unicode-ident",
 ]
 
 [[package]]
 name = "quote"
-version = "1.0.21"
+version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbe448f377a7d6961e30f5955f9b8d106c3f5e449d493ee1b125c1d43c2b5179"
+checksum = "50f3b39ccfb720540debaa0164757101c08ecb8d326b15358ce76a62c7e85965"
 dependencies = [
  "proc-macro2",
 ]
@@ -558,7 +558,6 @@ dependencies = [
 name = "solores"
 version = "0.1.4"
 dependencies = [
- "assert_cmd",
  "clap",
  "env_logger",
  "heck",
@@ -572,6 +571,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "syn",
+ "test-utils",
  "toml",
  "void",
 ]
@@ -607,6 +607,13 @@ name = "termtree"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95059e91184749cb66be6dc994f67f182b6d897cb3df74a5bf66b5e709295fd8"
+
+[[package]]
+name = "test-utils"
+version = "0.0.0"
+dependencies = [
+ "assert_cmd",
+]
 
 [[package]]
 name = "toml"

@@ -1,4 +1,4 @@
-#![doc = include_str!("../README.md")]
+#![doc = include_str!("../../README.md")]
 
 use std::{
     env,
@@ -90,7 +90,7 @@ pub struct Args {
     pub serde_vers: String,
 }
 
-fn main() {
+pub fn main() {
     if env::var(RUST_LOG_ENV_VAR).is_err() {
         env::set_var(RUST_LOG_ENV_VAR, "info")
     }

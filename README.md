@@ -89,7 +89,7 @@ Lets say you had the following shank generated IDL, `my_token_idl.json`:
 
 Running `solores my_token_idl.json` should generate a `my_token_interface` rust crate that allows you to use it in an on-chain program as so:
 
-```rust
+```rust ignore
 use my_token_interface::{TransferAccounts, TransferArgs, transfer_invoke_signed};
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
 
@@ -108,7 +108,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
 or in a client-side app:
 
-```rust
+```rust ignore
 use my_token_interface::{TransferKeys, TransferArgs, transfer_ix};
 
 pub fn do_something_with_instruction() -> std::io::Result<()> {
@@ -138,7 +138,7 @@ The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). 
 
 The generated `*_ix()` function parameters are genericized over any type that impls `Into<*Keys>` for the first arg and any type that impls `Into<*Args>` for the second arg. This allows users to easily implement, for example, account structs that compute/retrieve known pubkeys (like PDAs) at runtime:
 
-```rust
+```rust ignore
 use my_token_interface::{TransferArgs, TransferKeys, ID};
 use solana_program::pubkey::Pubkey;
 
