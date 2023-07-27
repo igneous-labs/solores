@@ -176,6 +176,51 @@ impl From<MyTransferArgs> for TransferArgs {
 //  );
 ```
 
+### Serde
+
+`serde` is added as an optional dependency behind the `serde` feature-flag to the generated crate to provide `Serialize` and `Deserialize` implementations for the various typedefs and onchain accounts.
+
+### Keys from array
+
+The various `*Keys` struct also impl `From<[Pubkey; *_IX_ACCOUNTS_LEN]>` to support indexing
+
+```rust ignore
+use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferKeys};
+use solana_program::{pubkey::Pubkey, sysvar::instructions::{BorrowedAccountMeta, BorrowedInstruction}};
+use std::convert::TryInto;
+
+fn index_instruction(ix: BorrowedInstruction) {
+    let metas: [BorrowedAccountMeta<'_>; TRANSFER_IX_ACCOUNTS_LEN] = ix.accounts.try_into().unwrap();
+    let pubkeys = metas.map(|meta| *meta.pubkey);
+    let transfer_keys: TransferKeys = pubkeys.into();
+
+    // Now you can do stuff like `transfer_keys.src` instead of
+    // having to keep track of the various account indices
+    // 
+    // ... 
+}
+```
+
+### Accounts from array
+
+The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` for to make simple CPIs more ergonomic
+
+```rust ignore
+use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferAccounts, TransferArgs, transfer_invoke_signed};
+use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
+
+pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
+    let transfer_accounts: &[AccountInfo; TRANSFER_IX_ACCOUNTS_LEN] = accounts[..TRANSFER_IX_ACCOUNTS_LEN].try_into().unwrap();
+    let accounts: TransferAccounts = transfer_accounts.into();
+
+    transfer_invoke_signed(
+        &accounts,
+        TransferArgs { amount: 1_000u64 },
+        &[&[&[0u8]]],
+    )
+}
+```
+
 ## Comparison to similar libs
 
 ### anchor-gen
@@ -191,6 +236,10 @@ Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 ## Known Missing Features
 
 Please check the repo's issues list for more.
+
+### General
+
+- Assumes all onchain accounts are borsh-serde, does not handle zero-copy/bytemuck accounts.
 
 ### Anchor
 
