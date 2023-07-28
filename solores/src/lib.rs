@@ -116,10 +116,6 @@ pub fn main() {
     write_gitignore(&args).unwrap();
     write_cargotoml(&args, idl.as_ref()).unwrap();
     write_lib(&args, idl.as_ref()).unwrap();
-    write_accounts(&args, idl.as_ref()).unwrap();
-    write_errors(&args, idl.as_ref()).unwrap();
-    write_typedefs(&args, idl.as_ref()).unwrap();
-    write_instructions(&args, idl.as_ref()).unwrap();
 
     log::info!(
         "{} crate written to {}",

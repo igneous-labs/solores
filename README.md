@@ -130,10 +130,11 @@ The crate will also export the instructions' discriminant as consts, and any err
 
 ### Anchor IDL
 
-The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). Additionally,
+The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). Additionally, the crate will also:
 
-- the crate will also export all accounts' discriminant as consts.
-- the crate will create a `*Account` newtype that includes account discriminant checking in borsh serde operations
+- export all accounts' discriminant as consts.
+- create a `*Account` newtype that includes account discriminant checking in borsh serde operations
+- export event struct defs
 
 ## Features
 
@@ -206,7 +207,7 @@ fn index_instruction(ix: BorrowedInstruction) {
 
 ### Accounts from array
 
-The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` for to make simple CPIs more ergonomic
+The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` to make simple CPIs more ergonomic
 
 ```rust ignore
 use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferAccounts, TransferArgs, transfer_invoke_signed};
@@ -248,4 +249,3 @@ Please check the repo's issues list for more.
 
 - Does not handle account namespaces
 - Does not handle the state instruction namespace
-- There's no convenience function for deserializing an on-chain account along with verifying its discriminator together that is generated

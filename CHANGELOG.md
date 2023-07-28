@@ -20,6 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `derive(PartialEq)` for all typedefs and `*IxArgs` and `*IxData`
 - `**Account` for anchor accounts newtype that includes the discriminant in borsh serde
 
+### Changed
+
+- internals refactored to enable dynamic modules for the generated crate
+
+### Fixed
+
+- Bug that wasn't including the generated `errors` module into the crate
+
 ## [0.1.4] - 2023-07-21
 
 ### Added

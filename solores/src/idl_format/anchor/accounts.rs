@@ -21,16 +21,16 @@ impl ToTokens for NamedAccount {
         )
         .unwrap();
         let discm_tokens: TokenStream = format!("{:?}", discm).parse().unwrap();
-        tokens.extend(quote! {
-            pub const #account_discm_ident: [u8; 8] = #discm_tokens;
-        });
-        // struct def
-        tokens.extend(self.0.to_token_stream());
 
-        // impl borsh=0.10 BorshSerialize and BorshDeserialize for account newtype
+        let struct_def = &self.0;
+
         let struct_ident = format_ident!("{}", name);
         let account_ident = format_ident!("{}Account", name);
         tokens.extend(quote! {
+            pub const #account_discm_ident: [u8; 8] = #discm_tokens;
+
+            #struct_def
+
             #[derive(Clone, Debug, PartialEq)]
             pub struct #account_ident(pub #struct_ident);
 

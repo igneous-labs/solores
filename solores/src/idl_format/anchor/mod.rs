@@ -1,16 +1,20 @@
+use heck::ToPascalCase;
+use proc_macro2::TokenStream;
+use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
 
-use self::{
-    accounts::NamedAccount, errors::ErrorEnumVariant, instructions::NamedInstruction,
-    typedefs::NamedType,
-};
+use crate::gen_body_newtype_slice;
 
-use super::{
-    AccountsHeaderFlags, IdlCodegenElems, IdlFormat, InstructionsHeaderFlags, TypedefsHeaderFlags,
+use super::{IdlCodegenModule, IdlFormat};
+
+use self::{
+    accounts::NamedAccount, errors::ErrorEnumVariant, events::Event,
+    instructions::NamedInstruction, typedefs::NamedType,
 };
 
 mod accounts;
 mod errors;
+mod events;
 mod instructions;
 mod typedefs;
 
@@ -23,33 +27,12 @@ pub struct AnchorIdl {
     types: Option<Vec<NamedType>>,
     instructions: Option<Vec<NamedInstruction>>,
     errors: Option<Vec<ErrorEnumVariant>>,
+    events: Option<Vec<Event>>,
 }
 
 #[derive(Deserialize)]
 pub struct Metadata {
     address: String,
-}
-
-impl IdlCodegenElems for AnchorIdl {
-    type TypedefElem = NamedType;
-    type AccountElem = NamedAccount;
-    type IxElem = NamedInstruction;
-    type ErrorsEnumVariantElem = ErrorEnumVariant;
-
-    fn typedefs(&self) -> Option<&[Self::TypedefElem]> {
-        self.types.as_ref().map(|v| v.as_ref())
-    }
-    fn accounts(&self) -> Option<&[Self::AccountElem]> {
-        self.accounts.as_ref().map(|v| v.as_ref())
-    }
-
-    fn instructions(&self) -> Option<&[Self::IxElem]> {
-        self.instructions.as_ref().map(|v| v.as_ref())
-    }
-
-    fn errors(&self) -> Option<&[Self::ErrorsEnumVariantElem]> {
-        self.errors.as_ref().map(|v| v.as_ref())
-    }
 }
 
 impl IdlFormat for AnchorIdl {
@@ -72,58 +55,227 @@ impl IdlFormat for AnchorIdl {
         true
     }
 
-    fn det_typedefs_header_flags(&self) -> TypedefsHeaderFlags {
-        let mut res = TypedefsHeaderFlags::default();
-        let typedefs = match self.typedefs() {
-            None => return res,
-            Some(t) => t,
+    fn has_errors(&self) -> bool {
+        self.errors.is_some()
+    }
+
+    fn modules<'me>(&'me self) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
+        let mut res: Vec<Box<dyn IdlCodegenModule + 'me>> = Vec::new();
+        if let Some(v) = &self.accounts {
+            res.push(Box::new(AccountsCodegenModule(v)));
+        }
+        if let Some(v) = &self.r#types {
+            res.push(Box::new(TypedefsCodegenModule(v)));
+        }
+        if let Some(v) = &self.instructions {
+            res.push(Box::new(IxCodegenModule(v)));
+        }
+        if let Some(v) = &self.errors {
+            res.push(Box::new(ErrorsCodegenModule {
+                program_name: self.program_name(),
+                variants: v,
+            }));
+        }
+        if let Some(v) = &self.events {
+            res.push(Box::new(EventsCodegenModule(v)));
+        }
+        res
+    }
+}
+
+struct AccountsCodegenModule<'a>(pub &'a [NamedAccount]);
+
+impl IdlCodegenModule for AccountsCodegenModule<'_> {
+    fn name(&self) -> &str {
+        "accounts"
+    }
+
+    fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {
+            use borsh::{BorshDeserialize, BorshSerialize};
         };
-        for t in typedefs {
+        let mut has_pubkey = false;
+        let mut has_defined = false;
+        for a in self.0 {
+            if a.0.r#type.has_pubkey_field() && !has_pubkey {
+                has_pubkey = true;
+                res.extend(quote! {
+                    use solana_program::pubkey::Pubkey;
+                });
+            }
+            if a.0.r#type.has_defined_field() && !has_defined {
+                has_defined = true;
+                res.extend(quote! {
+                    use crate::*;
+                })
+            }
+            if has_defined && has_pubkey {
+                break;
+            }
+        }
+        res
+    }
+
+    gen_body_newtype_slice!();
+}
+
+struct TypedefsCodegenModule<'a>(pub &'a [NamedType]);
+
+impl IdlCodegenModule for TypedefsCodegenModule<'_> {
+    fn name(&self) -> &str {
+        "typedefs"
+    }
+
+    fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {
+            use borsh::{BorshDeserialize, BorshSerialize};
+        };
+        for t in self.0 {
             if t.r#type.has_pubkey_field() {
-                res.has_pubkey = true;
+                res.extend(quote! {
+                    use solana_program::pubkey::Pubkey;
+                });
                 break;
             }
         }
         res
     }
 
-    fn det_accounts_header_flags(&self) -> AccountsHeaderFlags {
-        let mut res = AccountsHeaderFlags::default();
-        let accounts = match self.accounts() {
-            None => return res,
-            Some(t) => t,
-        };
-        for a in accounts {
-            if a.0.r#type.has_pubkey_field() {
-                res.has_pubkey = true;
-            }
-            if a.0.r#type.has_defined_field() {
-                res.has_defined = true;
-            }
-            if res.has_defined && res.has_pubkey {
-                break;
-            }
-        }
-        res
+    gen_body_newtype_slice!();
+}
+
+struct IxCodegenModule<'a>(pub &'a [NamedInstruction]);
+
+impl IdlCodegenModule for IxCodegenModule<'_> {
+    fn name(&self) -> &str {
+        "instructions"
     }
 
-    fn det_instructions_header_flags(&self) -> InstructionsHeaderFlags {
-        let mut res = InstructionsHeaderFlags::default();
-        let ixs = match self.instructions() {
-            None => return res,
-            Some(t) => t,
+    fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {
+            use borsh::{BorshDeserialize, BorshSerialize};
+            use solana_program::{
+                account_info::AccountInfo,
+                entrypoint::ProgramResult,
+                instruction::{AccountMeta, Instruction},
+                program::{invoke, invoke_signed},
+                pubkey::Pubkey,
+            };
         };
-        for ix in ixs {
+        for ix in self.0 {
             if ix
                 .args
                 .iter()
                 .map(|a| a.r#type.is_or_has_defined())
                 .any(|b| b)
             {
-                res.has_defined = true;
+                res.extend(quote! {
+                    use crate::*;
+                });
                 break;
             }
         }
         res
     }
+
+    gen_body_newtype_slice!();
+}
+
+struct ErrorsCodegenModule<'a> {
+    pub program_name: &'a str,
+    pub variants: &'a [ErrorEnumVariant],
+}
+
+impl IdlCodegenModule for ErrorsCodegenModule<'_> {
+    fn name(&self) -> &str {
+        "errors"
+    }
+
+    fn gen_head(&self) -> TokenStream {
+        quote! {
+            use solana_program::{
+                decode_error::DecodeError,
+                msg,
+                program_error::{PrintProgramError, ProgramError},
+            };
+            use thiserror::Error;
+        }
+    }
+
+    fn gen_body(&self) -> TokenStream {
+        let mut error_enum_variants = quote! {};
+        error_enum_variants.extend(self.variants.iter().map(|e| e.into_token_stream()));
+
+        let error_enum_ident_str = format!("{}Error", self.program_name.to_pascal_case());
+        let error_enum_ident = format_ident!("{}", &error_enum_ident_str);
+        quote! {
+            #[derive(Clone, Copy, Debug, Eq, Error, num_derive::FromPrimitive, PartialEq)]
+            pub enum #error_enum_ident {
+                #error_enum_variants
+            }
+
+            impl From<#error_enum_ident> for ProgramError {
+                fn from(e: #error_enum_ident) -> Self {
+                    ProgramError::Custom(e as u32)
+                }
+            }
+
+            impl<T> DecodeError<T> for #error_enum_ident {
+                fn type_of() -> &'static str {
+                    #error_enum_ident_str
+                }
+            }
+
+            impl PrintProgramError for #error_enum_ident {
+                fn print<E>(&self)
+                where
+                    E: 'static
+                        + std::error::Error
+                        + DecodeError<E>
+                        + PrintProgramError
+                        + num_traits::FromPrimitive,
+                {
+                    msg!(&self.to_string());
+                }
+            }
+        }
+    }
+}
+
+struct EventsCodegenModule<'a>(&'a [Event]);
+
+impl IdlCodegenModule for EventsCodegenModule<'_> {
+    fn name(&self) -> &str {
+        "events"
+    }
+
+    fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {
+            use borsh::{BorshDeserialize, BorshSerialize};
+        };
+        let mut has_pubkey = false;
+        let mut has_defined = false;
+        for a in self.0 {
+            for field in &a.0.fields {
+                if field.r#type.is_or_has_pubkey() && !has_pubkey {
+                    has_pubkey = true;
+                    res.extend(quote! {
+                        use solana_program::pubkey::Pubkey;
+                    });
+                }
+                if field.r#type.is_or_has_defined() && !has_defined {
+                    has_defined = true;
+                    res.extend(quote! {
+                        use crate::*;
+                    })
+                }
+            }
+            if has_defined && has_pubkey {
+                break;
+            }
+        }
+        res
+    }
+
+    gen_body_newtype_slice!();
 }

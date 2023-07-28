@@ -1,4 +1,3 @@
-use borsh::BorshDeserialize;
 use lazy_static::lazy_static;
 use marinade_finance_interface::StateAccount;
 use solana_client::nonblocking::rpc_client::RpcClient;
