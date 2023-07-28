@@ -1,6 +1,6 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrderParams {
     pub order_type: OrderType,
@@ -21,7 +21,7 @@ pub struct OrderParams {
     pub auction_start_price: Option<i64>,
     pub auction_end_price: Option<i64>,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderParams {
     pub direction: Option<PositionDirection>,
@@ -39,7 +39,7 @@ pub struct ModifyOrderParams {
     pub auction_end_price: Option<i64>,
     pub policy: Option<ModifyOrderPolicy>,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpRecord {
     pub market_index: u16,
@@ -53,7 +53,7 @@ pub struct LiquidatePerpRecord {
     pub liquidator_fee: u64,
     pub if_fee: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateSpotRecord {
     pub asset_market_index: u16,
@@ -64,7 +64,7 @@ pub struct LiquidateSpotRecord {
     pub liability_transfer: u128,
     pub if_fee: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateBorrowForPerpPnlRecord {
     pub perp_market_index: u16,
@@ -74,7 +74,7 @@ pub struct LiquidateBorrowForPerpPnlRecord {
     pub liability_price: i64,
     pub liability_transfer: u128,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpPnlForDepositRecord {
     pub perp_market_index: u16,
@@ -84,7 +84,7 @@ pub struct LiquidatePerpPnlForDepositRecord {
     pub asset_price: i64,
     pub asset_transfer: u128,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PerpBankruptcyRecord {
     pub market_index: u16,
@@ -94,7 +94,7 @@ pub struct PerpBankruptcyRecord {
     pub clawback_user_payment: Option<u128>,
     pub cumulative_funding_rate_delta: i128,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpotBankruptcyRecord {
     pub market_index: u16,
@@ -102,7 +102,7 @@ pub struct SpotBankruptcyRecord {
     pub if_payment: u128,
     pub cumulative_deposit_interest_delta: u128,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HistoricalOracleData {
     pub last_oracle_price: i64,
@@ -112,7 +112,7 @@ pub struct HistoricalOracleData {
     pub last_oracle_price_twap5min: i64,
     pub last_oracle_price_twap_ts: i64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HistoricalIndexData {
     pub last_index_bid_price: u64,
@@ -121,7 +121,7 @@ pub struct HistoricalIndexData {
     pub last_index_price_twap5min: u64,
     pub last_index_price_twap_ts: i64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsuranceClaim {
     pub revenue_withdraw_since_last_settle: i64,
@@ -130,14 +130,14 @@ pub struct InsuranceClaim {
     pub quote_settled_insurance: u64,
     pub last_revenue_withdraw_ts: i64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PoolBalance {
     pub scaled_balance: u128,
     pub market_index: u16,
     pub padding: [u8; 6],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AMM {
     pub oracle: Pubkey,
@@ -218,7 +218,7 @@ pub struct AMM {
     pub target_base_asset_amount_per_lp: i32,
     pub padding: [u8; 44],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsuranceFund {
     pub vault: Pubkey,
@@ -231,19 +231,19 @@ pub struct InsuranceFund {
     pub total_factor: u32,
     pub user_factor: u32,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OracleGuardRails {
     pub price_divergence: PriceDivergenceGuardRails,
     pub validity: ValidityGuardRails,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PriceDivergenceGuardRails {
     pub mark_oracle_divergence_numerator: u64,
     pub mark_oracle_divergence_denominator: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ValidityGuardRails {
     pub slots_before_stale_for_amm: i64,
@@ -251,7 +251,7 @@ pub struct ValidityGuardRails {
     pub confidence_interval_max_size: u64,
     pub too_volatile_ratio: i64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FeeStructure {
     pub fee_tiers: [FeeTier; 10],
@@ -259,7 +259,7 @@ pub struct FeeStructure {
     pub referrer_reward_epoch_upper_bound: u64,
     pub flat_filler_fee: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FeeTier {
     pub fee_numerator: u32,
@@ -271,14 +271,14 @@ pub struct FeeTier {
     pub referee_fee_numerator: u32,
     pub referee_fee_denominator: u32,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrderFillerRewardStructure {
     pub reward_numerator: u32,
     pub reward_denominator: u32,
     pub time_based_reward_lower_bound: u128,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UserFees {
     pub total_fee_paid: u64,
@@ -288,7 +288,7 @@ pub struct UserFees {
     pub total_referrer_reward: u64,
     pub current_epoch_referrer_reward: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SpotPosition {
     pub scaled_balance: u64,
@@ -300,7 +300,7 @@ pub struct SpotPosition {
     pub open_orders: u8,
     pub padding: [u8; 4],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PerpPosition {
     pub last_cumulative_funding_rate: i64,
@@ -319,7 +319,7 @@ pub struct PerpPosition {
     pub open_orders: u8,
     pub padding: [u8; 1],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Order {
     pub slot: u64,
@@ -347,69 +347,69 @@ pub struct Order {
     pub auction_duration: u8,
     pub padding: [u8; 3],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SwapDirection {
     Add,
     Remove,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ModifyOrderId {
     UserOrderId(u8),
     OrderId(u32),
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PositionDirection {
     Long,
     Short,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpotFulfillmentType {
     SerumV3,
     Match,
     PhoenixV1,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PostOnlyParam {
     None,
     MustPostOnly,
     TryPostOnly,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ModifyOrderPolicy {
     TryModify,
     MustModify,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SwapReduceOnly {
     In,
     Out,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TwapPeriod {
     FundingPeriod,
     FiveMin,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum LiquidationMultiplierType {
     Discount,
     Premium,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MarginRequirementType {
     Initial,
     Maintenance,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OracleValidity {
     Invalid,
@@ -420,7 +420,7 @@ pub enum OracleValidity {
     StaleForAmm,
     Valid,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DriftAction {
     UpdateFunding,
@@ -433,7 +433,7 @@ pub enum DriftAction {
     UpdateTwap,
     UpdateAmmCurve,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PositionUpdateType {
     Open,
@@ -442,19 +442,19 @@ pub enum PositionUpdateType {
     Close,
     Flip,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DepositExplanation {
     None,
     Transfer,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum DepositDirection {
     Deposit,
     Withdraw,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrderAction {
     Place,
@@ -463,7 +463,7 @@ pub enum OrderAction {
     Trigger,
     Expire,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrderActionExplanation {
     None,
@@ -485,14 +485,14 @@ pub enum OrderActionExplanation {
     OrderFilledWithAmmJitLpSplit,
     OrderFilledWithLpJit,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum LPAction {
     AddLiquidity,
     RemoveLiquidity,
     SettleLiquidity,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum LiquidationType {
     LiquidatePerp,
@@ -502,13 +502,13 @@ pub enum LiquidationType {
     PerpBankruptcy,
     SpotBankruptcy,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SettlePnlExplanation {
     None,
     ExpiredPosition,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum StakeAction {
     Stake,
@@ -516,19 +516,19 @@ pub enum StakeAction {
     UnstakeCancelRequest,
     Unstake,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PerpFulfillmentMethod {
     Amm(Option<u64>),
     Match(Pubkey, u16),
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpotFulfillmentMethod {
     ExternalMarket,
     Match,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OracleSource {
     Pyth,
@@ -538,7 +538,7 @@ pub enum OracleSource {
     Pyth1M,
     PythStableCoin,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MarketStatus {
     Initialized,
@@ -551,13 +551,13 @@ pub enum MarketStatus {
     Settlement,
     Delisted,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ContractType {
     Perpetual,
     Future,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ContractTier {
     A,
@@ -566,26 +566,26 @@ pub enum ContractTier {
     Speculative,
     Isolated,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AMMLiquiditySplit {
     ProtocolOwned,
     LpOwned,
     Shared,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpotBalanceType {
     Deposit,
     Borrow,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpotFulfillmentConfigStatus {
     Enabled,
     Disabled,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AssetTier {
     Collateral,
@@ -594,7 +594,7 @@ pub enum AssetTier {
     Isolated,
     Unlisted,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExchangeStatus {
     DepositPaused,
@@ -605,20 +605,20 @@ pub enum ExchangeStatus {
     FundingPaused,
     SettlePnlPaused,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum UserStatus {
     Active,
     BeingLiquidated,
     Bankrupt,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AssetType {
     Base,
     Quote,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrderStatus {
     Init,
@@ -626,7 +626,7 @@ pub enum OrderStatus {
     Filled,
     Canceled,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrderType {
     Market,
@@ -635,7 +635,7 @@ pub enum OrderType {
     TriggerLimit,
     Oracle,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrderTriggerCondition {
     Above,
@@ -643,7 +643,7 @@ pub enum OrderTriggerCondition {
     TriggeredAbove,
     TriggeredBelow,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MarketType {
     Spot,

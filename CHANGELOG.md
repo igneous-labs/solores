@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 
 - Removed variable lifetimes from the various `AccountInfo`s in `*Accounts`. They all now share the same lifetime `'info`
+- Changed the various `*IxData` structs to own the `*IxArgs` structs instead of a reference
 
 ### Added
 
 - `impl From<[Pubkey; *_IX_ACCOUNTS_LEN]> for *Keys` for easier indexing
 - `impl From<&[AccountInfo; *_IX_ACCOUNTS_LEN]> for *Accounts` for easier CPIs
+- `deserialize` method for `*IxData`. Not using `BorshDeserialize` trait due to breaking change in trait def between 0.9 and 0.10
+- `derive(PartialEq)` for all typedefs and `*IxArgs` and `*IxData`
 
 ## [0.1.4] - 2023-07-21
 
