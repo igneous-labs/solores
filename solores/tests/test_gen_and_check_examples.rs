@@ -33,7 +33,9 @@ fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
             "^0.9",
         ],
     )?;
-    check_example(EXAMPLE_PATH, "unstake_interface")
+    check_example(EXAMPLE_PATH, "unstake_interface")?;
+    test_consumer(EXAMPLE_PATH, "unstake_onchain_consumer")?;
+    test_consumer(EXAMPLE_PATH, "unstake_client_consumer")
 }
 
 #[test]

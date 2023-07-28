@@ -2,7 +2,7 @@
 
 members = [
     "solores",
-    "test-utils"
+    "test_utils"
 ]
 
 exclude = [

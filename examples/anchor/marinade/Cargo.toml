@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "marinade_finance_interface",
+    "marinade_finance_client_consumer"
+]
