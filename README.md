@@ -207,7 +207,7 @@ fn index_instruction(ix: BorrowedInstruction) {
 
 ### Accounts from array
 
-The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` for to make simple CPIs more ergonomic
+The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` to make simple CPIs more ergonomic
 
 ```rust ignore
 use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferAccounts, TransferArgs, transfer_invoke_signed};
