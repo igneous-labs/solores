@@ -1,11 +1,11 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Fee {
     pub basis_points: u32,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeData {
     pub admin_authority: Pubkey,
@@ -17,7 +17,7 @@ pub struct InitializeData {
     pub additional_validator_record_space: u32,
     pub slots_for_stake_delta: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiqPoolInitializeData {
     pub lp_liquidity_target: u64,
@@ -25,7 +25,7 @@ pub struct LiqPoolInitializeData {
     pub lp_min_fee: Fee,
     pub lp_treasury_cut: Fee,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ChangeAuthorityData {
     pub admin: Option<Pubkey>,
@@ -33,7 +33,7 @@ pub struct ChangeAuthorityData {
     pub operational_sol_account: Option<Pubkey>,
     pub treasury_msol_account: Option<Pubkey>,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConfigMarinadeParams {
     pub rewards_fee: Option<Fee>,
@@ -45,7 +45,7 @@ pub struct ConfigMarinadeParams {
     pub liquidity_sol_cap: Option<u64>,
     pub auto_add_validator_enabled: Option<bool>,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiqPool {
     pub lp_mint: Pubkey,
@@ -61,7 +61,7 @@ pub struct LiqPool {
     pub lent_from_sol_leg: u64,
     pub liquidity_sol_cap: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct List {
     pub account: Pubkey,
@@ -70,7 +70,7 @@ pub struct List {
     pub new_account: Pubkey,
     pub copied_count: u32,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StakeRecord {
     pub stake_account: Pubkey,
@@ -78,7 +78,7 @@ pub struct StakeRecord {
     pub last_update_epoch: u64,
     pub is_emergency_unstaking: u8,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StakeSystem {
     pub stake_list: List,
@@ -90,7 +90,7 @@ pub struct StakeSystem {
     pub min_stake: u64,
     pub extra_stake_delta_runs: u32,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ValidatorRecord {
     pub validator_account: Pubkey,
@@ -99,7 +99,7 @@ pub struct ValidatorRecord {
     pub last_stake_delta_epoch: u64,
     pub duplication_flag_bump_seed: u8,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ValidatorSystem {
     pub validator_list: List,

@@ -191,7 +191,7 @@ impl ToTokens for NamedInstruction {
         // impl Args
         let args_fields = self.args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
-            #[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+            #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             pub struct #ix_args_ident {
                 #(#args_fields),*
@@ -201,21 +201,37 @@ impl ToTokens for NamedInstruction {
         // impl IxData
         let discm_value = self.discriminant.value;
         tokens.extend(quote! {
-            #[derive(Copy, Clone, Debug)]
-            pub struct #ix_data_ident<'me>(pub &'me#ix_args_ident);
+            #[derive( Clone, Debug, PartialEq)]
+            pub struct #ix_data_ident(pub #ix_args_ident);
 
             pub const #discm_ident: u8 = #discm_value;
 
-            impl<'me> From<&'me #ix_args_ident> for #ix_data_ident<'me> {
-                fn from(args: &'me #ix_args_ident) -> Self {
+            impl From<#ix_args_ident> for #ix_data_ident {
+                fn from(args: #ix_args_ident) -> Self {
                     Self(args)
                 }
             }
 
-            impl BorshSerialize for #ix_data_ident<'_> {
+            impl BorshSerialize for #ix_data_ident {
                 fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
                     writer.write_all(&[#discm_ident])?;
                     self.0.serialize(writer)
+                }
+            }
+
+            impl #ix_data_ident {
+                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+                    let maybe_discm = buf.first()
+                        .ok_or(std::io::Error::new(std::io::ErrorKind::Other, "invalid discm byte".to_owned()))?;
+                    if *maybe_discm != #discm_ident {
+                        return Err(
+                            std::io::Error::new(
+                                std::io::ErrorKind::Other, format!("discm does not match. Expected: {:?}. Received: {:?}", #discm_ident, maybe_discm)
+                            )
+                        );
+                    }
+                    *buf = &buf[1..];
+                    Ok(Self(#ix_args_ident::deserialize(buf)?))
                 }
             }
         });
@@ -229,7 +245,7 @@ impl ToTokens for NamedInstruction {
                 let keys: #keys_ident = accounts.into();
                 let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
                 let args_full: #ix_args_ident = args.into();
-                let data: #ix_data_ident = (&args_full).into();
+                let data: #ix_data_ident = args_full.into();
                 Ok(Instruction {
                     program_id: crate::ID,
                     accounts: Vec::from(metas),

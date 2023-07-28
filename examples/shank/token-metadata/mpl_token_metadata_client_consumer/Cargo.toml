@@ -7,3 +7,6 @@ edition = "2021"
 mpl_token_metadata_interface = { path = "../mpl_token_metadata_interface" }
 solana-cli-config = "1.13.14"
 solana-sdk = "1.13.14"
+
+[dev-dependencies]
+borsh = "^0.9"

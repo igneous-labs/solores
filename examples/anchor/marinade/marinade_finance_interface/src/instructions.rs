@@ -24,7 +24,7 @@ pub struct InitializeAccounts<'me, 'info> {
     pub clock: &'me AccountInfo<'info>,
     pub rent: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct InitializeKeys {
     pub creator_authority: Pubkey,
     pub state: Pubkey,
@@ -139,23 +139,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeIxArgs {
     pub data: InitializeData,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct InitializeIxData<'me>(pub &'me InitializeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct InitializeIxData(pub InitializeIxArgs);
 pub const INITIALIZE_IX_DISCM: [u8; 8] = [175, 175, 109, 31, 13, 152, 155, 237];
-impl<'me> From<&'me InitializeIxArgs> for InitializeIxData<'me> {
-    fn from(args: &'me InitializeIxArgs) -> Self {
+impl From<InitializeIxArgs> for InitializeIxData {
+    fn from(args: InitializeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeIxData<'_> {
+impl BorshSerialize for InitializeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl InitializeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != INITIALIZE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    INITIALIZE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(InitializeIxArgs::deserialize(buf)?))
     }
 }
 pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
@@ -165,7 +188,7 @@ pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
     let keys: InitializeKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: InitializeIxArgs = args.into();
-    let data: InitializeIxData = (&args_full).into();
+    let data: InitializeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -195,7 +218,7 @@ pub struct ChangeAuthorityAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
     pub admin_authority: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ChangeAuthorityKeys {
     pub state: Pubkey,
     pub admin_authority: Pubkey,
@@ -241,23 +264,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ChangeAuthorityIxArgs {
     pub data: ChangeAuthorityData,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct ChangeAuthorityIxData<'me>(pub &'me ChangeAuthorityIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct ChangeAuthorityIxData(pub ChangeAuthorityIxArgs);
 pub const CHANGE_AUTHORITY_IX_DISCM: [u8; 8] = [50, 106, 66, 104, 99, 118, 145, 88];
-impl<'me> From<&'me ChangeAuthorityIxArgs> for ChangeAuthorityIxData<'me> {
-    fn from(args: &'me ChangeAuthorityIxArgs) -> Self {
+impl From<ChangeAuthorityIxArgs> for ChangeAuthorityIxData {
+    fn from(args: ChangeAuthorityIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for ChangeAuthorityIxData<'_> {
+impl BorshSerialize for ChangeAuthorityIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&CHANGE_AUTHORITY_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl ChangeAuthorityIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != CHANGE_AUTHORITY_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    CHANGE_AUTHORITY_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(ChangeAuthorityIxArgs::deserialize(buf)?))
     }
 }
 pub fn change_authority_ix<K: Into<ChangeAuthorityKeys>, A: Into<ChangeAuthorityIxArgs>>(
@@ -267,7 +313,7 @@ pub fn change_authority_ix<K: Into<ChangeAuthorityKeys>, A: Into<ChangeAuthority
     let keys: ChangeAuthorityKeys = accounts.into();
     let metas: [AccountMeta; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: ChangeAuthorityIxArgs = args.into();
-    let data: ChangeAuthorityIxData = (&args_full).into();
+    let data: ChangeAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -304,7 +350,7 @@ pub struct AddValidatorAccounts<'me, 'info> {
     pub rent: &'me AccountInfo<'info>,
     pub system_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct AddValidatorKeys {
     pub state: Pubkey,
     pub manager_authority: Pubkey,
@@ -395,23 +441,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddValidatorIxArgs {
     pub score: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct AddValidatorIxData<'me>(pub &'me AddValidatorIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct AddValidatorIxData(pub AddValidatorIxArgs);
 pub const ADD_VALIDATOR_IX_DISCM: [u8; 8] = [250, 113, 53, 54, 141, 117, 215, 185];
-impl<'me> From<&'me AddValidatorIxArgs> for AddValidatorIxData<'me> {
-    fn from(args: &'me AddValidatorIxArgs) -> Self {
+impl From<AddValidatorIxArgs> for AddValidatorIxData {
+    fn from(args: AddValidatorIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for AddValidatorIxData<'_> {
+impl BorshSerialize for AddValidatorIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&ADD_VALIDATOR_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl AddValidatorIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != ADD_VALIDATOR_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    ADD_VALIDATOR_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(AddValidatorIxArgs::deserialize(buf)?))
     }
 }
 pub fn add_validator_ix<K: Into<AddValidatorKeys>, A: Into<AddValidatorIxArgs>>(
@@ -421,7 +490,7 @@ pub fn add_validator_ix<K: Into<AddValidatorKeys>, A: Into<AddValidatorIxArgs>>(
     let keys: AddValidatorKeys = accounts.into();
     let metas: [AccountMeta; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: AddValidatorIxArgs = args.into();
-    let data: AddValidatorIxData = (&args_full).into();
+    let data: AddValidatorIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -454,7 +523,7 @@ pub struct RemoveValidatorAccounts<'me, 'info> {
     pub duplication_flag: &'me AccountInfo<'info>,
     pub operational_sol_account: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct RemoveValidatorKeys {
     pub state: Pubkey,
     pub manager_authority: Pubkey,
@@ -521,24 +590,47 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveValidatorIxArgs {
     pub index: u32,
     pub validator_vote: Pubkey,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct RemoveValidatorIxData<'me>(pub &'me RemoveValidatorIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct RemoveValidatorIxData(pub RemoveValidatorIxArgs);
 pub const REMOVE_VALIDATOR_IX_DISCM: [u8; 8] = [25, 96, 211, 155, 161, 14, 168, 188];
-impl<'me> From<&'me RemoveValidatorIxArgs> for RemoveValidatorIxData<'me> {
-    fn from(args: &'me RemoveValidatorIxArgs) -> Self {
+impl From<RemoveValidatorIxArgs> for RemoveValidatorIxData {
+    fn from(args: RemoveValidatorIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for RemoveValidatorIxData<'_> {
+impl BorshSerialize for RemoveValidatorIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&REMOVE_VALIDATOR_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl RemoveValidatorIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != REMOVE_VALIDATOR_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    REMOVE_VALIDATOR_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(RemoveValidatorIxArgs::deserialize(buf)?))
     }
 }
 pub fn remove_validator_ix<K: Into<RemoveValidatorKeys>, A: Into<RemoveValidatorIxArgs>>(
@@ -548,7 +640,7 @@ pub fn remove_validator_ix<K: Into<RemoveValidatorKeys>, A: Into<RemoveValidator
     let keys: RemoveValidatorKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: RemoveValidatorIxArgs = args.into();
-    let data: RemoveValidatorIxData = (&args_full).into();
+    let data: RemoveValidatorIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -579,7 +671,7 @@ pub struct SetValidatorScoreAccounts<'me, 'info> {
     pub manager_authority: &'me AccountInfo<'info>,
     pub validator_list: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct SetValidatorScoreKeys {
     pub state: Pubkey,
     pub manager_authority: Pubkey,
@@ -634,25 +726,48 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetValidatorScoreIxArgs {
     pub index: u32,
     pub validator_vote: Pubkey,
     pub score: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct SetValidatorScoreIxData<'me>(pub &'me SetValidatorScoreIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct SetValidatorScoreIxData(pub SetValidatorScoreIxArgs);
 pub const SET_VALIDATOR_SCORE_IX_DISCM: [u8; 8] = [101, 41, 206, 33, 216, 111, 25, 78];
-impl<'me> From<&'me SetValidatorScoreIxArgs> for SetValidatorScoreIxData<'me> {
-    fn from(args: &'me SetValidatorScoreIxArgs) -> Self {
+impl From<SetValidatorScoreIxArgs> for SetValidatorScoreIxData {
+    fn from(args: SetValidatorScoreIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for SetValidatorScoreIxData<'_> {
+impl BorshSerialize for SetValidatorScoreIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&SET_VALIDATOR_SCORE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl SetValidatorScoreIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != SET_VALIDATOR_SCORE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    SET_VALIDATOR_SCORE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(SetValidatorScoreIxArgs::deserialize(buf)?))
     }
 }
 pub fn set_validator_score_ix<K: Into<SetValidatorScoreKeys>, A: Into<SetValidatorScoreIxArgs>>(
@@ -662,7 +777,7 @@ pub fn set_validator_score_ix<K: Into<SetValidatorScoreKeys>, A: Into<SetValidat
     let keys: SetValidatorScoreKeys = accounts.into();
     let metas: [AccountMeta; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: SetValidatorScoreIxArgs = args.into();
-    let data: SetValidatorScoreIxData = (&args_full).into();
+    let data: SetValidatorScoreIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -692,7 +807,7 @@ pub struct ConfigValidatorSystemAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
     pub manager_authority: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ConfigValidatorSystemKeys {
     pub state: Pubkey,
     pub manager_authority: Pubkey,
@@ -738,23 +853,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOU
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConfigValidatorSystemIxArgs {
     pub extra_runs: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct ConfigValidatorSystemIxData<'me>(pub &'me ConfigValidatorSystemIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConfigValidatorSystemIxData(pub ConfigValidatorSystemIxArgs);
 pub const CONFIG_VALIDATOR_SYSTEM_IX_DISCM: [u8; 8] = [27, 90, 97, 209, 17, 115, 7, 40];
-impl<'me> From<&'me ConfigValidatorSystemIxArgs> for ConfigValidatorSystemIxData<'me> {
-    fn from(args: &'me ConfigValidatorSystemIxArgs) -> Self {
+impl From<ConfigValidatorSystemIxArgs> for ConfigValidatorSystemIxData {
+    fn from(args: ConfigValidatorSystemIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for ConfigValidatorSystemIxData<'_> {
+impl BorshSerialize for ConfigValidatorSystemIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&CONFIG_VALIDATOR_SYSTEM_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl ConfigValidatorSystemIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != CONFIG_VALIDATOR_SYSTEM_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    CONFIG_VALIDATOR_SYSTEM_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(ConfigValidatorSystemIxArgs::deserialize(buf)?))
     }
 }
 pub fn config_validator_system_ix<
@@ -767,7 +905,7 @@ pub fn config_validator_system_ix<
     let keys: ConfigValidatorSystemKeys = accounts.into();
     let metas: [AccountMeta; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: ConfigValidatorSystemIxArgs = args.into();
-    let data: ConfigValidatorSystemIxData = (&args_full).into();
+    let data: ConfigValidatorSystemIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -808,7 +946,7 @@ pub struct DepositAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub token_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DepositKeys {
     pub state: Pubkey,
     pub msol_mint: Pubkey,
@@ -909,23 +1047,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIxArgs {
     pub lamports: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct DepositIxData<'me>(pub &'me DepositIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct DepositIxData(pub DepositIxArgs);
 pub const DEPOSIT_IX_DISCM: [u8; 8] = [242, 35, 198, 137, 82, 225, 242, 182];
-impl<'me> From<&'me DepositIxArgs> for DepositIxData<'me> {
-    fn from(args: &'me DepositIxArgs) -> Self {
+impl From<DepositIxArgs> for DepositIxData {
+    fn from(args: DepositIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for DepositIxData<'_> {
+impl BorshSerialize for DepositIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&DEPOSIT_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl DepositIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != DEPOSIT_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    DEPOSIT_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(DepositIxArgs::deserialize(buf)?))
     }
 }
 pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
@@ -935,7 +1096,7 @@ pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
     let keys: DepositKeys = accounts.into();
     let metas: [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: DepositIxArgs = args.into();
-    let data: DepositIxData = (&args_full).into();
+    let data: DepositIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -978,7 +1139,7 @@ pub struct DepositStakeAccountAccounts<'me, 'info> {
     pub token_program: &'me AccountInfo<'info>,
     pub stake_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DepositStakeAccountKeys {
     pub state: Pubkey,
     pub validator_list: Pubkey,
@@ -1105,23 +1266,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNT
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositStakeAccountIxArgs {
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct DepositStakeAccountIxData<'me>(pub &'me DepositStakeAccountIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct DepositStakeAccountIxData(pub DepositStakeAccountIxArgs);
 pub const DEPOSIT_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [110, 130, 115, 41, 164, 102, 2, 59];
-impl<'me> From<&'me DepositStakeAccountIxArgs> for DepositStakeAccountIxData<'me> {
-    fn from(args: &'me DepositStakeAccountIxArgs) -> Self {
+impl From<DepositStakeAccountIxArgs> for DepositStakeAccountIxData {
+    fn from(args: DepositStakeAccountIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for DepositStakeAccountIxData<'_> {
+impl BorshSerialize for DepositStakeAccountIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&DEPOSIT_STAKE_ACCOUNT_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl DepositStakeAccountIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != DEPOSIT_STAKE_ACCOUNT_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    DEPOSIT_STAKE_ACCOUNT_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(DepositStakeAccountIxArgs::deserialize(buf)?))
     }
 }
 pub fn deposit_stake_account_ix<
@@ -1134,7 +1318,7 @@ pub fn deposit_stake_account_ix<
     let keys: DepositStakeAccountKeys = accounts.into();
     let metas: [AccountMeta; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: DepositStakeAccountIxArgs = args.into();
-    let data: DepositStakeAccountIxData = (&args_full).into();
+    let data: DepositStakeAccountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1172,7 +1356,7 @@ pub struct LiquidUnstakeAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub token_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct LiquidUnstakeKeys {
     pub state: Pubkey,
     pub msol_mint: Pubkey,
@@ -1269,23 +1453,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidUnstakeIxArgs {
     pub msol_amount: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct LiquidUnstakeIxData<'me>(pub &'me LiquidUnstakeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct LiquidUnstakeIxData(pub LiquidUnstakeIxArgs);
 pub const LIQUID_UNSTAKE_IX_DISCM: [u8; 8] = [30, 30, 119, 240, 191, 227, 12, 16];
-impl<'me> From<&'me LiquidUnstakeIxArgs> for LiquidUnstakeIxData<'me> {
-    fn from(args: &'me LiquidUnstakeIxArgs) -> Self {
+impl From<LiquidUnstakeIxArgs> for LiquidUnstakeIxData {
+    fn from(args: LiquidUnstakeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for LiquidUnstakeIxData<'_> {
+impl BorshSerialize for LiquidUnstakeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&LIQUID_UNSTAKE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl LiquidUnstakeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != LIQUID_UNSTAKE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    LIQUID_UNSTAKE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(LiquidUnstakeIxArgs::deserialize(buf)?))
     }
 }
 pub fn liquid_unstake_ix<K: Into<LiquidUnstakeKeys>, A: Into<LiquidUnstakeIxArgs>>(
@@ -1295,7 +1502,7 @@ pub fn liquid_unstake_ix<K: Into<LiquidUnstakeKeys>, A: Into<LiquidUnstakeIxArgs
     let keys: LiquidUnstakeKeys = accounts.into();
     let metas: [AccountMeta; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: LiquidUnstakeIxArgs = args.into();
-    let data: LiquidUnstakeIxData = (&args_full).into();
+    let data: LiquidUnstakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1332,7 +1539,7 @@ pub struct AddLiquidityAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub token_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct AddLiquidityKeys {
     pub state: Pubkey,
     pub lp_mint: Pubkey,
@@ -1423,23 +1630,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddLiquidityIxArgs {
     pub lamports: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct AddLiquidityIxData<'me>(pub &'me AddLiquidityIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct AddLiquidityIxData(pub AddLiquidityIxArgs);
 pub const ADD_LIQUIDITY_IX_DISCM: [u8; 8] = [181, 157, 89, 67, 143, 182, 52, 72];
-impl<'me> From<&'me AddLiquidityIxArgs> for AddLiquidityIxData<'me> {
-    fn from(args: &'me AddLiquidityIxArgs) -> Self {
+impl From<AddLiquidityIxArgs> for AddLiquidityIxData {
+    fn from(args: AddLiquidityIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for AddLiquidityIxData<'_> {
+impl BorshSerialize for AddLiquidityIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&ADD_LIQUIDITY_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl AddLiquidityIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != ADD_LIQUIDITY_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    ADD_LIQUIDITY_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(AddLiquidityIxArgs::deserialize(buf)?))
     }
 }
 pub fn add_liquidity_ix<K: Into<AddLiquidityKeys>, A: Into<AddLiquidityIxArgs>>(
@@ -1449,7 +1679,7 @@ pub fn add_liquidity_ix<K: Into<AddLiquidityKeys>, A: Into<AddLiquidityIxArgs>>(
     let keys: AddLiquidityKeys = accounts.into();
     let metas: [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: AddLiquidityIxArgs = args.into();
-    let data: AddLiquidityIxData = (&args_full).into();
+    let data: AddLiquidityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1488,7 +1718,7 @@ pub struct RemoveLiquidityAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub token_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct RemoveLiquidityKeys {
     pub state: Pubkey,
     pub lp_mint: Pubkey,
@@ -1591,23 +1821,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveLiquidityIxArgs {
     pub tokens: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct RemoveLiquidityIxData<'me>(pub &'me RemoveLiquidityIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct RemoveLiquidityIxData(pub RemoveLiquidityIxArgs);
 pub const REMOVE_LIQUIDITY_IX_DISCM: [u8; 8] = [80, 85, 209, 72, 24, 206, 177, 108];
-impl<'me> From<&'me RemoveLiquidityIxArgs> for RemoveLiquidityIxData<'me> {
-    fn from(args: &'me RemoveLiquidityIxArgs) -> Self {
+impl From<RemoveLiquidityIxArgs> for RemoveLiquidityIxData {
+    fn from(args: RemoveLiquidityIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for RemoveLiquidityIxData<'_> {
+impl BorshSerialize for RemoveLiquidityIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&REMOVE_LIQUIDITY_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl RemoveLiquidityIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != REMOVE_LIQUIDITY_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    REMOVE_LIQUIDITY_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(RemoveLiquidityIxArgs::deserialize(buf)?))
     }
 }
 pub fn remove_liquidity_ix<K: Into<RemoveLiquidityKeys>, A: Into<RemoveLiquidityIxArgs>>(
@@ -1617,7 +1870,7 @@ pub fn remove_liquidity_ix<K: Into<RemoveLiquidityKeys>, A: Into<RemoveLiquidity
     let keys: RemoveLiquidityKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: RemoveLiquidityIxArgs = args.into();
-    let data: RemoveLiquidityIxData = (&args_full).into();
+    let data: RemoveLiquidityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1647,7 +1900,7 @@ pub struct SetLpParamsAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
     pub admin_authority: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct SetLpParamsKeys {
     pub state: Pubkey,
     pub admin_authority: Pubkey,
@@ -1693,25 +1946,48 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetLpParamsIxArgs {
     pub min_fee: Fee,
     pub max_fee: Fee,
     pub liquidity_target: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct SetLpParamsIxData<'me>(pub &'me SetLpParamsIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct SetLpParamsIxData(pub SetLpParamsIxArgs);
 pub const SET_LP_PARAMS_IX_DISCM: [u8; 8] = [227, 163, 242, 45, 79, 203, 106, 44];
-impl<'me> From<&'me SetLpParamsIxArgs> for SetLpParamsIxData<'me> {
-    fn from(args: &'me SetLpParamsIxArgs) -> Self {
+impl From<SetLpParamsIxArgs> for SetLpParamsIxData {
+    fn from(args: SetLpParamsIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for SetLpParamsIxData<'_> {
+impl BorshSerialize for SetLpParamsIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&SET_LP_PARAMS_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl SetLpParamsIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != SET_LP_PARAMS_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    SET_LP_PARAMS_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(SetLpParamsIxArgs::deserialize(buf)?))
     }
 }
 pub fn set_lp_params_ix<K: Into<SetLpParamsKeys>, A: Into<SetLpParamsIxArgs>>(
@@ -1721,7 +1997,7 @@ pub fn set_lp_params_ix<K: Into<SetLpParamsKeys>, A: Into<SetLpParamsIxArgs>>(
     let keys: SetLpParamsKeys = accounts.into();
     let metas: [AccountMeta; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: SetLpParamsIxArgs = args.into();
-    let data: SetLpParamsIxData = (&args_full).into();
+    let data: SetLpParamsIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1751,7 +2027,7 @@ pub struct ConfigMarinadeAccounts<'me, 'info> {
     pub state: &'me AccountInfo<'info>,
     pub admin_authority: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ConfigMarinadeKeys {
     pub state: Pubkey,
     pub admin_authority: Pubkey,
@@ -1797,23 +2073,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN]
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConfigMarinadeIxArgs {
     pub params: ConfigMarinadeParams,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct ConfigMarinadeIxData<'me>(pub &'me ConfigMarinadeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConfigMarinadeIxData(pub ConfigMarinadeIxArgs);
 pub const CONFIG_MARINADE_IX_DISCM: [u8; 8] = [67, 3, 34, 114, 190, 185, 17, 62];
-impl<'me> From<&'me ConfigMarinadeIxArgs> for ConfigMarinadeIxData<'me> {
-    fn from(args: &'me ConfigMarinadeIxArgs) -> Self {
+impl From<ConfigMarinadeIxArgs> for ConfigMarinadeIxData {
+    fn from(args: ConfigMarinadeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for ConfigMarinadeIxData<'_> {
+impl BorshSerialize for ConfigMarinadeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&CONFIG_MARINADE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl ConfigMarinadeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != CONFIG_MARINADE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    CONFIG_MARINADE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(ConfigMarinadeIxArgs::deserialize(buf)?))
     }
 }
 pub fn config_marinade_ix<K: Into<ConfigMarinadeKeys>, A: Into<ConfigMarinadeIxArgs>>(
@@ -1823,7 +2122,7 @@ pub fn config_marinade_ix<K: Into<ConfigMarinadeKeys>, A: Into<ConfigMarinadeIxA
     let keys: ConfigMarinadeKeys = accounts.into();
     let metas: [AccountMeta; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: ConfigMarinadeIxArgs = args.into();
-    let data: ConfigMarinadeIxData = (&args_full).into();
+    let data: ConfigMarinadeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1859,7 +2158,7 @@ pub struct OrderUnstakeAccounts<'me, 'info> {
     pub rent: &'me AccountInfo<'info>,
     pub token_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct OrderUnstakeKeys {
     pub state: Pubkey,
     pub msol_mint: Pubkey,
@@ -1944,23 +2243,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrderUnstakeIxArgs {
     pub msol_amount: u64,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct OrderUnstakeIxData<'me>(pub &'me OrderUnstakeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct OrderUnstakeIxData(pub OrderUnstakeIxArgs);
 pub const ORDER_UNSTAKE_IX_DISCM: [u8; 8] = [97, 167, 144, 107, 117, 190, 128, 36];
-impl<'me> From<&'me OrderUnstakeIxArgs> for OrderUnstakeIxData<'me> {
-    fn from(args: &'me OrderUnstakeIxArgs) -> Self {
+impl From<OrderUnstakeIxArgs> for OrderUnstakeIxData {
+    fn from(args: OrderUnstakeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for OrderUnstakeIxData<'_> {
+impl BorshSerialize for OrderUnstakeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&ORDER_UNSTAKE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl OrderUnstakeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != ORDER_UNSTAKE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    ORDER_UNSTAKE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(OrderUnstakeIxArgs::deserialize(buf)?))
     }
 }
 pub fn order_unstake_ix<K: Into<OrderUnstakeKeys>, A: Into<OrderUnstakeIxArgs>>(
@@ -1970,7 +2292,7 @@ pub fn order_unstake_ix<K: Into<OrderUnstakeKeys>, A: Into<OrderUnstakeIxArgs>>(
     let keys: OrderUnstakeKeys = accounts.into();
     let metas: [AccountMeta; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: OrderUnstakeIxArgs = args.into();
-    let data: OrderUnstakeIxData = (&args_full).into();
+    let data: OrderUnstakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2004,7 +2326,7 @@ pub struct ClaimAccounts<'me, 'info> {
     pub clock: &'me AccountInfo<'info>,
     pub system_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct ClaimKeys {
     pub state: Pubkey,
     pub reserve_pda: Pubkey,
@@ -2075,21 +2397,44 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ClaimIxArgs {}
-#[derive(Copy, Clone, Debug)]
-pub struct ClaimIxData<'me>(pub &'me ClaimIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct ClaimIxData(pub ClaimIxArgs);
 pub const CLAIM_IX_DISCM: [u8; 8] = [62, 198, 214, 193, 213, 159, 108, 210];
-impl<'me> From<&'me ClaimIxArgs> for ClaimIxData<'me> {
-    fn from(args: &'me ClaimIxArgs) -> Self {
+impl From<ClaimIxArgs> for ClaimIxData {
+    fn from(args: ClaimIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for ClaimIxData<'_> {
+impl BorshSerialize for ClaimIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&CLAIM_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl ClaimIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != CLAIM_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    CLAIM_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(ClaimIxArgs::deserialize(buf)?))
     }
 }
 pub fn claim_ix<K: Into<ClaimKeys>, A: Into<ClaimIxArgs>>(
@@ -2099,7 +2444,7 @@ pub fn claim_ix<K: Into<ClaimKeys>, A: Into<ClaimIxArgs>>(
     let keys: ClaimKeys = accounts.into();
     let metas: [AccountMeta; CLAIM_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: ClaimIxArgs = args.into();
-    let data: ClaimIxData = (&args_full).into();
+    let data: ClaimIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2141,7 +2486,7 @@ pub struct StakeReserveAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub stake_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct StakeReserveKeys {
     pub state: Pubkey,
     pub validator_list: Pubkey,
@@ -2262,23 +2607,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StakeReserveIxArgs {
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct StakeReserveIxData<'me>(pub &'me StakeReserveIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct StakeReserveIxData(pub StakeReserveIxArgs);
 pub const STAKE_RESERVE_IX_DISCM: [u8; 8] = [87, 217, 23, 179, 205, 25, 113, 129];
-impl<'me> From<&'me StakeReserveIxArgs> for StakeReserveIxData<'me> {
-    fn from(args: &'me StakeReserveIxArgs) -> Self {
+impl From<StakeReserveIxArgs> for StakeReserveIxData {
+    fn from(args: StakeReserveIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for StakeReserveIxData<'_> {
+impl BorshSerialize for StakeReserveIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&STAKE_RESERVE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl StakeReserveIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != STAKE_RESERVE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    STAKE_RESERVE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(StakeReserveIxArgs::deserialize(buf)?))
     }
 }
 pub fn stake_reserve_ix<K: Into<StakeReserveKeys>, A: Into<StakeReserveIxArgs>>(
@@ -2288,7 +2656,7 @@ pub fn stake_reserve_ix<K: Into<StakeReserveKeys>, A: Into<StakeReserveIxArgs>>(
     let keys: StakeReserveKeys = accounts.into();
     let metas: [AccountMeta; STAKE_RESERVE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: StakeReserveIxArgs = args.into();
-    let data: StakeReserveIxData = (&args_full).into();
+    let data: StakeReserveIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2329,7 +2697,7 @@ pub struct UpdateActiveAccounts<'me, 'info> {
     pub common_token_program: &'me AccountInfo<'info>,
     pub validator_list: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct UpdateActiveKeys {
     pub common_state: Pubkey,
     pub common_stake_list: Pubkey,
@@ -2444,24 +2812,47 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateActiveIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct UpdateActiveIxData<'me>(pub &'me UpdateActiveIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct UpdateActiveIxData(pub UpdateActiveIxArgs);
 pub const UPDATE_ACTIVE_IX_DISCM: [u8; 8] = [4, 67, 81, 64, 136, 245, 93, 152];
-impl<'me> From<&'me UpdateActiveIxArgs> for UpdateActiveIxData<'me> {
-    fn from(args: &'me UpdateActiveIxArgs) -> Self {
+impl From<UpdateActiveIxArgs> for UpdateActiveIxData {
+    fn from(args: UpdateActiveIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateActiveIxData<'_> {
+impl BorshSerialize for UpdateActiveIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_ACTIVE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl UpdateActiveIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != UPDATE_ACTIVE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    UPDATE_ACTIVE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(UpdateActiveIxArgs::deserialize(buf)?))
     }
 }
 pub fn update_active_ix<K: Into<UpdateActiveKeys>, A: Into<UpdateActiveIxArgs>>(
@@ -2471,7 +2862,7 @@ pub fn update_active_ix<K: Into<UpdateActiveKeys>, A: Into<UpdateActiveIxArgs>>(
     let keys: UpdateActiveKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: UpdateActiveIxArgs = args.into();
-    let data: UpdateActiveIxData = (&args_full).into();
+    let data: UpdateActiveIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2513,7 +2904,7 @@ pub struct UpdateDeactivatedAccounts<'me, 'info> {
     pub operational_sol_account: &'me AccountInfo<'info>,
     pub system_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct UpdateDeactivatedKeys {
     pub common_state: Pubkey,
     pub common_stake_list: Pubkey,
@@ -2634,23 +3025,46 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_L
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateDeactivatedIxArgs {
     pub stake_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct UpdateDeactivatedIxData<'me>(pub &'me UpdateDeactivatedIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct UpdateDeactivatedIxData(pub UpdateDeactivatedIxArgs);
 pub const UPDATE_DEACTIVATED_IX_DISCM: [u8; 8] = [16, 232, 131, 115, 156, 100, 239, 50];
-impl<'me> From<&'me UpdateDeactivatedIxArgs> for UpdateDeactivatedIxData<'me> {
-    fn from(args: &'me UpdateDeactivatedIxArgs) -> Self {
+impl From<UpdateDeactivatedIxArgs> for UpdateDeactivatedIxData {
+    fn from(args: UpdateDeactivatedIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateDeactivatedIxData<'_> {
+impl BorshSerialize for UpdateDeactivatedIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_DEACTIVATED_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl UpdateDeactivatedIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != UPDATE_DEACTIVATED_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    UPDATE_DEACTIVATED_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(UpdateDeactivatedIxArgs::deserialize(buf)?))
     }
 }
 pub fn update_deactivated_ix<K: Into<UpdateDeactivatedKeys>, A: Into<UpdateDeactivatedIxArgs>>(
@@ -2660,7 +3074,7 @@ pub fn update_deactivated_ix<K: Into<UpdateDeactivatedKeys>, A: Into<UpdateDeact
     let keys: UpdateDeactivatedKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: UpdateDeactivatedIxArgs = args.into();
-    let data: UpdateDeactivatedIxData = (&args_full).into();
+    let data: UpdateDeactivatedIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2702,7 +3116,7 @@ pub struct DeactivateStakeAccounts<'me, 'info> {
     pub system_program: &'me AccountInfo<'info>,
     pub stake_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DeactivateStakeKeys {
     pub state: Pubkey,
     pub reserve_pda: Pubkey,
@@ -2823,24 +3237,47 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeactivateStakeIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct DeactivateStakeIxData<'me>(pub &'me DeactivateStakeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct DeactivateStakeIxData(pub DeactivateStakeIxArgs);
 pub const DEACTIVATE_STAKE_IX_DISCM: [u8; 8] = [165, 158, 229, 97, 168, 220, 187, 225];
-impl<'me> From<&'me DeactivateStakeIxArgs> for DeactivateStakeIxData<'me> {
-    fn from(args: &'me DeactivateStakeIxArgs) -> Self {
+impl From<DeactivateStakeIxArgs> for DeactivateStakeIxData {
+    fn from(args: DeactivateStakeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for DeactivateStakeIxData<'_> {
+impl BorshSerialize for DeactivateStakeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&DEACTIVATE_STAKE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl DeactivateStakeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != DEACTIVATE_STAKE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    DEACTIVATE_STAKE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(DeactivateStakeIxArgs::deserialize(buf)?))
     }
 }
 pub fn deactivate_stake_ix<K: Into<DeactivateStakeKeys>, A: Into<DeactivateStakeIxArgs>>(
@@ -2850,7 +3287,7 @@ pub fn deactivate_stake_ix<K: Into<DeactivateStakeKeys>, A: Into<DeactivateStake
     let keys: DeactivateStakeKeys = accounts.into();
     let metas: [AccountMeta; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: DeactivateStakeIxArgs = args.into();
-    let data: DeactivateStakeIxData = (&args_full).into();
+    let data: DeactivateStakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2886,7 +3323,7 @@ pub struct EmergencyUnstakeAccounts<'me, 'info> {
     pub clock: &'me AccountInfo<'info>,
     pub stake_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct EmergencyUnstakeKeys {
     pub state: Pubkey,
     pub validator_manager_authority: Pubkey,
@@ -2971,24 +3408,47 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LE
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EmergencyUnstakeIxArgs {
     pub stake_index: u32,
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct EmergencyUnstakeIxData<'me>(pub &'me EmergencyUnstakeIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct EmergencyUnstakeIxData(pub EmergencyUnstakeIxArgs);
 pub const EMERGENCY_UNSTAKE_IX_DISCM: [u8; 8] = [123, 69, 168, 195, 183, 213, 199, 214];
-impl<'me> From<&'me EmergencyUnstakeIxArgs> for EmergencyUnstakeIxData<'me> {
-    fn from(args: &'me EmergencyUnstakeIxArgs) -> Self {
+impl From<EmergencyUnstakeIxArgs> for EmergencyUnstakeIxData {
+    fn from(args: EmergencyUnstakeIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for EmergencyUnstakeIxData<'_> {
+impl BorshSerialize for EmergencyUnstakeIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&EMERGENCY_UNSTAKE_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl EmergencyUnstakeIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != EMERGENCY_UNSTAKE_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    EMERGENCY_UNSTAKE_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(EmergencyUnstakeIxArgs::deserialize(buf)?))
     }
 }
 pub fn emergency_unstake_ix<K: Into<EmergencyUnstakeKeys>, A: Into<EmergencyUnstakeIxArgs>>(
@@ -2998,7 +3458,7 @@ pub fn emergency_unstake_ix<K: Into<EmergencyUnstakeKeys>, A: Into<EmergencyUnst
     let keys: EmergencyUnstakeKeys = accounts.into();
     let metas: [AccountMeta; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: EmergencyUnstakeIxArgs = args.into();
-    let data: EmergencyUnstakeIxData = (&args_full).into();
+    let data: EmergencyUnstakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -3037,7 +3497,7 @@ pub struct MergeStakesAccounts<'me, 'info> {
     pub stake_history: &'me AccountInfo<'info>,
     pub stake_program: &'me AccountInfo<'info>,
 }
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct MergeStakesKeys {
     pub state: Pubkey,
     pub stake_list: Pubkey,
@@ -3140,25 +3600,48 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN]>
         }
     }
 }
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MergeStakesIxArgs {
     pub destination_stake_index: u32,
     pub source_stake_index: u32,
     pub validator_index: u32,
 }
-#[derive(Copy, Clone, Debug)]
-pub struct MergeStakesIxData<'me>(pub &'me MergeStakesIxArgs);
+#[derive(Clone, Debug, PartialEq)]
+pub struct MergeStakesIxData(pub MergeStakesIxArgs);
 pub const MERGE_STAKES_IX_DISCM: [u8; 8] = [216, 36, 141, 225, 243, 78, 125, 237];
-impl<'me> From<&'me MergeStakesIxArgs> for MergeStakesIxData<'me> {
-    fn from(args: &'me MergeStakesIxArgs) -> Self {
+impl From<MergeStakesIxArgs> for MergeStakesIxData {
+    fn from(args: MergeStakesIxArgs) -> Self {
         Self(args)
     }
 }
-impl BorshSerialize for MergeStakesIxData<'_> {
+impl BorshSerialize for MergeStakesIxData {
     fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
         writer.write_all(&MERGE_STAKES_IX_DISCM)?;
         self.0.serialize(writer)
+    }
+}
+impl MergeStakesIxData {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm: [u8; 8] =
+            buf.get(..8)
+                .map(|s| s.try_into().ok())
+                .flatten()
+                .ok_or(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "invalid discm bytes".to_owned(),
+                ))?;
+        if maybe_discm != MERGE_STAKES_IX_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    MERGE_STAKES_IX_DISCM, maybe_discm
+                ),
+            ));
+        }
+        *buf = &buf[8..];
+        Ok(Self(MergeStakesIxArgs::deserialize(buf)?))
     }
 }
 pub fn merge_stakes_ix<K: Into<MergeStakesKeys>, A: Into<MergeStakesIxArgs>>(
@@ -3168,7 +3651,7 @@ pub fn merge_stakes_ix<K: Into<MergeStakesKeys>, A: Into<MergeStakesIxArgs>>(
     let keys: MergeStakesKeys = accounts.into();
     let metas: [AccountMeta; MERGE_STAKES_IX_ACCOUNTS_LEN] = (&keys).into();
     let args_full: MergeStakesIxArgs = args.into();
-    let data: MergeStakesIxData = (&args_full).into();
+    let data: MergeStakesIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),

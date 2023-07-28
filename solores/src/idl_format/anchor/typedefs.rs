@@ -120,14 +120,14 @@ impl ToTokens for NamedType {
         let name = format_ident!("{}", self.name);
         let def = match &self.r#type {
             TypedefType::r#struct(typedef_struct) => quote! {
-                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                 pub struct #name {
                     #typedef_struct
                 }
             },
             TypedefType::r#enum(typedef_enum) => quote! {
-                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize)]
+                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
                 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
                 pub enum #name {
                     #typedef_enum
