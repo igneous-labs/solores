@@ -237,10 +237,7 @@ impl ToTokens for NamedInstruction {
 
             impl #ix_data_ident {
                 pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm: [u8; 8] = buf.get(..8)
-                        .map(|s| s.try_into().ok())
-                        .flatten()
-                        .ok_or(std::io::Error::new(std::io::ErrorKind::Other, "invalid discm bytes".to_owned()))?;
+                    let maybe_discm = <[u8; 8]>::deserialize(buf)?;
                     if maybe_discm != #discm_ident {
                         return Err(
                             std::io::Error::new(
@@ -248,7 +245,6 @@ impl ToTokens for NamedInstruction {
                             )
                         );
                     }
-                    *buf = &buf[8..];
                     Ok(Self(#ix_args_ident::deserialize(buf)?))
                 }
             }

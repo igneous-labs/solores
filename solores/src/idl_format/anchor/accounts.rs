@@ -26,33 +26,34 @@ impl ToTokens for NamedAccount {
         });
         // struct def
         tokens.extend(self.0.to_token_stream());
-        // TODO: BorshDeserialize trait definition changed between 0.9 - 0.10
-        // Not sure how to do this while enabling workspace dependency of borsh
-        /*
+
         // impl borsh=0.10 BorshSerialize and BorshDeserialize for account newtype
         let struct_ident = format_ident!("{}", name);
         let account_ident = format_ident!("{}Account", name);
         tokens.extend(quote! {
-            #[derive(Clone, Debug)]
+            #[derive(Clone, Debug, PartialEq)]
             pub struct #account_ident(pub #struct_ident);
 
             impl BorshSerialize for #account_ident {
-                fn serialize<W: borsh::maybestd::io::Write>(&self, writer: &mut W) -> borsh::maybestd::io::Result<()> {
+                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
                     #account_discm_ident.serialize(writer)?;
                     self.0.serialize(writer)
                 }
             }
 
-            impl BorshDeserialize for #account_ident  {
-                fn deserialize_reader<R: borsh::maybestd::io::Read>(reader: &mut R) -> borsh::maybestd::io::Result<Self> {
-                    let discm = <[u8; 8]>::deserialize_reader(reader)?;
-                    if discm != #account_discm_ident {
-                        return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::Other, "Account discriminant does not match"));
+            impl #account_ident {
+                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+                    let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+                    if maybe_discm != #account_discm_ident {
+                        return Err(
+                            std::io::Error::new(
+                                std::io::ErrorKind::Other, format!("discm does not match. Expected: {:?}. Received: {:?}", #account_discm_ident, maybe_discm)
+                            )
+                        );
                     }
-                    Ok(Self(#struct_ident::deserialize_reader(reader)?))
+                    Ok(Self(#struct_ident::deserialize(buf)?))
                 }
             }
         });
-         */
     }
 }

@@ -88,14 +88,7 @@ impl BorshSerialize for InitProtocolFeeIxData {
 }
 impl InitProtocolFeeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != INIT_PROTOCOL_FEE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -105,7 +98,6 @@ impl InitProtocolFeeIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(InitProtocolFeeIxArgs::deserialize(buf)?))
     }
 }
@@ -216,14 +208,7 @@ impl BorshSerialize for SetProtocolFeeIxData {
 }
 impl SetProtocolFeeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != SET_PROTOCOL_FEE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -233,7 +218,6 @@ impl SetProtocolFeeIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(SetProtocolFeeIxArgs::deserialize(buf)?))
     }
 }
@@ -393,14 +377,7 @@ impl BorshSerialize for CreatePoolIxData {
 }
 impl CreatePoolIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != CREATE_POOL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -410,7 +387,6 @@ impl CreatePoolIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(CreatePoolIxArgs::deserialize(buf)?))
     }
 }
@@ -556,14 +532,7 @@ impl BorshSerialize for AddLiquidityIxData {
 }
 impl AddLiquidityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != ADD_LIQUIDITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -573,7 +542,6 @@ impl AddLiquidityIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(AddLiquidityIxArgs::deserialize(buf)?))
     }
 }
@@ -726,14 +694,7 @@ impl BorshSerialize for RemoveLiquidityIxData {
 }
 impl RemoveLiquidityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != REMOVE_LIQUIDITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -743,7 +704,6 @@ impl RemoveLiquidityIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(RemoveLiquidityIxArgs::deserialize(buf)?))
     }
 }
@@ -873,14 +833,7 @@ impl BorshSerialize for SetFeeIxData {
 }
 impl SetFeeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != SET_FEE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -890,7 +843,6 @@ impl SetFeeIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(SetFeeIxArgs::deserialize(buf)?))
     }
 }
@@ -1006,14 +958,7 @@ impl BorshSerialize for SetFeeAuthorityIxData {
 }
 impl SetFeeAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != SET_FEE_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1023,7 +968,6 @@ impl SetFeeAuthorityIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(SetFeeAuthorityIxArgs::deserialize(buf)?))
     }
 }
@@ -1153,14 +1097,7 @@ impl BorshSerialize for DeactivateStakeAccountIxData {
 }
 impl DeactivateStakeAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != DEACTIVATE_STAKE_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1170,7 +1107,6 @@ impl DeactivateStakeAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(DeactivateStakeAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -1319,14 +1255,7 @@ impl BorshSerialize for ReclaimStakeAccountIxData {
 }
 impl ReclaimStakeAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != RECLAIM_STAKE_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1336,7 +1265,6 @@ impl ReclaimStakeAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(ReclaimStakeAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -1523,14 +1451,7 @@ impl BorshSerialize for UnstakeIxData {
 }
 impl UnstakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != UNSTAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1540,7 +1461,6 @@ impl UnstakeIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(UnstakeIxArgs::deserialize(buf)?))
     }
 }
@@ -1733,14 +1653,7 @@ impl BorshSerialize for UnstakeWsolIxData {
 }
 impl UnstakeWsolIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm: [u8; 8] =
-            buf.get(..8)
-                .map(|s| s.try_into().ok())
-                .flatten()
-                .ok_or(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "invalid discm bytes".to_owned(),
-                ))?;
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
         if maybe_discm != UNSTAKE_WSOL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1750,7 +1663,6 @@ impl UnstakeWsolIxData {
                 ),
             ));
         }
-        *buf = &buf[8..];
         Ok(Self(UnstakeWsolIxArgs::deserialize(buf)?))
     }
 }

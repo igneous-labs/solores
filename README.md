@@ -130,7 +130,10 @@ The crate will also export the instructions' discriminant as consts, and any err
 
 ### Anchor IDL
 
-The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). The crate will also export all accounts' discriminant as consts.
+The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). Additionally,
+
+- the crate will also export all accounts' discriminant as consts.
+- the crate will create a `*Account` newtype that includes account discriminant checking in borsh serde operations
 
 ## Features
 

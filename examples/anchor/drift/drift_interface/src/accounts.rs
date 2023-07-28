@@ -16,6 +16,29 @@ pub struct PhoenixV1FulfillmentConfig {
     pub status: SpotFulfillmentConfigStatus,
     pub padding: [u8; 4],
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct PhoenixV1FulfillmentConfigAccount(pub PhoenixV1FulfillmentConfig);
+impl BorshSerialize for PhoenixV1FulfillmentConfigAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl PhoenixV1FulfillmentConfigAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(PhoenixV1FulfillmentConfig::deserialize(buf)?))
+    }
+}
 pub const SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] =
     [65, 160, 197, 112, 239, 168, 103, 185];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -37,6 +60,29 @@ pub struct SerumV3FulfillmentConfig {
     pub status: SpotFulfillmentConfigStatus,
     pub padding: [u8; 4],
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct SerumV3FulfillmentConfigAccount(pub SerumV3FulfillmentConfig);
+impl BorshSerialize for SerumV3FulfillmentConfigAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl SerumV3FulfillmentConfigAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(SerumV3FulfillmentConfig::deserialize(buf)?))
+    }
+}
 pub const INSURANCE_FUND_STAKE_ACCOUNT_DISCM: [u8; 8] = [110, 202, 14, 42, 95, 73, 90, 95];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -51,6 +97,29 @@ pub struct InsuranceFundStake {
     pub cost_basis: i64,
     pub market_index: u16,
     pub padding: [u8; 14],
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct InsuranceFundStakeAccount(pub InsuranceFundStake);
+impl BorshSerialize for InsuranceFundStakeAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        INSURANCE_FUND_STAKE_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl InsuranceFundStakeAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != INSURANCE_FUND_STAKE_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    INSURANCE_FUND_STAKE_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(InsuranceFundStake::deserialize(buf)?))
+    }
 }
 pub const PERP_MARKET_ACCOUNT_DISCM: [u8; 8] = [10, 223, 12, 44, 107, 245, 55, 247];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -84,6 +153,29 @@ pub struct PerpMarket {
     pub padding1: bool,
     pub quote_spot_market_index: u16,
     pub padding: [u8; 48],
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct PerpMarketAccount(pub PerpMarket);
+impl BorshSerialize for PerpMarketAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        PERP_MARKET_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl PerpMarketAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != PERP_MARKET_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    PERP_MARKET_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(PerpMarket::deserialize(buf)?))
+    }
 }
 pub const SPOT_MARKET_ACCOUNT_DISCM: [u8; 8] = [100, 177, 8, 107, 168, 65, 65, 39];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -142,6 +234,29 @@ pub struct SpotMarket {
     pub total_swap_fee: u64,
     pub padding: [u8; 56],
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct SpotMarketAccount(pub SpotMarket);
+impl BorshSerialize for SpotMarketAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        SPOT_MARKET_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl SpotMarketAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != SPOT_MARKET_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    SPOT_MARKET_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(SpotMarket::deserialize(buf)?))
+    }
+}
 pub const STATE_ACCOUNT_DISCM: [u8; 8] = [216, 146, 107, 94, 104, 75, 182, 177];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -169,6 +284,29 @@ pub struct State {
     pub liquidation_duration: u8,
     pub initial_pct_to_liquidate: u16,
     pub padding: [u8; 14],
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct StateAccount(pub State);
+impl BorshSerialize for StateAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        STATE_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl StateAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != STATE_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    STATE_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(State::deserialize(buf)?))
+    }
 }
 pub const USER_ACCOUNT_DISCM: [u8; 8] = [159, 117, 95, 227, 239, 151, 58, 236];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -202,6 +340,29 @@ pub struct User {
     pub has_open_auction: bool,
     pub padding: [u8; 21],
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct UserAccount(pub User);
+impl BorshSerialize for UserAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        USER_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl UserAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != USER_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    USER_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(User::deserialize(buf)?))
+    }
+}
 pub const USER_STATS_ACCOUNT_DISCM: [u8; 8] = [176, 223, 136, 27, 122, 79, 32, 227];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -222,6 +383,29 @@ pub struct UserStats {
     pub is_referrer: bool,
     pub padding: [u8; 51],
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct UserStatsAccount(pub UserStats);
+impl BorshSerialize for UserStatsAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        USER_STATS_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl UserStatsAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != USER_STATS_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    USER_STATS_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(UserStats::deserialize(buf)?))
+    }
+}
 pub const REFERRER_NAME_ACCOUNT_DISCM: [u8; 8] = [105, 133, 170, 110, 52, 42, 28, 182];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -230,4 +414,27 @@ pub struct ReferrerName {
     pub user: Pubkey,
     pub user_stats: Pubkey,
     pub name: [u8; 32],
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct ReferrerNameAccount(pub ReferrerName);
+impl BorshSerialize for ReferrerNameAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        REFERRER_NAME_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl ReferrerNameAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != REFERRER_NAME_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    REFERRER_NAME_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(ReferrerName::deserialize(buf)?))
+    }
 }
