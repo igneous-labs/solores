@@ -1,6 +1,6 @@
 use borsh::BorshDeserialize;
 use lazy_static::lazy_static;
-use marinade_finance_interface::{State, STATE_ACCOUNT_DISCM};
+use marinade_finance_interface::StateAccount;
 use solana_client::nonblocking::rpc_client::RpcClient;
 
 lazy_static! {
@@ -15,10 +15,7 @@ mod marinade_state {
 #[tokio::test]
 async fn test_read_serde_marinade_state() {
     let acc = RPC.get_account_data(&marinade_state::ID).await.unwrap();
-    let mut reader = acc.as_slice();
-
-    let discm = <[u8; 8]>::deserialize(&mut reader).unwrap();
-    assert_eq!(discm, STATE_ACCOUNT_DISCM);
-    let s = State::deserialize(&mut reader).unwrap();
-    serde_json::to_string(&s).unwrap();
+    let mut buf = acc.as_slice();
+    let sa = StateAccount::deserialize(&mut buf).unwrap();
+    serde_json::to_string(&sa.0).unwrap();
 }

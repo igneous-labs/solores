@@ -27,6 +27,29 @@ pub struct State {
     pub staking_sol_cap: u64,
     pub emergency_cooling_down: u64,
 }
+#[derive(Clone, Debug, PartialEq)]
+pub struct StateAccount(pub State);
+impl BorshSerialize for StateAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        STATE_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl StateAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != STATE_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    STATE_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(State::deserialize(buf)?))
+    }
+}
 pub const TICKET_ACCOUNT_DATA_ACCOUNT_DISCM: [u8; 8] = [133, 77, 18, 98, 211, 1, 231, 3];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -35,4 +58,27 @@ pub struct TicketAccountData {
     pub beneficiary: Pubkey,
     pub lamports_amount: u64,
     pub created_epoch: u64,
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct TicketAccountDataAccount(pub TicketAccountData);
+impl BorshSerialize for TicketAccountDataAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        TICKET_ACCOUNT_DATA_ACCOUNT_DISCM.serialize(writer)?;
+        self.0.serialize(writer)
+    }
+}
+impl TicketAccountDataAccount {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        if maybe_discm != TICKET_ACCOUNT_DATA_ACCOUNT_DISCM {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!(
+                    "discm does not match. Expected: {:?}. Received: {:?}",
+                    TICKET_ACCOUNT_DATA_ACCOUNT_DISCM, maybe_discm
+                ),
+            ));
+        }
+        Ok(Self(TicketAccountData::deserialize(buf)?))
+    }
 }

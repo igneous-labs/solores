@@ -132,11 +132,8 @@ impl BorshSerialize for CreateMetadataAccountIxData {
 }
 impl CreateMetadataAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != CREATE_METADATA_ACCOUNT_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != CREATE_METADATA_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -145,7 +142,6 @@ impl CreateMetadataAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(CreateMetadataAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -262,11 +258,8 @@ impl BorshSerialize for UpdateMetadataAccountIxData {
 }
 impl UpdateMetadataAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != UPDATE_METADATA_ACCOUNT_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != UPDATE_METADATA_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -275,7 +268,6 @@ impl UpdateMetadataAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(UpdateMetadataAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -506,11 +498,8 @@ impl BorshSerialize for DeprecatedCreateMasterEditionIxData {
 }
 impl DeprecatedCreateMasterEditionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -519,7 +508,6 @@ impl DeprecatedCreateMasterEditionIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(DeprecatedCreateMasterEditionIxArgs::deserialize(buf)?))
     }
 }
@@ -798,11 +786,8 @@ impl BorshSerialize for DeprecatedMintNewEditionFromMasterEditionViaPrintingToke
 }
 impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm
             != DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
         {
             return Err(std::io::Error::new(
@@ -814,7 +799,6 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(
             DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(buf)?,
         ))
@@ -962,11 +946,8 @@ impl BorshSerialize for UpdatePrimarySaleHappenedViaTokenIxData {
 }
 impl UpdatePrimarySaleHappenedViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -975,7 +956,6 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(
             buf,
         )?))
@@ -1119,11 +1099,8 @@ impl BorshSerialize for DeprecatedSetReservationListIxData {
 }
 impl DeprecatedSetReservationListIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != DEPRECATED_SET_RESERVATION_LIST_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != DEPRECATED_SET_RESERVATION_LIST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -1132,7 +1109,6 @@ impl DeprecatedSetReservationListIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(DeprecatedSetReservationListIxArgs::deserialize(buf)?))
     }
 }
@@ -1318,11 +1294,8 @@ impl BorshSerialize for DeprecatedCreateReservationListIxData {
 }
 impl DeprecatedCreateReservationListIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -1331,7 +1304,6 @@ impl DeprecatedCreateReservationListIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(DeprecatedCreateReservationListIxArgs::deserialize(
             buf,
         )?))
@@ -1454,11 +1426,8 @@ impl BorshSerialize for SignMetadataIxData {
 }
 impl SignMetadataIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != SIGN_METADATA_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != SIGN_METADATA_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -1467,7 +1436,6 @@ impl SignMetadataIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(SignMetadataIxArgs::deserialize(buf)?))
     }
 }
@@ -1660,11 +1628,8 @@ impl BorshSerialize for DeprecatedMintPrintingTokensViaTokenIxData {
 }
 impl DeprecatedMintPrintingTokensViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -1673,7 +1638,6 @@ impl DeprecatedMintPrintingTokensViaTokenIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(
             DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(buf)?,
         ))
@@ -1853,11 +1817,8 @@ impl BorshSerialize for DeprecatedMintPrintingTokensIxData {
 }
 impl DeprecatedMintPrintingTokensIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -1866,7 +1827,6 @@ impl DeprecatedMintPrintingTokensIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(DeprecatedMintPrintingTokensIxArgs::deserialize(buf)?))
     }
 }
@@ -2055,11 +2015,8 @@ impl BorshSerialize for CreateMasterEditionIxData {
 }
 impl CreateMasterEditionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != CREATE_MASTER_EDITION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != CREATE_MASTER_EDITION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -2068,7 +2025,6 @@ impl CreateMasterEditionIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(CreateMasterEditionIxArgs::deserialize(buf)?))
     }
 }
@@ -2311,11 +2267,8 @@ impl BorshSerialize for MintNewEditionFromMasterEditionViaTokenIxData {
 }
 impl MintNewEditionFromMasterEditionViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -2324,7 +2277,6 @@ impl MintNewEditionFromMasterEditionViaTokenIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(
             MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(buf)?,
         ))
@@ -2466,11 +2418,8 @@ impl BorshSerialize for ConvertMasterEditionV1ToV2IxData {
 }
 impl ConvertMasterEditionV1ToV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -2479,7 +2428,6 @@ impl ConvertMasterEditionV1ToV2IxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(ConvertMasterEditionV1ToV2IxArgs::deserialize(buf)?))
     }
 }
@@ -2756,11 +2704,8 @@ impl BorshSerialize for MintNewEditionFromMasterEditionViaVaultProxyIxData {
 }
 impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -2769,7 +2714,6 @@ impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(
             MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(buf)?,
         ))
@@ -2881,11 +2825,8 @@ impl BorshSerialize for PuffMetadataIxData {
 }
 impl PuffMetadataIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != PUFF_METADATA_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != PUFF_METADATA_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -2894,7 +2835,6 @@ impl PuffMetadataIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(PuffMetadataIxArgs::deserialize(buf)?))
     }
 }
@@ -3008,11 +2948,8 @@ impl BorshSerialize for UpdateMetadataAccountV2IxData {
 }
 impl UpdateMetadataAccountV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != UPDATE_METADATA_ACCOUNT_V2_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != UPDATE_METADATA_ACCOUNT_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3021,7 +2958,6 @@ impl UpdateMetadataAccountV2IxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(UpdateMetadataAccountV2IxArgs::deserialize(buf)?))
     }
 }
@@ -3188,11 +3124,8 @@ impl BorshSerialize for CreateMetadataAccountV2IxData {
 }
 impl CreateMetadataAccountV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != CREATE_METADATA_ACCOUNT_V2_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != CREATE_METADATA_ACCOUNT_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3201,7 +3134,6 @@ impl CreateMetadataAccountV2IxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(CreateMetadataAccountV2IxArgs::deserialize(buf)?))
     }
 }
@@ -3384,11 +3316,8 @@ impl BorshSerialize for CreateMasterEditionV3IxData {
 }
 impl CreateMasterEditionV3IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != CREATE_MASTER_EDITION_V3_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != CREATE_MASTER_EDITION_V3_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3397,7 +3326,6 @@ impl CreateMasterEditionV3IxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(CreateMasterEditionV3IxArgs::deserialize(buf)?))
     }
 }
@@ -3551,11 +3479,8 @@ impl BorshSerialize for VerifyCollectionIxData {
 }
 impl VerifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != VERIFY_COLLECTION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != VERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3564,7 +3489,6 @@ impl VerifyCollectionIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(VerifyCollectionIxArgs::deserialize(buf)?))
     }
 }
@@ -3758,11 +3682,8 @@ impl BorshSerialize for UtilizeIxData {
 }
 impl UtilizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != UTILIZE_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != UTILIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3771,7 +3692,6 @@ impl UtilizeIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(UtilizeIxArgs::deserialize(buf)?))
     }
 }
@@ -3967,11 +3887,8 @@ impl BorshSerialize for ApproveUseAuthorityIxData {
 }
 impl ApproveUseAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != APPROVE_USE_AUTHORITY_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != APPROVE_USE_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -3980,7 +3897,6 @@ impl ApproveUseAuthorityIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(ApproveUseAuthorityIxArgs::deserialize(buf)?))
     }
 }
@@ -4159,11 +4075,8 @@ impl BorshSerialize for RevokeUseAuthorityIxData {
 }
 impl RevokeUseAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != REVOKE_USE_AUTHORITY_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != REVOKE_USE_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -4172,7 +4085,6 @@ impl RevokeUseAuthorityIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(RevokeUseAuthorityIxArgs::deserialize(buf)?))
     }
 }
@@ -4324,11 +4236,8 @@ impl BorshSerialize for UnverifyCollectionIxData {
 }
 impl UnverifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != UNVERIFY_COLLECTION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != UNVERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -4337,7 +4246,6 @@ impl UnverifyCollectionIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(UnverifyCollectionIxArgs::deserialize(buf)?))
     }
 }
@@ -4511,11 +4419,8 @@ impl BorshSerialize for ApproveCollectionAuthorityIxData {
 }
 impl ApproveCollectionAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != APPROVE_COLLECTION_AUTHORITY_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != APPROVE_COLLECTION_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -4524,7 +4429,6 @@ impl ApproveCollectionAuthorityIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(ApproveCollectionAuthorityIxArgs::deserialize(buf)?))
     }
 }
@@ -4665,11 +4569,8 @@ impl BorshSerialize for RevokeCollectionAuthorityIxData {
 }
 impl RevokeCollectionAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != REVOKE_COLLECTION_AUTHORITY_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != REVOKE_COLLECTION_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -4678,7 +4579,6 @@ impl RevokeCollectionAuthorityIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(RevokeCollectionAuthorityIxArgs::deserialize(buf)?))
     }
 }
@@ -4855,11 +4755,8 @@ impl BorshSerialize for SetAndVerifyCollectionIxData {
 }
 impl SetAndVerifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != SET_AND_VERIFY_COLLECTION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != SET_AND_VERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -4868,7 +4765,6 @@ impl SetAndVerifyCollectionIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(SetAndVerifyCollectionIxArgs::deserialize(buf)?))
     }
 }
@@ -5013,11 +4909,8 @@ impl BorshSerialize for FreezeDelegatedAccountIxData {
 }
 impl FreezeDelegatedAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != FREEZE_DELEGATED_ACCOUNT_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != FREEZE_DELEGATED_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -5026,7 +4919,6 @@ impl FreezeDelegatedAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(FreezeDelegatedAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -5171,11 +5063,8 @@ impl BorshSerialize for ThawDelegatedAccountIxData {
 }
 impl ThawDelegatedAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != THAW_DELEGATED_ACCOUNT_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != THAW_DELEGATED_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -5184,7 +5073,6 @@ impl ThawDelegatedAccountIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(ThawDelegatedAccountIxArgs::deserialize(buf)?))
     }
 }
@@ -5301,11 +5189,8 @@ impl BorshSerialize for RemoveCreatorVerificationIxData {
 }
 impl RemoveCreatorVerificationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = buf.first().ok_or(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "invalid discm byte".to_owned(),
-        ))?;
-        if *maybe_discm != REMOVE_CREATOR_VERIFICATION_IX_DISCM {
+        let maybe_discm = u8::deserialize(buf)?;
+        if maybe_discm != REMOVE_CREATOR_VERIFICATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!(
@@ -5314,7 +5199,6 @@ impl RemoveCreatorVerificationIxData {
                 ),
             ));
         }
-        *buf = &buf[1..];
         Ok(Self(RemoveCreatorVerificationIxArgs::deserialize(buf)?))
     }
 }
