@@ -1,13 +1,11 @@
 use heck::{ToShoutySnakeCase, ToSnakeCase};
 use itertools::Itertools;
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
 use syn::{LitBool, LitInt};
 
-use crate::utils::unique_by_report_dups;
-
-use super::typedefs::TypedefField;
+use crate::{idl_format::shank::typedefs::TypedefField, utils::unique_by_report_dups};
 
 #[derive(Deserialize)]
 pub struct NamedInstruction {
@@ -15,6 +13,16 @@ pub struct NamedInstruction {
     pub accounts: Vec<IxAccount>,
     pub args: Vec<TypedefField>,
     pub discriminant: Discriminant,
+}
+
+impl NamedInstruction {
+    pub fn ix_args_ident(&self) -> Ident {
+        format_ident!("{}IxArgs", &self.name)
+    }
+
+    pub fn discm_ident(&self) -> Ident {
+        format_ident!("{}_IX_DISCM", &self.name.to_shouty_snake_case())
+    }
 }
 
 #[derive(Deserialize)]
@@ -37,7 +45,7 @@ impl ToTokens for NamedInstruction {
         let name = &self.name;
         let accounts_ident = format_ident!("{}Accounts", name);
         let keys_ident = format_ident!("{}Keys", name);
-        let ix_args_ident = format_ident!("{}IxArgs", name);
+        let ix_args_ident = self.ix_args_ident();
         let ix_data_ident = format_ident!("{}IxData", name);
         let snake_case_name = name.to_snake_case();
         let ix_fn_ident = format_ident!("{}_ix", snake_case_name);
@@ -45,7 +53,7 @@ impl ToTokens for NamedInstruction {
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
         let shouty_snake_case_name = name.to_shouty_snake_case();
         let accounts_len_ident = format_ident!("{}_IX_ACCOUNTS_LEN", shouty_snake_case_name);
-        let discm_ident = format_ident!("{}_IX_DISCM", shouty_snake_case_name);
+        let discm_ident = self.discm_ident();
 
         let accounts = &self.accounts;
         let n_accounts = accounts.len();
