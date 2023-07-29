@@ -1,5 +1,6 @@
 [workspace]
 
 members = [
-    "drift_interface"
+    "drift_interface",
+    "drift_client_consumer",
 ]

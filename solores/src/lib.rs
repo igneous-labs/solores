@@ -22,7 +22,8 @@ use write_cargotoml::write_cargotoml;
 use write_gitignore::write_gitignore;
 use write_src::*;
 
-const DEFAULT_OUTPUT_CRATE_NAME: &str = "<name-of-program>_interface";
+const DEFAULT_OUTPUT_CRATE_NAME_MSG: &str = "<name-of-program>_interface";
+const DEFAULT_PROGRAM_ID_MSG: &str = "program ID in IDL else system program ID if absent";
 const RUST_LOG_ENV_VAR: &str = "RUST_LOG";
 
 #[derive(Parser, Debug)]
@@ -41,11 +42,11 @@ pub struct Args {
     #[arg(
         long,
         help = "output crate name",
-        default_value = DEFAULT_OUTPUT_CRATE_NAME,
+        default_value = DEFAULT_OUTPUT_CRATE_NAME_MSG,
     )]
     pub output_crate_name: String,
 
-    #[arg(long, short, help = "program ID / address / pubkey")]
+    #[arg(long, short, help = "program ID / address / pubkey", default_value = DEFAULT_PROGRAM_ID_MSG)]
     pub program_id: Option<String>,
 
     #[arg(
@@ -107,11 +108,17 @@ pub fn main() {
 
     let idl = load_idl(&mut file);
 
-    args.output_crate_name = if args.output_crate_name == DEFAULT_OUTPUT_CRATE_NAME {
-        format!("{}_interface", idl.program_name())
-    } else {
-        args.output_crate_name
-    };
+    if args.output_crate_name == DEFAULT_OUTPUT_CRATE_NAME_MSG {
+        args.output_crate_name = format!("{}_interface", idl.program_name());
+    }
+
+    args.program_id = args.program_id.and_then(|s| {
+        if s == DEFAULT_PROGRAM_ID_MSG {
+            None
+        } else {
+            Some(s)
+        }
+    });
 
     args.output_dir.push(&args.output_crate_name);
     fs::create_dir_all(args.output_dir.join("src/")).unwrap();

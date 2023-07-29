@@ -64,5 +64,6 @@ fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
             "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
         ],
     )?;
-    check_example(EXAMPLE_PATH, "drift_interface")
+    check_example(EXAMPLE_PATH, "drift_interface")?;
+    test_consumer(EXAMPLE_PATH, "drift_client_consumer")
 }
