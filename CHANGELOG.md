@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - internals refactored to enable dynamic modules for the generated crate
+- Anchor: standardize `*IxArgs` to be PascalCase per rust convention instead of camelCase in the IDL
 
 ### Fixed
 
