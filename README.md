@@ -9,19 +9,24 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
 ## Contents
 
 - [solores](#solores)
-  - [Contents](#contents)
-  - [Supported IDL Formats](#supported-idl-formats)
-  - [Installation](#installation)
-  - [Examples](#examples)
-    - [Shank IDL](#shank-idl)
-    - [Anchor IDL](#anchor-idl)
-  - [Features](#features)
-    - [Instruction Function Generics](#instruction-function-generics)
-  - [Comparison to similar libs](#comparison-to-similar-libs)
-    - [anchor-gen](#anchor-gen)
-  - [Known Missing Features](#known-missing-features)
-    - [General](#general)
-    - [Anchor](#anchor)
+  * [Contents](#contents)
+  * [Supported IDL Formats](#supported-idl-formats)
+  * [Installation](#installation)
+  * [Examples](#examples)
+    + [Shank IDL](#shank-idl)
+    + [Anchor IDL](#anchor-idl)
+  * [Features](#features)
+    + [Instruction Function Generics](#instruction-function-generics)
+    + [Serde](#serde)
+    + [Keys from array](#keys-from-array)
+    + [Accounts from array](#accounts-from-array)
+  * [Comparison to similar libs](#comparison-to-similar-libs)
+    + [anchor-gen](#anchor-gen)
+  * [Known Missing Features](#known-missing-features)
+    + [General](#general)
+    + [Anchor](#anchor)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## Supported IDL Formats
 
