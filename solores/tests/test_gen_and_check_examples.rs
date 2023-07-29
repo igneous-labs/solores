@@ -57,6 +57,12 @@ fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "anchor/drift";
-    gen_example(EXAMPLE_PATH, &[])?;
+    gen_example(
+        EXAMPLE_PATH,
+        &[
+            "--program-id",
+            "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+        ],
+    )?;
     check_example(EXAMPLE_PATH, "drift_interface")
 }

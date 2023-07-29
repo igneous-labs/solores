@@ -45,6 +45,9 @@ pub struct Args {
     )]
     pub output_crate_name: String,
 
+    #[arg(long, short, help = "program ID / address / pubkey")]
+    pub program_id: Option<String>,
+
     #[arg(
         long,
         short,

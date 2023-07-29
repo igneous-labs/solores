@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `deserialize` method for `*IxData`. Not using `BorshDeserialize` trait due to breaking change in trait def between 0.9 and 0.10
 - `derive(PartialEq)` for all typedefs and `*IxArgs` and `*IxData`
 - `**Account` for anchor accounts newtype that includes the discriminant in borsh serde
+- Added `--program-id` option to allow setting of custom program IDs to accomodate anchor IDLs not containing their program IDs.
 
 ### Changed
 
