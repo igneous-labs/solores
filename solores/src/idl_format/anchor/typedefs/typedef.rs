@@ -219,9 +219,9 @@ impl ToTokens for EnumVariant {
     }
 }
 
-const PUBKEY_TOKEN: &str = "Pubkey";
+pub const PUBKEY_TOKEN: &str = "Pubkey";
 
-fn primitive_or_pubkey_to_token(s: &str) -> String {
+pub fn primitive_or_pubkey_to_token(s: &str) -> String {
     if s == "publicKey" {
         PUBKEY_TOKEN.to_owned()
     } else if s == "string" {

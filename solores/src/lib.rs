@@ -12,11 +12,13 @@ use idl_format::IdlFormat;
 
 use crate::idl_format::{anchor::AnchorIdl, shank::ShankIdl};
 
-mod idl_format;
-mod utils;
-mod write_cargotoml;
-mod write_gitignore;
-mod write_src;
+// Just make all mods pub to allow ppl to use the lib
+
+pub mod idl_format;
+pub mod utils;
+pub mod write_cargotoml;
+pub mod write_gitignore;
+pub mod write_src;
 
 use write_cargotoml::write_cargotoml;
 use write_gitignore::write_gitignore;

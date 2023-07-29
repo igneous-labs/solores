@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - document `--program-id` default values in `--help`
+- all internal modules are now `pub` to allow people to use the library
 
 ## [0.2.0] - 2023-07-30
 

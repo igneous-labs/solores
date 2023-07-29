@@ -16,7 +16,7 @@ pub fn write_cargotoml(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> 
 }
 
 #[derive(Serialize)]
-struct CargoToml<'a> {
+pub struct CargoToml<'a> {
     package: Package<'a>,
     dependencies: GeneratedCrateDependencies<'a>,
 }
@@ -50,14 +50,14 @@ impl<'a> CargoToml<'a> {
 }
 
 #[derive(Serialize)]
-struct Package<'a> {
+pub struct Package<'a> {
     name: &'a str,
     version: &'a str,
     edition: &'a str,
 }
 
 #[derive(Serialize)]
-struct GeneratedCrateDependencies<'a> {
+pub struct GeneratedCrateDependencies<'a> {
     borsh: DependencyValue<'a>,
 
     #[serde(rename = "solana-program")]
@@ -74,7 +74,7 @@ struct GeneratedCrateDependencies<'a> {
     num_traits: Option<DependencyValue<'a>>,
 }
 
-struct DependencyValue<'a>(&'a str);
+pub struct DependencyValue<'a>(&'a str);
 
 impl Serialize for DependencyValue<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -88,7 +88,7 @@ impl Serialize for DependencyValue<'_> {
     }
 }
 
-struct OptionalDependencyValue<'a>(&'a str);
+pub struct OptionalDependencyValue<'a>(&'a str);
 
 impl Serialize for OptionalDependencyValue<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
