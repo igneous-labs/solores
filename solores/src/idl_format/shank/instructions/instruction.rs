@@ -1,4 +1,4 @@
-use heck::{ToShoutySnakeCase, ToSnakeCase};
+use heck::{ToPascalCase, ToShoutySnakeCase, ToSnakeCase};
 use itertools::Itertools;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
@@ -17,7 +17,7 @@ pub struct NamedInstruction {
 
 impl NamedInstruction {
     pub fn ix_args_ident(&self) -> Ident {
-        format_ident!("{}IxArgs", &self.name)
+        format_ident!("{}IxArgs", &self.name.to_pascal_case())
     }
 
     pub fn discm_ident(&self) -> Ident {

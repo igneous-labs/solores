@@ -7,6 +7,1018 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
+#[derive(Clone, Debug, PartialEq)]
+pub enum DriftProgramIx {
+    InitializeUser(InitializeUserIxArgs),
+    InitializeUserStats(InitializeUserStatsIxArgs),
+    InitializeReferrerName(InitializeReferrerNameIxArgs),
+    Deposit(DepositIxArgs),
+    Withdraw(WithdrawIxArgs),
+    TransferDeposit(TransferDepositIxArgs),
+    PlacePerpOrder(PlacePerpOrderIxArgs),
+    CancelOrder(CancelOrderIxArgs),
+    CancelOrderByUserId(CancelOrderByUserIdIxArgs),
+    CancelOrders(CancelOrdersIxArgs),
+    ModifyOrder(ModifyOrderIxArgs),
+    ModifyOrderByUserId(ModifyOrderByUserIdIxArgs),
+    PlaceAndTakePerpOrder(PlaceAndTakePerpOrderIxArgs),
+    PlaceAndMakePerpOrder(PlaceAndMakePerpOrderIxArgs),
+    PlaceSpotOrder(PlaceSpotOrderIxArgs),
+    PlaceAndTakeSpotOrder(PlaceAndTakeSpotOrderIxArgs),
+    PlaceAndMakeSpotOrder(PlaceAndMakeSpotOrderIxArgs),
+    BeginSwap(BeginSwapIxArgs),
+    EndSwap(EndSwapIxArgs),
+    AddPerpLpShares(AddPerpLpSharesIxArgs),
+    RemovePerpLpShares(RemovePerpLpSharesIxArgs),
+    RemovePerpLpSharesInExpiringMarket(RemovePerpLpSharesInExpiringMarketIxArgs),
+    UpdateUserName(UpdateUserNameIxArgs),
+    UpdateUserCustomMarginRatio(UpdateUserCustomMarginRatioIxArgs),
+    UpdateUserMarginTradingEnabled(UpdateUserMarginTradingEnabledIxArgs),
+    UpdateUserDelegate(UpdateUserDelegateIxArgs),
+    DeleteUser(DeleteUserIxArgs),
+    FillPerpOrder(FillPerpOrderIxArgs),
+    RevertFill(RevertFillIxArgs),
+    FillSpotOrder(FillSpotOrderIxArgs),
+    TriggerOrder(TriggerOrderIxArgs),
+    ForceCancelOrders(ForceCancelOrdersIxArgs),
+    UpdateUserIdle(UpdateUserIdleIxArgs),
+    UpdateUserOpenOrdersCount(UpdateUserOpenOrdersCountIxArgs),
+    SettlePnl(SettlePnlIxArgs),
+    SettleFundingPayment(SettleFundingPaymentIxArgs),
+    SettleLp(SettleLpIxArgs),
+    SettleExpiredMarket(SettleExpiredMarketIxArgs),
+    LiquidatePerp(LiquidatePerpIxArgs),
+    LiquidateSpot(LiquidateSpotIxArgs),
+    LiquidateBorrowForPerpPnl(LiquidateBorrowForPerpPnlIxArgs),
+    LiquidatePerpPnlForDeposit(LiquidatePerpPnlForDepositIxArgs),
+    ResolvePerpPnlDeficit(ResolvePerpPnlDeficitIxArgs),
+    ResolvePerpBankruptcy(ResolvePerpBankruptcyIxArgs),
+    ResolveSpotBankruptcy(ResolveSpotBankruptcyIxArgs),
+    SettleRevenueToInsuranceFund(SettleRevenueToInsuranceFundIxArgs),
+    UpdateFundingRate(UpdateFundingRateIxArgs),
+    UpdateSpotMarketCumulativeInterest(UpdateSpotMarketCumulativeInterestIxArgs),
+    UpdateAmms(UpdateAmmsIxArgs),
+    UpdateSpotMarketExpiry(UpdateSpotMarketExpiryIxArgs),
+    UpdateUserQuoteAssetInsuranceStake(UpdateUserQuoteAssetInsuranceStakeIxArgs),
+    InitializeInsuranceFundStake(InitializeInsuranceFundStakeIxArgs),
+    AddInsuranceFundStake(AddInsuranceFundStakeIxArgs),
+    RequestRemoveInsuranceFundStake(RequestRemoveInsuranceFundStakeIxArgs),
+    CancelRequestRemoveInsuranceFundStake(CancelRequestRemoveInsuranceFundStakeIxArgs),
+    RemoveInsuranceFundStake(RemoveInsuranceFundStakeIxArgs),
+    Initialize(InitializeIxArgs),
+    InitializeSpotMarket(InitializeSpotMarketIxArgs),
+    InitializeSerumFulfillmentConfig(InitializeSerumFulfillmentConfigIxArgs),
+    UpdateSerumFulfillmentConfigStatus(UpdateSerumFulfillmentConfigStatusIxArgs),
+    InitializePhoenixFulfillmentConfig(InitializePhoenixFulfillmentConfigIxArgs),
+    PhoenixFulfillmentConfigStatus(PhoenixFulfillmentConfigStatusIxArgs),
+    UpdateSerumVault(UpdateSerumVaultIxArgs),
+    InitializePerpMarket(InitializePerpMarketIxArgs),
+    DeleteInitializedPerpMarket(DeleteInitializedPerpMarketIxArgs),
+    MoveAmmPrice(MoveAmmPriceIxArgs),
+    UpdatePerpMarketExpiry(UpdatePerpMarketExpiryIxArgs),
+    SettleExpiredMarketPoolsToRevenuePool(SettleExpiredMarketPoolsToRevenuePoolIxArgs),
+    DepositIntoPerpMarketFeePool(DepositIntoPerpMarketFeePoolIxArgs),
+    RepegAmmCurve(RepegAmmCurveIxArgs),
+    UpdatePerpMarketAmmOracleTwap(UpdatePerpMarketAmmOracleTwapIxArgs),
+    ResetPerpMarketAmmOracleTwap(ResetPerpMarketAmmOracleTwapIxArgs),
+    UpdateK(UpdateKIxArgs),
+    UpdatePerpMarketMarginRatio(UpdatePerpMarketMarginRatioIxArgs),
+    UpdatePerpMarketMaxImbalances(UpdatePerpMarketMaxImbalancesIxArgs),
+    UpdatePerpMarketLiquidationFee(UpdatePerpMarketLiquidationFeeIxArgs),
+    UpdateInsuranceFundUnstakingPeriod(UpdateInsuranceFundUnstakingPeriodIxArgs),
+    UpdateSpotMarketLiquidationFee(UpdateSpotMarketLiquidationFeeIxArgs),
+    UpdateWithdrawGuardThreshold(UpdateWithdrawGuardThresholdIxArgs),
+    UpdateSpotMarketIfFactor(UpdateSpotMarketIfFactorIxArgs),
+    UpdateSpotMarketRevenueSettlePeriod(UpdateSpotMarketRevenueSettlePeriodIxArgs),
+    UpdateSpotMarketStatus(UpdateSpotMarketStatusIxArgs),
+    UpdateSpotMarketAssetTier(UpdateSpotMarketAssetTierIxArgs),
+    UpdateSpotMarketMarginWeights(UpdateSpotMarketMarginWeightsIxArgs),
+    UpdateSpotMarketBorrowRate(UpdateSpotMarketBorrowRateIxArgs),
+    UpdateSpotMarketMaxTokenDeposits(UpdateSpotMarketMaxTokenDepositsIxArgs),
+    UpdateSpotMarketOracle(UpdateSpotMarketOracleIxArgs),
+    UpdateSpotMarketStepSizeAndTickSize(UpdateSpotMarketStepSizeAndTickSizeIxArgs),
+    UpdateSpotMarketMinOrderSize(UpdateSpotMarketMinOrderSizeIxArgs),
+    UpdateSpotMarketOrdersEnabled(UpdateSpotMarketOrdersEnabledIxArgs),
+    UpdateSpotMarketName(UpdateSpotMarketNameIxArgs),
+    UpdatePerpMarketStatus(UpdatePerpMarketStatusIxArgs),
+    UpdatePerpMarketContractTier(UpdatePerpMarketContractTierIxArgs),
+    UpdatePerpMarketImfFactor(UpdatePerpMarketImfFactorIxArgs),
+    UpdatePerpMarketUnrealizedAssetWeight(UpdatePerpMarketUnrealizedAssetWeightIxArgs),
+    UpdatePerpMarketConcentrationCoef(UpdatePerpMarketConcentrationCoefIxArgs),
+    UpdatePerpMarketCurveUpdateIntensity(UpdatePerpMarketCurveUpdateIntensityIxArgs),
+    UpdatePerpMarketTargetBaseAssetAmountPerLp(UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs),
+    UpdateLpCooldownTime(UpdateLpCooldownTimeIxArgs),
+    UpdatePerpFeeStructure(UpdatePerpFeeStructureIxArgs),
+    UpdateSpotFeeStructure(UpdateSpotFeeStructureIxArgs),
+    UpdateInitialPctToLiquidate(UpdateInitialPctToLiquidateIxArgs),
+    UpdateLiquidationDuration(UpdateLiquidationDurationIxArgs),
+    UpdateOracleGuardRails(UpdateOracleGuardRailsIxArgs),
+    UpdateStateSettlementDuration(UpdateStateSettlementDurationIxArgs),
+    UpdatePerpMarketOracle(UpdatePerpMarketOracleIxArgs),
+    UpdatePerpMarketBaseSpread(UpdatePerpMarketBaseSpreadIxArgs),
+    UpdateAmmJitIntensity(UpdateAmmJitIntensityIxArgs),
+    UpdatePerpMarketMaxSpread(UpdatePerpMarketMaxSpreadIxArgs),
+    UpdatePerpMarketStepSizeAndTickSize(UpdatePerpMarketStepSizeAndTickSizeIxArgs),
+    UpdatePerpMarketName(UpdatePerpMarketNameIxArgs),
+    UpdatePerpMarketMinOrderSize(UpdatePerpMarketMinOrderSizeIxArgs),
+    UpdatePerpMarketMaxSlippageRatio(UpdatePerpMarketMaxSlippageRatioIxArgs),
+    UpdatePerpMarketMaxFillReserveFraction(UpdatePerpMarketMaxFillReserveFractionIxArgs),
+    UpdatePerpMarketMaxOpenInterest(UpdatePerpMarketMaxOpenInterestIxArgs),
+    UpdateAdmin(UpdateAdminIxArgs),
+    UpdateWhitelistMint(UpdateWhitelistMintIxArgs),
+    UpdateDiscountMint(UpdateDiscountMintIxArgs),
+    UpdateExchangeStatus(UpdateExchangeStatusIxArgs),
+    UpdatePerpAuctionDuration(UpdatePerpAuctionDurationIxArgs),
+    UpdateSpotAuctionDuration(UpdateSpotAuctionDurationIxArgs),
+    AdminRemoveInsuranceFundStake(AdminRemoveInsuranceFundStakeIxArgs),
+}
+impl BorshSerialize for DriftProgramIx {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        match self {
+            Self::InitializeUser(args) => {
+                INITIALIZE_USER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializeUserStats(args) => {
+                INITIALIZE_USER_STATS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializeReferrerName(args) => {
+                INITIALIZE_REFERRER_NAME_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Deposit(args) => {
+                DEPOSIT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Withdraw(args) => {
+                WITHDRAW_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::TransferDeposit(args) => {
+                TRANSFER_DEPOSIT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlacePerpOrder(args) => {
+                PLACE_PERP_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CancelOrder(args) => {
+                CANCEL_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CancelOrderByUserId(args) => {
+                CANCEL_ORDER_BY_USER_ID_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CancelOrders(args) => {
+                CANCEL_ORDERS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ModifyOrder(args) => {
+                MODIFY_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ModifyOrderByUserId(args) => {
+                MODIFY_ORDER_BY_USER_ID_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlaceAndTakePerpOrder(args) => {
+                PLACE_AND_TAKE_PERP_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlaceAndMakePerpOrder(args) => {
+                PLACE_AND_MAKE_PERP_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlaceSpotOrder(args) => {
+                PLACE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlaceAndTakeSpotOrder(args) => {
+                PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PlaceAndMakeSpotOrder(args) => {
+                PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::BeginSwap(args) => {
+                BEGIN_SWAP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::EndSwap(args) => {
+                END_SWAP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AddPerpLpShares(args) => {
+                ADD_PERP_LP_SHARES_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemovePerpLpShares(args) => {
+                REMOVE_PERP_LP_SHARES_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemovePerpLpSharesInExpiringMarket(args) => {
+                REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserName(args) => {
+                UPDATE_USER_NAME_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserCustomMarginRatio(args) => {
+                UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserMarginTradingEnabled(args) => {
+                UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserDelegate(args) => {
+                UPDATE_USER_DELEGATE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeleteUser(args) => {
+                DELETE_USER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::FillPerpOrder(args) => {
+                FILL_PERP_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RevertFill(args) => {
+                REVERT_FILL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::FillSpotOrder(args) => {
+                FILL_SPOT_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::TriggerOrder(args) => {
+                TRIGGER_ORDER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ForceCancelOrders(args) => {
+                FORCE_CANCEL_ORDERS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserIdle(args) => {
+                UPDATE_USER_IDLE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserOpenOrdersCount(args) => {
+                UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettlePnl(args) => {
+                SETTLE_PNL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettleFundingPayment(args) => {
+                SETTLE_FUNDING_PAYMENT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettleLp(args) => {
+                SETTLE_LP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettleExpiredMarket(args) => {
+                SETTLE_EXPIRED_MARKET_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::LiquidatePerp(args) => {
+                LIQUIDATE_PERP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::LiquidateSpot(args) => {
+                LIQUIDATE_SPOT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::LiquidateBorrowForPerpPnl(args) => {
+                LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::LiquidatePerpPnlForDeposit(args) => {
+                LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ResolvePerpPnlDeficit(args) => {
+                RESOLVE_PERP_PNL_DEFICIT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ResolvePerpBankruptcy(args) => {
+                RESOLVE_PERP_BANKRUPTCY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ResolveSpotBankruptcy(args) => {
+                RESOLVE_SPOT_BANKRUPTCY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettleRevenueToInsuranceFund(args) => {
+                SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateFundingRate(args) => {
+                UPDATE_FUNDING_RATE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketCumulativeInterest(args) => {
+                UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateAmms(args) => {
+                UPDATE_AMMS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketExpiry(args) => {
+                UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateUserQuoteAssetInsuranceStake(args) => {
+                UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializeInsuranceFundStake(args) => {
+                INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AddInsuranceFundStake(args) => {
+                ADD_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RequestRemoveInsuranceFundStake(args) => {
+                REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CancelRequestRemoveInsuranceFundStake(args) => {
+                CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemoveInsuranceFundStake(args) => {
+                REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Initialize(args) => {
+                INITIALIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializeSpotMarket(args) => {
+                INITIALIZE_SPOT_MARKET_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializeSerumFulfillmentConfig(args) => {
+                INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSerumFulfillmentConfigStatus(args) => {
+                UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializePhoenixFulfillmentConfig(args) => {
+                INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PhoenixFulfillmentConfigStatus(args) => {
+                PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSerumVault(args) => {
+                UPDATE_SERUM_VAULT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::InitializePerpMarket(args) => {
+                INITIALIZE_PERP_MARKET_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeleteInitializedPerpMarket(args) => {
+                DELETE_INITIALIZED_PERP_MARKET_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::MoveAmmPrice(args) => {
+                MOVE_AMM_PRICE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketExpiry(args) => {
+                UPDATE_PERP_MARKET_EXPIRY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SettleExpiredMarketPoolsToRevenuePool(args) => {
+                SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DepositIntoPerpMarketFeePool(args) => {
+                DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RepegAmmCurve(args) => {
+                REPEG_AMM_CURVE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketAmmOracleTwap(args) => {
+                UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ResetPerpMarketAmmOracleTwap(args) => {
+                RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateK(args) => {
+                UPDATE_K_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMarginRatio(args) => {
+                UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMaxImbalances(args) => {
+                UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketLiquidationFee(args) => {
+                UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateInsuranceFundUnstakingPeriod(args) => {
+                UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketLiquidationFee(args) => {
+                UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateWithdrawGuardThreshold(args) => {
+                UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketIfFactor(args) => {
+                UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketRevenueSettlePeriod(args) => {
+                UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketStatus(args) => {
+                UPDATE_SPOT_MARKET_STATUS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketAssetTier(args) => {
+                UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketMarginWeights(args) => {
+                UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketBorrowRate(args) => {
+                UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketMaxTokenDeposits(args) => {
+                UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketOracle(args) => {
+                UPDATE_SPOT_MARKET_ORACLE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketStepSizeAndTickSize(args) => {
+                UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketMinOrderSize(args) => {
+                UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketOrdersEnabled(args) => {
+                UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotMarketName(args) => {
+                UPDATE_SPOT_MARKET_NAME_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketStatus(args) => {
+                UPDATE_PERP_MARKET_STATUS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketContractTier(args) => {
+                UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketImfFactor(args) => {
+                UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketUnrealizedAssetWeight(args) => {
+                UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketConcentrationCoef(args) => {
+                UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketCurveUpdateIntensity(args) => {
+                UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(args) => {
+                UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateLpCooldownTime(args) => {
+                UPDATE_LP_COOLDOWN_TIME_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpFeeStructure(args) => {
+                UPDATE_PERP_FEE_STRUCTURE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotFeeStructure(args) => {
+                UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateInitialPctToLiquidate(args) => {
+                UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateLiquidationDuration(args) => {
+                UPDATE_LIQUIDATION_DURATION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateOracleGuardRails(args) => {
+                UPDATE_ORACLE_GUARD_RAILS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateStateSettlementDuration(args) => {
+                UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketOracle(args) => {
+                UPDATE_PERP_MARKET_ORACLE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketBaseSpread(args) => {
+                UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateAmmJitIntensity(args) => {
+                UPDATE_AMM_JIT_INTENSITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMaxSpread(args) => {
+                UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketStepSizeAndTickSize(args) => {
+                UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketName(args) => {
+                UPDATE_PERP_MARKET_NAME_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMinOrderSize(args) => {
+                UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMaxSlippageRatio(args) => {
+                UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMaxFillReserveFraction(args) => {
+                UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpMarketMaxOpenInterest(args) => {
+                UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateAdmin(args) => {
+                UPDATE_ADMIN_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateWhitelistMint(args) => {
+                UPDATE_WHITELIST_MINT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateDiscountMint(args) => {
+                UPDATE_DISCOUNT_MINT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateExchangeStatus(args) => {
+                UPDATE_EXCHANGE_STATUS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePerpAuctionDuration(args) => {
+                UPDATE_PERP_AUCTION_DURATION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateSpotAuctionDuration(args) => {
+                UPDATE_SPOT_AUCTION_DURATION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AdminRemoveInsuranceFundStake(args) => {
+                ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+        }
+    }
+}
+impl DriftProgramIx {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        match maybe_discm {
+            INITIALIZE_USER_IX_DISCM => Ok(Self::InitializeUser(
+                InitializeUserIxArgs::deserialize(buf)?,
+            )),
+            INITIALIZE_USER_STATS_IX_DISCM => Ok(Self::InitializeUserStats(
+                InitializeUserStatsIxArgs::deserialize(buf)?,
+            )),
+            INITIALIZE_REFERRER_NAME_IX_DISCM => Ok(Self::InitializeReferrerName(
+                InitializeReferrerNameIxArgs::deserialize(buf)?,
+            )),
+            DEPOSIT_IX_DISCM => Ok(Self::Deposit(DepositIxArgs::deserialize(buf)?)),
+            WITHDRAW_IX_DISCM => Ok(Self::Withdraw(WithdrawIxArgs::deserialize(buf)?)),
+            TRANSFER_DEPOSIT_IX_DISCM => Ok(Self::TransferDeposit(
+                TransferDepositIxArgs::deserialize(buf)?,
+            )),
+            PLACE_PERP_ORDER_IX_DISCM => Ok(Self::PlacePerpOrder(
+                PlacePerpOrderIxArgs::deserialize(buf)?,
+            )),
+            CANCEL_ORDER_IX_DISCM => Ok(Self::CancelOrder(CancelOrderIxArgs::deserialize(buf)?)),
+            CANCEL_ORDER_BY_USER_ID_IX_DISCM => Ok(Self::CancelOrderByUserId(
+                CancelOrderByUserIdIxArgs::deserialize(buf)?,
+            )),
+            CANCEL_ORDERS_IX_DISCM => Ok(Self::CancelOrders(CancelOrdersIxArgs::deserialize(buf)?)),
+            MODIFY_ORDER_IX_DISCM => Ok(Self::ModifyOrder(ModifyOrderIxArgs::deserialize(buf)?)),
+            MODIFY_ORDER_BY_USER_ID_IX_DISCM => Ok(Self::ModifyOrderByUserId(
+                ModifyOrderByUserIdIxArgs::deserialize(buf)?,
+            )),
+            PLACE_AND_TAKE_PERP_ORDER_IX_DISCM => Ok(Self::PlaceAndTakePerpOrder(
+                PlaceAndTakePerpOrderIxArgs::deserialize(buf)?,
+            )),
+            PLACE_AND_MAKE_PERP_ORDER_IX_DISCM => Ok(Self::PlaceAndMakePerpOrder(
+                PlaceAndMakePerpOrderIxArgs::deserialize(buf)?,
+            )),
+            PLACE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceSpotOrder(
+                PlaceSpotOrderIxArgs::deserialize(buf)?,
+            )),
+            PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceAndTakeSpotOrder(
+                PlaceAndTakeSpotOrderIxArgs::deserialize(buf)?,
+            )),
+            PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceAndMakeSpotOrder(
+                PlaceAndMakeSpotOrderIxArgs::deserialize(buf)?,
+            )),
+            BEGIN_SWAP_IX_DISCM => Ok(Self::BeginSwap(BeginSwapIxArgs::deserialize(buf)?)),
+            END_SWAP_IX_DISCM => Ok(Self::EndSwap(EndSwapIxArgs::deserialize(buf)?)),
+            ADD_PERP_LP_SHARES_IX_DISCM => Ok(Self::AddPerpLpShares(
+                AddPerpLpSharesIxArgs::deserialize(buf)?,
+            )),
+            REMOVE_PERP_LP_SHARES_IX_DISCM => Ok(Self::RemovePerpLpShares(
+                RemovePerpLpSharesIxArgs::deserialize(buf)?,
+            )),
+            REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM => {
+                Ok(Self::RemovePerpLpSharesInExpiringMarket(
+                    RemovePerpLpSharesInExpiringMarketIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_USER_NAME_IX_DISCM => Ok(Self::UpdateUserName(
+                UpdateUserNameIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM => Ok(Self::UpdateUserCustomMarginRatio(
+                UpdateUserCustomMarginRatioIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM => {
+                Ok(Self::UpdateUserMarginTradingEnabled(
+                    UpdateUserMarginTradingEnabledIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_USER_DELEGATE_IX_DISCM => Ok(Self::UpdateUserDelegate(
+                UpdateUserDelegateIxArgs::deserialize(buf)?,
+            )),
+            DELETE_USER_IX_DISCM => Ok(Self::DeleteUser(DeleteUserIxArgs::deserialize(buf)?)),
+            FILL_PERP_ORDER_IX_DISCM => {
+                Ok(Self::FillPerpOrder(FillPerpOrderIxArgs::deserialize(buf)?))
+            }
+            REVERT_FILL_IX_DISCM => Ok(Self::RevertFill(RevertFillIxArgs::deserialize(buf)?)),
+            FILL_SPOT_ORDER_IX_DISCM => {
+                Ok(Self::FillSpotOrder(FillSpotOrderIxArgs::deserialize(buf)?))
+            }
+            TRIGGER_ORDER_IX_DISCM => Ok(Self::TriggerOrder(TriggerOrderIxArgs::deserialize(buf)?)),
+            FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders(
+                ForceCancelOrdersIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_USER_IDLE_IX_DISCM => Ok(Self::UpdateUserIdle(
+                UpdateUserIdleIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM => Ok(Self::UpdateUserOpenOrdersCount(
+                UpdateUserOpenOrdersCountIxArgs::deserialize(buf)?,
+            )),
+            SETTLE_PNL_IX_DISCM => Ok(Self::SettlePnl(SettlePnlIxArgs::deserialize(buf)?)),
+            SETTLE_FUNDING_PAYMENT_IX_DISCM => Ok(Self::SettleFundingPayment(
+                SettleFundingPaymentIxArgs::deserialize(buf)?,
+            )),
+            SETTLE_LP_IX_DISCM => Ok(Self::SettleLp(SettleLpIxArgs::deserialize(buf)?)),
+            SETTLE_EXPIRED_MARKET_IX_DISCM => Ok(Self::SettleExpiredMarket(
+                SettleExpiredMarketIxArgs::deserialize(buf)?,
+            )),
+            LIQUIDATE_PERP_IX_DISCM => {
+                Ok(Self::LiquidatePerp(LiquidatePerpIxArgs::deserialize(buf)?))
+            }
+            LIQUIDATE_SPOT_IX_DISCM => {
+                Ok(Self::LiquidateSpot(LiquidateSpotIxArgs::deserialize(buf)?))
+            }
+            LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM => Ok(Self::LiquidateBorrowForPerpPnl(
+                LiquidateBorrowForPerpPnlIxArgs::deserialize(buf)?,
+            )),
+            LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM => Ok(Self::LiquidatePerpPnlForDeposit(
+                LiquidatePerpPnlForDepositIxArgs::deserialize(buf)?,
+            )),
+            RESOLVE_PERP_PNL_DEFICIT_IX_DISCM => Ok(Self::ResolvePerpPnlDeficit(
+                ResolvePerpPnlDeficitIxArgs::deserialize(buf)?,
+            )),
+            RESOLVE_PERP_BANKRUPTCY_IX_DISCM => Ok(Self::ResolvePerpBankruptcy(
+                ResolvePerpBankruptcyIxArgs::deserialize(buf)?,
+            )),
+            RESOLVE_SPOT_BANKRUPTCY_IX_DISCM => Ok(Self::ResolveSpotBankruptcy(
+                ResolveSpotBankruptcyIxArgs::deserialize(buf)?,
+            )),
+            SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM => Ok(Self::SettleRevenueToInsuranceFund(
+                SettleRevenueToInsuranceFundIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_FUNDING_RATE_IX_DISCM => Ok(Self::UpdateFundingRate(
+                UpdateFundingRateIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM => {
+                Ok(Self::UpdateSpotMarketCumulativeInterest(
+                    UpdateSpotMarketCumulativeInterestIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_AMMS_IX_DISCM => Ok(Self::UpdateAmms(UpdateAmmsIxArgs::deserialize(buf)?)),
+            UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM => Ok(Self::UpdateSpotMarketExpiry(
+                UpdateSpotMarketExpiryIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM => {
+                Ok(Self::UpdateUserQuoteAssetInsuranceStake(
+                    UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(buf)?,
+                ))
+            }
+            INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::InitializeInsuranceFundStake(
+                InitializeInsuranceFundStakeIxArgs::deserialize(buf)?,
+            )),
+            ADD_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::AddInsuranceFundStake(
+                AddInsuranceFundStakeIxArgs::deserialize(buf)?,
+            )),
+            REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => {
+                Ok(Self::RequestRemoveInsuranceFundStake(
+                    RequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                ))
+            }
+            CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => {
+                Ok(Self::CancelRequestRemoveInsuranceFundStake(
+                    CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                ))
+            }
+            REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::RemoveInsuranceFundStake(
+                RemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+            )),
+            INITIALIZE_IX_DISCM => Ok(Self::Initialize(InitializeIxArgs::deserialize(buf)?)),
+            INITIALIZE_SPOT_MARKET_IX_DISCM => Ok(Self::InitializeSpotMarket(
+                InitializeSpotMarketIxArgs::deserialize(buf)?,
+            )),
+            INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM => {
+                Ok(Self::InitializeSerumFulfillmentConfig(
+                    InitializeSerumFulfillmentConfigIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM => {
+                Ok(Self::UpdateSerumFulfillmentConfigStatus(
+                    UpdateSerumFulfillmentConfigStatusIxArgs::deserialize(buf)?,
+                ))
+            }
+            INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM => {
+                Ok(Self::InitializePhoenixFulfillmentConfig(
+                    InitializePhoenixFulfillmentConfigIxArgs::deserialize(buf)?,
+                ))
+            }
+            PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM => Ok(Self::PhoenixFulfillmentConfigStatus(
+                PhoenixFulfillmentConfigStatusIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SERUM_VAULT_IX_DISCM => Ok(Self::UpdateSerumVault(
+                UpdateSerumVaultIxArgs::deserialize(buf)?,
+            )),
+            INITIALIZE_PERP_MARKET_IX_DISCM => Ok(Self::InitializePerpMarket(
+                InitializePerpMarketIxArgs::deserialize(buf)?,
+            )),
+            DELETE_INITIALIZED_PERP_MARKET_IX_DISCM => Ok(Self::DeleteInitializedPerpMarket(
+                DeleteInitializedPerpMarketIxArgs::deserialize(buf)?,
+            )),
+            MOVE_AMM_PRICE_IX_DISCM => {
+                Ok(Self::MoveAmmPrice(MoveAmmPriceIxArgs::deserialize(buf)?))
+            }
+            UPDATE_PERP_MARKET_EXPIRY_IX_DISCM => Ok(Self::UpdatePerpMarketExpiry(
+                UpdatePerpMarketExpiryIxArgs::deserialize(buf)?,
+            )),
+            SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM => {
+                Ok(Self::SettleExpiredMarketPoolsToRevenuePool(
+                    SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(buf)?,
+                ))
+            }
+            DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM => Ok(Self::DepositIntoPerpMarketFeePool(
+                DepositIntoPerpMarketFeePoolIxArgs::deserialize(buf)?,
+            )),
+            REPEG_AMM_CURVE_IX_DISCM => {
+                Ok(Self::RepegAmmCurve(RepegAmmCurveIxArgs::deserialize(buf)?))
+            }
+            UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::UpdatePerpMarketAmmOracleTwap(
+                UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(buf)?,
+            )),
+            RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::ResetPerpMarketAmmOracleTwap(
+                ResetPerpMarketAmmOracleTwapIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_K_IX_DISCM => Ok(Self::UpdateK(UpdateKIxArgs::deserialize(buf)?)),
+            UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM => Ok(Self::UpdatePerpMarketMarginRatio(
+                UpdatePerpMarketMarginRatioIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM => Ok(Self::UpdatePerpMarketMaxImbalances(
+                UpdatePerpMarketMaxImbalancesIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketLiquidationFee(
+                    UpdatePerpMarketLiquidationFeeIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM => {
+                Ok(Self::UpdateInsuranceFundUnstakingPeriod(
+                    UpdateInsuranceFundUnstakingPeriodIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM => {
+                Ok(Self::UpdateSpotMarketLiquidationFee(
+                    UpdateSpotMarketLiquidationFeeIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM => Ok(Self::UpdateWithdrawGuardThreshold(
+                UpdateWithdrawGuardThresholdIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM => Ok(Self::UpdateSpotMarketIfFactor(
+                UpdateSpotMarketIfFactorIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM => {
+                Ok(Self::UpdateSpotMarketRevenueSettlePeriod(
+                    UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_SPOT_MARKET_STATUS_IX_DISCM => Ok(Self::UpdateSpotMarketStatus(
+                UpdateSpotMarketStatusIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM => Ok(Self::UpdateSpotMarketAssetTier(
+                UpdateSpotMarketAssetTierIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM => Ok(Self::UpdateSpotMarketMarginWeights(
+                UpdateSpotMarketMarginWeightsIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM => Ok(Self::UpdateSpotMarketBorrowRate(
+                UpdateSpotMarketBorrowRateIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM => {
+                Ok(Self::UpdateSpotMarketMaxTokenDeposits(
+                    UpdateSpotMarketMaxTokenDepositsIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_SPOT_MARKET_ORACLE_IX_DISCM => Ok(Self::UpdateSpotMarketOracle(
+                UpdateSpotMarketOracleIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM => {
+                Ok(Self::UpdateSpotMarketStepSizeAndTickSize(
+                    UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM => Ok(Self::UpdateSpotMarketMinOrderSize(
+                UpdateSpotMarketMinOrderSizeIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM => Ok(Self::UpdateSpotMarketOrdersEnabled(
+                UpdateSpotMarketOrdersEnabledIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_MARKET_NAME_IX_DISCM => Ok(Self::UpdateSpotMarketName(
+                UpdateSpotMarketNameIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_STATUS_IX_DISCM => Ok(Self::UpdatePerpMarketStatus(
+                UpdatePerpMarketStatusIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM => Ok(Self::UpdatePerpMarketContractTier(
+                UpdatePerpMarketContractTierIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM => Ok(Self::UpdatePerpMarketImfFactor(
+                UpdatePerpMarketImfFactorIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketUnrealizedAssetWeight(
+                    UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketConcentrationCoef(
+                    UpdatePerpMarketConcentrationCoefIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketCurveUpdateIntensity(
+                    UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(
+                    UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_LP_COOLDOWN_TIME_IX_DISCM => Ok(Self::UpdateLpCooldownTime(
+                UpdateLpCooldownTimeIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_FEE_STRUCTURE_IX_DISCM => Ok(Self::UpdatePerpFeeStructure(
+                UpdatePerpFeeStructureIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM => Ok(Self::UpdateSpotFeeStructure(
+                UpdateSpotFeeStructureIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM => Ok(Self::UpdateInitialPctToLiquidate(
+                UpdateInitialPctToLiquidateIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_LIQUIDATION_DURATION_IX_DISCM => Ok(Self::UpdateLiquidationDuration(
+                UpdateLiquidationDurationIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_ORACLE_GUARD_RAILS_IX_DISCM => Ok(Self::UpdateOracleGuardRails(
+                UpdateOracleGuardRailsIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM => Ok(Self::UpdateStateSettlementDuration(
+                UpdateStateSettlementDurationIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_ORACLE_IX_DISCM => Ok(Self::UpdatePerpMarketOracle(
+                UpdatePerpMarketOracleIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM => Ok(Self::UpdatePerpMarketBaseSpread(
+                UpdatePerpMarketBaseSpreadIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_AMM_JIT_INTENSITY_IX_DISCM => Ok(Self::UpdateAmmJitIntensity(
+                UpdateAmmJitIntensityIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM => Ok(Self::UpdatePerpMarketMaxSpread(
+                UpdatePerpMarketMaxSpreadIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketStepSizeAndTickSize(
+                    UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_NAME_IX_DISCM => Ok(Self::UpdatePerpMarketName(
+                UpdatePerpMarketNameIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM => Ok(Self::UpdatePerpMarketMinOrderSize(
+                UpdatePerpMarketMinOrderSizeIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketMaxSlippageRatio(
+                    UpdatePerpMarketMaxSlippageRatioIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketMaxFillReserveFraction(
+                    UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM => {
+                Ok(Self::UpdatePerpMarketMaxOpenInterest(
+                    UpdatePerpMarketMaxOpenInterestIxArgs::deserialize(buf)?,
+                ))
+            }
+            UPDATE_ADMIN_IX_DISCM => Ok(Self::UpdateAdmin(UpdateAdminIxArgs::deserialize(buf)?)),
+            UPDATE_WHITELIST_MINT_IX_DISCM => Ok(Self::UpdateWhitelistMint(
+                UpdateWhitelistMintIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_DISCOUNT_MINT_IX_DISCM => Ok(Self::UpdateDiscountMint(
+                UpdateDiscountMintIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_EXCHANGE_STATUS_IX_DISCM => Ok(Self::UpdateExchangeStatus(
+                UpdateExchangeStatusIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_PERP_AUCTION_DURATION_IX_DISCM => Ok(Self::UpdatePerpAuctionDuration(
+                UpdatePerpAuctionDurationIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_SPOT_AUCTION_DURATION_IX_DISCM => Ok(Self::UpdateSpotAuctionDuration(
+                UpdateSpotAuctionDurationIxArgs::deserialize(buf)?,
+            )),
+            ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::AdminRemoveInsuranceFundStake(
+                AdminRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+            )),
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("discm {:?} not found", maybe_discm),
+            )),
+        }
+    }
+}
 pub const INITIALIZE_USER_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserAccounts<'me, 'info> {

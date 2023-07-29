@@ -29,8 +29,11 @@ impl IdlCodegenModule for ErrorsCodegenModule<'_> {
     }
 
     fn gen_body(&self) -> TokenStream {
-        let mut error_enum_variants = quote! {};
-        error_enum_variants.extend(self.variants.iter().map(|e| e.into_token_stream()));
+        let error_enum_variants: TokenStream = self
+            .variants
+            .iter()
+            .map(|e| e.into_token_stream())
+            .collect();
 
         let error_enum_ident_str = format!("{}Error", self.program_name.to_pascal_case());
         let error_enum_ident = format_ident!("{}", &error_enum_ident_str);

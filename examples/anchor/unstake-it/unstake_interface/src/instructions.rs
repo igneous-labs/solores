@@ -7,6 +7,104 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
+#[derive(Clone, Debug, PartialEq)]
+pub enum UnstakeProgramIx {
+    InitProtocolFee(InitProtocolFeeIxArgs),
+    SetProtocolFee(SetProtocolFeeIxArgs),
+    CreatePool(CreatePoolIxArgs),
+    AddLiquidity(AddLiquidityIxArgs),
+    RemoveLiquidity(RemoveLiquidityIxArgs),
+    SetFee(SetFeeIxArgs),
+    SetFeeAuthority(SetFeeAuthorityIxArgs),
+    DeactivateStakeAccount(DeactivateStakeAccountIxArgs),
+    ReclaimStakeAccount(ReclaimStakeAccountIxArgs),
+    Unstake(UnstakeIxArgs),
+    UnstakeWsol(UnstakeWsolIxArgs),
+}
+impl BorshSerialize for UnstakeProgramIx {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        match self {
+            Self::InitProtocolFee(args) => {
+                INIT_PROTOCOL_FEE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetProtocolFee(args) => {
+                SET_PROTOCOL_FEE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CreatePool(args) => {
+                CREATE_POOL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AddLiquidity(args) => {
+                ADD_LIQUIDITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemoveLiquidity(args) => {
+                REMOVE_LIQUIDITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetFee(args) => {
+                SET_FEE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetFeeAuthority(args) => {
+                SET_FEE_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeactivateStakeAccount(args) => {
+                DEACTIVATE_STAKE_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ReclaimStakeAccount(args) => {
+                RECLAIM_STAKE_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Unstake(args) => {
+                UNSTAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UnstakeWsol(args) => {
+                UNSTAKE_WSOL_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+        }
+    }
+}
+impl UnstakeProgramIx {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        match maybe_discm {
+            INIT_PROTOCOL_FEE_IX_DISCM => Ok(Self::InitProtocolFee(
+                InitProtocolFeeIxArgs::deserialize(buf)?,
+            )),
+            SET_PROTOCOL_FEE_IX_DISCM => Ok(Self::SetProtocolFee(
+                SetProtocolFeeIxArgs::deserialize(buf)?,
+            )),
+            CREATE_POOL_IX_DISCM => Ok(Self::CreatePool(CreatePoolIxArgs::deserialize(buf)?)),
+            ADD_LIQUIDITY_IX_DISCM => Ok(Self::AddLiquidity(AddLiquidityIxArgs::deserialize(buf)?)),
+            REMOVE_LIQUIDITY_IX_DISCM => Ok(Self::RemoveLiquidity(
+                RemoveLiquidityIxArgs::deserialize(buf)?,
+            )),
+            SET_FEE_IX_DISCM => Ok(Self::SetFee(SetFeeIxArgs::deserialize(buf)?)),
+            SET_FEE_AUTHORITY_IX_DISCM => Ok(Self::SetFeeAuthority(
+                SetFeeAuthorityIxArgs::deserialize(buf)?,
+            )),
+            DEACTIVATE_STAKE_ACCOUNT_IX_DISCM => Ok(Self::DeactivateStakeAccount(
+                DeactivateStakeAccountIxArgs::deserialize(buf)?,
+            )),
+            RECLAIM_STAKE_ACCOUNT_IX_DISCM => Ok(Self::ReclaimStakeAccount(
+                ReclaimStakeAccountIxArgs::deserialize(buf)?,
+            )),
+            UNSTAKE_IX_DISCM => Ok(Self::Unstake(UnstakeIxArgs::deserialize(buf)?)),
+            UNSTAKE_WSOL_IX_DISCM => Ok(Self::UnstakeWsol(UnstakeWsolIxArgs::deserialize(buf)?)),
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("discm {:?} not found", maybe_discm),
+            )),
+        }
+    }
+}
 pub const INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct InitProtocolFeeAccounts<'me, 'info> {

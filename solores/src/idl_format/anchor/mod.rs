@@ -66,7 +66,10 @@ impl IdlFormat for AnchorIdl {
             res.push(Box::new(TypedefsCodegenModule(v)));
         }
         if let Some(v) = &self.instructions {
-            res.push(Box::new(IxCodegenModule(v)));
+            res.push(Box::new(IxCodegenModule {
+                program_name: self.program_name(),
+                instructions: v,
+            }));
         }
         if let Some(v) = &self.errors {
             res.push(Box::new(ErrorsCodegenModule {
