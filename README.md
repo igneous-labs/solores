@@ -139,9 +139,9 @@ use my_token_interface::{MyTokenProgramIx, TransferArgs, TransferIxArgs};
 #[test]
 pub fn test_borsh_serde_roundtrip_program_ix() {
     let program_ix = MyTokenProgramIx::Transfer(
-        TransferArgs(TransferIxArgs {
+        TransferIxArgs {
             transfer_args: TransferArgs { amount: 1 },
-        }) 
+        }
     );
 
     // [0, 1, 0, 0, 0, 0, 0, 0, 0]
