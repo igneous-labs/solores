@@ -3,7 +3,7 @@ name = "solores"
 description = "Solana IDL to Rust client / CPI interface generator"
 license = "Apache-2.0"
 repository = "https://github.com/igneous-labs/solores"
-version = "0.1.4"
+version = "0.2.0"
 edition = "2021"
 exclude = [
     ".pre-commit-config.yaml",
