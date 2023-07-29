@@ -90,6 +90,7 @@ pub struct Args {
     pub serde_vers: String,
 }
 
+/// The CLI entrypoint
 pub fn main() {
     if env::var(RUST_LOG_ENV_VAR).is_err() {
         env::set_var(RUST_LOG_ENV_VAR, "info")
@@ -124,7 +125,7 @@ pub fn main() {
     );
 }
 
-fn load_idl(file: &mut File) -> Box<dyn IdlFormat> {
+pub fn load_idl(file: &mut File) -> Box<dyn IdlFormat> {
     if let Ok(shank_idl) = serde_json::from_reader::<&File, ShankIdl>(file) {
         if shank_idl.is_correct_idl_format() {
             log::info!("Successfully loaded shank IDL");
