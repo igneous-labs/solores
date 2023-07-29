@@ -6,9 +6,7 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use syn::{LitBool, LitInt};
 
-use crate::utils::unique_by_report_dups;
-
-use super::typedefs::TypedefField;
+use crate::{idl_format::anchor::typedefs::TypedefField, utils::unique_by_report_dups};
 
 #[derive(Deserialize)]
 pub struct NamedInstruction {
