@@ -7,6 +7,271 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
+#[derive(Clone, Debug, PartialEq)]
+pub enum MplTokenMetadataProgramIx {
+    CreateMetadataAccount(CreateMetadataAccountIxArgs),
+    UpdateMetadataAccount(UpdateMetadataAccountIxArgs),
+    DeprecatedCreateMasterEdition(DeprecatedCreateMasterEditionIxArgs),
+    DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(
+        DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs,
+    ),
+    UpdatePrimarySaleHappenedViaToken(UpdatePrimarySaleHappenedViaTokenIxArgs),
+    DeprecatedSetReservationList(DeprecatedSetReservationListIxArgs),
+    DeprecatedCreateReservationList(DeprecatedCreateReservationListIxArgs),
+    SignMetadata(SignMetadataIxArgs),
+    DeprecatedMintPrintingTokensViaToken(DeprecatedMintPrintingTokensViaTokenIxArgs),
+    DeprecatedMintPrintingTokens(DeprecatedMintPrintingTokensIxArgs),
+    CreateMasterEdition(CreateMasterEditionIxArgs),
+    MintNewEditionFromMasterEditionViaToken(MintNewEditionFromMasterEditionViaTokenIxArgs),
+    ConvertMasterEditionV1ToV2(ConvertMasterEditionV1ToV2IxArgs),
+    MintNewEditionFromMasterEditionViaVaultProxy(
+        MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
+    ),
+    PuffMetadata(PuffMetadataIxArgs),
+    UpdateMetadataAccountV2(UpdateMetadataAccountV2IxArgs),
+    CreateMetadataAccountV2(CreateMetadataAccountV2IxArgs),
+    CreateMasterEditionV3(CreateMasterEditionV3IxArgs),
+    VerifyCollection(VerifyCollectionIxArgs),
+    Utilize(UtilizeIxArgs),
+    ApproveUseAuthority(ApproveUseAuthorityIxArgs),
+    RevokeUseAuthority(RevokeUseAuthorityIxArgs),
+    UnverifyCollection(UnverifyCollectionIxArgs),
+    ApproveCollectionAuthority(ApproveCollectionAuthorityIxArgs),
+    RevokeCollectionAuthority(RevokeCollectionAuthorityIxArgs),
+    SetAndVerifyCollection(SetAndVerifyCollectionIxArgs),
+    FreezeDelegatedAccount(FreezeDelegatedAccountIxArgs),
+    ThawDelegatedAccount(ThawDelegatedAccountIxArgs),
+    RemoveCreatorVerification(RemoveCreatorVerificationIxArgs),
+}
+impl BorshSerialize for MplTokenMetadataProgramIx {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        match self {
+            Self::CreateMetadataAccount(args) => {
+                CREATE_METADATA_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateMetadataAccount(args) => {
+                UPDATE_METADATA_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedCreateMasterEdition(args) => {
+                DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(args) => {
+                DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
+                    .serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdatePrimarySaleHappenedViaToken(args) => {
+                UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedSetReservationList(args) => {
+                DEPRECATED_SET_RESERVATION_LIST_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedCreateReservationList(args) => {
+                DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SignMetadata(args) => {
+                SIGN_METADATA_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedMintPrintingTokensViaToken(args) => {
+                DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeprecatedMintPrintingTokens(args) => {
+                DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CreateMasterEdition(args) => {
+                CREATE_MASTER_EDITION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::MintNewEditionFromMasterEditionViaToken(args) => {
+                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ConvertMasterEditionV1ToV2(args) => {
+                CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::MintNewEditionFromMasterEditionViaVaultProxy(args) => {
+                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::PuffMetadata(args) => {
+                PUFF_METADATA_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateMetadataAccountV2(args) => {
+                UPDATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CreateMetadataAccountV2(args) => {
+                CREATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::CreateMasterEditionV3(args) => {
+                CREATE_MASTER_EDITION_V3_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::VerifyCollection(args) => {
+                VERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Utilize(args) => {
+                UTILIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ApproveUseAuthority(args) => {
+                APPROVE_USE_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RevokeUseAuthority(args) => {
+                REVOKE_USE_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UnverifyCollection(args) => {
+                UNVERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ApproveCollectionAuthority(args) => {
+                APPROVE_COLLECTION_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RevokeCollectionAuthority(args) => {
+                REVOKE_COLLECTION_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetAndVerifyCollection(args) => {
+                SET_AND_VERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::FreezeDelegatedAccount(args) => {
+                FREEZE_DELEGATED_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ThawDelegatedAccount(args) => {
+                THAW_DELEGATED_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemoveCreatorVerification(args) => {
+                REMOVE_CREATOR_VERIFICATION_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+        }
+    }
+}
+impl MplTokenMetadataProgramIx {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = u8::deserialize(buf)?;
+        match maybe_discm {
+            CREATE_METADATA_ACCOUNT_IX_DISCM => Ok(Self::CreateMetadataAccount(
+                CreateMetadataAccountIxArgs::deserialize(buf)?,
+            )),
+            UPDATE_METADATA_ACCOUNT_IX_DISCM => Ok(Self::UpdateMetadataAccount(
+                UpdateMetadataAccountIxArgs::deserialize(buf)?,
+            )),
+            DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM => Ok(Self::DeprecatedCreateMasterEdition(
+                DeprecatedCreateMasterEditionIxArgs::deserialize(buf)?,
+            )),
+            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM => Ok(
+                Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(
+                    DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(
+                        buf,
+                    )?,
+                ),
+            ),
+            UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM => {
+                Ok(Self::UpdatePrimarySaleHappenedViaToken(
+                    UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(buf)?,
+                ))
+            }
+            DEPRECATED_SET_RESERVATION_LIST_IX_DISCM => Ok(Self::DeprecatedSetReservationList(
+                DeprecatedSetReservationListIxArgs::deserialize(buf)?,
+            )),
+            DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM => {
+                Ok(Self::DeprecatedCreateReservationList(
+                    DeprecatedCreateReservationListIxArgs::deserialize(buf)?,
+                ))
+            }
+            SIGN_METADATA_IX_DISCM => Ok(Self::SignMetadata(SignMetadataIxArgs::deserialize(buf)?)),
+            DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM => {
+                Ok(Self::DeprecatedMintPrintingTokensViaToken(
+                    DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(buf)?,
+                ))
+            }
+            DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM => Ok(Self::DeprecatedMintPrintingTokens(
+                DeprecatedMintPrintingTokensIxArgs::deserialize(buf)?,
+            )),
+            CREATE_MASTER_EDITION_IX_DISCM => Ok(Self::CreateMasterEdition(
+                CreateMasterEditionIxArgs::deserialize(buf)?,
+            )),
+            MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM => {
+                Ok(Self::MintNewEditionFromMasterEditionViaToken(
+                    MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(buf)?,
+                ))
+            }
+            CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM => Ok(Self::ConvertMasterEditionV1ToV2(
+                ConvertMasterEditionV1ToV2IxArgs::deserialize(buf)?,
+            )),
+            MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM => {
+                Ok(Self::MintNewEditionFromMasterEditionViaVaultProxy(
+                    MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(buf)?,
+                ))
+            }
+            PUFF_METADATA_IX_DISCM => Ok(Self::PuffMetadata(PuffMetadataIxArgs::deserialize(buf)?)),
+            UPDATE_METADATA_ACCOUNT_V2_IX_DISCM => Ok(Self::UpdateMetadataAccountV2(
+                UpdateMetadataAccountV2IxArgs::deserialize(buf)?,
+            )),
+            CREATE_METADATA_ACCOUNT_V2_IX_DISCM => Ok(Self::CreateMetadataAccountV2(
+                CreateMetadataAccountV2IxArgs::deserialize(buf)?,
+            )),
+            CREATE_MASTER_EDITION_V3_IX_DISCM => Ok(Self::CreateMasterEditionV3(
+                CreateMasterEditionV3IxArgs::deserialize(buf)?,
+            )),
+            VERIFY_COLLECTION_IX_DISCM => Ok(Self::VerifyCollection(
+                VerifyCollectionIxArgs::deserialize(buf)?,
+            )),
+            UTILIZE_IX_DISCM => Ok(Self::Utilize(UtilizeIxArgs::deserialize(buf)?)),
+            APPROVE_USE_AUTHORITY_IX_DISCM => Ok(Self::ApproveUseAuthority(
+                ApproveUseAuthorityIxArgs::deserialize(buf)?,
+            )),
+            REVOKE_USE_AUTHORITY_IX_DISCM => Ok(Self::RevokeUseAuthority(
+                RevokeUseAuthorityIxArgs::deserialize(buf)?,
+            )),
+            UNVERIFY_COLLECTION_IX_DISCM => Ok(Self::UnverifyCollection(
+                UnverifyCollectionIxArgs::deserialize(buf)?,
+            )),
+            APPROVE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::ApproveCollectionAuthority(
+                ApproveCollectionAuthorityIxArgs::deserialize(buf)?,
+            )),
+            REVOKE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::RevokeCollectionAuthority(
+                RevokeCollectionAuthorityIxArgs::deserialize(buf)?,
+            )),
+            SET_AND_VERIFY_COLLECTION_IX_DISCM => Ok(Self::SetAndVerifyCollection(
+                SetAndVerifyCollectionIxArgs::deserialize(buf)?,
+            )),
+            FREEZE_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::FreezeDelegatedAccount(
+                FreezeDelegatedAccountIxArgs::deserialize(buf)?,
+            )),
+            THAW_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::ThawDelegatedAccount(
+                ThawDelegatedAccountIxArgs::deserialize(buf)?,
+            )),
+            REMOVE_CREATOR_VERIFICATION_IX_DISCM => Ok(Self::RemoveCreatorVerification(
+                RemoveCreatorVerificationIxArgs::deserialize(buf)?,
+            )),
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("discm {:?} not found", maybe_discm),
+            )),
+        }
+    }
+}
 pub const CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountAccounts<'me, 'info> {

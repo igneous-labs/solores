@@ -4,7 +4,7 @@ use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-use super::typedefs::TypedefField;
+use crate::idl_format::anchor::typedefs::TypedefField;
 
 #[derive(Deserialize)]
 pub struct Event(pub EventType);

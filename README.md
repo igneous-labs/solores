@@ -90,7 +90,7 @@ Lets say you had the following shank generated IDL, `my_token_idl.json`:
 Running `solores my_token_idl.json` should generate a `my_token_interface` rust crate that allows you to use it in an on-chain program as so:
 
 ```rust ignore
-use my_token_interface::{TransferAccounts, TransferArgs, transfer_invoke_signed};
+use my_token_interface::{TransferAccounts, TransferArgs, TransferIxArgs, transfer_invoke_signed};
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
@@ -100,7 +100,9 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
     transfer_invoke_signed(
         &TransferAccounts { src, dest },
-        TransferArgs { amount: 1_000u64 },
+        TransferIxArgs {
+            transfer_args: TransferArgs { amount: 1_000 },
+        },
         &[&[&[0u8]]],
     )
 }
@@ -118,12 +120,40 @@ pub fn do_something_with_instruction() -> std::io::Result<()> {
         src: some_pubkey,
         dest: another_pubkey,
     };
-    let transfer_ix_args = TransferArgs { amount: 1_000u64 };
+    let transfer_ix_args = TransferIxArgs {
+        transfer_args: TransferArgs { amount: 1_000 },
+    };
     let ix = transfer_ix(&transfer_accounts, transfer_ix_args)?;
 
     ...
 }
 
+```
+
+The crate will also combine all instructions into a single borsh de/serializable `ProgramIx` enum
+
+```rust ignore
+use borsh::BorshSerialize;
+use my_token_interface::{MyTokenProgramIx, TransferArgs, TransferIxArgs};
+
+#[test]
+pub fn test_borsh_serde_roundtrip_program_ix() {
+    let program_ix = MyTokenProgramIx::Transfer(
+        TransferIxArgs {
+            transfer_args: TransferArgs { amount: 1 },
+        }
+    );
+
+    // [0, 1, 0, 0, 0, 0, 0, 0, 0]
+    let serialized = program_ix.try_to_vec().unwrap();
+
+    // note that deserialize is an associated function/method
+    // rather than the BorshDeserialize trait impl,
+    // i.e. MyTokenProgramIx does NOT impl BorshDeserialize
+    // because the definition of BorshDeserialize changed between borsh 0.9 and 0.10
+    let deserialized = MyTokenProgramIx::deserialize(&mut serialized.as_ref()).unwrap();
+    assert_eq!(program_ix, deserialized);
+}
 ```
 
 The crate will also export the instructions' discriminant as consts, and any error types defined in the IDL as an enum convertible to/from u32.
@@ -140,10 +170,10 @@ The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). 
 
 ### Instruction Function Generics
 
-The generated `*_ix()` function parameters are genericized over any type that impls `Into<*Keys>` for the first arg and any type that impls `Into<*Args>` for the second arg. This allows users to easily implement, for example, account structs that compute/retrieve known pubkeys (like PDAs) at runtime:
+The generated `*_ix()` function parameters are genericized over any type that impls `Into<*Keys>` for the first arg and any type that impls `Into<*IxArgs>` for the second arg. This allows users to easily implement, for example, account structs that compute/retrieve known pubkeys (like PDAs) at runtime:
 
 ```rust ignore
-use my_token_interface::{TransferArgs, TransferKeys, ID};
+use my_token_interface::{TransferArgs, TransferIxArgs, TransferKeys, ID};
 use solana_program::pubkey::Pubkey;
 
 struct MyTransferKeys {
@@ -157,18 +187,18 @@ impl From<&MyTransferKeys> for TransferKeys {
             &ID,
         );
         Self {
-          src: my_transfer_keys.src,
-          dest: my_pda_dest,
+            src: my_transfer_keys.src,
+            dest: my_pda_dest,
         }
     }
 }
 
 struct MyTransferArgs {};
 
-impl From<MyTransferArgs> for TransferArgs {
+impl From<MyTransferArgs> for TransferIxArgs {
     fn from(_unused: MyTransferArgs) -> Self {
         Self {
-            amount: 1000u64,
+            transfer_args: TransferArgs { amount: 1000 },
         }
     }
 }
@@ -210,7 +240,7 @@ fn index_instruction(ix: BorrowedInstruction) {
 The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` to make simple CPIs more ergonomic
 
 ```rust ignore
-use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferAccounts, TransferArgs, transfer_invoke_signed};
+use my_token_interface::{TRANSFER_IX_ACCOUNTS_LEN, TransferAccounts, TransferArgs, TransferIxArgs, transfer_invoke_signed};
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey};
 
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
@@ -219,7 +249,9 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
     transfer_invoke_signed(
         &accounts,
-        TransferArgs { amount: 1_000u64 },
+        TransferIxArgs {
+            transfer_args: TransferArgs { amount: 1_000 },
+        },
         &[&[&[0u8]]],
     )
 }

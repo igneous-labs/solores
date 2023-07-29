@@ -7,6 +7,174 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
+#[derive(Clone, Debug, PartialEq)]
+pub enum MarinadeFinanceProgramIx {
+    Initialize(InitializeIxArgs),
+    ChangeAuthority(ChangeAuthorityIxArgs),
+    AddValidator(AddValidatorIxArgs),
+    RemoveValidator(RemoveValidatorIxArgs),
+    SetValidatorScore(SetValidatorScoreIxArgs),
+    ConfigValidatorSystem(ConfigValidatorSystemIxArgs),
+    Deposit(DepositIxArgs),
+    DepositStakeAccount(DepositStakeAccountIxArgs),
+    LiquidUnstake(LiquidUnstakeIxArgs),
+    AddLiquidity(AddLiquidityIxArgs),
+    RemoveLiquidity(RemoveLiquidityIxArgs),
+    SetLpParams(SetLpParamsIxArgs),
+    ConfigMarinade(ConfigMarinadeIxArgs),
+    OrderUnstake(OrderUnstakeIxArgs),
+    Claim(ClaimIxArgs),
+    StakeReserve(StakeReserveIxArgs),
+    UpdateActive(UpdateActiveIxArgs),
+    UpdateDeactivated(UpdateDeactivatedIxArgs),
+    DeactivateStake(DeactivateStakeIxArgs),
+    EmergencyUnstake(EmergencyUnstakeIxArgs),
+    MergeStakes(MergeStakesIxArgs),
+}
+impl BorshSerialize for MarinadeFinanceProgramIx {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        match self {
+            Self::Initialize(args) => {
+                INITIALIZE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ChangeAuthority(args) => {
+                CHANGE_AUTHORITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AddValidator(args) => {
+                ADD_VALIDATOR_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemoveValidator(args) => {
+                REMOVE_VALIDATOR_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetValidatorScore(args) => {
+                SET_VALIDATOR_SCORE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ConfigValidatorSystem(args) => {
+                CONFIG_VALIDATOR_SYSTEM_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Deposit(args) => {
+                DEPOSIT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DepositStakeAccount(args) => {
+                DEPOSIT_STAKE_ACCOUNT_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::LiquidUnstake(args) => {
+                LIQUID_UNSTAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::AddLiquidity(args) => {
+                ADD_LIQUIDITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::RemoveLiquidity(args) => {
+                REMOVE_LIQUIDITY_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::SetLpParams(args) => {
+                SET_LP_PARAMS_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::ConfigMarinade(args) => {
+                CONFIG_MARINADE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::OrderUnstake(args) => {
+                ORDER_UNSTAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::Claim(args) => {
+                CLAIM_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::StakeReserve(args) => {
+                STAKE_RESERVE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateActive(args) => {
+                UPDATE_ACTIVE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::UpdateDeactivated(args) => {
+                UPDATE_DEACTIVATED_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::DeactivateStake(args) => {
+                DEACTIVATE_STAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::EmergencyUnstake(args) => {
+                EMERGENCY_UNSTAKE_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+            Self::MergeStakes(args) => {
+                MERGE_STAKES_IX_DISCM.serialize(writer)?;
+                args.serialize(writer)
+            }
+        }
+    }
+}
+impl MarinadeFinanceProgramIx {
+    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+        match maybe_discm {
+            INITIALIZE_IX_DISCM => Ok(Self::Initialize(InitializeIxArgs::deserialize(buf)?)),
+            CHANGE_AUTHORITY_IX_DISCM => Ok(Self::ChangeAuthority(
+                ChangeAuthorityIxArgs::deserialize(buf)?,
+            )),
+            ADD_VALIDATOR_IX_DISCM => Ok(Self::AddValidator(AddValidatorIxArgs::deserialize(buf)?)),
+            REMOVE_VALIDATOR_IX_DISCM => Ok(Self::RemoveValidator(
+                RemoveValidatorIxArgs::deserialize(buf)?,
+            )),
+            SET_VALIDATOR_SCORE_IX_DISCM => Ok(Self::SetValidatorScore(
+                SetValidatorScoreIxArgs::deserialize(buf)?,
+            )),
+            CONFIG_VALIDATOR_SYSTEM_IX_DISCM => Ok(Self::ConfigValidatorSystem(
+                ConfigValidatorSystemIxArgs::deserialize(buf)?,
+            )),
+            DEPOSIT_IX_DISCM => Ok(Self::Deposit(DepositIxArgs::deserialize(buf)?)),
+            DEPOSIT_STAKE_ACCOUNT_IX_DISCM => Ok(Self::DepositStakeAccount(
+                DepositStakeAccountIxArgs::deserialize(buf)?,
+            )),
+            LIQUID_UNSTAKE_IX_DISCM => {
+                Ok(Self::LiquidUnstake(LiquidUnstakeIxArgs::deserialize(buf)?))
+            }
+            ADD_LIQUIDITY_IX_DISCM => Ok(Self::AddLiquidity(AddLiquidityIxArgs::deserialize(buf)?)),
+            REMOVE_LIQUIDITY_IX_DISCM => Ok(Self::RemoveLiquidity(
+                RemoveLiquidityIxArgs::deserialize(buf)?,
+            )),
+            SET_LP_PARAMS_IX_DISCM => Ok(Self::SetLpParams(SetLpParamsIxArgs::deserialize(buf)?)),
+            CONFIG_MARINADE_IX_DISCM => Ok(Self::ConfigMarinade(
+                ConfigMarinadeIxArgs::deserialize(buf)?,
+            )),
+            ORDER_UNSTAKE_IX_DISCM => Ok(Self::OrderUnstake(OrderUnstakeIxArgs::deserialize(buf)?)),
+            CLAIM_IX_DISCM => Ok(Self::Claim(ClaimIxArgs::deserialize(buf)?)),
+            STAKE_RESERVE_IX_DISCM => Ok(Self::StakeReserve(StakeReserveIxArgs::deserialize(buf)?)),
+            UPDATE_ACTIVE_IX_DISCM => Ok(Self::UpdateActive(UpdateActiveIxArgs::deserialize(buf)?)),
+            UPDATE_DEACTIVATED_IX_DISCM => Ok(Self::UpdateDeactivated(
+                UpdateDeactivatedIxArgs::deserialize(buf)?,
+            )),
+            DEACTIVATE_STAKE_IX_DISCM => Ok(Self::DeactivateStake(
+                DeactivateStakeIxArgs::deserialize(buf)?,
+            )),
+            EMERGENCY_UNSTAKE_IX_DISCM => Ok(Self::EmergencyUnstake(
+                EmergencyUnstakeIxArgs::deserialize(buf)?,
+            )),
+            MERGE_STAKES_IX_DISCM => Ok(Self::MergeStakes(MergeStakesIxArgs::deserialize(buf)?)),
+            _ => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("discm {:?} not found", maybe_discm),
+            )),
+        }
+    }
+}
 pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeAccounts<'me, 'info> {

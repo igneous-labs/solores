@@ -31,14 +31,13 @@ pub trait IdlFormat {
     fn modules<'me>(&'me self) -> Vec<Box<dyn IdlCodegenModule + 'me>>;
 }
 
+/// The gen_body() impl for simple newtypes i.e. `struct NewType(&[ToTokens])`
 #[macro_export]
 macro_rules! gen_body_newtype_slice {
     () => {
         fn gen_body(&self) -> TokenStream {
-            let elems = self.0.iter().map(|e| e.into_token_stream());
-            let mut res = quote! {};
-            res.extend(elems);
-            res
+            use quote::ToTokens;
+            self.0.iter().map(|e| e.into_token_stream()).collect()
         }
     };
 }
