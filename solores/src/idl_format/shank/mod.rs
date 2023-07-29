@@ -9,26 +9,26 @@ use self::{
     typedefs::{NamedType, TypedefsCodegenModule},
 };
 
-mod accounts;
-mod errors;
-mod instructions;
-mod typedefs;
+pub mod accounts;
+pub mod errors;
+pub mod instructions;
+pub mod typedefs;
 
 #[derive(Deserialize)]
 pub struct ShankIdl {
-    name: String,
-    version: String,
-    metadata: Metadata,
-    accounts: Option<Vec<NamedType>>,
-    types: Option<Vec<NamedType>>,
-    instructions: Option<Vec<NamedInstruction>>,
-    errors: Option<Vec<ErrorEnumVariant>>,
+    pub name: String,
+    pub version: String,
+    pub metadata: Metadata,
+    pub accounts: Option<Vec<NamedType>>,
+    pub types: Option<Vec<NamedType>>,
+    pub instructions: Option<Vec<NamedInstruction>>,
+    pub errors: Option<Vec<ErrorEnumVariant>>,
 }
 
 #[derive(Deserialize)]
 pub struct Metadata {
-    address: String,
-    origin: String,
+    pub address: String,
+    pub origin: String,
 }
 
 impl IdlFormat for ShankIdl {

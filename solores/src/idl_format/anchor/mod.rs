@@ -10,27 +10,27 @@ use self::{
     typedefs::{NamedType, TypedefsCodegenModule},
 };
 
-mod accounts;
-mod errors;
-mod events;
-mod instructions;
-mod typedefs;
+pub mod accounts;
+pub mod errors;
+pub mod events;
+pub mod instructions;
+pub mod typedefs;
 
 #[derive(Deserialize)]
 pub struct AnchorIdl {
-    name: String,
-    version: String,
-    metadata: Option<Metadata>,
-    accounts: Option<Vec<NamedAccount>>,
-    types: Option<Vec<NamedType>>,
-    instructions: Option<Vec<NamedInstruction>>,
-    errors: Option<Vec<ErrorEnumVariant>>,
-    events: Option<Vec<Event>>,
+    pub name: String,
+    pub version: String,
+    pub metadata: Option<Metadata>,
+    pub accounts: Option<Vec<NamedAccount>>,
+    pub types: Option<Vec<NamedType>>,
+    pub instructions: Option<Vec<NamedInstruction>>,
+    pub errors: Option<Vec<ErrorEnumVariant>>,
+    pub events: Option<Vec<Event>>,
 }
 
 #[derive(Deserialize)]
 pub struct Metadata {
-    address: String,
+    pub address: String,
 }
 
 impl IdlFormat for AnchorIdl {
