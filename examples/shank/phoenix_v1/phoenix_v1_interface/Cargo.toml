@@ -1,0 +1,15 @@
+[package]
+name = "phoenix_v1_interface"
+version = "0.2.3"
+edition = "2021"
+
+[dependencies]
+borsh = "^0.9"
+solana-program = "^1.9,<1.16"
+thiserror = "^1.0"
+num-derive = "^0.3"
+num-traits = "^0.2"
+
+[dependencies.serde]
+optional = true
+version = "^1.0"
