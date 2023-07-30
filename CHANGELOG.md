@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Breaking
+
+- Removed unused macro `gen_body_newtype_slice`
+
 ### Added
 
 - Simple support for Pod/zero copy typedefs with the `-z` option
