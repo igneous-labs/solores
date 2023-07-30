@@ -51,6 +51,7 @@ impl ToTokens for NamedInstruction {
         let ix_fn_ident = format_ident!("{}_ix", snake_case_name);
         let invoke_fn_ident = format_ident!("{}_invoke", snake_case_name);
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
+        let verify_account_keys_fn_ident = format_ident!("{}_verify_account_keys", snake_case_name);
         let shouty_snake_case_name = name.to_shouty_snake_case();
         let accounts_len_ident = format_ident!("{}_IX_ACCOUNTS_LEN", shouty_snake_case_name);
         let discm_ident = self.discm_ident();
@@ -284,10 +285,35 @@ impl ToTokens for NamedInstruction {
                 invoke_signed(&ix, &account_info, seeds)
             }
         });
+
+        // impl _verify_account_keys()
+        let key_tups = self
+            .accounts
+            .iter()
+            .map(IxAccount::to_verify_account_keys_tuple);
+        tokens.extend(quote! {
+            pub fn #verify_account_keys_fn_ident(
+                accounts: &#accounts_ident<'_, '_>,
+                keys: &#keys_ident
+            ) -> Result<(), (Pubkey, Pubkey)> {
+                for (actual, expected) in [
+                    #(#key_tups),*
+                ] {
+                    if actual != expected {
+                        return Err((*actual, *expected));
+                    }
+                }
+                Ok(())
+            }
+        })
     }
 }
 
 impl IxAccount {
+    pub fn field_ident(&self) -> Ident {
+        format_ident!("{}", self.name.to_snake_case())
+    }
+
     pub fn to_keys_account_meta_tokens(&self) -> TokenStream {
         let call_ident = format_ident!(
             "{}",
@@ -297,9 +323,16 @@ impl IxAccount {
             }
         );
         let is_signer_arg = LitBool::new(self.is_signer, Span::call_site());
-        let name = format_ident!("{}", self.name.to_snake_case());
+        let name = self.field_ident();
         quote! {
             AccountMeta::#call_ident(keys.#name, #is_signer_arg)
+        }
+    }
+
+    pub fn to_verify_account_keys_tuple(&self) -> TokenStream {
+        let name = self.field_ident();
+        quote! {
+            (accounts.#name.key, &keys.#name)
         }
     }
 }

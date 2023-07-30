@@ -219,7 +219,7 @@ impl From<MyTransferArgs> for TransferIxArgs {
 
 `serde` is added as an optional dependency behind the `serde` feature-flag to the generated crate to provide `Serialize` and `Deserialize` implementations for the various typedefs and onchain accounts.
 
-### Keys from array
+### Keys From Array
 
 The various `*Keys` struct also impl `From<[Pubkey; *_IX_ACCOUNTS_LEN]>` to support indexing
 
@@ -240,7 +240,7 @@ fn index_instruction(ix: BorrowedInstruction) {
 }
 ```
 
-### Accounts from array
+### Accounts From Array
 
 The various `*Accounts` also impl `From<&[AccountInfo; *_IX_ACCOUNTS_LEN]>` to make simple CPIs more ergonomic
 
@@ -262,7 +262,42 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 }
 ```
 
-## Comparison to similar libs
+### Instruction Accounts Verification Functions
+
+A function to compare equality between the pubkeys of a instruction `*Accounts` struct with a `*Keys` struct is generated:
+
+```rust ignore
+use my_token_interface::{TransferAccounts, TransferKeys, transfer_verify_account_keys};
+use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, pubkey::Pubkey, program_error::ProgramError};
+
+pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
+    let accounts: TransferAccounts = ...
+    let expected_keys: TransferKeys = ...
+
+    // transfer_verify_account_keys() returns the first non-matching pubkeys between accounts and expected_keys
+    if let Err((actual_pubkey, expected_pubkey)) = transfer_verify_account_keys(&accounts, &expected_keys) {
+        return Err(ProgramError::InvalidAccountData);
+    } 
+}
+```
+
+A function to ensure writable/signer privileges of a instruction `*Accounts` struct is also generated:
+
+```rust ignore
+use my_token_interface::{TransferAccounts, TransferKeys, transfer_verify_account_privileges};
+use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, pubkey::Pubkey, program_error::ProgramError};
+
+pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
+    let accounts: TransferAccounts = ...
+
+    // transfer_verify_account_privileges returns
+    // - `ProgramError::InvalidAccountData` on the first account with missing writable privilege
+    // - `ProgramError::MissingRequiredSignature` on the first account with missing signer privilege
+    transfer_verify_account_privileges(&accounts)?;
+}
+```
+
+## Comparison To Similar Libs
 
 ### anchor-gen
 
