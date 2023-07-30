@@ -5,6 +5,7 @@ use solana_program::{
     entrypoint::ProgramResult,
     instruction::{AccountMeta, Instruction},
     program::{invoke, invoke_signed},
+    program_error::ProgramError,
     pubkey::Pubkey,
 };
 #[derive(Clone, Debug, PartialEq)]
@@ -1175,6 +1176,45 @@ pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_user_verify_account_keys(
+    accounts: &InitializeUserAccounts<'_, '_>,
+    keys: &InitializeUserKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_user_verify_account_privileges(
+    accounts: &InitializeUserAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.state,
+        accounts.payer,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeUserStatsAccounts<'me, 'info> {
@@ -1323,6 +1363,39 @@ pub fn initialize_user_stats_invoke_signed<'info, A: Into<InitializeUserStatsIxA
     let ix = initialize_user_stats_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn initialize_user_stats_verify_account_keys(
+    accounts: &InitializeUserStatsAccounts<'_, '_>,
+    keys: &InitializeUserStatsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_user_stats_verify_account_privileges(
+    accounts: &InitializeUserStatsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user_stats, accounts.state, accounts.payer] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
@@ -1484,6 +1557,45 @@ pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerN
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_referrer_name_verify_account_keys(
+    accounts: &InitializeReferrerNameAccounts<'_, '_>,
+    keys: &InitializeReferrerNameKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.referrer_name.key, &keys.referrer_name),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_referrer_name_verify_account_privileges(
+    accounts: &InitializeReferrerNameAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.referrer_name,
+        accounts.user,
+        accounts.user_stats,
+        accounts.payer,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct DepositAccounts<'me, 'info> {
@@ -1638,6 +1750,45 @@ pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
     let ix = deposit_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn deposit_verify_account_keys(
+    accounts: &DepositAccounts<'_, '_>,
+    keys: &DepositKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (accounts.user_token_account.key, &keys.user_token_account),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deposit_verify_account_privileges(
+    accounts: &DepositAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.spot_market_vault,
+        accounts.user_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const WITHDRAW_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -1801,6 +1952,46 @@ pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
     let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn withdraw_verify_account_keys(
+    accounts: &WithdrawAccounts<'_, '_>,
+    keys: &WithdrawKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.user_token_account.key, &keys.user_token_account),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn withdraw_verify_account_privileges(
+    accounts: &WithdrawAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.spot_market_vault,
+        accounts.user_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct TransferDepositAccounts<'me, 'info> {
@@ -1950,6 +2141,39 @@ pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
     let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn transfer_deposit_verify_account_keys(
+    accounts: &TransferDepositAccounts<'_, '_>,
+    keys: &TransferDepositKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.from_user.key, &keys.from_user),
+        (accounts.to_user.key, &keys.to_user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn transfer_deposit_verify_account_privileges(
+    accounts: &TransferDepositAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.from_user, accounts.to_user, accounts.user_stats] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const PLACE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PlacePerpOrderAccounts<'me, 'info> {
@@ -2077,6 +2301,36 @@ pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn place_perp_order_verify_account_keys(
+    accounts: &PlacePerpOrderAccounts<'_, '_>,
+    keys: &PlacePerpOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_perp_order_verify_account_privileges(
+    accounts: &PlacePerpOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CANCEL_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrderAccounts<'me, 'info> {
@@ -2203,6 +2457,36 @@ pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
     let ix = cancel_order_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn cancel_order_verify_account_keys(
+    accounts: &CancelOrderAccounts<'_, '_>,
+    keys: &CancelOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn cancel_order_verify_account_privileges(
+    accounts: &CancelOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -2336,6 +2620,36 @@ pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn cancel_order_by_user_id_verify_account_keys(
+    accounts: &CancelOrderByUserIdAccounts<'_, '_>,
+    keys: &CancelOrderByUserIdKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn cancel_order_by_user_id_verify_account_privileges(
+    accounts: &CancelOrderByUserIdAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct CancelOrdersAccounts<'me, 'info> {
@@ -2465,6 +2779,36 @@ pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
     let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn cancel_orders_verify_account_keys(
+    accounts: &CancelOrdersAccounts<'_, '_>,
+    keys: &CancelOrdersKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn cancel_orders_verify_account_privileges(
+    accounts: &CancelOrdersAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct ModifyOrderAccounts<'me, 'info> {
@@ -2592,6 +2936,36 @@ pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
     let ix = modify_order_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn modify_order_verify_account_keys(
+    accounts: &ModifyOrderAccounts<'_, '_>,
+    keys: &ModifyOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn modify_order_verify_account_privileges(
+    accounts: &ModifyOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -2725,6 +3099,36 @@ pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdI
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn modify_order_by_user_id_verify_account_keys(
+    accounts: &ModifyOrderByUserIdAccounts<'_, '_>,
+    keys: &ModifyOrderByUserIdKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn modify_order_by_user_id_verify_account_privileges(
+    accounts: &ModifyOrderByUserIdAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -2865,6 +3269,37 @@ pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOr
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn place_and_take_perp_order_verify_account_keys(
+    accounts: &PlaceAndTakePerpOrderAccounts<'_, '_>,
+    keys: &PlaceAndTakePerpOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_and_take_perp_order_verify_account_privileges(
+    accounts: &PlaceAndTakePerpOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user, accounts.user_stats] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -3020,6 +3455,44 @@ pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn place_and_make_perp_order_verify_account_keys(
+    accounts: &PlaceAndMakePerpOrderAccounts<'_, '_>,
+    keys: &PlaceAndMakePerpOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.taker.key, &keys.taker),
+        (accounts.taker_stats.key, &keys.taker_stats),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_and_make_perp_order_verify_account_privileges(
+    accounts: &PlaceAndMakePerpOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.taker,
+        accounts.taker_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceSpotOrderAccounts<'me, 'info> {
@@ -3146,6 +3619,36 @@ pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
     let ix = place_spot_order_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn place_spot_order_verify_account_keys(
+    accounts: &PlaceSpotOrderAccounts<'_, '_>,
+    keys: &PlaceSpotOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_spot_order_verify_account_privileges(
+    accounts: &PlaceSpotOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -3287,6 +3790,37 @@ pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOr
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn place_and_take_spot_order_verify_account_keys(
+    accounts: &PlaceAndTakeSpotOrderAccounts<'_, '_>,
+    keys: &PlaceAndTakeSpotOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_and_take_spot_order_verify_account_privileges(
+    accounts: &PlaceAndTakeSpotOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user, accounts.user_stats] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -3442,6 +3976,44 @@ pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOr
     let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn place_and_make_spot_order_verify_account_keys(
+    accounts: &PlaceAndMakeSpotOrderAccounts<'_, '_>,
+    keys: &PlaceAndMakeSpotOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.taker.key, &keys.taker),
+        (accounts.taker_stats.key, &keys.taker_stats),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn place_and_make_spot_order_verify_account_privileges(
+    accounts: &PlaceAndMakeSpotOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.taker,
+        accounts.taker_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -3628,6 +4200,57 @@ pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
     let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn begin_swap_verify_account_keys(
+    accounts: &BeginSwapAccounts<'_, '_>,
+    keys: &BeginSwapKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.out_spot_market_vault.key,
+            &keys.out_spot_market_vault,
+        ),
+        (
+            accounts.in_spot_market_vault.key,
+            &keys.in_spot_market_vault,
+        ),
+        (accounts.out_token_account.key, &keys.out_token_account),
+        (accounts.in_token_account.key, &keys.in_token_account),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.instructions.key, &keys.instructions),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn begin_swap_verify_account_privileges(
+    accounts: &BeginSwapAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.out_spot_market_vault,
+        accounts.in_spot_market_vault,
+        accounts.out_token_account,
+        accounts.in_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
 pub struct EndSwapAccounts<'me, 'info> {
@@ -3812,6 +4435,57 @@ pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
     let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn end_swap_verify_account_keys(
+    accounts: &EndSwapAccounts<'_, '_>,
+    keys: &EndSwapKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.out_spot_market_vault.key,
+            &keys.out_spot_market_vault,
+        ),
+        (
+            accounts.in_spot_market_vault.key,
+            &keys.in_spot_market_vault,
+        ),
+        (accounts.out_token_account.key, &keys.out_token_account),
+        (accounts.in_token_account.key, &keys.in_token_account),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.instructions.key, &keys.instructions),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn end_swap_verify_account_privileges(
+    accounts: &EndSwapAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.user,
+        accounts.user_stats,
+        accounts.out_spot_market_vault,
+        accounts.in_spot_market_vault,
+        accounts.out_token_account,
+        accounts.in_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct AddPerpLpSharesAccounts<'me, 'info> {
@@ -3939,6 +4613,36 @@ pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
     let ix = add_perp_lp_shares_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn add_perp_lp_shares_verify_account_keys(
+    accounts: &AddPerpLpSharesAccounts<'_, '_>,
+    keys: &AddPerpLpSharesKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn add_perp_lp_shares_verify_account_privileges(
+    accounts: &AddPerpLpSharesAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -4070,6 +4774,36 @@ pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxAr
     let ix = remove_perp_lp_shares_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn remove_perp_lp_shares_verify_account_keys(
+    accounts: &RemovePerpLpSharesAccounts<'_, '_>,
+    keys: &RemovePerpLpSharesKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_perp_lp_shares_verify_account_privileges(
+    accounts: &RemovePerpLpSharesAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -4213,6 +4947,30 @@ pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
         REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn remove_perp_lp_shares_in_expiring_market_verify_account_keys(
+    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
+    keys: &RemovePerpLpSharesInExpiringMarketKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_perp_lp_shares_in_expiring_market_verify_account_privileges(
+    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_USER_NAME_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserNameAccounts<'me, 'info> {
@@ -4330,6 +5088,35 @@ pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
     let ix = update_user_name_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_user_name_verify_account_keys(
+    accounts: &UpdateUserNameAccounts<'_, '_>,
+    keys: &UpdateUserNameKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_name_verify_account_privileges(
+    accounts: &UpdateUserNameAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -4462,6 +5249,35 @@ pub fn update_user_custom_margin_ratio_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_user_custom_margin_ratio_verify_account_keys(
+    accounts: &UpdateUserCustomMarginRatioAccounts<'_, '_>,
+    keys: &UpdateUserCustomMarginRatioKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_custom_margin_ratio_verify_account_privileges(
+    accounts: &UpdateUserCustomMarginRatioAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -4601,6 +5417,35 @@ pub fn update_user_margin_trading_enabled_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_user_margin_trading_enabled_verify_account_keys(
+    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, '_>,
+    keys: &UpdateUserMarginTradingEnabledKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_margin_trading_enabled_verify_account_privileges(
+    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserDelegateAccounts<'me, 'info> {
@@ -4721,6 +5566,35 @@ pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArg
     let ix = update_user_delegate_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_user_delegate_verify_account_keys(
+    accounts: &UpdateUserDelegateAccounts<'_, '_>,
+    keys: &UpdateUserDelegateKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_delegate_verify_account_privileges(
+    accounts: &UpdateUserDelegateAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DELETE_USER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -4853,6 +5727,37 @@ pub fn delete_user_invoke_signed<'info, A: Into<DeleteUserIxArgs>>(
     let ix = delete_user_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn delete_user_verify_account_keys(
+    accounts: &DeleteUserAccounts<'_, '_>,
+    keys: &DeleteUserKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn delete_user_verify_account_privileges(
+    accounts: &DeleteUserAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user, accounts.user_stats, accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const FILL_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -5003,6 +5908,44 @@ pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn fill_perp_order_verify_account_keys(
+    accounts: &FillPerpOrderAccounts<'_, '_>,
+    keys: &FillPerpOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.filler_stats.key, &keys.filler_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn fill_perp_order_verify_account_privileges(
+    accounts: &FillPerpOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.filler,
+        accounts.filler_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RevertFillAccounts<'me, 'info> {
@@ -5134,6 +6077,37 @@ pub fn revert_fill_invoke_signed<'info, A: Into<RevertFillIxArgs>>(
     let ix = revert_fill_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn revert_fill_verify_account_keys(
+    accounts: &RevertFillAccounts<'_, '_>,
+    keys: &RevertFillKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.filler_stats.key, &keys.filler_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn revert_fill_verify_account_privileges(
+    accounts: &RevertFillAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.filler, accounts.filler_stats] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -5285,6 +6259,44 @@ pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn fill_spot_order_verify_account_keys(
+    accounts: &FillSpotOrderAccounts<'_, '_>,
+    keys: &FillSpotOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.filler_stats.key, &keys.filler_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn fill_spot_order_verify_account_privileges(
+    accounts: &FillSpotOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.filler,
+        accounts.filler_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const TRIGGER_ORDER_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct TriggerOrderAccounts<'me, 'info> {
@@ -5419,6 +6431,37 @@ pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
     let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn trigger_order_verify_account_keys(
+    accounts: &TriggerOrderAccounts<'_, '_>,
+    keys: &TriggerOrderKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn trigger_order_verify_account_privileges(
+    accounts: &TriggerOrderAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.filler, accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct ForceCancelOrdersAccounts<'me, 'info> {
@@ -5551,6 +6594,37 @@ pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn force_cancel_orders_verify_account_keys(
+    accounts: &ForceCancelOrdersAccounts<'_, '_>,
+    keys: &ForceCancelOrdersKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn force_cancel_orders_verify_account_privileges(
+    accounts: &ForceCancelOrdersAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.filler, accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateUserIdleAccounts<'me, 'info> {
@@ -5682,6 +6756,37 @@ pub fn update_user_idle_invoke_signed<'info, A: Into<UpdateUserIdleIxArgs>>(
     let ix = update_user_idle_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_user_idle_verify_account_keys(
+    accounts: &UpdateUserIdleAccounts<'_, '_>,
+    keys: &UpdateUserIdleKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_idle_verify_account_privileges(
+    accounts: &UpdateUserIdleAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.filler, accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -5827,6 +6932,37 @@ pub fn update_user_open_orders_count_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_user_open_orders_count_verify_account_keys(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, '_>,
+    keys: &UpdateUserOpenOrdersCountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.filler.key, &keys.filler),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_open_orders_count_verify_account_privileges(
+    accounts: &UpdateUserOpenOrdersCountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.filler, accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct SettlePnlAccounts<'me, 'info> {
@@ -5961,6 +7097,37 @@ pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
     let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn settle_pnl_verify_account_keys(
+    accounts: &SettlePnlAccounts<'_, '_>,
+    keys: &SettlePnlKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+        (accounts.authority.key, &keys.authority),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_pnl_verify_account_privileges(
+    accounts: &SettlePnlAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleFundingPaymentAccounts<'me, 'info> {
@@ -6081,6 +7248,30 @@ pub fn settle_funding_payment_invoke_signed<'info, A: Into<SettleFundingPaymentI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn settle_funding_payment_verify_account_keys(
+    accounts: &SettleFundingPaymentAccounts<'_, '_>,
+    keys: &SettleFundingPaymentKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_funding_payment_verify_account_privileges(
+    accounts: &SettleFundingPaymentAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
+}
 pub const SETTLE_LP_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleLpAccounts<'me, 'info> {
@@ -6195,6 +7386,30 @@ pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
     let ix = settle_lp_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn settle_lp_verify_account_keys(
+    accounts: &SettleLpAccounts<'_, '_>,
+    keys: &SettleLpKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.user.key, &keys.user),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_lp_verify_account_privileges(
+    accounts: &SettleLpAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.user] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -6315,6 +7530,30 @@ pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxA
     let ix = settle_expired_market_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn settle_expired_market_verify_account_keys(
+    accounts: &SettleExpiredMarketAccounts<'_, '_>,
+    keys: &SettleExpiredMarketKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_expired_market_verify_account_privileges(
+    accounts: &SettleExpiredMarketAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const LIQUIDATE_PERP_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -6466,6 +7705,44 @@ pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn liquidate_perp_verify_account_keys(
+    accounts: &LiquidatePerpAccounts<'_, '_>,
+    keys: &LiquidatePerpKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn liquidate_perp_verify_account_privileges(
+    accounts: &LiquidatePerpAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const LIQUIDATE_SPOT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidateSpotAccounts<'me, 'info> {
@@ -6616,6 +7893,44 @@ pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
     let ix = liquidate_spot_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn liquidate_spot_verify_account_keys(
+    accounts: &LiquidateSpotAccounts<'_, '_>,
+    keys: &LiquidateSpotKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn liquidate_spot_verify_account_privileges(
+    accounts: &LiquidateSpotAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -6779,6 +8094,44 @@ pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
     let account_info: [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn liquidate_borrow_for_perp_pnl_verify_account_keys(
+    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, '_>,
+    keys: &LiquidateBorrowForPerpPnlKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn liquidate_borrow_for_perp_pnl_verify_account_privileges(
+    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -6945,6 +8298,44 @@ pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn liquidate_perp_pnl_for_deposit_verify_account_keys(
+    accounts: &LiquidatePerpPnlForDepositAccounts<'_, '_>,
+    keys: &LiquidatePerpPnlForDepositKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn liquidate_perp_pnl_for_deposit_verify_account_privileges(
+    accounts: &LiquidatePerpPnlForDepositAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct ResolvePerpPnlDeficitAccounts<'me, 'info> {
@@ -7098,6 +8489,42 @@ pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDefic
     let account_info: [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn resolve_perp_pnl_deficit_verify_account_keys(
+    accounts: &ResolvePerpPnlDeficitAccounts<'_, '_>,
+    keys: &ResolvePerpPnlDeficitKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn resolve_perp_pnl_deficit_verify_account_privileges(
+    accounts: &ResolvePerpPnlDeficitAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market_vault, accounts.insurance_fund_vault] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
@@ -7281,6 +8708,53 @@ pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn resolve_perp_bankruptcy_verify_account_keys(
+    accounts: &ResolvePerpBankruptcyAccounts<'_, '_>,
+    keys: &ResolvePerpBankruptcyKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn resolve_perp_bankruptcy_verify_account_privileges(
+    accounts: &ResolvePerpBankruptcyAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+        accounts.spot_market_vault,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct ResolveSpotBankruptcyAccounts<'me, 'info> {
@@ -7462,6 +8936,53 @@ pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn resolve_spot_bankruptcy_verify_account_keys(
+    accounts: &ResolveSpotBankruptcyAccounts<'_, '_>,
+    keys: &ResolveSpotBankruptcyKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.liquidator.key, &keys.liquidator),
+        (accounts.liquidator_stats.key, &keys.liquidator_stats),
+        (accounts.user.key, &keys.user),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn resolve_spot_bankruptcy_verify_account_privileges(
+    accounts: &ResolveSpotBankruptcyAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.liquidator,
+        accounts.liquidator_stats,
+        accounts.user,
+        accounts.user_stats,
+        accounts.spot_market_vault,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct SettleRevenueToInsuranceFundAccounts<'me, 'info> {
@@ -7628,6 +9149,41 @@ pub fn settle_revenue_to_insurance_fund_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn settle_revenue_to_insurance_fund_verify_account_keys(
+    accounts: &SettleRevenueToInsuranceFundAccounts<'_, '_>,
+    keys: &SettleRevenueToInsuranceFundKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_revenue_to_insurance_fund_verify_account_privileges(
+    accounts: &SettleRevenueToInsuranceFundAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.spot_market,
+        accounts.spot_market_vault,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateFundingRateAccounts<'me, 'info> {
@@ -7754,6 +9310,31 @@ pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>
     let ix = update_funding_rate_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_funding_rate_verify_account_keys(
+    accounts: &UpdateFundingRateAccounts<'_, '_>,
+    keys: &UpdateFundingRateKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_funding_rate_verify_account_privileges(
+    accounts: &UpdateFundingRateAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -7904,6 +9485,31 @@ pub fn update_spot_market_cumulative_interest_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_cumulative_interest_verify_account_keys(
+    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
+    keys: &UpdateSpotMarketCumulativeInterestKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (accounts.oracle.key, &keys.oracle),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_cumulative_interest_verify_account_privileges(
+    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_AMMS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmsAccounts<'me, 'info> {
@@ -8020,6 +9626,30 @@ pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
     let ix = update_amms_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_amms_verify_account_keys(
+    accounts: &UpdateAmmsAccounts<'_, '_>,
+    keys: &UpdateAmmsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_amms_verify_account_privileges(
+    accounts: &UpdateAmmsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -8154,6 +9784,36 @@ pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketEx
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_expiry_verify_account_keys(
+    accounts: &UpdateSpotMarketExpiryAccounts<'_, '_>,
+    keys: &UpdateSpotMarketExpiryKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_expiry_verify_account_privileges(
+    accounts: &UpdateSpotMarketExpiryAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -8324,6 +9984,49 @@ pub fn update_user_quote_asset_insurance_stake_invoke_signed<
     let account_info: [AccountInfo<'info>;
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_user_quote_asset_insurance_stake_verify_account_keys(
+    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
+    keys: &UpdateUserQuoteAssetInsuranceStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_user_quote_asset_insurance_stake_verify_account_privileges(
+    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -8503,6 +10206,48 @@ pub fn initialize_insurance_fund_stake_invoke_signed<
     let account_info: [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn initialize_insurance_fund_stake_verify_account_keys(
+    accounts: &InitializeInsuranceFundStakeAccounts<'_, '_>,
+    keys: &InitializeInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.state.key, &keys.state),
+        (accounts.authority.key, &keys.authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_insurance_fund_stake_verify_account_privileges(
+    accounts: &InitializeInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.payer,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
@@ -8686,6 +10431,55 @@ pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundSta
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn add_insurance_fund_stake_verify_account_keys(
+    accounts: &AddInsuranceFundStakeAccounts<'_, '_>,
+    keys: &AddInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.user_token_account.key, &keys.user_token_account),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn add_insurance_fund_stake_verify_account_privileges(
+    accounts: &AddInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.spot_market_vault,
+        accounts.insurance_fund_vault,
+        accounts.user_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct RequestRemoveInsuranceFundStakeAccounts<'me, 'info> {
@@ -8850,6 +10644,48 @@ pub fn request_remove_insurance_fund_stake_invoke_signed<
     let account_info: [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn request_remove_insurance_fund_stake_verify_account_keys(
+    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: &RequestRemoveInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn request_remove_insurance_fund_stake_verify_account_privileges(
+    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
@@ -9019,6 +10855,48 @@ pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
     let account_info: [AccountInfo<'info>;
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn cancel_request_remove_insurance_fund_stake_verify_account_keys(
+    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: &CancelRequestRemoveInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn cancel_request_remove_insurance_fund_stake_verify_account_privileges(
+    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.insurance_fund_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
@@ -9196,6 +11074,53 @@ pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceF
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn remove_insurance_fund_stake_verify_account_keys(
+    accounts: &RemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: &RemoveInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_stake.key,
+            &keys.insurance_fund_stake,
+        ),
+        (accounts.user_stats.key, &keys.user_stats),
+        (accounts.authority.key, &keys.authority),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.user_token_account.key, &keys.user_token_account),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_insurance_fund_stake_verify_account_privileges(
+    accounts: &RemoveInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.insurance_fund_stake,
+        accounts.user_stats,
+        accounts.insurance_fund_vault,
+        accounts.user_token_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct InitializeAccounts<'me, 'info> {
@@ -9348,6 +11273,40 @@ pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
     let ix = initialize_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn initialize_verify_account_keys(
+    accounts: &InitializeAccounts<'_, '_>,
+    keys: &InitializeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.quote_asset_mint.key, &keys.quote_asset_mint),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_verify_account_privileges(
+    accounts: &InitializeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.admin, accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -9547,6 +11506,53 @@ pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketI
     let account_info: [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn initialize_spot_market_verify_account_keys(
+    accounts: &InitializeSpotMarketAccounts<'_, '_>,
+    keys: &InitializeSpotMarketKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.spot_market.key, &keys.spot_market),
+        (accounts.spot_market_mint.key, &keys.spot_market_mint),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.state.key, &keys.state),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.admin.key, &keys.admin),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_spot_market_verify_account_privileges(
+    accounts: &InitializeSpotMarketAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.spot_market,
+        accounts.spot_market_vault,
+        accounts.insurance_fund_vault,
+        accounts.state,
+        accounts.admin,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -9754,6 +11760,52 @@ pub fn initialize_serum_fulfillment_config_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_serum_fulfillment_config_verify_account_keys(
+    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, '_>,
+    keys: &InitializeSerumFulfillmentConfigKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.base_spot_market.key, &keys.base_spot_market),
+        (accounts.quote_spot_market.key, &keys.quote_spot_market),
+        (accounts.state.key, &keys.state),
+        (accounts.serum_program.key, &keys.serum_program),
+        (accounts.serum_market.key, &keys.serum_market),
+        (accounts.serum_open_orders.key, &keys.serum_open_orders),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (
+            accounts.serum_fulfillment_config.key,
+            &keys.serum_fulfillment_config,
+        ),
+        (accounts.admin.key, &keys.admin),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_serum_fulfillment_config_verify_account_privileges(
+    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.serum_open_orders,
+        accounts.serum_fulfillment_config,
+        accounts.admin,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info> {
@@ -9904,6 +11956,39 @@ pub fn update_serum_fulfillment_config_status_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_serum_fulfillment_config_status_verify_account_keys(
+    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
+    keys: &UpdateSerumFulfillmentConfigStatusKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (
+            accounts.serum_fulfillment_config.key,
+            &keys.serum_fulfillment_config,
+        ),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_serum_fulfillment_config_status_verify_account_privileges(
+    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.serum_fulfillment_config, accounts.admin] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
@@ -10105,6 +12190,50 @@ pub fn initialize_phoenix_fulfillment_config_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_phoenix_fulfillment_config_verify_account_keys(
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
+    keys: &InitializePhoenixFulfillmentConfigKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.base_spot_market.key, &keys.base_spot_market),
+        (accounts.quote_spot_market.key, &keys.quote_spot_market),
+        (accounts.state.key, &keys.state),
+        (accounts.phoenix_program.key, &keys.phoenix_program),
+        (accounts.phoenix_market.key, &keys.phoenix_market),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (
+            accounts.phoenix_fulfillment_config.key,
+            &keys.phoenix_fulfillment_config,
+        ),
+        (accounts.admin.key, &keys.admin),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_phoenix_fulfillment_config_verify_account_privileges(
+    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.phoenix_fulfillment_config,
+        accounts.admin,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct PhoenixFulfillmentConfigStatusAccounts<'me, 'info> {
@@ -10251,6 +12380,39 @@ pub fn phoenix_fulfillment_config_status_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn phoenix_fulfillment_config_status_verify_account_keys(
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
+    keys: &PhoenixFulfillmentConfigStatusKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (
+            accounts.phoenix_fulfillment_config.key,
+            &keys.phoenix_fulfillment_config,
+        ),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn phoenix_fulfillment_config_status_verify_account_privileges(
+    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.phoenix_fulfillment_config, accounts.admin] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSerumVaultAccounts<'me, 'info> {
@@ -10375,6 +12537,36 @@ pub fn update_serum_vault_invoke_signed<'info, A: Into<UpdateSerumVaultIxArgs>>(
     let ix = update_serum_vault_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_serum_vault_verify_account_keys(
+    accounts: &UpdateSerumVaultAccounts<'_, '_>,
+    keys: &UpdateSerumVaultKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.admin.key, &keys.admin),
+        (accounts.srm_vault.key, &keys.srm_vault),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_serum_vault_verify_account_privileges(
+    accounts: &UpdateSerumVaultAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state, accounts.admin] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
@@ -10539,6 +12731,39 @@ pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_perp_market_verify_account_keys(
+    accounts: &InitializePerpMarketAccounts<'_, '_>,
+    keys: &InitializePerpMarketKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_perp_market_verify_account_privileges(
+    accounts: &InitializePerpMarketAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct DeleteInitializedPerpMarketAccounts<'me, 'info> {
@@ -10680,6 +12905,36 @@ pub fn delete_initialized_perp_market_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn delete_initialized_perp_market_verify_account_keys(
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, '_>,
+    keys: &DeleteInitializedPerpMarketKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn delete_initialized_perp_market_verify_account_privileges(
+    accounts: &DeleteInitializedPerpMarketAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct MoveAmmPriceAccounts<'me, 'info> {
@@ -10808,6 +13063,36 @@ pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
     let ix = move_amm_price_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn move_amm_price_verify_account_keys(
+    accounts: &MoveAmmPriceAccounts<'_, '_>,
+    keys: &MoveAmmPriceKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn move_amm_price_verify_account_privileges(
+    accounts: &MoveAmmPriceAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -10942,6 +13227,36 @@ pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketEx
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_expiry_verify_account_keys(
+    accounts: &UpdatePerpMarketExpiryAccounts<'_, '_>,
+    keys: &UpdatePerpMarketExpiryKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_expiry_verify_account_privileges(
+    accounts: &UpdatePerpMarketExpiryAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -11104,6 +13419,37 @@ pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<
     let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn settle_expired_market_pools_to_revenue_pool_verify_account_keys(
+    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
+    keys: &SettleExpiredMarketPoolsToRevenuePoolKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.admin.key, &keys.admin),
+        (accounts.spot_market.key, &keys.spot_market),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn settle_expired_market_pools_to_revenue_pool_verify_account_privileges(
+    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market, accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -11284,6 +13630,47 @@ pub fn deposit_into_perp_market_fee_pool_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deposit_into_perp_market_fee_pool_verify_account_keys(
+    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
+    keys: &DepositIntoPerpMarketFeePoolKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.admin.key, &keys.admin),
+        (accounts.source_vault.key, &keys.source_vault),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.quote_spot_market.key, &keys.quote_spot_market),
+        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deposit_into_perp_market_fee_pool_verify_account_privileges(
+    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.perp_market,
+        accounts.source_vault,
+        accounts.quote_spot_market,
+        accounts.spot_market_vault,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REPEG_AMM_CURVE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RepegAmmCurveAccounts<'me, 'info> {
@@ -11417,6 +13804,37 @@ pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
     let ix = repeg_amm_curve_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn repeg_amm_curve_verify_account_keys(
+    accounts: &RepegAmmCurveAccounts<'_, '_>,
+    keys: &RepegAmmCurveKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn repeg_amm_curve_verify_account_privileges(
+    accounts: &RepegAmmCurveAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -11568,6 +13986,37 @@ pub fn update_perp_market_amm_oracle_twap_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_amm_oracle_twap_verify_account_keys(
+    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
+    keys: &UpdatePerpMarketAmmOracleTwapKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_amm_oracle_twap_verify_account_privileges(
+    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct ResetPerpMarketAmmOracleTwapAccounts<'me, 'info> {
@@ -11718,6 +14167,37 @@ pub fn reset_perp_market_amm_oracle_twap_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn reset_perp_market_amm_oracle_twap_verify_account_keys(
+    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
+    keys: &ResetPerpMarketAmmOracleTwapKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn reset_perp_market_amm_oracle_twap_verify_account_privileges(
+    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_K_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateKAccounts<'me, 'info> {
@@ -11849,6 +14329,37 @@ pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
     let ix = update_k_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_k_verify_account_keys(
+    accounts: &UpdateKAccounts<'_, '_>,
+    keys: &UpdateKKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_k_verify_account_privileges(
+    accounts: &UpdateKAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -11992,6 +14503,36 @@ pub fn update_perp_market_margin_ratio_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_margin_ratio_verify_account_keys(
+    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMarginRatioKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_margin_ratio_verify_account_privileges(
+    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -12139,6 +14680,36 @@ pub fn update_perp_market_max_imbalances_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_max_imbalances_verify_account_keys(
+    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMaxImbalancesKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_max_imbalances_verify_account_privileges(
+    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketLiquidationFeeAccounts<'me, 'info> {
@@ -12285,6 +14856,36 @@ pub fn update_perp_market_liquidation_fee_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_liquidation_fee_verify_account_keys(
+    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
+    keys: &UpdatePerpMarketLiquidationFeeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_liquidation_fee_verify_account_privileges(
+    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -12437,6 +15038,36 @@ pub fn update_insurance_fund_unstaking_period_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_insurance_fund_unstaking_period_verify_account_keys(
+    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
+    keys: &UpdateInsuranceFundUnstakingPeriodKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_insurance_fund_unstaking_period_verify_account_privileges(
+    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketLiquidationFeeAccounts<'me, 'info> {
@@ -12585,6 +15216,36 @@ pub fn update_spot_market_liquidation_fee_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_liquidation_fee_verify_account_keys(
+    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
+    keys: &UpdateSpotMarketLiquidationFeeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_liquidation_fee_verify_account_privileges(
+    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateWithdrawGuardThresholdAccounts<'me, 'info> {
@@ -12729,6 +15390,36 @@ pub fn update_withdraw_guard_threshold_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_withdraw_guard_threshold_verify_account_keys(
+    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, '_>,
+    keys: &UpdateWithdrawGuardThresholdKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_withdraw_guard_threshold_verify_account_privileges(
+    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketIfFactorAccounts<'me, 'info> {
@@ -12867,6 +15558,36 @@ pub fn update_spot_market_if_factor_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_if_factor_verify_account_keys(
+    accounts: &UpdateSpotMarketIfFactorAccounts<'_, '_>,
+    keys: &UpdateSpotMarketIfFactorKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_if_factor_verify_account_privileges(
+    accounts: &UpdateSpotMarketIfFactorAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -13019,6 +15740,36 @@ pub fn update_spot_market_revenue_settle_period_invoke_signed<
         UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_revenue_settle_period_verify_account_keys(
+    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
+    keys: &UpdateSpotMarketRevenueSettlePeriodKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_revenue_settle_period_verify_account_privileges(
+    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketStatusAccounts<'me, 'info> {
@@ -13152,6 +15903,36 @@ pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketSt
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_status_verify_account_keys(
+    accounts: &UpdateSpotMarketStatusAccounts<'_, '_>,
+    keys: &UpdateSpotMarketStatusKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_status_verify_account_privileges(
+    accounts: &UpdateSpotMarketStatusAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -13291,6 +16072,36 @@ pub fn update_spot_market_asset_tier_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_asset_tier_verify_account_keys(
+    accounts: &UpdateSpotMarketAssetTierAccounts<'_, '_>,
+    keys: &UpdateSpotMarketAssetTierKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_asset_tier_verify_account_privileges(
+    accounts: &UpdateSpotMarketAssetTierAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -13440,6 +16251,36 @@ pub fn update_spot_market_margin_weights_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_margin_weights_verify_account_keys(
+    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
+    keys: &UpdateSpotMarketMarginWeightsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_margin_weights_verify_account_privileges(
+    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketBorrowRateAccounts<'me, 'info> {
@@ -13582,6 +16423,36 @@ pub fn update_spot_market_borrow_rate_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_borrow_rate_verify_account_keys(
+    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, '_>,
+    keys: &UpdateSpotMarketBorrowRateKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_borrow_rate_verify_account_privileges(
+    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -13734,6 +16605,36 @@ pub fn update_spot_market_max_token_deposits_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_max_token_deposits_verify_account_keys(
+    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
+    keys: &UpdateSpotMarketMaxTokenDepositsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_max_token_deposits_verify_account_privileges(
+    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketOracleAccounts<'me, 'info> {
@@ -13875,6 +16776,37 @@ pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOr
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_oracle_verify_account_keys(
+    accounts: &UpdateSpotMarketOracleAccounts<'_, '_>,
+    keys: &UpdateSpotMarketOracleKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (accounts.oracle.key, &keys.oracle),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_oracle_verify_account_privileges(
+    accounts: &UpdateSpotMarketOracleAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -14028,6 +16960,36 @@ pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_step_size_and_tick_size_verify_account_keys(
+    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    keys: &UpdateSpotMarketStepSizeAndTickSizeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_step_size_and_tick_size_verify_account_privileges(
+    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketMinOrderSizeAccounts<'me, 'info> {
@@ -14171,6 +17133,36 @@ pub fn update_spot_market_min_order_size_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_min_order_size_verify_account_keys(
+    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
+    keys: &UpdateSpotMarketMinOrderSizeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_min_order_size_verify_account_privileges(
+    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -14317,6 +17309,36 @@ pub fn update_spot_market_orders_enabled_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_spot_market_orders_enabled_verify_account_keys(
+    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
+    keys: &UpdateSpotMarketOrdersEnabledKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_orders_enabled_verify_account_privileges(
+    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotMarketNameAccounts<'me, 'info> {
@@ -14448,6 +17470,36 @@ pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketName
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_market_name_verify_account_keys(
+    accounts: &UpdateSpotMarketNameAccounts<'_, '_>,
+    keys: &UpdateSpotMarketNameKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_market_name_verify_account_privileges(
+    accounts: &UpdateSpotMarketNameAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.spot_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -14582,6 +17634,36 @@ pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketSt
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_status_verify_account_keys(
+    accounts: &UpdatePerpMarketStatusAccounts<'_, '_>,
+    keys: &UpdatePerpMarketStatusKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_status_verify_account_privileges(
+    accounts: &UpdatePerpMarketStatusAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -14728,6 +17810,36 @@ pub fn update_perp_market_contract_tier_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_contract_tier_verify_account_keys(
+    accounts: &UpdatePerpMarketContractTierAccounts<'_, '_>,
+    keys: &UpdatePerpMarketContractTierKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_contract_tier_verify_account_privileges(
+    accounts: &UpdatePerpMarketContractTierAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketImfFactorAccounts<'me, 'info> {
@@ -14867,6 +17979,36 @@ pub fn update_perp_market_imf_factor_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_imf_factor_verify_account_keys(
+    accounts: &UpdatePerpMarketImfFactorAccounts<'_, '_>,
+    keys: &UpdatePerpMarketImfFactorKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_imf_factor_verify_account_privileges(
+    accounts: &UpdatePerpMarketImfFactorAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -15024,6 +18166,36 @@ pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_unrealized_asset_weight_verify_account_keys(
+    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
+    keys: &UpdatePerpMarketUnrealizedAssetWeightKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_unrealized_asset_weight_verify_account_privileges(
+    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketConcentrationCoefAccounts<'me, 'info> {
@@ -15174,6 +18346,36 @@ pub fn update_perp_market_concentration_coef_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_concentration_coef_verify_account_keys(
+    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
+    keys: &UpdatePerpMarketConcentrationCoefKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_concentration_coef_verify_account_privileges(
+    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -15329,6 +18531,36 @@ pub fn update_perp_market_curve_update_intensity_invoke_signed<
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_curve_update_intensity_verify_account_keys(
+    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
+    keys: &UpdatePerpMarketCurveUpdateIntensityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_curve_update_intensity_verify_account_privileges(
+    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -15490,6 +18722,36 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_keys(
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
+    keys: &UpdatePerpMarketTargetBaseAssetAmountPerLpKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_privileges(
+    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLpCooldownTimeAccounts<'me, 'info> {
@@ -15611,6 +18873,35 @@ pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTime
     let account_info: [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_lp_cooldown_time_verify_account_keys(
+    accounts: &UpdateLpCooldownTimeAccounts<'_, '_>,
+    keys: &UpdateLpCooldownTimeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_lp_cooldown_time_verify_account_privileges(
+    accounts: &UpdateLpCooldownTimeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -15736,6 +19027,35 @@ pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStruc
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_fee_structure_verify_account_keys(
+    accounts: &UpdatePerpFeeStructureAccounts<'_, '_>,
+    keys: &UpdatePerpFeeStructureKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_fee_structure_verify_account_privileges(
+    accounts: &UpdatePerpFeeStructureAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotFeeStructureAccounts<'me, 'info> {
@@ -15859,6 +19179,35 @@ pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStruc
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_fee_structure_verify_account_keys(
+    accounts: &UpdateSpotFeeStructureAccounts<'_, '_>,
+    keys: &UpdateSpotFeeStructureKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_fee_structure_verify_account_privileges(
+    accounts: &UpdateSpotFeeStructureAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -15992,6 +19341,35 @@ pub fn update_initial_pct_to_liquidate_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_initial_pct_to_liquidate_verify_account_keys(
+    accounts: &UpdateInitialPctToLiquidateAccounts<'_, '_>,
+    keys: &UpdateInitialPctToLiquidateKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_initial_pct_to_liquidate_verify_account_privileges(
+    accounts: &UpdateInitialPctToLiquidateAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateLiquidationDurationAccounts<'me, 'info> {
@@ -16119,6 +19497,35 @@ pub fn update_liquidation_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_liquidation_duration_verify_account_keys(
+    accounts: &UpdateLiquidationDurationAccounts<'_, '_>,
+    keys: &UpdateLiquidationDurationKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_liquidation_duration_verify_account_privileges(
+    accounts: &UpdateLiquidationDurationAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateOracleGuardRailsAccounts<'me, 'info> {
@@ -16242,6 +19649,35 @@ pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardR
     let account_info: [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_oracle_guard_rails_verify_account_keys(
+    accounts: &UpdateOracleGuardRailsAccounts<'_, '_>,
+    keys: &UpdateOracleGuardRailsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_oracle_guard_rails_verify_account_privileges(
+    accounts: &UpdateOracleGuardRailsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -16376,6 +19812,35 @@ pub fn update_state_settlement_duration_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_state_settlement_duration_verify_account_keys(
+    accounts: &UpdateStateSettlementDurationAccounts<'_, '_>,
+    keys: &UpdateStateSettlementDurationKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_state_settlement_duration_verify_account_privileges(
+    accounts: &UpdateStateSettlementDurationAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
@@ -16519,6 +19984,37 @@ pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOr
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_oracle_verify_account_keys(
+    accounts: &UpdatePerpMarketOracleAccounts<'_, '_>,
+    keys: &UpdatePerpMarketOracleKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+        (accounts.oracle.key, &keys.oracle),
+        (accounts.admin.key, &keys.admin),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_oracle_verify_account_privileges(
+    accounts: &UpdatePerpMarketOracleAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketBaseSpreadAccounts<'me, 'info> {
@@ -16660,6 +20156,36 @@ pub fn update_perp_market_base_spread_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_base_spread_verify_account_keys(
+    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
+    keys: &UpdatePerpMarketBaseSpreadKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_base_spread_verify_account_privileges(
+    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAmmJitIntensityAccounts<'me, 'info> {
@@ -16791,6 +20317,36 @@ pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensi
     let account_info: [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_amm_jit_intensity_verify_account_keys(
+    accounts: &UpdateAmmJitIntensityAccounts<'_, '_>,
+    keys: &UpdateAmmJitIntensityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_amm_jit_intensity_verify_account_privileges(
+    accounts: &UpdateAmmJitIntensityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -16930,6 +20486,36 @@ pub fn update_perp_market_max_spread_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_max_spread_verify_account_keys(
+    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMaxSpreadKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_max_spread_verify_account_privileges(
+    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -17083,6 +20669,36 @@ pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_step_size_and_tick_size_verify_account_keys(
+    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    keys: &UpdatePerpMarketStepSizeAndTickSizeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_step_size_and_tick_size_verify_account_privileges(
+    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketNameAccounts<'me, 'info> {
@@ -17214,6 +20830,36 @@ pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketName
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_name_verify_account_keys(
+    accounts: &UpdatePerpMarketNameAccounts<'_, '_>,
+    keys: &UpdatePerpMarketNameKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_name_verify_account_privileges(
+    accounts: &UpdatePerpMarketNameAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -17358,6 +21004,36 @@ pub fn update_perp_market_min_order_size_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_min_order_size_verify_account_keys(
+    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMinOrderSizeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_min_order_size_verify_account_privileges(
+    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -17509,6 +21185,36 @@ pub fn update_perp_market_max_slippage_ratio_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_perp_market_max_slippage_ratio_verify_account_keys(
+    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMaxSlippageRatioKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_max_slippage_ratio_verify_account_privileges(
+    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
@@ -17668,6 +21374,36 @@ pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_max_fill_reserve_fraction_verify_account_keys(
+    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMaxFillReserveFractionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_max_fill_reserve_fraction_verify_account_privileges(
+    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info> {
@@ -17818,6 +21554,36 @@ pub fn update_perp_market_max_open_interest_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_market_max_open_interest_verify_account_keys(
+    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
+    keys: &UpdatePerpMarketMaxOpenInterestKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.perp_market.key, &keys.perp_market),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_market_max_open_interest_verify_account_privileges(
+    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.perp_market] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_ADMIN_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateAdminAccounts<'me, 'info> {
@@ -17934,6 +21700,35 @@ pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
     let ix = update_admin_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_admin_verify_account_keys(
+    accounts: &UpdateAdminAccounts<'_, '_>,
+    keys: &UpdateAdminKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_admin_verify_account_privileges(
+    accounts: &UpdateAdminAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -18055,6 +21850,35 @@ pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxA
     let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_whitelist_mint_verify_account_keys(
+    accounts: &UpdateWhitelistMintAccounts<'_, '_>,
+    keys: &UpdateWhitelistMintKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_whitelist_mint_verify_account_privileges(
+    accounts: &UpdateWhitelistMintAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateDiscountMintAccounts<'me, 'info> {
@@ -18174,6 +21998,35 @@ pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArg
     let ix = update_discount_mint_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_discount_mint_verify_account_keys(
+    accounts: &UpdateDiscountMintAccounts<'_, '_>,
+    keys: &UpdateDiscountMintKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_discount_mint_verify_account_privileges(
+    accounts: &UpdateDiscountMintAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -18296,6 +22149,35 @@ pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusI
     let account_info: [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_exchange_status_verify_account_keys(
+    accounts: &UpdateExchangeStatusAccounts<'_, '_>,
+    keys: &UpdateExchangeStatusKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_exchange_status_verify_account_privileges(
+    accounts: &UpdateExchangeStatusAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -18426,6 +22308,35 @@ pub fn update_perp_auction_duration_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_perp_auction_duration_verify_account_keys(
+    accounts: &UpdatePerpAuctionDurationAccounts<'_, '_>,
+    keys: &UpdatePerpAuctionDurationKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_perp_auction_duration_verify_account_privileges(
+    accounts: &UpdatePerpAuctionDurationAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateSpotAuctionDurationAccounts<'me, 'info> {
@@ -18554,6 +22465,35 @@ pub fn update_spot_auction_duration_invoke_signed<
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_spot_auction_duration_verify_account_keys(
+    accounts: &UpdateSpotAuctionDurationAccounts<'_, '_>,
+    keys: &UpdateSpotAuctionDurationKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_spot_auction_duration_verify_account_privileges(
+    accounts: &UpdateSpotAuctionDurationAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
@@ -18728,4 +22668,41 @@ pub fn admin_remove_insurance_fund_stake_invoke_signed<
     let account_info: [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn admin_remove_insurance_fund_stake_verify_account_keys(
+    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: &AdminRemoveInsuranceFundStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.admin.key, &keys.admin),
+        (accounts.state.key, &keys.state),
+        (accounts.spot_market.key, &keys.spot_market),
+        (
+            accounts.insurance_fund_vault.key,
+            &keys.insurance_fund_vault,
+        ),
+        (accounts.drift_signer.key, &keys.drift_signer),
+        (accounts.admin_token_account.key, &keys.admin_token_account),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn admin_remove_insurance_fund_stake_verify_account_privileges(
+    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.insurance_fund_vault, accounts.admin_token_account] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }

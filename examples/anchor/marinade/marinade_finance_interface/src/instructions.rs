@@ -5,6 +5,7 @@ use solana_program::{
     entrypoint::ProgramResult,
     instruction::{AccountMeta, Instruction},
     program::{invoke, invoke_signed},
+    program_error::ProgramError,
     pubkey::Pubkey,
 };
 #[derive(Clone, Debug, PartialEq)]
@@ -372,6 +373,55 @@ pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn initialize_verify_account_keys(
+    accounts: &InitializeAccounts<'_, '_>,
+    keys: &InitializeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.creator_authority.key, &keys.creator_authority),
+        (accounts.state.key, &keys.state),
+        (accounts.reserve_pda.key, &keys.reserve_pda),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.msol_mint.key, &keys.msol_mint),
+        (
+            accounts.operational_sol_account.key,
+            &keys.operational_sol_account,
+        ),
+        (accounts.liq_pool_lp_mint.key, &keys.liq_pool_lp_mint),
+        (
+            accounts.liq_pool_sol_leg_pda.key,
+            &keys.liq_pool_sol_leg_pda,
+        ),
+        (accounts.liq_pool_msol_leg.key, &keys.liq_pool_msol_leg),
+        (
+            accounts.treasury_msol_account.key,
+            &keys.treasury_msol_account,
+        ),
+        (accounts.clock.key, &keys.clock),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn initialize_verify_account_privileges(
+    accounts: &InitializeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state, accounts.stake_list, accounts.validator_list] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.creator_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CHANGE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ChangeAuthorityAccounts<'me, 'info> {
@@ -488,6 +538,35 @@ pub fn change_authority_invoke_signed<'info, A: Into<ChangeAuthorityIxArgs>>(
     let ix = change_authority_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn change_authority_verify_account_keys(
+    accounts: &ChangeAuthorityAccounts<'_, '_>,
+    keys: &ChangeAuthorityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.admin_authority.key, &keys.admin_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn change_authority_verify_account_privileges(
+    accounts: &ChangeAuthorityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const ADD_VALIDATOR_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
@@ -658,6 +737,47 @@ pub fn add_validator_invoke_signed<'info, A: Into<AddValidatorIxArgs>>(
     let account_info: [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn add_validator_verify_account_keys(
+    accounts: &AddValidatorAccounts<'_, '_>,
+    keys: &AddValidatorKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.manager_authority.key, &keys.manager_authority),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.validator_vote.key, &keys.validator_vote),
+        (accounts.duplication_flag.key, &keys.duplication_flag),
+        (accounts.rent_payer.key, &keys.rent_payer),
+        (accounts.clock.key, &keys.clock),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn add_validator_verify_account_privileges(
+    accounts: &AddValidatorAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.duplication_flag,
+        accounts.rent_payer,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.manager_authority, accounts.rent_payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REMOVE_VALIDATOR_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveValidatorAccounts<'me, 'info> {
@@ -800,6 +920,46 @@ pub fn remove_validator_invoke_signed<'info, A: Into<RemoveValidatorIxArgs>>(
     let account_info: [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn remove_validator_verify_account_keys(
+    accounts: &RemoveValidatorAccounts<'_, '_>,
+    keys: &RemoveValidatorKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.manager_authority.key, &keys.manager_authority),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.duplication_flag.key, &keys.duplication_flag),
+        (
+            accounts.operational_sol_account.key,
+            &keys.operational_sol_account,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_validator_verify_account_privileges(
+    accounts: &RemoveValidatorAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.duplication_flag,
+        accounts.operational_sol_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.manager_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct SetValidatorScoreAccounts<'me, 'info> {
@@ -929,6 +1089,36 @@ pub fn set_validator_score_invoke_signed<'info, A: Into<SetValidatorScoreIxArgs>
     let account_info: [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn set_validator_score_verify_account_keys(
+    accounts: &SetValidatorScoreAccounts<'_, '_>,
+    keys: &SetValidatorScoreKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.manager_authority.key, &keys.manager_authority),
+        (accounts.validator_list.key, &keys.validator_list),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn set_validator_score_verify_account_privileges(
+    accounts: &SetValidatorScoreAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state, accounts.validator_list] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.manager_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ConfigValidatorSystemAccounts<'me, 'info> {
@@ -1050,6 +1240,35 @@ pub fn config_validator_system_invoke_signed<'info, A: Into<ConfigValidatorSyste
     let account_info: [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn config_validator_system_verify_account_keys(
+    accounts: &ConfigValidatorSystemAccounts<'_, '_>,
+    keys: &ConfigValidatorSystemKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.manager_authority.key, &keys.manager_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn config_validator_system_verify_account_privileges(
+    accounts: &ConfigValidatorSystemAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.manager_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -1231,6 +1450,58 @@ pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
     let ix = deposit_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn deposit_verify_account_keys(
+    accounts: &DepositAccounts<'_, '_>,
+    keys: &DepositKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.msol_mint.key, &keys.msol_mint),
+        (
+            accounts.liq_pool_sol_leg_pda.key,
+            &keys.liq_pool_sol_leg_pda,
+        ),
+        (accounts.liq_pool_msol_leg.key, &keys.liq_pool_msol_leg),
+        (
+            accounts.liq_pool_msol_leg_authority.key,
+            &keys.liq_pool_msol_leg_authority,
+        ),
+        (accounts.reserve_pda.key, &keys.reserve_pda),
+        (accounts.transfer_from.key, &keys.transfer_from),
+        (accounts.mint_to.key, &keys.mint_to),
+        (accounts.msol_mint_authority.key, &keys.msol_mint_authority),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deposit_verify_account_privileges(
+    accounts: &DepositAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.msol_mint,
+        accounts.liq_pool_sol_leg_pda,
+        accounts.liq_pool_msol_leg,
+        accounts.reserve_pda,
+        accounts.transfer_from,
+        accounts.mint_to,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.transfer_from] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN: usize = 15;
 #[derive(Copy, Clone, Debug)]
@@ -1446,6 +1717,57 @@ pub fn deposit_stake_account_invoke_signed<'info, A: Into<DepositStakeAccountIxA
     let account_info: [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deposit_stake_account_verify_account_keys(
+    accounts: &DepositStakeAccountAccounts<'_, '_>,
+    keys: &DepositStakeAccountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.stake_account.key, &keys.stake_account),
+        (accounts.stake_authority.key, &keys.stake_authority),
+        (accounts.duplication_flag.key, &keys.duplication_flag),
+        (accounts.rent_payer.key, &keys.rent_payer),
+        (accounts.msol_mint.key, &keys.msol_mint),
+        (accounts.mint_to.key, &keys.mint_to),
+        (accounts.msol_mint_authority.key, &keys.msol_mint_authority),
+        (accounts.clock.key, &keys.clock),
+        (accounts.rent.key, &keys.rent),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.stake_program.key, &keys.stake_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deposit_stake_account_verify_account_privileges(
+    accounts: &DepositStakeAccountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.stake_list,
+        accounts.stake_account,
+        accounts.duplication_flag,
+        accounts.rent_payer,
+        accounts.msol_mint,
+        accounts.mint_to,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.stake_authority, accounts.rent_payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const LIQUID_UNSTAKE_IX_ACCOUNTS_LEN: usize = 10;
 #[derive(Copy, Clone, Debug)]
 pub struct LiquidUnstakeAccounts<'me, 'info> {
@@ -1622,6 +1944,60 @@ pub fn liquid_unstake_invoke_signed<'info, A: Into<LiquidUnstakeIxArgs>>(
     let account_info: [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn liquid_unstake_verify_account_keys(
+    accounts: &LiquidUnstakeAccounts<'_, '_>,
+    keys: &LiquidUnstakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.msol_mint.key, &keys.msol_mint),
+        (
+            accounts.liq_pool_sol_leg_pda.key,
+            &keys.liq_pool_sol_leg_pda,
+        ),
+        (accounts.liq_pool_msol_leg.key, &keys.liq_pool_msol_leg),
+        (
+            accounts.treasury_msol_account.key,
+            &keys.treasury_msol_account,
+        ),
+        (accounts.get_msol_from.key, &keys.get_msol_from),
+        (
+            accounts.get_msol_from_authority.key,
+            &keys.get_msol_from_authority,
+        ),
+        (accounts.transfer_sol_to.key, &keys.transfer_sol_to),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn liquid_unstake_verify_account_privileges(
+    accounts: &LiquidUnstakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.msol_mint,
+        accounts.liq_pool_sol_leg_pda,
+        accounts.liq_pool_msol_leg,
+        accounts.treasury_msol_account,
+        accounts.get_msol_from,
+        accounts.transfer_sol_to,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.get_msol_from_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const ADD_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct AddLiquidityAccounts<'me, 'info> {
@@ -1790,6 +2166,51 @@ pub fn add_liquidity_invoke_signed<'info, A: Into<AddLiquidityIxArgs>>(
     let ix = add_liquidity_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn add_liquidity_verify_account_keys(
+    accounts: &AddLiquidityAccounts<'_, '_>,
+    keys: &AddLiquidityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.lp_mint.key, &keys.lp_mint),
+        (accounts.lp_mint_authority.key, &keys.lp_mint_authority),
+        (accounts.liq_pool_msol_leg.key, &keys.liq_pool_msol_leg),
+        (
+            accounts.liq_pool_sol_leg_pda.key,
+            &keys.liq_pool_sol_leg_pda,
+        ),
+        (accounts.transfer_from.key, &keys.transfer_from),
+        (accounts.mint_to.key, &keys.mint_to),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn add_liquidity_verify_account_privileges(
+    accounts: &AddLiquidityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.lp_mint,
+        accounts.liq_pool_sol_leg_pda,
+        accounts.transfer_from,
+        accounts.mint_to,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.transfer_from] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -1974,6 +2395,58 @@ pub fn remove_liquidity_invoke_signed<'info, A: Into<RemoveLiquidityIxArgs>>(
     let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn remove_liquidity_verify_account_keys(
+    accounts: &RemoveLiquidityAccounts<'_, '_>,
+    keys: &RemoveLiquidityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.lp_mint.key, &keys.lp_mint),
+        (accounts.burn_from.key, &keys.burn_from),
+        (accounts.burn_from_authority.key, &keys.burn_from_authority),
+        (accounts.transfer_sol_to.key, &keys.transfer_sol_to),
+        (accounts.transfer_msol_to.key, &keys.transfer_msol_to),
+        (
+            accounts.liq_pool_sol_leg_pda.key,
+            &keys.liq_pool_sol_leg_pda,
+        ),
+        (accounts.liq_pool_msol_leg.key, &keys.liq_pool_msol_leg),
+        (
+            accounts.liq_pool_msol_leg_authority.key,
+            &keys.liq_pool_msol_leg_authority,
+        ),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_liquidity_verify_account_privileges(
+    accounts: &RemoveLiquidityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.lp_mint,
+        accounts.burn_from,
+        accounts.transfer_sol_to,
+        accounts.transfer_msol_to,
+        accounts.liq_pool_sol_leg_pda,
+        accounts.liq_pool_msol_leg,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.burn_from_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SET_LP_PARAMS_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SetLpParamsAccounts<'me, 'info> {
@@ -2093,6 +2566,35 @@ pub fn set_lp_params_invoke_signed<'info, A: Into<SetLpParamsIxArgs>>(
     let account_info: [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn set_lp_params_verify_account_keys(
+    accounts: &SetLpParamsAccounts<'_, '_>,
+    keys: &SetLpParamsKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.admin_authority.key, &keys.admin_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn set_lp_params_verify_account_privileges(
+    accounts: &SetLpParamsAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CONFIG_MARINADE_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct ConfigMarinadeAccounts<'me, 'info> {
@@ -2209,6 +2711,35 @@ pub fn config_marinade_invoke_signed<'info, A: Into<ConfigMarinadeIxArgs>>(
     let ix = config_marinade_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn config_marinade_verify_account_keys(
+    accounts: &ConfigMarinadeAccounts<'_, '_>,
+    keys: &ConfigMarinadeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.admin_authority.key, &keys.admin_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn config_marinade_verify_account_privileges(
+    accounts: &ConfigMarinadeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.state] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.admin_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const ORDER_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -2372,6 +2903,46 @@ pub fn order_unstake_invoke_signed<'info, A: Into<OrderUnstakeIxArgs>>(
     let account_info: [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn order_unstake_verify_account_keys(
+    accounts: &OrderUnstakeAccounts<'_, '_>,
+    keys: &OrderUnstakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.msol_mint.key, &keys.msol_mint),
+        (accounts.burn_msol_from.key, &keys.burn_msol_from),
+        (accounts.burn_msol_authority.key, &keys.burn_msol_authority),
+        (accounts.new_ticket_account.key, &keys.new_ticket_account),
+        (accounts.clock.key, &keys.clock),
+        (accounts.rent.key, &keys.rent),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn order_unstake_verify_account_privileges(
+    accounts: &OrderUnstakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.msol_mint,
+        accounts.burn_msol_from,
+        accounts.new_ticket_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.burn_msol_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CLAIM_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct ClaimAccounts<'me, 'info> {
@@ -2515,6 +3086,39 @@ pub fn claim_invoke_signed<'info, A: Into<ClaimIxArgs>>(
     let ix = claim_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn claim_verify_account_keys(
+    accounts: &ClaimAccounts<'_, '_>,
+    keys: &ClaimKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.reserve_pda.key, &keys.reserve_pda),
+        (accounts.ticket_account.key, &keys.ticket_account),
+        (accounts.transfer_sol_to.key, &keys.transfer_sol_to),
+        (accounts.clock.key, &keys.clock),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn claim_verify_account_privileges(
+    accounts: &ClaimAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.reserve_pda,
+        accounts.ticket_account,
+        accounts.transfer_sol_to,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const STAKE_RESERVE_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
@@ -2720,6 +3324,52 @@ pub fn stake_reserve_invoke_signed<'info, A: Into<StakeReserveIxArgs>>(
     let account_info: [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn stake_reserve_verify_account_keys(
+    accounts: &StakeReserveAccounts<'_, '_>,
+    keys: &StakeReserveKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.validator_vote.key, &keys.validator_vote),
+        (accounts.reserve_pda.key, &keys.reserve_pda),
+        (accounts.stake_account.key, &keys.stake_account),
+        (
+            accounts.stake_deposit_authority.key,
+            &keys.stake_deposit_authority,
+        ),
+        (accounts.clock.key, &keys.clock),
+        (accounts.epoch_schedule.key, &keys.epoch_schedule),
+        (accounts.rent.key, &keys.rent),
+        (accounts.stake_history.key, &keys.stake_history),
+        (accounts.stake_config.key, &keys.stake_config),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.stake_program.key, &keys.stake_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn stake_reserve_verify_account_privileges(
+    accounts: &StakeReserveAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.stake_list,
+        accounts.validator_vote,
+        accounts.reserve_pda,
+        accounts.stake_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_ACTIVE_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateActiveAccounts<'me, 'info> {
@@ -2917,6 +3567,70 @@ pub fn update_active_invoke_signed<'info, A: Into<UpdateActiveIxArgs>>(
     let ix = update_active_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_active_verify_account_keys(
+    accounts: &UpdateActiveAccounts<'_, '_>,
+    keys: &UpdateActiveKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.common_state.key, &keys.common_state),
+        (accounts.common_stake_list.key, &keys.common_stake_list),
+        (
+            accounts.common_stake_account.key,
+            &keys.common_stake_account,
+        ),
+        (
+            accounts.common_stake_withdraw_authority.key,
+            &keys.common_stake_withdraw_authority,
+        ),
+        (accounts.common_reserve_pda.key, &keys.common_reserve_pda),
+        (accounts.common_msol_mint.key, &keys.common_msol_mint),
+        (
+            accounts.common_msol_mint_authority.key,
+            &keys.common_msol_mint_authority,
+        ),
+        (
+            accounts.common_treasury_msol_account.key,
+            &keys.common_treasury_msol_account,
+        ),
+        (accounts.common_clock.key, &keys.common_clock),
+        (
+            accounts.common_stake_history.key,
+            &keys.common_stake_history,
+        ),
+        (
+            accounts.common_stake_program.key,
+            &keys.common_stake_program,
+        ),
+        (
+            accounts.common_token_program.key,
+            &keys.common_token_program,
+        ),
+        (accounts.validator_list.key, &keys.validator_list),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_active_verify_account_privileges(
+    accounts: &UpdateActiveAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.common_state,
+        accounts.common_stake_list,
+        accounts.common_stake_account,
+        accounts.common_reserve_pda,
+        accounts.common_msol_mint,
+        accounts.common_treasury_msol_account,
+        accounts.validator_list,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
@@ -3121,6 +3835,74 @@ pub fn update_deactivated_invoke_signed<'info, A: Into<UpdateDeactivatedIxArgs>>
     let ix = update_deactivated_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_deactivated_verify_account_keys(
+    accounts: &UpdateDeactivatedAccounts<'_, '_>,
+    keys: &UpdateDeactivatedKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.common_state.key, &keys.common_state),
+        (accounts.common_stake_list.key, &keys.common_stake_list),
+        (
+            accounts.common_stake_account.key,
+            &keys.common_stake_account,
+        ),
+        (
+            accounts.common_stake_withdraw_authority.key,
+            &keys.common_stake_withdraw_authority,
+        ),
+        (accounts.common_reserve_pda.key, &keys.common_reserve_pda),
+        (accounts.common_msol_mint.key, &keys.common_msol_mint),
+        (
+            accounts.common_msol_mint_authority.key,
+            &keys.common_msol_mint_authority,
+        ),
+        (
+            accounts.common_treasury_msol_account.key,
+            &keys.common_treasury_msol_account,
+        ),
+        (accounts.common_clock.key, &keys.common_clock),
+        (
+            accounts.common_stake_history.key,
+            &keys.common_stake_history,
+        ),
+        (
+            accounts.common_stake_program.key,
+            &keys.common_stake_program,
+        ),
+        (
+            accounts.common_token_program.key,
+            &keys.common_token_program,
+        ),
+        (
+            accounts.operational_sol_account.key,
+            &keys.operational_sol_account,
+        ),
+        (accounts.system_program.key, &keys.system_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_deactivated_verify_account_privileges(
+    accounts: &UpdateDeactivatedAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.common_state,
+        accounts.common_stake_list,
+        accounts.common_stake_account,
+        accounts.common_reserve_pda,
+        accounts.common_msol_mint,
+        accounts.common_treasury_msol_account,
+        accounts.operational_sol_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const DEACTIVATE_STAKE_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
@@ -3327,6 +4109,63 @@ pub fn deactivate_stake_invoke_signed<'info, A: Into<DeactivateStakeIxArgs>>(
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deactivate_stake_verify_account_keys(
+    accounts: &DeactivateStakeAccounts<'_, '_>,
+    keys: &DeactivateStakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.reserve_pda.key, &keys.reserve_pda),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.stake_account.key, &keys.stake_account),
+        (
+            accounts.stake_deposit_authority.key,
+            &keys.stake_deposit_authority,
+        ),
+        (accounts.split_stake_account.key, &keys.split_stake_account),
+        (
+            accounts.split_stake_rent_payer.key,
+            &keys.split_stake_rent_payer,
+        ),
+        (accounts.clock.key, &keys.clock),
+        (accounts.rent.key, &keys.rent),
+        (accounts.epoch_schedule.key, &keys.epoch_schedule),
+        (accounts.stake_history.key, &keys.stake_history),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.stake_program.key, &keys.stake_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deactivate_stake_verify_account_privileges(
+    accounts: &DeactivateStakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.stake_list,
+        accounts.stake_account,
+        accounts.split_stake_account,
+        accounts.split_stake_rent_payer,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.split_stake_account,
+        accounts.split_stake_rent_payer,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
 pub struct EmergencyUnstakeAccounts<'me, 'info> {
@@ -3489,6 +4328,52 @@ pub fn emergency_unstake_invoke_signed<'info, A: Into<EmergencyUnstakeIxArgs>>(
     let ix = emergency_unstake_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn emergency_unstake_verify_account_keys(
+    accounts: &EmergencyUnstakeAccounts<'_, '_>,
+    keys: &EmergencyUnstakeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (
+            accounts.validator_manager_authority.key,
+            &keys.validator_manager_authority,
+        ),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.stake_account.key, &keys.stake_account),
+        (
+            accounts.stake_deposit_authority.key,
+            &keys.stake_deposit_authority,
+        ),
+        (accounts.clock.key, &keys.clock),
+        (accounts.stake_program.key, &keys.stake_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn emergency_unstake_verify_account_privileges(
+    accounts: &EmergencyUnstakeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.validator_list,
+        accounts.stake_list,
+        accounts.stake_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.validator_manager_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const MERGE_STAKES_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -3674,4 +4559,53 @@ pub fn merge_stakes_invoke_signed<'info, A: Into<MergeStakesIxArgs>>(
     let ix = merge_stakes_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn merge_stakes_verify_account_keys(
+    accounts: &MergeStakesAccounts<'_, '_>,
+    keys: &MergeStakesKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.state.key, &keys.state),
+        (accounts.stake_list.key, &keys.stake_list),
+        (accounts.validator_list.key, &keys.validator_list),
+        (accounts.destination_stake.key, &keys.destination_stake),
+        (accounts.source_stake.key, &keys.source_stake),
+        (
+            accounts.stake_deposit_authority.key,
+            &keys.stake_deposit_authority,
+        ),
+        (
+            accounts.stake_withdraw_authority.key,
+            &keys.stake_withdraw_authority,
+        ),
+        (
+            accounts.operational_sol_account.key,
+            &keys.operational_sol_account,
+        ),
+        (accounts.clock.key, &keys.clock),
+        (accounts.stake_history.key, &keys.stake_history),
+        (accounts.stake_program.key, &keys.stake_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn merge_stakes_verify_account_privileges(
+    accounts: &MergeStakesAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.state,
+        accounts.stake_list,
+        accounts.validator_list,
+        accounts.destination_stake,
+        accounts.source_stake,
+        accounts.operational_sol_account,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }

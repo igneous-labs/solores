@@ -25,6 +25,7 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 entrypoint::ProgramResult,
                 instruction::{AccountMeta, Instruction},
                 program::{invoke, invoke_signed},
+                program_error::ProgramError,
                 pubkey::Pubkey,
             };
         };
