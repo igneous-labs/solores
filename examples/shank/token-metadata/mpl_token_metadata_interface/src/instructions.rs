@@ -5,6 +5,7 @@ use solana_program::{
     entrypoint::ProgramResult,
     instruction::{AccountMeta, Instruction},
     program::{invoke, invoke_signed},
+    program_error::ProgramError,
     pubkey::Pubkey,
 };
 #[derive(Clone, Debug, PartialEq)]
@@ -446,6 +447,40 @@ pub fn create_metadata_account_invoke_signed<'info, A: Into<CreateMetadataAccoun
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn create_metadata_account_verify_account_keys(
+    accounts: &CreateMetadataAccountAccounts<'_, '_>,
+    keys: &CreateMetadataAccountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.mint.key, &keys.mint),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn create_metadata_account_verify_account_privileges(
+    accounts: &CreateMetadataAccountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.mint_authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdateMetadataAccountAccounts<'me, 'info> {
@@ -571,6 +606,35 @@ pub fn update_metadata_account_invoke_signed<'info, A: Into<UpdateMetadataAccoun
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_metadata_account_verify_account_keys(
+    accounts: &UpdateMetadataAccountAccounts<'_, '_>,
+    keys: &UpdateMetadataAccountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.update_authority.key, &keys.update_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_metadata_account_verify_account_privileges(
+    accounts: &UpdateMetadataAccountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.update_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 13;
 #[derive(Copy, Clone, Debug)]
@@ -817,6 +881,66 @@ pub fn deprecated_create_master_edition_invoke_signed<
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn deprecated_create_master_edition_verify_account_keys(
+    accounts: &DeprecatedCreateMasterEditionAccounts<'_, '_>,
+    keys: &DeprecatedCreateMasterEditionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.edition.key, &keys.edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.printing_mint.key, &keys.printing_mint),
+        (
+            accounts.one_time_printing_authorization_mint.key,
+            &keys.one_time_printing_authorization_mint,
+        ),
+        (accounts.update_authority.key, &keys.update_authority),
+        (
+            accounts.printing_mint_authority.key,
+            &keys.printing_mint_authority,
+        ),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.payer.key, &keys.payer),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+        (
+            accounts.one_time_printing_authorization_mint_authority.key,
+            &keys.one_time_printing_authorization_mint_authority,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_create_master_edition_verify_account_privileges(
+    accounts: &DeprecatedCreateMasterEditionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.edition,
+        accounts.mint,
+        accounts.printing_mint,
+        accounts.one_time_printing_authorization_mint,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.update_authority,
+        accounts.printing_mint_authority,
+        accounts.mint_authority,
+        accounts.payer,
+        accounts.one_time_printing_authorization_mint_authority,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN:
     usize = 16;
@@ -1115,6 +1239,68 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_keys(
+    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
+    keys: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.edition.key, &keys.edition),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.printing_mint.key, &keys.printing_mint),
+        (
+            accounts.master_token_account.key,
+            &keys.master_token_account,
+        ),
+        (accounts.edition_marker.key, &keys.edition_marker),
+        (accounts.burn_authority.key, &keys.burn_authority),
+        (accounts.payer.key, &keys.payer),
+        (
+            accounts.master_update_authority.key,
+            &keys.master_update_authority,
+        ),
+        (accounts.master_metadata.key, &keys.master_metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+        (accounts.reservation_list.key, &keys.reservation_list),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_privileges(
+    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.metadata,
+        accounts.edition,
+        accounts.master_edition,
+        accounts.mint,
+        accounts.printing_mint,
+        accounts.master_token_account,
+        accounts.edition_marker,
+        accounts.reservation_list,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.mint_authority,
+        accounts.burn_authority,
+        accounts.payer,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info> {
@@ -1269,6 +1455,36 @@ pub fn update_primary_sale_happened_via_token_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn update_primary_sale_happened_via_token_verify_account_keys(
+    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
+    keys: &UpdatePrimarySaleHappenedViaTokenKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.owner.key, &keys.owner),
+        (accounts.token.key, &keys.token),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_primary_sale_happened_via_token_verify_account_privileges(
+    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.owner] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedSetReservationListAccounts<'me, 'info> {
@@ -1418,6 +1634,36 @@ pub fn deprecated_set_reservation_list_invoke_signed<
     let account_info: [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn deprecated_set_reservation_list_verify_account_keys(
+    accounts: &DeprecatedSetReservationListAccounts<'_, '_>,
+    keys: &DeprecatedSetReservationListKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.reservation_list.key, &keys.reservation_list),
+        (accounts.resource.key, &keys.resource),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_set_reservation_list_verify_account_privileges(
+    accounts: &DeprecatedSetReservationListAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.master_edition, accounts.reservation_list] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.resource] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -1616,6 +1862,41 @@ pub fn deprecated_create_reservation_list_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deprecated_create_reservation_list_verify_account_keys(
+    accounts: &DeprecatedCreateReservationListAccounts<'_, '_>,
+    keys: &DeprecatedCreateReservationListKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.reservation_list.key, &keys.reservation_list),
+        (accounts.payer.key, &keys.payer),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.resource.key, &keys.resource),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_create_reservation_list_verify_account_privileges(
+    accounts: &DeprecatedCreateReservationListAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.reservation_list] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.payer, accounts.update_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const SIGN_METADATA_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct SignMetadataAccounts<'me, 'info> {
@@ -1734,6 +2015,35 @@ pub fn sign_metadata_invoke_signed<'info, A: Into<SignMetadataIxArgs>>(
     let ix = sign_metadata_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn sign_metadata_verify_account_keys(
+    accounts: &SignMetadataAccounts<'_, '_>,
+    keys: &SignMetadataKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.creator.key, &keys.creator),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn sign_metadata_verify_account_privileges(
+    accounts: &SignMetadataAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.creator] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
@@ -1951,6 +2261,50 @@ pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<
         DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn deprecated_mint_printing_tokens_via_token_verify_account_keys(
+    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
+    keys: &DeprecatedMintPrintingTokensViaTokenKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.destination.key, &keys.destination),
+        (accounts.token.key, &keys.token),
+        (
+            accounts.one_time_printing_authorization_mint.key,
+            &keys.one_time_printing_authorization_mint,
+        ),
+        (accounts.printing_mint.key, &keys.printing_mint),
+        (accounts.burn_authority.key, &keys.burn_authority),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_via_token_verify_account_privileges(
+    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.destination,
+        accounts.token,
+        accounts.one_time_printing_authorization_mint,
+        accounts.printing_mint,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.burn_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct DeprecatedMintPrintingTokensAccounts<'me, 'info> {
@@ -2136,6 +2490,40 @@ pub fn deprecated_mint_printing_tokens_invoke_signed<
     let account_info: [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn deprecated_mint_printing_tokens_verify_account_keys(
+    accounts: &DeprecatedMintPrintingTokensAccounts<'_, '_>,
+    keys: &DeprecatedMintPrintingTokensKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.destination.key, &keys.destination),
+        (accounts.printing_mint.key, &keys.printing_mint),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_verify_account_privileges(
+    accounts: &DeprecatedMintPrintingTokensAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.destination, accounts.printing_mint] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.update_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
@@ -2326,6 +2714,46 @@ pub fn create_master_edition_invoke_signed<'info, A: Into<CreateMasterEditionIxA
     let ix = create_master_edition_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn create_master_edition_verify_account_keys(
+    accounts: &CreateMasterEditionAccounts<'_, '_>,
+    keys: &CreateMasterEditionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.edition.key, &keys.edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn create_master_edition_verify_account_privileges(
+    accounts: &CreateMasterEditionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.edition, accounts.mint] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.update_authority,
+        accounts.mint_authority,
+        accounts.payer,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 14;
 #[derive(Copy, Clone, Debug)]
@@ -2590,6 +3018,60 @@ pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn mint_new_edition_from_master_edition_via_token_verify_account_keys(
+    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
+    keys: &MintNewEditionFromMasterEditionViaTokenKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.new_metadata.key, &keys.new_metadata),
+        (accounts.new_edition.key, &keys.new_edition),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.new_mint.key, &keys.new_mint),
+        (accounts.edition_mark_pda.key, &keys.edition_mark_pda),
+        (accounts.new_mint_authority.key, &keys.new_mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.token_account_owner.key, &keys.token_account_owner),
+        (accounts.token_account.key, &keys.token_account),
+        (
+            accounts.new_metadata_update_authority.key,
+            &keys.new_metadata_update_authority,
+        ),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges(
+    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.new_metadata,
+        accounts.new_edition,
+        accounts.master_edition,
+        accounts.new_mint,
+        accounts.edition_mark_pda,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.new_mint_authority,
+        accounts.payer,
+        accounts.token_account_owner,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct ConvertMasterEditionV1ToV2Accounts<'me, 'info> {
@@ -2734,6 +3216,35 @@ pub fn convert_master_edition_v1_to_v2_invoke_signed<
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn convert_master_edition_v1_to_v2_verify_account_keys(
+    accounts: &ConvertMasterEditionV1ToV2Accounts<'_, '_>,
+    keys: &ConvertMasterEditionV1ToV2Keys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.one_time_auth.key, &keys.one_time_auth),
+        (accounts.printing_mint.key, &keys.printing_mint),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn convert_master_edition_v1_to_v2_verify_account_privileges(
+    accounts: &ConvertMasterEditionV1ToV2Accounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.master_edition,
+        accounts.one_time_auth,
+        accounts.printing_mint,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN: usize = 17;
 #[derive(Copy, Clone, Debug)]
@@ -3027,6 +3538,66 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_keys(
+    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
+    keys: &MintNewEditionFromMasterEditionViaVaultProxyKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.new_metadata.key, &keys.new_metadata),
+        (accounts.new_edition.key, &keys.new_edition),
+        (accounts.master_edition.key, &keys.master_edition),
+        (accounts.new_mint.key, &keys.new_mint),
+        (accounts.edition_mark_pda.key, &keys.edition_mark_pda),
+        (accounts.new_mint_authority.key, &keys.new_mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.vault_authority.key, &keys.vault_authority),
+        (
+            accounts.safety_deposit_store.key,
+            &keys.safety_deposit_store,
+        ),
+        (accounts.safety_deposit_box.key, &keys.safety_deposit_box),
+        (accounts.vault.key, &keys.vault),
+        (
+            accounts.new_metadata_update_authority.key,
+            &keys.new_metadata_update_authority,
+        ),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.token_vault_program.key, &keys.token_vault_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privileges(
+    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.new_metadata,
+        accounts.new_edition,
+        accounts.master_edition,
+        accounts.new_mint,
+        accounts.edition_mark_pda,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.new_mint_authority,
+        accounts.payer,
+        accounts.vault_authority,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const PUFF_METADATA_IX_ACCOUNTS_LEN: usize = 1;
 #[derive(Copy, Clone, Debug)]
 pub struct PuffMetadataAccounts<'me, 'info> {
@@ -3133,6 +3704,27 @@ pub fn puff_metadata_invoke_signed<'info, A: Into<PuffMetadataIxArgs>>(
     let ix = puff_metadata_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn puff_metadata_verify_account_keys(
+    accounts: &PuffMetadataAccounts<'_, '_>,
+    keys: &PuffMetadataKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [(accounts.metadata.key, &keys.metadata)] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn puff_metadata_verify_account_privileges(
+    accounts: &PuffMetadataAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    Ok(())
 }
 pub const UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
@@ -3261,6 +3853,35 @@ pub fn update_metadata_account_v2_invoke_signed<'info, A: Into<UpdateMetadataAcc
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn update_metadata_account_v2_verify_account_keys(
+    accounts: &UpdateMetadataAccountV2Accounts<'_, '_>,
+    keys: &UpdateMetadataAccountV2Keys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.update_authority.key, &keys.update_authority),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn update_metadata_account_v2_verify_account_privileges(
+    accounts: &UpdateMetadataAccountV2Accounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.update_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
@@ -3437,6 +4058,40 @@ pub fn create_metadata_account_v2_invoke_signed<'info, A: Into<CreateMetadataAcc
     let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn create_metadata_account_v2_verify_account_keys(
+    accounts: &CreateMetadataAccountV2Accounts<'_, '_>,
+    keys: &CreateMetadataAccountV2Keys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.mint.key, &keys.mint),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn create_metadata_account_v2_verify_account_privileges(
+    accounts: &CreateMetadataAccountV2Accounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.mint_authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
@@ -3630,6 +4285,46 @@ pub fn create_master_edition_v3_invoke_signed<'info, A: Into<CreateMasterEdition
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn create_master_edition_v3_verify_account_keys(
+    accounts: &CreateMasterEditionV3Accounts<'_, '_>,
+    keys: &CreateMasterEditionV3Keys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.edition.key, &keys.edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.mint_authority.key, &keys.mint_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn create_master_edition_v3_verify_account_privileges(
+    accounts: &CreateMasterEditionV3Accounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.edition, accounts.mint, accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [
+        accounts.update_authority,
+        accounts.mint_authority,
+        accounts.payer,
+    ] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct VerifyCollectionAccounts<'me, 'info> {
@@ -3787,6 +4482,45 @@ pub fn verify_collection_invoke_signed<'info, A: Into<VerifyCollectionIxArgs>>(
     let ix = verify_collection_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn verify_collection_verify_account_keys(
+    accounts: &VerifyCollectionAccounts<'_, '_>,
+    keys: &VerifyCollectionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (
+            accounts.collection_authority.key,
+            &keys.collection_authority,
+        ),
+        (accounts.payer.key, &keys.payer),
+        (accounts.collection_mint.key, &keys.collection_mint),
+        (accounts.collection.key, &keys.collection),
+        (
+            accounts.collection_master_edition_account.key,
+            &keys.collection_master_edition_account,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn verify_collection_verify_account_privileges(
+    accounts: &VerifyCollectionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.collection_authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const UTILIZE_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -3990,6 +4724,52 @@ pub fn utilize_invoke_signed<'info, A: Into<UtilizeIxArgs>>(
     let ix = utilize_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn utilize_verify_account_keys(
+    accounts: &UtilizeAccounts<'_, '_>,
+    keys: &UtilizeKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_account.key, &keys.token_account),
+        (accounts.mint.key, &keys.mint),
+        (accounts.use_authority.key, &keys.use_authority),
+        (accounts.owner.key, &keys.owner),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.ata_program.key, &keys.ata_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+        (
+            accounts.use_authority_record.key,
+            &keys.use_authority_record,
+        ),
+        (accounts.burner.key, &keys.burner),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn utilize_verify_account_privileges(
+    accounts: &UtilizeAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [
+        accounts.metadata,
+        accounts.token_account,
+        accounts.mint,
+        accounts.use_authority_record,
+    ] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.use_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 11;
 #[derive(Copy, Clone, Debug)]
@@ -4199,6 +4979,47 @@ pub fn approve_use_authority_invoke_signed<'info, A: Into<ApproveUseAuthorityIxA
     let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn approve_use_authority_verify_account_keys(
+    accounts: &ApproveUseAuthorityAccounts<'_, '_>,
+    keys: &ApproveUseAuthorityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (
+            accounts.use_authority_record.key,
+            &keys.use_authority_record,
+        ),
+        (accounts.owner.key, &keys.owner),
+        (accounts.payer.key, &keys.payer),
+        (accounts.user.key, &keys.user),
+        (accounts.owner_token_account.key, &keys.owner_token_account),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.mint.key, &keys.mint),
+        (accounts.burner.key, &keys.burner),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn approve_use_authority_verify_account_privileges(
+    accounts: &ApproveUseAuthorityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.owner, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeUseAuthorityAccounts<'me, 'info> {
@@ -4387,6 +5208,45 @@ pub fn revoke_use_authority_invoke_signed<'info, A: Into<RevokeUseAuthorityIxArg
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn revoke_use_authority_verify_account_keys(
+    accounts: &RevokeUseAuthorityAccounts<'_, '_>,
+    keys: &RevokeUseAuthorityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (
+            accounts.use_authority_record.key,
+            &keys.use_authority_record,
+        ),
+        (accounts.owner.key, &keys.owner),
+        (accounts.user.key, &keys.user),
+        (accounts.owner_token_account.key, &keys.owner_token_account),
+        (accounts.mint.key, &keys.mint),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.token_program.key, &keys.token_program),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn revoke_use_authority_verify_account_privileges(
+    accounts: &RevokeUseAuthorityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.owner] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
 #[derive(Copy, Clone, Debug)]
 pub struct UnverifyCollectionAccounts<'me, 'info> {
@@ -4547,6 +5407,48 @@ pub fn unverify_collection_invoke_signed<'info, A: Into<UnverifyCollectionIxArgs
     let ix = unverify_collection_ix(accounts, args)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn unverify_collection_verify_account_keys(
+    accounts: &UnverifyCollectionAccounts<'_, '_>,
+    keys: &UnverifyCollectionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (
+            accounts.collection_authority.key,
+            &keys.collection_authority,
+        ),
+        (accounts.collection_mint.key, &keys.collection_mint),
+        (accounts.collection.key, &keys.collection),
+        (
+            accounts.collection_master_edition_account.key,
+            &keys.collection_master_edition_account,
+        ),
+        (
+            accounts.collection_authority_record.key,
+            &keys.collection_authority_record,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn unverify_collection_verify_account_privileges(
+    accounts: &UnverifyCollectionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.collection_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -4736,6 +5638,47 @@ pub fn approve_collection_authority_invoke_signed<
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn approve_collection_authority_verify_account_keys(
+    accounts: &ApproveCollectionAuthorityAccounts<'_, '_>,
+    keys: &ApproveCollectionAuthorityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (
+            accounts.collection_authority_record.key,
+            &keys.collection_authority_record,
+        ),
+        (
+            accounts.new_collection_authority.key,
+            &keys.new_collection_authority,
+        ),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.payer.key, &keys.payer),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.mint.key, &keys.mint),
+        (accounts.system_program.key, &keys.system_program),
+        (accounts.rent.key, &keys.rent),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn approve_collection_authority_verify_account_privileges(
+    accounts: &ApproveCollectionAuthorityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.collection_authority_record] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.update_authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 4;
 #[derive(Copy, Clone, Debug)]
 pub struct RevokeCollectionAuthorityAccounts<'me, 'info> {
@@ -4885,6 +5828,40 @@ pub fn revoke_collection_authority_invoke_signed<
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn revoke_collection_authority_verify_account_keys(
+    accounts: &RevokeCollectionAuthorityAccounts<'_, '_>,
+    keys: &RevokeCollectionAuthorityKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (
+            accounts.collection_authority_record.key,
+            &keys.collection_authority_record,
+        ),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.mint.key, &keys.mint),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn revoke_collection_authority_verify_account_privileges(
+    accounts: &RevokeCollectionAuthorityAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.collection_authority_record] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.update_authority] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 8;
 #[derive(Copy, Clone, Debug)]
@@ -5069,6 +6046,50 @@ pub fn set_and_verify_collection_invoke_signed<'info, A: Into<SetAndVerifyCollec
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn set_and_verify_collection_verify_account_keys(
+    accounts: &SetAndVerifyCollectionAccounts<'_, '_>,
+    keys: &SetAndVerifyCollectionKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (
+            accounts.collection_authority.key,
+            &keys.collection_authority,
+        ),
+        (accounts.payer.key, &keys.payer),
+        (accounts.update_authority.key, &keys.update_authority),
+        (accounts.collection_mint.key, &keys.collection_mint),
+        (accounts.collection.key, &keys.collection),
+        (
+            accounts.collection_master_edition_account.key,
+            &keys.collection_master_edition_account,
+        ),
+        (
+            accounts.collection_authority_record.key,
+            &keys.collection_authority_record,
+        ),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn set_and_verify_collection_verify_account_privileges(
+    accounts: &SetAndVerifyCollectionAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.collection_authority, accounts.payer] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
 pub struct FreezeDelegatedAccountAccounts<'me, 'info> {
@@ -5222,6 +6243,38 @@ pub fn freeze_delegated_account_invoke_signed<'info, A: Into<FreezeDelegatedAcco
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn freeze_delegated_account_verify_account_keys(
+    accounts: &FreezeDelegatedAccountAccounts<'_, '_>,
+    keys: &FreezeDelegatedAccountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.delegate.key, &keys.delegate),
+        (accounts.token_account.key, &keys.token_account),
+        (accounts.edition.key, &keys.edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn freeze_delegated_account_verify_account_privileges(
+    accounts: &FreezeDelegatedAccountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.token_account] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.delegate] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
 pub const THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
 #[derive(Copy, Clone, Debug)]
@@ -5377,6 +6430,38 @@ pub fn thaw_delegated_account_invoke_signed<'info, A: Into<ThawDelegatedAccountI
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
+pub fn thaw_delegated_account_verify_account_keys(
+    accounts: &ThawDelegatedAccountAccounts<'_, '_>,
+    keys: &ThawDelegatedAccountKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.delegate.key, &keys.delegate),
+        (accounts.token_account.key, &keys.token_account),
+        (accounts.edition.key, &keys.edition),
+        (accounts.mint.key, &keys.mint),
+        (accounts.token_program.key, &keys.token_program),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn thaw_delegated_account_verify_account_privileges(
+    accounts: &ThawDelegatedAccountAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.token_account] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.delegate] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
+}
 pub const REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN: usize = 2;
 #[derive(Copy, Clone, Debug)]
 pub struct RemoveCreatorVerificationAccounts<'me, 'info> {
@@ -5505,4 +6590,33 @@ pub fn remove_creator_verification_invoke_signed<
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
+}
+pub fn remove_creator_verification_verify_account_keys(
+    accounts: &RemoveCreatorVerificationAccounts<'_, '_>,
+    keys: &RemoveCreatorVerificationKeys,
+) -> Result<(), (Pubkey, Pubkey)> {
+    for (actual, expected) in [
+        (accounts.metadata.key, &keys.metadata),
+        (accounts.creator.key, &keys.creator),
+    ] {
+        if actual != expected {
+            return Err((*actual, *expected));
+        }
+    }
+    Ok(())
+}
+pub fn remove_creator_verification_verify_account_privileges(
+    accounts: &RemoveCreatorVerificationAccounts<'_, '_>,
+) -> Result<(), ProgramError> {
+    for should_be_writable in [accounts.metadata] {
+        if !should_be_writable.is_writable {
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
+    for should_be_signer in [accounts.creator] {
+        if !should_be_signer.is_signer {
+            return Err(ProgramError::MissingRequiredSignature);
+        }
+    }
+    Ok(())
 }
