@@ -298,6 +298,10 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 }
 ```
 
+### Zero-copy/bytemuck support
+
+Pass `-z <name-of-type-or-account-in-idl>` to additionally derive `Pod + Zeroable + Copy` for the generated types. Accepts multiple options.
+
 ## Comparison To Similar Libs
 
 ### anchor-gen
@@ -316,7 +320,7 @@ Please check the repo's issues list for more.
 
 ### General
 
-- Assumes all onchain accounts are borsh-serde, does not handle zero-copy/bytemuck accounts.
+- Does not check correctness of zero-copy/bytemuck accounts derives
 
 ### Anchor
 

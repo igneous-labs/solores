@@ -1,6 +1,6 @@
 use heck::{ToPascalCase, ToShoutySnakeCase};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, quote};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
@@ -9,8 +9,8 @@ use crate::idl_format::anchor::typedefs::NamedType;
 #[derive(Deserialize)]
 pub struct NamedAccount(pub NamedType);
 
-impl ToTokens for NamedAccount {
-    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+impl NamedAccount {
+    pub fn to_token_stream(&self, cli_args: &crate::Args) -> TokenStream {
         let name = &self.0.name;
         // discriminant
         let account_discm_ident = format_ident!("{}_ACCOUNT_DISCM", name.to_shouty_snake_case());
@@ -22,11 +22,11 @@ impl ToTokens for NamedAccount {
         .unwrap();
         let discm_tokens: TokenStream = format!("{:?}", discm).parse().unwrap();
 
-        let struct_def = &self.0;
+        let struct_def = self.0.to_token_stream(cli_args);
 
         let struct_ident = format_ident!("{}", name);
         let account_ident = format_ident!("{}Account", name);
-        tokens.extend(quote! {
+        quote! {
             pub const #account_discm_ident: [u8; 8] = #discm_tokens;
 
             #struct_def
@@ -54,6 +54,6 @@ impl ToTokens for NamedAccount {
                     Ok(Self(#struct_ident::deserialize(buf)?))
                 }
             }
-        });
+        }
     }
 }

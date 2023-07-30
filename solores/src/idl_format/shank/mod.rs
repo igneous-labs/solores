@@ -52,13 +52,19 @@ impl IdlFormat for ShankIdl {
         self.errors.is_some()
     }
 
-    fn modules<'me>(&'me self) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
+    fn modules<'me>(&'me self, args: &'me crate::Args) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
         let mut res: Vec<Box<dyn IdlCodegenModule + 'me>> = Vec::new();
         if let Some(v) = &self.accounts {
-            res.push(Box::new(AccountsCodegenModule(v)));
+            res.push(Box::new(AccountsCodegenModule {
+                cli_args: args,
+                named_types: v,
+            }));
         }
         if let Some(v) = &self.r#types {
-            res.push(Box::new(TypedefsCodegenModule(v)));
+            res.push(Box::new(TypedefsCodegenModule {
+                cli_args: args,
+                named_types: v,
+            }));
         }
         if let Some(v) = &self.instructions {
             res.push(Box::new(IxCodegenModule {

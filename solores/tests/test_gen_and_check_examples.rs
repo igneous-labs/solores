@@ -31,6 +31,18 @@ fn test_phoenix_v1() -> Result<(), Box<dyn std::error::Error>> {
             "^1.9,<1.16",
             "--borsh-vers",
             "^0.9",
+            "-z",
+            "Ticks",
+            "-z",
+            "MarketSizeParams",
+            "-z",
+            "TokenParams",
+            "-z",
+            "Seat",
+            "-z",
+            "MarketHeader",
+            "-z",
+            "FIFOOrderId",
         ],
     )?;
     check_example(EXAMPLE_PATH, "phoenix_v1_interface")

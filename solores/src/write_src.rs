@@ -33,7 +33,7 @@ pub fn write_lib(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
         solana_program::declare_id!(#id);
     };
 
-    for module in idl.modules() {
+    for module in idl.modules(args) {
         let module_name = module.name();
         let module_ident = Ident::new(module.name(), Span::call_site());
         contents.extend(quote! {

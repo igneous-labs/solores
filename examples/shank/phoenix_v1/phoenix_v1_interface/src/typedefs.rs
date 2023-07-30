@@ -1,18 +1,22 @@
 use borsh::{BorshDeserialize, BorshSerialize};
+use bytemuck::{Pod, Zeroable};
 use solana_program::pubkey::Pubkey;
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Ticks {
     pub inner: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MarketSizeParams {
     pub bids_size: u64,
     pub asks_size: u64,
     pub num_seats: u64,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TokenParams {
     pub decimals: u32,
@@ -20,7 +24,8 @@ pub struct TokenParams {
     pub mint_key: Pubkey,
     pub vault_key: Pubkey,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Seat {
     pub discriminant: u64,
@@ -174,7 +179,8 @@ pub struct WithdrawParams {
     pub quote_lots_to_withdraw: Option<u64>,
     pub base_lots_to_withdraw: Option<u64>,
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MarketHeader {
     pub discriminant: u64,
@@ -193,7 +199,8 @@ pub struct MarketHeader {
     pub padding1: u32,
     pub padding2: [u64; 32],
 }
-#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[repr(C)]
+#[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FIFOOrderId {
     pub price_in_ticks: Ticks,

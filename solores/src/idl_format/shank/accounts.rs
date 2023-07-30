@@ -1,11 +1,14 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{gen_body_newtype_slice, idl_format::IdlCodegenModule};
+use crate::idl_format::IdlCodegenModule;
 
 use super::typedefs::NamedType;
 
-pub struct AccountsCodegenModule<'a>(pub &'a [NamedType]);
+pub struct AccountsCodegenModule<'a> {
+    pub cli_args: &'a crate::Args,
+    pub named_types: &'a [NamedType],
+}
 
 impl IdlCodegenModule for AccountsCodegenModule<'_> {
     fn name(&self) -> &str {
@@ -16,9 +19,17 @@ impl IdlCodegenModule for AccountsCodegenModule<'_> {
         let mut res = quote! {
             use borsh::{BorshDeserialize, BorshSerialize};
         };
+        for a in self.named_types {
+            if self.cli_args.zero_copy.iter().any(|e| e == &a.name) {
+                res.extend(quote! {
+                    use bytemuck::{Pod, Zeroable};
+                });
+                break;
+            }
+        }
         let mut has_pubkey = false;
         let mut has_defined = false;
-        for a in self.0 {
+        for a in self.named_types {
             if a.r#type.has_pubkey_field() && !has_pubkey {
                 has_pubkey = true;
                 res.extend(quote! {
@@ -38,5 +49,10 @@ impl IdlCodegenModule for AccountsCodegenModule<'_> {
         res
     }
 
-    gen_body_newtype_slice!();
+    fn gen_body(&self) -> TokenStream {
+        self.named_types
+            .iter()
+            .map(|e| e.to_token_stream(self.cli_args))
+            .collect()
+    }
 }

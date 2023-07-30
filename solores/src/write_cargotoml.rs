@@ -31,6 +31,10 @@ impl<'a> CargoToml<'a> {
             ),
             false => (None, None, None),
         };
+        let bytemuck = match args.zero_copy.is_empty() {
+            true => None,
+            false => Some(args.bytemuck_vers.as_str()),
+        };
         Self {
             package: Package {
                 name: &args.output_crate_name,
@@ -44,6 +48,7 @@ impl<'a> CargoToml<'a> {
                 thiserror: thiserror.map(DependencyValue),
                 num_derive: num_derive.map(DependencyValue),
                 num_traits: num_traits.map(DependencyValue),
+                bytemuck: bytemuck.map(DependencyValue),
             },
         }
     }
@@ -72,6 +77,8 @@ pub struct GeneratedCrateDependencies<'a> {
 
     #[serde(rename = "num-traits")]
     pub num_traits: Option<DependencyValue<'a>>,
+
+    pub bytemuck: Option<DependencyValue<'a>>,
 }
 
 pub struct DependencyValue<'a>(pub &'a str);

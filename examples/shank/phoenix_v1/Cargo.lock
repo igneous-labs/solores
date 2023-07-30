@@ -692,6 +692,7 @@ name = "phoenix_v1_interface"
 version = "0.2.3"
 dependencies = [
  "borsh",
+ "bytemuck",
  "num-derive",
  "num-traits",
  "serde",
