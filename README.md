@@ -18,9 +18,10 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
   * [Features](#features)
     + [Instruction Function Generics](#instruction-function-generics)
     + [Serde](#serde)
-    + [Keys from array](#keys-from-array)
-    + [Accounts from array](#accounts-from-array)
-  * [Comparison to similar libs](#comparison-to-similar-libs)
+    + [Keys From Array](#keys-from-array)
+    + [Accounts From Array](#accounts-from-array)
+    + [Instruction Accounts Verification Functions](#instruction-accounts-verification-functions)
+  * [Comparison To Similar Libs](#comparison-to-similar-libs)
     + [anchor-gen](#anchor-gen)
   * [Known Missing Features](#known-missing-features)
     + [General](#general)
@@ -281,7 +282,7 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 }
 ```
 
-A function to ensure writable/signer privileges of a instruction `*Accounts` struct is also generated:
+A function to ensure writable + signer privileges of a instruction `*Accounts` struct is also generated:
 
 ```rust ignore
 use my_token_interface::{TransferAccounts, TransferKeys, transfer_verify_account_privileges};
