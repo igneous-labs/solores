@@ -52,6 +52,8 @@ impl ToTokens for NamedInstruction {
         let invoke_fn_ident = format_ident!("{}_invoke", snake_case_name);
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", snake_case_name);
         let verify_account_keys_fn_ident = format_ident!("{}_verify_account_keys", snake_case_name);
+        let verify_account_privileges_fn_ident =
+            format_ident!("{}_verify_account_privileges", snake_case_name);
         let shouty_snake_case_name = name.to_shouty_snake_case();
         let accounts_len_ident = format_ident!("{}_IX_ACCOUNTS_LEN", shouty_snake_case_name);
         let discm_ident = self.discm_ident();
@@ -291,11 +293,11 @@ impl ToTokens for NamedInstruction {
             .accounts
             .iter()
             .map(IxAccount::to_verify_account_keys_tuple);
-        tokens.extend(quote! {
-            pub fn #verify_account_keys_fn_ident(
-                accounts: &#accounts_ident<'_, '_>,
-                keys: &#keys_ident
-            ) -> Result<(), (Pubkey, Pubkey)> {
+        // edge-case of accounts and keys being empty
+        let pubkeys_loop_check = if self.accounts.is_empty() {
+            quote! {}
+        } else {
+            quote! {
                 for (actual, expected) in [
                     #(#key_tups),*
                 ] {
@@ -303,9 +305,82 @@ impl ToTokens for NamedInstruction {
                         return Err((*actual, *expected));
                     }
                 }
+            }
+        };
+        tokens.extend(quote! {
+            pub fn #verify_account_keys_fn_ident(
+                accounts: &#accounts_ident<'_, '_>,
+                keys: &#keys_ident
+            ) -> Result<(), (Pubkey, Pubkey)> {
+                #pubkeys_loop_check
                 Ok(())
             }
-        })
+        });
+
+        // impl_verify_account_privileges
+        let mut writables = self
+            .accounts
+            .iter()
+            .filter_map(|a| {
+                if a.is_mut {
+                    let name = a.field_ident();
+                    Some(quote! {
+                        accounts.#name
+                    })
+                } else {
+                    None
+                }
+            })
+            .peekable();
+        let writables_loop_check = if writables.peek().is_none() {
+            quote! {}
+        } else {
+            quote! {
+                for should_be_writable in [
+                    #(#writables),*
+                ] {
+                    if !should_be_writable.is_writable {
+                        return Err(ProgramError::InvalidAccountData);
+                    }
+                }
+            }
+        };
+        let mut signers = self
+            .accounts
+            .iter()
+            .filter_map(|a| {
+                if a.is_signer {
+                    let name = a.field_ident();
+                    Some(quote! {
+                        accounts.#name
+                    })
+                } else {
+                    None
+                }
+            })
+            .peekable();
+        let signers_loop_check = if signers.peek().is_none() {
+            quote! {}
+        } else {
+            quote! {
+                for should_be_signer in [
+                    #(#signers),*
+                ] {
+                    if !should_be_signer.is_signer {
+                        return Err(ProgramError::MissingRequiredSignature);
+                    }
+                }
+            }
+        };
+        tokens.extend(quote! {
+            pub fn #verify_account_privileges_fn_ident(
+                accounts: &#accounts_ident<'_, '_>,
+            ) -> Result<(), ProgramError> {
+                #writables_loop_check
+                #signers_loop_check
+                Ok(())
+            }
+        });
     }
 }
 
