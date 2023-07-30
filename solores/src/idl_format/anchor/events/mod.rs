@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 
-use crate::{gen_body_newtype_slice, idl_format::IdlCodegenModule};
+use crate::idl_format::IdlCodegenModule;
 
 mod event;
 pub use event::*;
@@ -41,5 +41,7 @@ impl IdlCodegenModule for EventsCodegenModule<'_> {
         res
     }
 
-    gen_body_newtype_slice!();
+    fn gen_body(&self) -> TokenStream {
+        self.0.iter().map(|e| e.into_token_stream()).collect()
+    }
 }

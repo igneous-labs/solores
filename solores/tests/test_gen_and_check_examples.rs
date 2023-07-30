@@ -6,7 +6,7 @@ use test_utils::{check_example, gen_example, test_consumer};
 
 #[test]
 fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
-    const EXAMPLE_PATH: &str = "shank/token-metadata";
+    const EXAMPLE_PATH: &str = "shank/token_metadata";
     gen_example(
         EXAMPLE_PATH,
         &[
@@ -22,8 +22,35 @@ fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_phoenix_v1() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "shank/phoenix_v1";
+    gen_example(
+        EXAMPLE_PATH,
+        &[
+            "--solana-program-vers",
+            "^1.9,<1.16",
+            "--borsh-vers",
+            "^0.9",
+            "-z",
+            "Ticks",
+            "-z",
+            "MarketSizeParams",
+            "-z",
+            "TokenParams",
+            "-z",
+            "Seat",
+            "-z",
+            "MarketHeader",
+            "-z",
+            "FIFOOrderId",
+        ],
+    )?;
+    check_example(EXAMPLE_PATH, "phoenix_v1_interface")
+}
+
+#[test]
 fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
-    const EXAMPLE_PATH: &str = "anchor/unstake-it";
+    const EXAMPLE_PATH: &str = "anchor/unstake_it";
     gen_example(
         EXAMPLE_PATH,
         &[

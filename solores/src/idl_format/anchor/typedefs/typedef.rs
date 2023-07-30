@@ -17,6 +17,43 @@ pub struct NamedType {
     pub r#type: TypedefType,
 }
 
+impl NamedType {
+    pub fn to_token_stream(&self, cli_args: &crate::Args) -> TokenStream {
+        let name = format_ident!("{}", self.name);
+        // rust enums cannot impl Pod due to illegal bitpatterns
+        let typedef_struct = match &self.r#type {
+            TypedefType::r#struct(typedef_struct) => typedef_struct,
+            TypedefType::r#enum(typedef_enum) => {
+                return quote! {
+                    #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+                    #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+                    pub enum #name {
+                        #typedef_enum
+                    }
+                }
+            }
+        };
+
+        let derive = if cli_args.zero_copy.iter().any(|e| e == &self.name) {
+            quote! {
+                #[repr(C)]
+                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq, Pod, Copy, Zeroable)]
+            }
+        } else {
+            quote! {
+                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+            }
+        };
+        quote! {
+            #derive
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            pub struct #name {
+                #typedef_struct
+            }
+        }
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(tag = "kind")]
 pub enum TypedefType {
@@ -113,29 +150,6 @@ impl EnumVariantFields {
 pub struct EnumVariant {
     pub name: String,
     pub fields: Option<EnumVariantFields>,
-}
-
-impl ToTokens for NamedType {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        let name = format_ident!("{}", self.name);
-        let def = match &self.r#type {
-            TypedefType::r#struct(typedef_struct) => quote! {
-                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
-                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                pub struct #name {
-                    #typedef_struct
-                }
-            },
-            TypedefType::r#enum(typedef_enum) => quote! {
-                #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
-                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-                pub enum #name {
-                    #typedef_enum
-                }
-            },
-        };
-        tokens.extend(def);
-    }
 }
 
 impl ToTokens for TypedefStruct {

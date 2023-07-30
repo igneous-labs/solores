@@ -54,6 +54,13 @@ pub struct Args {
     #[arg(
         long,
         short,
+        help = "typedefs and accounts to derive bytemuck::Pod for. Does not currently check validity of derivation."
+    )]
+    pub zero_copy: Vec<String>,
+
+    #[arg(
+        long,
+        short,
         help = "solana-program dependency version for generated crate",
         default_value = "^1.16"
     )]
@@ -94,6 +101,13 @@ pub struct Args {
         default_value = "^1.0"
     )]
     pub serde_vers: String,
+
+    #[arg(
+        long,
+        help = "bytemuck dependency version for generated crate",
+        default_value = "^1.0"
+    )]
+    pub bytemuck_vers: String,
 }
 
 /// The CLI entrypoint
