@@ -21,6 +21,7 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
     + [Keys From Array](#keys-from-array)
     + [Accounts From Array](#accounts-from-array)
     + [Instruction Accounts Verification Functions](#instruction-accounts-verification-functions)
+    + [Zero-copy/bytemuck support](#zero-copy-bytemuck-support)
   * [Comparison To Similar Libs](#comparison-to-similar-libs)
     + [anchor-gen](#anchor-gen)
   * [Known Missing Features](#known-missing-features)
@@ -308,7 +309,10 @@ Pass `-z <name-of-type-or-account-in-idl>` to additionally derive `Pod + Zeroabl
 
 Compared to [anchor-gen](https://github.com/saber-hq/anchor-gen), solores:
 
-- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's dependencies are [borsh](https://github.com/near/borsh-rs) + [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program), and also [thiserror](https://github.com/dtolnay/thiserror) + [num-derive](https://github.com/rust-num/num-derive) + [num-traits](https://github.com/rust-num/num-traits) if the idl contains error enum definitions.
+- Has no dependency on [anchor](https://github.com/coral-xyz/anchor). The generated crate's dependencies are:
+  - [borsh](https://github.com/near/borsh-rs) + [solana-program](https://github.com/solana-labs/solana/tree/master/sdk/program)
+  - [thiserror](https://github.com/dtolnay/thiserror) + [num-derive](https://github.com/rust-num/num-derive) + [num-traits](https://github.com/rust-num/num-traits) if the idl contains error enum definitions.
+  - [bytemuck](https://github.com/Lokathor/bytemuck) if any `-z` types are provided
 
 - Produces (almost) human-readable rust code in a new, separate crate instead of using a proc-macro.
 
