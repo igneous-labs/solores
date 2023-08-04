@@ -1430,7 +1430,7 @@ dependencies = [
 
 [[package]]
 name = "solores"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "clap",
  "env_logger",

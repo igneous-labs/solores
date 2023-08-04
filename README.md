@@ -4,7 +4,7 @@ Solana IDL to Rust client / CPI interface generator.
 
 > [solita](https://github.com/metaplex-foundation/solita), light of my life, fire of my loins
 
-This software is still in its early stages of development. USE AT YOUR OWN RISK.
+This software is still in its early stages of development. USE AT YOUR OWN RISK. It's a codegen CLI, so you can always read and modify the generated code if you need to.
 
 ## Contents
 
