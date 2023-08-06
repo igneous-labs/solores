@@ -444,7 +444,9 @@ pub fn swap_verify_account_keys(
     }
     Ok(())
 }
-pub fn swap_verify_account_privileges(accounts: &SwapAccounts<'_, '_>) -> Result<(), ProgramError> {
+pub fn swap_verify_account_privileges<'me, 'info>(
+    accounts: &SwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -453,12 +455,12 @@ pub fn swap_verify_account_privileges(accounts: &SwapAccounts<'_, '_>) -> Result
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -627,17 +629,17 @@ pub fn swap_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn swap_with_free_funds_verify_account_privileges(
-    accounts: &SwapWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn swap_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &SwapWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -856,9 +858,9 @@ pub fn place_limit_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_limit_order_verify_account_privileges(
-    accounts: &PlaceLimitOrderAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn place_limit_order_verify_account_privileges<'me, 'info>(
+    accounts: &PlaceLimitOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -867,12 +869,12 @@ pub fn place_limit_order_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1058,17 +1060,17 @@ pub fn place_limit_order_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_limit_order_with_free_funds_verify_account_privileges(
-    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn place_limit_order_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1279,9 +1281,9 @@ pub fn reduce_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn reduce_order_verify_account_privileges(
-    accounts: &ReduceOrderAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn reduce_order_verify_account_privileges<'me, 'info>(
+    accounts: &ReduceOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -1290,12 +1292,12 @@ pub fn reduce_order_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1466,17 +1468,17 @@ pub fn reduce_order_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn reduce_order_with_free_funds_verify_account_privileges(
-    accounts: &ReduceOrderWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn reduce_order_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &ReduceOrderWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.trader] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1685,9 +1687,9 @@ pub fn cancel_all_orders_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_all_orders_verify_account_privileges(
-    accounts: &CancelAllOrdersAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_all_orders_verify_account_privileges<'me, 'info>(
+    accounts: &CancelAllOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -1696,12 +1698,12 @@ pub fn cancel_all_orders_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1877,17 +1879,17 @@ pub fn cancel_all_orders_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_all_orders_with_free_funds_verify_account_privileges(
-    accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_all_orders_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &CancelAllOrdersWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2098,9 +2100,9 @@ pub fn cancel_up_to_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_up_to_verify_account_privileges(
-    accounts: &CancelUpToAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_up_to_verify_account_privileges<'me, 'info>(
+    accounts: &CancelUpToAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -2109,12 +2111,12 @@ pub fn cancel_up_to_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2282,17 +2284,17 @@ pub fn cancel_up_to_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_up_to_with_free_funds_verify_account_privileges(
-    accounts: &CancelUpToWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_up_to_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &CancelUpToWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2513,9 +2515,9 @@ pub fn cancel_multiple_orders_by_id_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_multiple_orders_by_id_verify_account_privileges(
-    accounts: &CancelMultipleOrdersByIdAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_multiple_orders_by_id_verify_account_privileges<'me, 'info>(
+    accounts: &CancelMultipleOrdersByIdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -2524,12 +2526,12 @@ pub fn cancel_multiple_orders_by_id_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2720,17 +2722,17 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_privileges(
-    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2941,9 +2943,9 @@ pub fn withdraw_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn withdraw_funds_verify_account_privileges(
-    accounts: &WithdrawFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn withdraw_funds_verify_account_privileges<'me, 'info>(
+    accounts: &WithdrawFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -2952,12 +2954,12 @@ pub fn withdraw_funds_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -3176,9 +3178,9 @@ pub fn deposit_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_funds_verify_account_privileges(
-    accounts: &DepositFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn deposit_funds_verify_account_privileges<'me, 'info>(
+    accounts: &DepositFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -3187,12 +3189,12 @@ pub fn deposit_funds_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -3369,17 +3371,17 @@ pub fn request_seat_verify_account_keys(
     }
     Ok(())
 }
-pub fn request_seat_verify_account_privileges(
-    accounts: &RequestSeatAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn request_seat_verify_account_privileges<'me, 'info>(
+    accounts: &RequestSeatAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.payer, accounts.seat] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.payer] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -3500,10 +3502,12 @@ pub fn log_verify_account_keys(
     }
     Ok(())
 }
-pub fn log_verify_account_privileges(accounts: &LogAccounts<'_, '_>) -> Result<(), ProgramError> {
+pub fn log_verify_account_privileges<'me, 'info>(
+    accounts: &LogAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.log_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -3736,9 +3740,9 @@ pub fn place_multiple_post_only_orders_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_multiple_post_only_orders_verify_account_privileges(
-    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn place_multiple_post_only_orders_verify_account_privileges<'me, 'info>(
+    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -3747,12 +3751,12 @@ pub fn place_multiple_post_only_orders_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -3951,17 +3955,17 @@ pub fn place_multiple_post_only_orders_with_free_funds_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_multiple_post_only_orders_with_free_funds_verify_account_privileges(
-    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn place_multiple_post_only_orders_with_free_funds_verify_account_privileges<'me, 'info>(
+    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.trader] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -4184,9 +4188,9 @@ pub fn initialize_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_market_verify_account_privileges(
-    accounts: &InitializeMarketAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn initialize_market_verify_account_privileges<'me, 'info>(
+    accounts: &InitializeMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.market_creator,
@@ -4194,12 +4198,12 @@ pub fn initialize_market_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_creator] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -4360,17 +4364,17 @@ pub fn claim_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn claim_authority_verify_account_privileges(
-    accounts: &ClaimAuthorityAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn claim_authority_verify_account_privileges<'me, 'info>(
+    accounts: &ClaimAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.successor] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -4533,17 +4537,17 @@ pub fn name_successor_verify_account_keys(
     }
     Ok(())
 }
-pub fn name_successor_verify_account_privileges(
-    accounts: &NameSuccessorAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn name_successor_verify_account_privileges<'me, 'info>(
+    accounts: &NameSuccessorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -4709,17 +4713,17 @@ pub fn change_market_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn change_market_status_verify_account_privileges(
-    accounts: &ChangeMarketStatusAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn change_market_status_verify_account_privileges<'me, 'info>(
+    accounts: &ChangeMarketStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -4890,17 +4894,17 @@ pub fn change_seat_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn change_seat_status_verify_account_privileges(
-    accounts: &ChangeSeatStatusAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn change_seat_status_verify_account_privileges<'me, 'info>(
+    accounts: &ChangeSeatStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.seat] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -5100,17 +5104,17 @@ pub fn request_seat_authorized_verify_account_keys(
     }
     Ok(())
 }
-pub fn request_seat_authorized_verify_account_privileges(
-    accounts: &RequestSeatAuthorizedAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn request_seat_authorized_verify_account_privileges<'me, 'info>(
+    accounts: &RequestSeatAuthorizedAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.payer, accounts.seat] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority, accounts.payer] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -5331,9 +5335,9 @@ pub fn evict_seat_verify_account_keys(
     }
     Ok(())
 }
-pub fn evict_seat_verify_account_privileges(
-    accounts: &EvictSeatAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn evict_seat_verify_account_privileges<'me, 'info>(
+    accounts: &EvictSeatAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -5342,12 +5346,12 @@ pub fn evict_seat_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -5578,9 +5582,9 @@ pub fn force_cancel_orders_verify_account_keys(
     }
     Ok(())
 }
-pub fn force_cancel_orders_verify_account_privileges(
-    accounts: &ForceCancelOrdersAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
+    accounts: &ForceCancelOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.base_account,
@@ -5589,12 +5593,12 @@ pub fn force_cancel_orders_verify_account_privileges(
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -5785,21 +5789,21 @@ pub fn collect_fees_verify_account_keys(
     }
     Ok(())
 }
-pub fn collect_fees_verify_account_privileges(
-    accounts: &CollectFeesAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn collect_fees_verify_account_privileges<'me, 'info>(
+    accounts: &CollectFeesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
         accounts.fee_recipient,
         accounts.quote_vault,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.sweeper] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -5973,17 +5977,17 @@ pub fn change_fee_recipient_verify_account_keys(
     }
     Ok(())
 }
-pub fn change_fee_recipient_verify_account_privileges(
-    accounts: &ChangeFeeRecipientAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn change_fee_recipient_verify_account_privileges<'me, 'info>(
+    accounts: &ChangeFeeRecipientAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.market_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())

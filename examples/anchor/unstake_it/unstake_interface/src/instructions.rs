@@ -249,17 +249,17 @@ pub fn init_protocol_fee_verify_account_keys(
     }
     Ok(())
 }
-pub fn init_protocol_fee_verify_account_privileges(
-    accounts: &InitProtocolFeeAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn init_protocol_fee_verify_account_privileges<'me, 'info>(
+    accounts: &InitProtocolFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.payer, accounts.protocol_fee_account] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.payer] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -401,17 +401,17 @@ pub fn set_protocol_fee_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_protocol_fee_verify_account_privileges(
-    accounts: &SetProtocolFeeAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn set_protocol_fee_verify_account_privileges<'me, 'info>(
+    accounts: &SetProtocolFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.protocol_fee_account] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -606,9 +606,9 @@ pub fn create_pool_verify_account_keys(
     }
     Ok(())
 }
-pub fn create_pool_verify_account_privileges(
-    accounts: &CreatePoolAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn create_pool_verify_account_privileges<'me, 'info>(
+    accounts: &CreatePoolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,
         accounts.pool_account,
@@ -616,7 +616,7 @@ pub fn create_pool_verify_account_privileges(
         accounts.lp_mint,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [
@@ -626,7 +626,7 @@ pub fn create_pool_verify_account_privileges(
         accounts.lp_mint,
     ] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -805,9 +805,9 @@ pub fn add_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_liquidity_verify_account_privileges(
-    accounts: &AddLiquidityAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn add_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: &AddLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.from,
         accounts.pool_account,
@@ -816,12 +816,12 @@ pub fn add_liquidity_verify_account_privileges(
         accounts.mint_lp_tokens_to,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.from] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1011,9 +1011,9 @@ pub fn remove_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_liquidity_verify_account_privileges(
-    accounts: &RemoveLiquidityAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: &RemoveLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.to,
         accounts.pool_account,
@@ -1022,12 +1022,12 @@ pub fn remove_liquidity_verify_account_privileges(
         accounts.burn_lp_tokens_from,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.burn_lp_tokens_from_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1188,17 +1188,17 @@ pub fn set_fee_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_fee_verify_account_privileges(
-    accounts: &SetFeeAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn set_fee_verify_account_privileges<'me, 'info>(
+    accounts: &SetFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.fee_account] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.fee_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1343,17 +1343,17 @@ pub fn set_fee_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_fee_authority_verify_account_privileges(
-    accounts: &SetFeeAuthorityAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn set_fee_authority_verify_account_privileges<'me, 'info>(
+    accounts: &SetFeeAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.pool_account] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.fee_authority] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -1519,12 +1519,12 @@ pub fn deactivate_stake_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn deactivate_stake_account_verify_account_privileges(
-    accounts: &DeactivateStakeAccountAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn deactivate_stake_account_verify_account_privileges<'me, 'info>(
+    accounts: &DeactivateStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.stake_account] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     Ok(())
@@ -1707,9 +1707,9 @@ pub fn reclaim_stake_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn reclaim_stake_account_verify_account_privileges(
-    accounts: &ReclaimStakeAccountAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn reclaim_stake_account_verify_account_privileges<'me, 'info>(
+    accounts: &ReclaimStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.stake_account,
         accounts.pool_account,
@@ -1717,7 +1717,7 @@ pub fn reclaim_stake_account_verify_account_privileges(
         accounts.stake_account_record_account,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     Ok(())
@@ -1949,9 +1949,9 @@ pub fn unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn unstake_verify_account_privileges(
-    accounts: &UnstakeAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn unstake_verify_account_privileges<'me, 'info>(
+    accounts: &UnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,
         accounts.stake_account,
@@ -1962,12 +1962,12 @@ pub fn unstake_verify_account_privileges(
         accounts.protocol_fee_destination,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.payer, accounts.unstaker] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())
@@ -2209,9 +2209,9 @@ pub fn unstake_wsol_verify_account_keys(
     }
     Ok(())
 }
-pub fn unstake_wsol_verify_account_privileges(
-    accounts: &UnstakeWsolAccounts<'_, '_>,
-) -> Result<(), ProgramError> {
+pub fn unstake_wsol_verify_account_privileges<'me, 'info>(
+    accounts: &UnstakeWsolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,
         accounts.stake_account,
@@ -2222,12 +2222,12 @@ pub fn unstake_wsol_verify_account_privileges(
         accounts.protocol_fee_destination,
     ] {
         if !should_be_writable.is_writable {
-            return Err(ProgramError::InvalidAccountData);
+            return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
     for should_be_signer in [accounts.payer, accounts.unstaker] {
         if !should_be_signer.is_signer {
-            return Err(ProgramError::MissingRequiredSignature);
+            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
     Ok(())

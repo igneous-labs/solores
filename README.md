@@ -292,10 +292,10 @@ use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, pubke
 pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> ProgramResult {
     let accounts: TransferAccounts = ...
 
-    // transfer_verify_account_privileges returns
-    // - `ProgramError::InvalidAccountData` on the first account with missing writable privilege
-    // - `ProgramError::MissingRequiredSignature` on the first account with missing signer privilege
-    transfer_verify_account_privileges(&accounts)?;
+    if let Err((offending_acc, program_err)) = transfer_verify_account_privileges(&accounts) {
+        solana_program::msg!("Writable/signer privilege escalation for {}: {}", offending_acc.key, program_err);
+        return Err(program_err);
+    }
 }
 ```
 
