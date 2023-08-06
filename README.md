@@ -293,8 +293,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
     let accounts: TransferAccounts = ...
 
     if let Err((offending_acc, program_err)) = transfer_verify_account_privileges(&accounts) {
-      solana_program::msg!("Writable/signer privilege escalation for {}: {}", offending_acc.key, program_err);
-      return Err(program_err);
+        solana_program::msg!("Writable/signer privilege escalation for {}: {}", offending_acc.key, program_err);
+        return Err(program_err);
     }
 }
 ```
