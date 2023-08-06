@@ -340,7 +340,7 @@ impl ToTokens for NamedInstruction {
                     #(#writables),*
                 ] {
                     if !should_be_writable.is_writable {
-                        return Err(ProgramError::InvalidAccountData);
+                        return Err((should_be_writable, ProgramError::InvalidAccountData));
                     }
                 }
             }
@@ -367,15 +367,15 @@ impl ToTokens for NamedInstruction {
                     #(#signers),*
                 ] {
                     if !should_be_signer.is_signer {
-                        return Err(ProgramError::MissingRequiredSignature);
+                        return Err((should_be_signer, ProgramError::MissingRequiredSignature));
                     }
                 }
             }
         };
         tokens.extend(quote! {
-            pub fn #verify_account_privileges_fn_ident(
-                accounts: &#accounts_ident<'_, '_>,
-            ) -> Result<(), ProgramError> {
+            pub fn #verify_account_privileges_fn_ident<'me, 'info>(
+                accounts: &#accounts_ident<'me, 'info>,
+            ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
                 #writables_loop_check
                 #signers_loop_check
                 Ok(())
