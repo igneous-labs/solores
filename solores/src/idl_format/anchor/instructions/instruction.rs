@@ -371,7 +371,7 @@ impl NamedInstruction {
             .iter()
             .map(|a| IxAccount::to_verify_account_keys_tuple(a));
         // edge-case of accounts and keys being empty
-        let pubkeys_loop_check = if self.accounts.is_empty() {
+        let pubkeys_loop_check = if unique_accounts.is_empty() {
             quote! {}
         } else {
             quote! {

@@ -79,6 +79,13 @@ fn test_anchor_ix_no_privilege() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_shank_ix_no_privilege() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "shank/ix_no_privilege";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "shank_ix_no_privilege_interface")
+}
+
+#[test]
 fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "anchor/drift";
     gen_example(
