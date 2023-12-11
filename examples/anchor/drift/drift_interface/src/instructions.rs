@@ -1007,8 +1007,8 @@ pub struct InitializeUserKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializeUserAccounts<'_, '_>> for InitializeUserKeys {
-    fn from(accounts: &InitializeUserAccounts) -> Self {
+impl From<InitializeUserAccounts<'_, '_>> for InitializeUserKeys {
+    fn from(accounts: InitializeUserAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             user_stats: *accounts.user_stats.key,
@@ -1020,8 +1020,8 @@ impl From<&InitializeUserAccounts<'_, '_>> for InitializeUserKeys {
         }
     }
 }
-impl From<&InitializeUserKeys> for [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeUserKeys) -> Self {
+impl From<InitializeUserKeys> for [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeUserKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -1074,10 +1074,10 @@ impl From<[Pubkey; INITIALIZE_USER_IX_ACCOUNTS_LEN]> for InitializeUserKeys {
         }
     }
 }
-impl<'info> From<&InitializeUserAccounts<'_, 'info>>
+impl<'info> From<InitializeUserAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeUserAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeUserAccounts<'_, 'info>) -> Self {
         [
             accounts.user.clone(),
             accounts.user_stats.clone(),
@@ -1149,7 +1149,7 @@ pub fn initialize_user_ix<K: Into<InitializeUserKeys>, A: Into<InitializeUserIxA
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeUserKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeUserIxArgs = args.into();
     let data: InitializeUserIxData = args_full.into();
     Ok(Instruction {
@@ -1159,7 +1159,7 @@ pub fn initialize_user_ix<K: Into<InitializeUserKeys>, A: Into<InitializeUserIxA
     })
 }
 pub fn initialize_user_invoke<'info, A: Into<InitializeUserIxArgs>>(
-    accounts: &InitializeUserAccounts<'_, 'info>,
+    accounts: InitializeUserAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_user_ix(accounts, args)?;
@@ -1167,7 +1167,7 @@ pub fn initialize_user_invoke<'info, A: Into<InitializeUserIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
-    accounts: &InitializeUserAccounts<'_, 'info>,
+    accounts: InitializeUserAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1176,26 +1176,26 @@ pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_user_verify_account_keys(
-    accounts: &InitializeUserAccounts<'_, '_>,
-    keys: &InitializeUserKeys,
+    accounts: InitializeUserAccounts<'_, '_>,
+    keys: InitializeUserKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.payer.key, &keys.payer),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_user_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeUserAccounts<'me, 'info>,
+    accounts: InitializeUserAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -1233,8 +1233,8 @@ pub struct InitializeUserStatsKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializeUserStatsAccounts<'_, '_>> for InitializeUserStatsKeys {
-    fn from(accounts: &InitializeUserStatsAccounts) -> Self {
+impl From<InitializeUserStatsAccounts<'_, '_>> for InitializeUserStatsKeys {
+    fn from(accounts: InitializeUserStatsAccounts) -> Self {
         Self {
             user_stats: *accounts.user_stats.key,
             state: *accounts.state.key,
@@ -1245,8 +1245,8 @@ impl From<&InitializeUserStatsAccounts<'_, '_>> for InitializeUserStatsKeys {
         }
     }
 }
-impl From<&InitializeUserStatsKeys> for [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeUserStatsKeys) -> Self {
+impl From<InitializeUserStatsKeys> for [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeUserStatsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user_stats,
@@ -1293,10 +1293,10 @@ impl From<[Pubkey; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]> for InitializeUserSta
         }
     }
 }
-impl<'info> From<&InitializeUserStatsAccounts<'_, 'info>>
+impl<'info> From<InitializeUserStatsAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeUserStatsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeUserStatsAccounts<'_, 'info>) -> Self {
         [
             accounts.user_stats.clone(),
             accounts.state.clone(),
@@ -1353,7 +1353,7 @@ pub fn initialize_user_stats_ix<K: Into<InitializeUserStatsKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeUserStatsKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1361,14 +1361,14 @@ pub fn initialize_user_stats_ix<K: Into<InitializeUserStatsKeys>>(
     })
 }
 pub fn initialize_user_stats_invoke<'info>(
-    accounts: &InitializeUserStatsAccounts<'_, 'info>,
+    accounts: InitializeUserStatsAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = initialize_user_stats_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn initialize_user_stats_invoke_signed<'info>(
-    accounts: &InitializeUserStatsAccounts<'_, 'info>,
+    accounts: InitializeUserStatsAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_user_stats_ix(accounts)?;
@@ -1376,25 +1376,25 @@ pub fn initialize_user_stats_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_user_stats_verify_account_keys(
-    accounts: &InitializeUserStatsAccounts<'_, '_>,
-    keys: &InitializeUserStatsKeys,
+    accounts: InitializeUserStatsAccounts<'_, '_>,
+    keys: InitializeUserStatsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.payer.key, &keys.payer),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_user_stats_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeUserStatsAccounts<'me, 'info>,
+    accounts: InitializeUserStatsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user_stats, accounts.state, accounts.payer] {
         if !should_be_writable.is_writable {
@@ -1429,8 +1429,8 @@ pub struct InitializeReferrerNameKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializeReferrerNameAccounts<'_, '_>> for InitializeReferrerNameKeys {
-    fn from(accounts: &InitializeReferrerNameAccounts) -> Self {
+impl From<InitializeReferrerNameAccounts<'_, '_>> for InitializeReferrerNameKeys {
+    fn from(accounts: InitializeReferrerNameAccounts) -> Self {
         Self {
             referrer_name: *accounts.referrer_name.key,
             user: *accounts.user.key,
@@ -1442,8 +1442,8 @@ impl From<&InitializeReferrerNameAccounts<'_, '_>> for InitializeReferrerNameKey
         }
     }
 }
-impl From<&InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeReferrerNameKeys) -> Self {
+impl From<InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeReferrerNameKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.referrer_name,
@@ -1496,10 +1496,10 @@ impl From<[Pubkey; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]> for InitializeRefe
         }
     }
 }
-impl<'info> From<&InitializeReferrerNameAccounts<'_, 'info>>
+impl<'info> From<InitializeReferrerNameAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeReferrerNameAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeReferrerNameAccounts<'_, 'info>) -> Self {
         [
             accounts.referrer_name.clone(),
             accounts.user.clone(),
@@ -1575,7 +1575,7 @@ pub fn initialize_referrer_name_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeReferrerNameKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeReferrerNameIxArgs = args.into();
     let data: InitializeReferrerNameIxData = args_full.into();
     Ok(Instruction {
@@ -1585,7 +1585,7 @@ pub fn initialize_referrer_name_ix<
     })
 }
 pub fn initialize_referrer_name_invoke<'info, A: Into<InitializeReferrerNameIxArgs>>(
-    accounts: &InitializeReferrerNameAccounts<'_, 'info>,
+    accounts: InitializeReferrerNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_referrer_name_ix(accounts, args)?;
@@ -1594,7 +1594,7 @@ pub fn initialize_referrer_name_invoke<'info, A: Into<InitializeReferrerNameIxAr
     invoke(&ix, &account_info)
 }
 pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerNameIxArgs>>(
-    accounts: &InitializeReferrerNameAccounts<'_, 'info>,
+    accounts: InitializeReferrerNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1604,26 +1604,26 @@ pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerN
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_referrer_name_verify_account_keys(
-    accounts: &InitializeReferrerNameAccounts<'_, '_>,
-    keys: &InitializeReferrerNameKeys,
+    accounts: InitializeReferrerNameAccounts<'_, '_>,
+    keys: InitializeReferrerNameKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.referrer_name.key, &keys.referrer_name),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
-        (accounts.payer.key, &keys.payer),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.referrer_name.key, keys.referrer_name),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_referrer_name_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeReferrerNameAccounts<'me, 'info>,
+    accounts: InitializeReferrerNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.referrer_name,
@@ -1663,8 +1663,8 @@ pub struct DepositKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&DepositAccounts<'_, '_>> for DepositKeys {
-    fn from(accounts: &DepositAccounts) -> Self {
+impl From<DepositAccounts<'_, '_>> for DepositKeys {
+    fn from(accounts: DepositAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1676,8 +1676,8 @@ impl From<&DepositAccounts<'_, '_>> for DepositKeys {
         }
     }
 }
-impl From<&DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &DepositKeys) -> Self {
+impl From<DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
+    fn from(keys: DepositKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -1730,8 +1730,8 @@ impl From<[Pubkey; DEPOSIT_IX_ACCOUNTS_LEN]> for DepositKeys {
         }
     }
 }
-impl<'info> From<&DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &DepositAccounts<'_, 'info>) -> Self {
+impl<'info> From<DepositAccounts<'_, 'info>> for [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] {
+    fn from(accounts: DepositAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -1804,7 +1804,7 @@ pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DepositKeys = accounts.into();
-    let metas: [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DepositIxArgs = args.into();
     let data: DepositIxData = args_full.into();
     Ok(Instruction {
@@ -1814,7 +1814,7 @@ pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
     })
 }
 pub fn deposit_invoke<'info, A: Into<DepositIxArgs>>(
-    accounts: &DepositAccounts<'_, 'info>,
+    accounts: DepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deposit_ix(accounts, args)?;
@@ -1822,7 +1822,7 @@ pub fn deposit_invoke<'info, A: Into<DepositIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
-    accounts: &DepositAccounts<'_, 'info>,
+    accounts: DepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1831,26 +1831,26 @@ pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deposit_verify_account_keys(
-    accounts: &DepositAccounts<'_, '_>,
-    keys: &DepositKeys,
+    accounts: DepositAccounts<'_, '_>,
+    keys: DepositKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
-        (accounts.user_token_account.key, &keys.user_token_account),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
+        (*accounts.user_token_account.key, keys.user_token_account),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn deposit_verify_account_privileges<'me, 'info>(
-    accounts: &DepositAccounts<'me, 'info>,
+    accounts: DepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -1892,8 +1892,8 @@ pub struct WithdrawKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&WithdrawAccounts<'_, '_>> for WithdrawKeys {
-    fn from(accounts: &WithdrawAccounts) -> Self {
+impl From<WithdrawAccounts<'_, '_>> for WithdrawKeys {
+    fn from(accounts: WithdrawAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -1906,8 +1906,8 @@ impl From<&WithdrawAccounts<'_, '_>> for WithdrawKeys {
         }
     }
 }
-impl From<&WithdrawKeys> for [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] {
-    fn from(keys: &WithdrawKeys) -> Self {
+impl From<WithdrawKeys> for [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] {
+    fn from(keys: WithdrawKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -1966,8 +1966,8 @@ impl From<[Pubkey; WITHDRAW_IX_ACCOUNTS_LEN]> for WithdrawKeys {
         }
     }
 }
-impl<'info> From<&WithdrawAccounts<'_, 'info>> for [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &WithdrawAccounts<'_, 'info>) -> Self {
+impl<'info> From<WithdrawAccounts<'_, 'info>> for [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] {
+    fn from(accounts: WithdrawAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2042,7 +2042,7 @@ pub fn withdraw_ix<K: Into<WithdrawKeys>, A: Into<WithdrawIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: WithdrawKeys = accounts.into();
-    let metas: [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: WithdrawIxArgs = args.into();
     let data: WithdrawIxData = args_full.into();
     Ok(Instruction {
@@ -2052,7 +2052,7 @@ pub fn withdraw_ix<K: Into<WithdrawKeys>, A: Into<WithdrawIxArgs>>(
     })
 }
 pub fn withdraw_invoke<'info, A: Into<WithdrawIxArgs>>(
-    accounts: &WithdrawAccounts<'_, 'info>,
+    accounts: WithdrawAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = withdraw_ix(accounts, args)?;
@@ -2060,7 +2060,7 @@ pub fn withdraw_invoke<'info, A: Into<WithdrawIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
-    accounts: &WithdrawAccounts<'_, 'info>,
+    accounts: WithdrawAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2069,27 +2069,27 @@ pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn withdraw_verify_account_keys(
-    accounts: &WithdrawAccounts<'_, '_>,
-    keys: &WithdrawKeys,
+    accounts: WithdrawAccounts<'_, '_>,
+    keys: WithdrawKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.user_token_account.key, &keys.user_token_account),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.user_token_account.key, keys.user_token_account),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn withdraw_verify_account_privileges<'me, 'info>(
-    accounts: &WithdrawAccounts<'me, 'info>,
+    accounts: WithdrawAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -2127,8 +2127,8 @@ pub struct TransferDepositKeys {
     pub state: Pubkey,
     pub spot_market_vault: Pubkey,
 }
-impl From<&TransferDepositAccounts<'_, '_>> for TransferDepositKeys {
-    fn from(accounts: &TransferDepositAccounts) -> Self {
+impl From<TransferDepositAccounts<'_, '_>> for TransferDepositKeys {
+    fn from(accounts: TransferDepositAccounts) -> Self {
         Self {
             from_user: *accounts.from_user.key,
             to_user: *accounts.to_user.key,
@@ -2139,8 +2139,8 @@ impl From<&TransferDepositAccounts<'_, '_>> for TransferDepositKeys {
         }
     }
 }
-impl From<&TransferDepositKeys> for [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &TransferDepositKeys) -> Self {
+impl From<TransferDepositKeys> for [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] {
+    fn from(keys: TransferDepositKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.from_user,
@@ -2187,10 +2187,10 @@ impl From<[Pubkey; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]> for TransferDepositKeys {
         }
     }
 }
-impl<'info> From<&TransferDepositAccounts<'_, 'info>>
+impl<'info> From<TransferDepositAccounts<'_, 'info>>
     for [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &TransferDepositAccounts<'_, 'info>) -> Self {
+    fn from(accounts: TransferDepositAccounts<'_, 'info>) -> Self {
         [
             accounts.from_user.clone(),
             accounts.to_user.clone(),
@@ -2260,7 +2260,7 @@ pub fn transfer_deposit_ix<K: Into<TransferDepositKeys>, A: Into<TransferDeposit
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: TransferDepositKeys = accounts.into();
-    let metas: [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: TransferDepositIxArgs = args.into();
     let data: TransferDepositIxData = args_full.into();
     Ok(Instruction {
@@ -2270,7 +2270,7 @@ pub fn transfer_deposit_ix<K: Into<TransferDepositKeys>, A: Into<TransferDeposit
     })
 }
 pub fn transfer_deposit_invoke<'info, A: Into<TransferDepositIxArgs>>(
-    accounts: &TransferDepositAccounts<'_, 'info>,
+    accounts: TransferDepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = transfer_deposit_ix(accounts, args)?;
@@ -2278,7 +2278,7 @@ pub fn transfer_deposit_invoke<'info, A: Into<TransferDepositIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
-    accounts: &TransferDepositAccounts<'_, 'info>,
+    accounts: TransferDepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2287,25 +2287,25 @@ pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn transfer_deposit_verify_account_keys(
-    accounts: &TransferDepositAccounts<'_, '_>,
-    keys: &TransferDepositKeys,
+    accounts: TransferDepositAccounts<'_, '_>,
+    keys: TransferDepositKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.from_user.key, &keys.from_user),
-        (accounts.to_user.key, &keys.to_user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.from_user.key, keys.from_user),
+        (*accounts.to_user.key, keys.to_user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn transfer_deposit_verify_account_privileges<'me, 'info>(
-    accounts: &TransferDepositAccounts<'me, 'info>,
+    accounts: TransferDepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.from_user, accounts.to_user, accounts.user_stats] {
         if !should_be_writable.is_writable {
@@ -2332,8 +2332,8 @@ pub struct PlacePerpOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlacePerpOrderAccounts<'_, '_>> for PlacePerpOrderKeys {
-    fn from(accounts: &PlacePerpOrderAccounts) -> Self {
+impl From<PlacePerpOrderAccounts<'_, '_>> for PlacePerpOrderKeys {
+    fn from(accounts: PlacePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2341,8 +2341,8 @@ impl From<&PlacePerpOrderAccounts<'_, '_>> for PlacePerpOrderKeys {
         }
     }
 }
-impl From<&PlacePerpOrderKeys> for [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlacePerpOrderKeys) -> Self {
+impl From<PlacePerpOrderKeys> for [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlacePerpOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -2371,10 +2371,10 @@ impl From<[Pubkey; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlacePerpOrderKeys {
         }
     }
 }
-impl<'info> From<&PlacePerpOrderAccounts<'_, 'info>>
+impl<'info> From<PlacePerpOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlacePerpOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlacePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2437,7 +2437,7 @@ pub fn place_perp_order_ix<K: Into<PlacePerpOrderKeys>, A: Into<PlacePerpOrderIx
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlacePerpOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlacePerpOrderIxArgs = args.into();
     let data: PlacePerpOrderIxData = args_full.into();
     Ok(Instruction {
@@ -2447,7 +2447,7 @@ pub fn place_perp_order_ix<K: Into<PlacePerpOrderKeys>, A: Into<PlacePerpOrderIx
     })
 }
 pub fn place_perp_order_invoke<'info, A: Into<PlacePerpOrderIxArgs>>(
-    accounts: &PlacePerpOrderAccounts<'_, 'info>,
+    accounts: PlacePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_perp_order_ix(accounts, args)?;
@@ -2455,7 +2455,7 @@ pub fn place_perp_order_invoke<'info, A: Into<PlacePerpOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
-    accounts: &PlacePerpOrderAccounts<'_, 'info>,
+    accounts: PlacePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2464,22 +2464,22 @@ pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_perp_order_verify_account_keys(
-    accounts: &PlacePerpOrderAccounts<'_, '_>,
-    keys: &PlacePerpOrderKeys,
+    accounts: PlacePerpOrderAccounts<'_, '_>,
+    keys: PlacePerpOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_perp_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlacePerpOrderAccounts<'me, 'info>,
+    accounts: PlacePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -2506,8 +2506,8 @@ pub struct CancelOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&CancelOrderAccounts<'_, '_>> for CancelOrderKeys {
-    fn from(accounts: &CancelOrderAccounts) -> Self {
+impl From<CancelOrderAccounts<'_, '_>> for CancelOrderKeys {
+    fn from(accounts: CancelOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2515,8 +2515,8 @@ impl From<&CancelOrderAccounts<'_, '_>> for CancelOrderKeys {
         }
     }
 }
-impl From<&CancelOrderKeys> for [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CancelOrderKeys) -> Self {
+impl From<CancelOrderKeys> for [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: CancelOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -2545,10 +2545,10 @@ impl From<[Pubkey; CANCEL_ORDER_IX_ACCOUNTS_LEN]> for CancelOrderKeys {
         }
     }
 }
-impl<'info> From<&CancelOrderAccounts<'_, 'info>>
+impl<'info> From<CancelOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2611,7 +2611,7 @@ pub fn cancel_order_ix<K: Into<CancelOrderKeys>, A: Into<CancelOrderIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelOrderKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelOrderIxArgs = args.into();
     let data: CancelOrderIxData = args_full.into();
     Ok(Instruction {
@@ -2621,7 +2621,7 @@ pub fn cancel_order_ix<K: Into<CancelOrderKeys>, A: Into<CancelOrderIxArgs>>(
     })
 }
 pub fn cancel_order_invoke<'info, A: Into<CancelOrderIxArgs>>(
-    accounts: &CancelOrderAccounts<'_, 'info>,
+    accounts: CancelOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_order_ix(accounts, args)?;
@@ -2629,7 +2629,7 @@ pub fn cancel_order_invoke<'info, A: Into<CancelOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
-    accounts: &CancelOrderAccounts<'_, 'info>,
+    accounts: CancelOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2638,22 +2638,22 @@ pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_order_verify_account_keys(
-    accounts: &CancelOrderAccounts<'_, '_>,
-    keys: &CancelOrderKeys,
+    accounts: CancelOrderAccounts<'_, '_>,
+    keys: CancelOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn cancel_order_verify_account_privileges<'me, 'info>(
-    accounts: &CancelOrderAccounts<'me, 'info>,
+    accounts: CancelOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -2680,8 +2680,8 @@ pub struct CancelOrderByUserIdKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&CancelOrderByUserIdAccounts<'_, '_>> for CancelOrderByUserIdKeys {
-    fn from(accounts: &CancelOrderByUserIdAccounts) -> Self {
+impl From<CancelOrderByUserIdAccounts<'_, '_>> for CancelOrderByUserIdKeys {
+    fn from(accounts: CancelOrderByUserIdAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2689,8 +2689,8 @@ impl From<&CancelOrderByUserIdAccounts<'_, '_>> for CancelOrderByUserIdKeys {
         }
     }
 }
-impl From<&CancelOrderByUserIdKeys> for [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CancelOrderByUserIdKeys) -> Self {
+impl From<CancelOrderByUserIdKeys> for [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
+    fn from(keys: CancelOrderByUserIdKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -2719,10 +2719,10 @@ impl From<[Pubkey; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]> for CancelOrderByUs
         }
     }
 }
-impl<'info> From<&CancelOrderByUserIdAccounts<'_, 'info>>
+impl<'info> From<CancelOrderByUserIdAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrderByUserIdAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelOrderByUserIdAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2788,7 +2788,7 @@ pub fn cancel_order_by_user_id_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelOrderByUserIdKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelOrderByUserIdIxArgs = args.into();
     let data: CancelOrderByUserIdIxData = args_full.into();
     Ok(Instruction {
@@ -2798,7 +2798,7 @@ pub fn cancel_order_by_user_id_ix<
     })
 }
 pub fn cancel_order_by_user_id_invoke<'info, A: Into<CancelOrderByUserIdIxArgs>>(
-    accounts: &CancelOrderByUserIdAccounts<'_, 'info>,
+    accounts: CancelOrderByUserIdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_order_by_user_id_ix(accounts, args)?;
@@ -2807,7 +2807,7 @@ pub fn cancel_order_by_user_id_invoke<'info, A: Into<CancelOrderByUserIdIxArgs>>
     invoke(&ix, &account_info)
 }
 pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdIxArgs>>(
-    accounts: &CancelOrderByUserIdAccounts<'_, 'info>,
+    accounts: CancelOrderByUserIdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2817,22 +2817,22 @@ pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdI
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_order_by_user_id_verify_account_keys(
-    accounts: &CancelOrderByUserIdAccounts<'_, '_>,
-    keys: &CancelOrderByUserIdKeys,
+    accounts: CancelOrderByUserIdAccounts<'_, '_>,
+    keys: CancelOrderByUserIdKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn cancel_order_by_user_id_verify_account_privileges<'me, 'info>(
-    accounts: &CancelOrderByUserIdAccounts<'me, 'info>,
+    accounts: CancelOrderByUserIdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -2859,8 +2859,8 @@ pub struct CancelOrdersKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&CancelOrdersAccounts<'_, '_>> for CancelOrdersKeys {
-    fn from(accounts: &CancelOrdersAccounts) -> Self {
+impl From<CancelOrdersAccounts<'_, '_>> for CancelOrdersKeys {
+    fn from(accounts: CancelOrdersAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -2868,8 +2868,8 @@ impl From<&CancelOrdersAccounts<'_, '_>> for CancelOrdersKeys {
         }
     }
 }
-impl From<&CancelOrdersKeys> for [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CancelOrdersKeys) -> Self {
+impl From<CancelOrdersKeys> for [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
+    fn from(keys: CancelOrdersKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -2898,10 +2898,10 @@ impl From<[Pubkey; CANCEL_ORDERS_IX_ACCOUNTS_LEN]> for CancelOrdersKeys {
         }
     }
 }
-impl<'info> From<&CancelOrdersAccounts<'_, 'info>>
+impl<'info> From<CancelOrdersAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelOrdersAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -2966,7 +2966,7 @@ pub fn cancel_orders_ix<K: Into<CancelOrdersKeys>, A: Into<CancelOrdersIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelOrdersKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelOrdersIxArgs = args.into();
     let data: CancelOrdersIxData = args_full.into();
     Ok(Instruction {
@@ -2976,7 +2976,7 @@ pub fn cancel_orders_ix<K: Into<CancelOrdersKeys>, A: Into<CancelOrdersIxArgs>>(
     })
 }
 pub fn cancel_orders_invoke<'info, A: Into<CancelOrdersIxArgs>>(
-    accounts: &CancelOrdersAccounts<'_, 'info>,
+    accounts: CancelOrdersAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_orders_ix(accounts, args)?;
@@ -2984,7 +2984,7 @@ pub fn cancel_orders_invoke<'info, A: Into<CancelOrdersIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
-    accounts: &CancelOrdersAccounts<'_, 'info>,
+    accounts: CancelOrdersAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2993,22 +2993,22 @@ pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_orders_verify_account_keys(
-    accounts: &CancelOrdersAccounts<'_, '_>,
-    keys: &CancelOrdersKeys,
+    accounts: CancelOrdersAccounts<'_, '_>,
+    keys: CancelOrdersKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn cancel_orders_verify_account_privileges<'me, 'info>(
-    accounts: &CancelOrdersAccounts<'me, 'info>,
+    accounts: CancelOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -3035,8 +3035,8 @@ pub struct ModifyOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&ModifyOrderAccounts<'_, '_>> for ModifyOrderKeys {
-    fn from(accounts: &ModifyOrderAccounts) -> Self {
+impl From<ModifyOrderAccounts<'_, '_>> for ModifyOrderKeys {
+    fn from(accounts: ModifyOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3044,8 +3044,8 @@ impl From<&ModifyOrderAccounts<'_, '_>> for ModifyOrderKeys {
         }
     }
 }
-impl From<&ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ModifyOrderKeys) -> Self {
+impl From<ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: ModifyOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -3074,10 +3074,10 @@ impl From<[Pubkey; MODIFY_ORDER_IX_ACCOUNTS_LEN]> for ModifyOrderKeys {
         }
     }
 }
-impl<'info> From<&ModifyOrderAccounts<'_, 'info>>
+impl<'info> From<ModifyOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ModifyOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ModifyOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3141,7 +3141,7 @@ pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ModifyOrderKeys = accounts.into();
-    let metas: [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ModifyOrderIxArgs = args.into();
     let data: ModifyOrderIxData = args_full.into();
     Ok(Instruction {
@@ -3151,7 +3151,7 @@ pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
     })
 }
 pub fn modify_order_invoke<'info, A: Into<ModifyOrderIxArgs>>(
-    accounts: &ModifyOrderAccounts<'_, 'info>,
+    accounts: ModifyOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = modify_order_ix(accounts, args)?;
@@ -3159,7 +3159,7 @@ pub fn modify_order_invoke<'info, A: Into<ModifyOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
-    accounts: &ModifyOrderAccounts<'_, 'info>,
+    accounts: ModifyOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3168,22 +3168,22 @@ pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn modify_order_verify_account_keys(
-    accounts: &ModifyOrderAccounts<'_, '_>,
-    keys: &ModifyOrderKeys,
+    accounts: ModifyOrderAccounts<'_, '_>,
+    keys: ModifyOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn modify_order_verify_account_privileges<'me, 'info>(
-    accounts: &ModifyOrderAccounts<'me, 'info>,
+    accounts: ModifyOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -3210,8 +3210,8 @@ pub struct ModifyOrderByUserIdKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&ModifyOrderByUserIdAccounts<'_, '_>> for ModifyOrderByUserIdKeys {
-    fn from(accounts: &ModifyOrderByUserIdAccounts) -> Self {
+impl From<ModifyOrderByUserIdAccounts<'_, '_>> for ModifyOrderByUserIdKeys {
+    fn from(accounts: ModifyOrderByUserIdAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3219,8 +3219,8 @@ impl From<&ModifyOrderByUserIdAccounts<'_, '_>> for ModifyOrderByUserIdKeys {
         }
     }
 }
-impl From<&ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ModifyOrderByUserIdKeys) -> Self {
+impl From<ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
+    fn from(keys: ModifyOrderByUserIdKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -3249,10 +3249,10 @@ impl From<[Pubkey; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]> for ModifyOrderByUs
         }
     }
 }
-impl<'info> From<&ModifyOrderByUserIdAccounts<'_, 'info>>
+impl<'info> From<ModifyOrderByUserIdAccounts<'_, 'info>>
     for [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ModifyOrderByUserIdAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ModifyOrderByUserIdAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3319,7 +3319,7 @@ pub fn modify_order_by_user_id_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ModifyOrderByUserIdKeys = accounts.into();
-    let metas: [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ModifyOrderByUserIdIxArgs = args.into();
     let data: ModifyOrderByUserIdIxData = args_full.into();
     Ok(Instruction {
@@ -3329,7 +3329,7 @@ pub fn modify_order_by_user_id_ix<
     })
 }
 pub fn modify_order_by_user_id_invoke<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
-    accounts: &ModifyOrderByUserIdAccounts<'_, 'info>,
+    accounts: ModifyOrderByUserIdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = modify_order_by_user_id_ix(accounts, args)?;
@@ -3338,7 +3338,7 @@ pub fn modify_order_by_user_id_invoke<'info, A: Into<ModifyOrderByUserIdIxArgs>>
     invoke(&ix, &account_info)
 }
 pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
-    accounts: &ModifyOrderByUserIdAccounts<'_, 'info>,
+    accounts: ModifyOrderByUserIdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3348,22 +3348,22 @@ pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdI
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn modify_order_by_user_id_verify_account_keys(
-    accounts: &ModifyOrderByUserIdAccounts<'_, '_>,
-    keys: &ModifyOrderByUserIdKeys,
+    accounts: ModifyOrderByUserIdAccounts<'_, '_>,
+    keys: ModifyOrderByUserIdKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn modify_order_by_user_id_verify_account_privileges<'me, 'info>(
-    accounts: &ModifyOrderByUserIdAccounts<'me, 'info>,
+    accounts: ModifyOrderByUserIdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -3392,8 +3392,8 @@ pub struct PlaceAndTakePerpOrderKeys {
     pub user_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlaceAndTakePerpOrderAccounts<'_, '_>> for PlaceAndTakePerpOrderKeys {
-    fn from(accounts: &PlaceAndTakePerpOrderAccounts) -> Self {
+impl From<PlaceAndTakePerpOrderAccounts<'_, '_>> for PlaceAndTakePerpOrderKeys {
+    fn from(accounts: PlaceAndTakePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3402,8 +3402,8 @@ impl From<&PlaceAndTakePerpOrderAccounts<'_, '_>> for PlaceAndTakePerpOrderKeys 
         }
     }
 }
-impl From<&PlaceAndTakePerpOrderKeys> for [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceAndTakePerpOrderKeys) -> Self {
+impl From<PlaceAndTakePerpOrderKeys> for [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceAndTakePerpOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -3438,10 +3438,10 @@ impl From<[Pubkey; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndTakeP
         }
     }
 }
-impl<'info> From<&PlaceAndTakePerpOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceAndTakePerpOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceAndTakePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3510,7 +3510,7 @@ pub fn place_and_take_perp_order_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceAndTakePerpOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceAndTakePerpOrderIxArgs = args.into();
     let data: PlaceAndTakePerpOrderIxData = args_full.into();
     Ok(Instruction {
@@ -3520,7 +3520,7 @@ pub fn place_and_take_perp_order_ix<
     })
 }
 pub fn place_and_take_perp_order_invoke<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
-    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>,
+    accounts: PlaceAndTakePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_take_perp_order_ix(accounts, args)?;
@@ -3529,7 +3529,7 @@ pub fn place_and_take_perp_order_invoke<'info, A: Into<PlaceAndTakePerpOrderIxAr
     invoke(&ix, &account_info)
 }
 pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
-    accounts: &PlaceAndTakePerpOrderAccounts<'_, 'info>,
+    accounts: PlaceAndTakePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3539,23 +3539,23 @@ pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_and_take_perp_order_verify_account_keys(
-    accounts: &PlaceAndTakePerpOrderAccounts<'_, '_>,
-    keys: &PlaceAndTakePerpOrderKeys,
+    accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
+    keys: PlaceAndTakePerpOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_and_take_perp_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceAndTakePerpOrderAccounts<'me, 'info>,
+    accounts: PlaceAndTakePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats] {
         if !should_be_writable.is_writable {
@@ -3588,8 +3588,8 @@ pub struct PlaceAndMakePerpOrderKeys {
     pub taker_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlaceAndMakePerpOrderAccounts<'_, '_>> for PlaceAndMakePerpOrderKeys {
-    fn from(accounts: &PlaceAndMakePerpOrderAccounts) -> Self {
+impl From<PlaceAndMakePerpOrderAccounts<'_, '_>> for PlaceAndMakePerpOrderKeys {
+    fn from(accounts: PlaceAndMakePerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3600,8 +3600,8 @@ impl From<&PlaceAndMakePerpOrderAccounts<'_, '_>> for PlaceAndMakePerpOrderKeys 
         }
     }
 }
-impl From<&PlaceAndMakePerpOrderKeys> for [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceAndMakePerpOrderKeys) -> Self {
+impl From<PlaceAndMakePerpOrderKeys> for [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceAndMakePerpOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -3648,10 +3648,10 @@ impl From<[Pubkey; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndMakeP
         }
     }
 }
-impl<'info> From<&PlaceAndMakePerpOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceAndMakePerpOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceAndMakePerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3724,7 +3724,7 @@ pub fn place_and_make_perp_order_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceAndMakePerpOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceAndMakePerpOrderIxArgs = args.into();
     let data: PlaceAndMakePerpOrderIxData = args_full.into();
     Ok(Instruction {
@@ -3734,7 +3734,7 @@ pub fn place_and_make_perp_order_ix<
     })
 }
 pub fn place_and_make_perp_order_invoke<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
-    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>,
+    accounts: PlaceAndMakePerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_make_perp_order_ix(accounts, args)?;
@@ -3743,7 +3743,7 @@ pub fn place_and_make_perp_order_invoke<'info, A: Into<PlaceAndMakePerpOrderIxAr
     invoke(&ix, &account_info)
 }
 pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
-    accounts: &PlaceAndMakePerpOrderAccounts<'_, 'info>,
+    accounts: PlaceAndMakePerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3753,25 +3753,25 @@ pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_and_make_perp_order_verify_account_keys(
-    accounts: &PlaceAndMakePerpOrderAccounts<'_, '_>,
-    keys: &PlaceAndMakePerpOrderKeys,
+    accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
+    keys: PlaceAndMakePerpOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.taker.key, &keys.taker),
-        (accounts.taker_stats.key, &keys.taker_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.taker.key, keys.taker),
+        (*accounts.taker_stats.key, keys.taker_stats),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_and_make_perp_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceAndMakePerpOrderAccounts<'me, 'info>,
+    accounts: PlaceAndMakePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -3803,8 +3803,8 @@ pub struct PlaceSpotOrderKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlaceSpotOrderAccounts<'_, '_>> for PlaceSpotOrderKeys {
-    fn from(accounts: &PlaceSpotOrderAccounts) -> Self {
+impl From<PlaceSpotOrderAccounts<'_, '_>> for PlaceSpotOrderKeys {
+    fn from(accounts: PlaceSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3812,8 +3812,8 @@ impl From<&PlaceSpotOrderAccounts<'_, '_>> for PlaceSpotOrderKeys {
         }
     }
 }
-impl From<&PlaceSpotOrderKeys> for [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceSpotOrderKeys) -> Self {
+impl From<PlaceSpotOrderKeys> for [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceSpotOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -3842,10 +3842,10 @@ impl From<[Pubkey; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceSpotOrderKeys {
         }
     }
 }
-impl<'info> From<&PlaceSpotOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceSpotOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceSpotOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -3908,7 +3908,7 @@ pub fn place_spot_order_ix<K: Into<PlaceSpotOrderKeys>, A: Into<PlaceSpotOrderIx
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceSpotOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceSpotOrderIxArgs = args.into();
     let data: PlaceSpotOrderIxData = args_full.into();
     Ok(Instruction {
@@ -3918,7 +3918,7 @@ pub fn place_spot_order_ix<K: Into<PlaceSpotOrderKeys>, A: Into<PlaceSpotOrderIx
     })
 }
 pub fn place_spot_order_invoke<'info, A: Into<PlaceSpotOrderIxArgs>>(
-    accounts: &PlaceSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_spot_order_ix(accounts, args)?;
@@ -3926,7 +3926,7 @@ pub fn place_spot_order_invoke<'info, A: Into<PlaceSpotOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
-    accounts: &PlaceSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3935,22 +3935,22 @@ pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_spot_order_verify_account_keys(
-    accounts: &PlaceSpotOrderAccounts<'_, '_>,
-    keys: &PlaceSpotOrderKeys,
+    accounts: PlaceSpotOrderAccounts<'_, '_>,
+    keys: PlaceSpotOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_spot_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceSpotOrderAccounts<'me, 'info>,
+    accounts: PlaceSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -3979,8 +3979,8 @@ pub struct PlaceAndTakeSpotOrderKeys {
     pub user_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlaceAndTakeSpotOrderAccounts<'_, '_>> for PlaceAndTakeSpotOrderKeys {
-    fn from(accounts: &PlaceAndTakeSpotOrderAccounts) -> Self {
+impl From<PlaceAndTakeSpotOrderAccounts<'_, '_>> for PlaceAndTakeSpotOrderKeys {
+    fn from(accounts: PlaceAndTakeSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -3989,8 +3989,8 @@ impl From<&PlaceAndTakeSpotOrderAccounts<'_, '_>> for PlaceAndTakeSpotOrderKeys 
         }
     }
 }
-impl From<&PlaceAndTakeSpotOrderKeys> for [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceAndTakeSpotOrderKeys) -> Self {
+impl From<PlaceAndTakeSpotOrderKeys> for [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceAndTakeSpotOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -4025,10 +4025,10 @@ impl From<[Pubkey; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndTakeS
         }
     }
 }
-impl<'info> From<&PlaceAndTakeSpotOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceAndTakeSpotOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceAndTakeSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -4098,7 +4098,7 @@ pub fn place_and_take_spot_order_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceAndTakeSpotOrderIxArgs = args.into();
     let data: PlaceAndTakeSpotOrderIxData = args_full.into();
     Ok(Instruction {
@@ -4108,7 +4108,7 @@ pub fn place_and_take_spot_order_ix<
     })
 }
 pub fn place_and_take_spot_order_invoke<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceAndTakeSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_take_spot_order_ix(accounts, args)?;
@@ -4117,7 +4117,7 @@ pub fn place_and_take_spot_order_invoke<'info, A: Into<PlaceAndTakeSpotOrderIxAr
     invoke(&ix, &account_info)
 }
 pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceAndTakeSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4127,23 +4127,23 @@ pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_and_take_spot_order_verify_account_keys(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'_, '_>,
-    keys: &PlaceAndTakeSpotOrderKeys,
+    accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
+    keys: PlaceAndTakeSpotOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_and_take_spot_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceAndTakeSpotOrderAccounts<'me, 'info>,
+    accounts: PlaceAndTakeSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats] {
         if !should_be_writable.is_writable {
@@ -4176,8 +4176,8 @@ pub struct PlaceAndMakeSpotOrderKeys {
     pub taker_stats: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&PlaceAndMakeSpotOrderAccounts<'_, '_>> for PlaceAndMakeSpotOrderKeys {
-    fn from(accounts: &PlaceAndMakeSpotOrderAccounts) -> Self {
+impl From<PlaceAndMakeSpotOrderAccounts<'_, '_>> for PlaceAndMakeSpotOrderKeys {
+    fn from(accounts: PlaceAndMakeSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -4188,8 +4188,8 @@ impl From<&PlaceAndMakeSpotOrderAccounts<'_, '_>> for PlaceAndMakeSpotOrderKeys 
         }
     }
 }
-impl From<&PlaceAndMakeSpotOrderKeys> for [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceAndMakeSpotOrderKeys) -> Self {
+impl From<PlaceAndMakeSpotOrderKeys> for [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceAndMakeSpotOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -4236,10 +4236,10 @@ impl From<[Pubkey; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]> for PlaceAndMakeS
         }
     }
 }
-impl<'info> From<&PlaceAndMakeSpotOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceAndMakeSpotOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceAndMakeSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -4313,7 +4313,7 @@ pub fn place_and_make_spot_order_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceAndMakeSpotOrderIxArgs = args.into();
     let data: PlaceAndMakeSpotOrderIxData = args_full.into();
     Ok(Instruction {
@@ -4323,7 +4323,7 @@ pub fn place_and_make_spot_order_ix<
     })
 }
 pub fn place_and_make_spot_order_invoke<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceAndMakeSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_and_make_spot_order_ix(accounts, args)?;
@@ -4332,7 +4332,7 @@ pub fn place_and_make_spot_order_invoke<'info, A: Into<PlaceAndMakeSpotOrderIxAr
     invoke(&ix, &account_info)
 }
 pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'_, 'info>,
+    accounts: PlaceAndMakeSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4342,25 +4342,25 @@ pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_and_make_spot_order_verify_account_keys(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'_, '_>,
-    keys: &PlaceAndMakeSpotOrderKeys,
+    accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
+    keys: PlaceAndMakeSpotOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.taker.key, &keys.taker),
-        (accounts.taker_stats.key, &keys.taker_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.taker.key, keys.taker),
+        (*accounts.taker_stats.key, keys.taker_stats),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn place_and_make_spot_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceAndMakeSpotOrderAccounts<'me, 'info>,
+    accounts: PlaceAndMakeSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -4408,8 +4408,8 @@ pub struct BeginSwapKeys {
     pub drift_signer: Pubkey,
     pub instructions: Pubkey,
 }
-impl From<&BeginSwapAccounts<'_, '_>> for BeginSwapKeys {
-    fn from(accounts: &BeginSwapAccounts) -> Self {
+impl From<BeginSwapAccounts<'_, '_>> for BeginSwapKeys {
+    fn from(accounts: BeginSwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -4425,8 +4425,8 @@ impl From<&BeginSwapAccounts<'_, '_>> for BeginSwapKeys {
         }
     }
 }
-impl From<&BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
-    fn from(keys: &BeginSwapKeys) -> Self {
+impl From<BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(keys: BeginSwapKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -4503,10 +4503,10 @@ impl From<[Pubkey; BEGIN_SWAP_IX_ACCOUNTS_LEN]> for BeginSwapKeys {
         }
     }
 }
-impl<'info> From<&BeginSwapAccounts<'_, 'info>>
+impl<'info> From<BeginSwapAccounts<'_, 'info>>
     for [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &BeginSwapAccounts<'_, 'info>) -> Self {
+    fn from(accounts: BeginSwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -4587,7 +4587,7 @@ pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: BeginSwapKeys = accounts.into();
-    let metas: [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: BeginSwapIxArgs = args.into();
     let data: BeginSwapIxData = args_full.into();
     Ok(Instruction {
@@ -4597,7 +4597,7 @@ pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
     })
 }
 pub fn begin_swap_invoke<'info, A: Into<BeginSwapIxArgs>>(
-    accounts: &BeginSwapAccounts<'_, 'info>,
+    accounts: BeginSwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = begin_swap_ix(accounts, args)?;
@@ -4605,7 +4605,7 @@ pub fn begin_swap_invoke<'info, A: Into<BeginSwapIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
-    accounts: &BeginSwapAccounts<'_, 'info>,
+    accounts: BeginSwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4614,36 +4614,36 @@ pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn begin_swap_verify_account_keys(
-    accounts: &BeginSwapAccounts<'_, '_>,
-    keys: &BeginSwapKeys,
+    accounts: BeginSwapAccounts<'_, '_>,
+    keys: BeginSwapKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.out_spot_market_vault.key,
-            &keys.out_spot_market_vault,
+            *accounts.out_spot_market_vault.key,
+            keys.out_spot_market_vault,
         ),
         (
-            accounts.in_spot_market_vault.key,
-            &keys.in_spot_market_vault,
+            *accounts.in_spot_market_vault.key,
+            keys.in_spot_market_vault,
         ),
-        (accounts.out_token_account.key, &keys.out_token_account),
-        (accounts.in_token_account.key, &keys.in_token_account),
-        (accounts.token_program.key, &keys.token_program),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.instructions.key, &keys.instructions),
+        (*accounts.out_token_account.key, keys.out_token_account),
+        (*accounts.in_token_account.key, keys.in_token_account),
+        (*accounts.token_program.key, keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.instructions.key, keys.instructions),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn begin_swap_verify_account_privileges<'me, 'info>(
-    accounts: &BeginSwapAccounts<'me, 'info>,
+    accounts: BeginSwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -4693,8 +4693,8 @@ pub struct EndSwapKeys {
     pub drift_signer: Pubkey,
     pub instructions: Pubkey,
 }
-impl From<&EndSwapAccounts<'_, '_>> for EndSwapKeys {
-    fn from(accounts: &EndSwapAccounts) -> Self {
+impl From<EndSwapAccounts<'_, '_>> for EndSwapKeys {
+    fn from(accounts: EndSwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -4710,8 +4710,8 @@ impl From<&EndSwapAccounts<'_, '_>> for EndSwapKeys {
         }
     }
 }
-impl From<&EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
-    fn from(keys: &EndSwapKeys) -> Self {
+impl From<EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(keys: EndSwapKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -4788,8 +4788,8 @@ impl From<[Pubkey; END_SWAP_IX_ACCOUNTS_LEN]> for EndSwapKeys {
         }
     }
 }
-impl<'info> From<&EndSwapAccounts<'_, 'info>> for [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &EndSwapAccounts<'_, 'info>) -> Self {
+impl<'info> From<EndSwapAccounts<'_, 'info>> for [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] {
+    fn from(accounts: EndSwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -4871,7 +4871,7 @@ pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: EndSwapKeys = accounts.into();
-    let metas: [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: EndSwapIxArgs = args.into();
     let data: EndSwapIxData = args_full.into();
     Ok(Instruction {
@@ -4881,7 +4881,7 @@ pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
     })
 }
 pub fn end_swap_invoke<'info, A: Into<EndSwapIxArgs>>(
-    accounts: &EndSwapAccounts<'_, 'info>,
+    accounts: EndSwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = end_swap_ix(accounts, args)?;
@@ -4889,7 +4889,7 @@ pub fn end_swap_invoke<'info, A: Into<EndSwapIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
-    accounts: &EndSwapAccounts<'_, 'info>,
+    accounts: EndSwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4898,36 +4898,36 @@ pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn end_swap_verify_account_keys(
-    accounts: &EndSwapAccounts<'_, '_>,
-    keys: &EndSwapKeys,
+    accounts: EndSwapAccounts<'_, '_>,
+    keys: EndSwapKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.out_spot_market_vault.key,
-            &keys.out_spot_market_vault,
+            *accounts.out_spot_market_vault.key,
+            keys.out_spot_market_vault,
         ),
         (
-            accounts.in_spot_market_vault.key,
-            &keys.in_spot_market_vault,
+            *accounts.in_spot_market_vault.key,
+            keys.in_spot_market_vault,
         ),
-        (accounts.out_token_account.key, &keys.out_token_account),
-        (accounts.in_token_account.key, &keys.in_token_account),
-        (accounts.token_program.key, &keys.token_program),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.instructions.key, &keys.instructions),
+        (*accounts.out_token_account.key, keys.out_token_account),
+        (*accounts.in_token_account.key, keys.in_token_account),
+        (*accounts.token_program.key, keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.instructions.key, keys.instructions),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn end_swap_verify_account_privileges<'me, 'info>(
-    accounts: &EndSwapAccounts<'me, 'info>,
+    accounts: EndSwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.user,
@@ -4961,8 +4961,8 @@ pub struct AddPerpLpSharesKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&AddPerpLpSharesAccounts<'_, '_>> for AddPerpLpSharesKeys {
-    fn from(accounts: &AddPerpLpSharesAccounts) -> Self {
+impl From<AddPerpLpSharesAccounts<'_, '_>> for AddPerpLpSharesKeys {
+    fn from(accounts: AddPerpLpSharesAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -4970,8 +4970,8 @@ impl From<&AddPerpLpSharesAccounts<'_, '_>> for AddPerpLpSharesKeys {
         }
     }
 }
-impl From<&AddPerpLpSharesKeys> for [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
-    fn from(keys: &AddPerpLpSharesKeys) -> Self {
+impl From<AddPerpLpSharesKeys> for [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
+    fn from(keys: AddPerpLpSharesKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -5000,10 +5000,10 @@ impl From<[Pubkey; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]> for AddPerpLpSharesKeys 
         }
     }
 }
-impl<'info> From<&AddPerpLpSharesAccounts<'_, 'info>>
+impl<'info> From<AddPerpLpSharesAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &AddPerpLpSharesAccounts<'_, 'info>) -> Self {
+    fn from(accounts: AddPerpLpSharesAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -5067,7 +5067,7 @@ pub fn add_perp_lp_shares_ix<K: Into<AddPerpLpSharesKeys>, A: Into<AddPerpLpShar
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: AddPerpLpSharesKeys = accounts.into();
-    let metas: [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: AddPerpLpSharesIxArgs = args.into();
     let data: AddPerpLpSharesIxData = args_full.into();
     Ok(Instruction {
@@ -5077,7 +5077,7 @@ pub fn add_perp_lp_shares_ix<K: Into<AddPerpLpSharesKeys>, A: Into<AddPerpLpShar
     })
 }
 pub fn add_perp_lp_shares_invoke<'info, A: Into<AddPerpLpSharesIxArgs>>(
-    accounts: &AddPerpLpSharesAccounts<'_, 'info>,
+    accounts: AddPerpLpSharesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = add_perp_lp_shares_ix(accounts, args)?;
@@ -5085,7 +5085,7 @@ pub fn add_perp_lp_shares_invoke<'info, A: Into<AddPerpLpSharesIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
-    accounts: &AddPerpLpSharesAccounts<'_, 'info>,
+    accounts: AddPerpLpSharesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5094,22 +5094,22 @@ pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn add_perp_lp_shares_verify_account_keys(
-    accounts: &AddPerpLpSharesAccounts<'_, '_>,
-    keys: &AddPerpLpSharesKeys,
+    accounts: AddPerpLpSharesAccounts<'_, '_>,
+    keys: AddPerpLpSharesKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn add_perp_lp_shares_verify_account_privileges<'me, 'info>(
-    accounts: &AddPerpLpSharesAccounts<'me, 'info>,
+    accounts: AddPerpLpSharesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -5136,8 +5136,8 @@ pub struct RemovePerpLpSharesKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&RemovePerpLpSharesAccounts<'_, '_>> for RemovePerpLpSharesKeys {
-    fn from(accounts: &RemovePerpLpSharesAccounts) -> Self {
+impl From<RemovePerpLpSharesAccounts<'_, '_>> for RemovePerpLpSharesKeys {
+    fn from(accounts: RemovePerpLpSharesAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -5145,8 +5145,8 @@ impl From<&RemovePerpLpSharesAccounts<'_, '_>> for RemovePerpLpSharesKeys {
         }
     }
 }
-impl From<&RemovePerpLpSharesKeys> for [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RemovePerpLpSharesKeys) -> Self {
+impl From<RemovePerpLpSharesKeys> for [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
+    fn from(keys: RemovePerpLpSharesKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -5175,10 +5175,10 @@ impl From<[Pubkey; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]> for RemovePerpLpShare
         }
     }
 }
-impl<'info> From<&RemovePerpLpSharesAccounts<'_, 'info>>
+impl<'info> From<RemovePerpLpSharesAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemovePerpLpSharesAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RemovePerpLpSharesAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -5245,7 +5245,7 @@ pub fn remove_perp_lp_shares_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RemovePerpLpSharesKeys = accounts.into();
-    let metas: [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: RemovePerpLpSharesIxArgs = args.into();
     let data: RemovePerpLpSharesIxData = args_full.into();
     Ok(Instruction {
@@ -5255,7 +5255,7 @@ pub fn remove_perp_lp_shares_ix<
     })
 }
 pub fn remove_perp_lp_shares_invoke<'info, A: Into<RemovePerpLpSharesIxArgs>>(
-    accounts: &RemovePerpLpSharesAccounts<'_, 'info>,
+    accounts: RemovePerpLpSharesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_ix(accounts, args)?;
@@ -5263,7 +5263,7 @@ pub fn remove_perp_lp_shares_invoke<'info, A: Into<RemovePerpLpSharesIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxArgs>>(
-    accounts: &RemovePerpLpSharesAccounts<'_, 'info>,
+    accounts: RemovePerpLpSharesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5272,22 +5272,22 @@ pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxAr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn remove_perp_lp_shares_verify_account_keys(
-    accounts: &RemovePerpLpSharesAccounts<'_, '_>,
-    keys: &RemovePerpLpSharesKeys,
+    accounts: RemovePerpLpSharesAccounts<'_, '_>,
+    keys: RemovePerpLpSharesKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn remove_perp_lp_shares_verify_account_privileges<'me, 'info>(
-    accounts: &RemovePerpLpSharesAccounts<'me, 'info>,
+    accounts: RemovePerpLpSharesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -5312,20 +5312,20 @@ pub struct RemovePerpLpSharesInExpiringMarketKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>>
+impl From<RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>>
     for RemovePerpLpSharesInExpiringMarketKeys
 {
-    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts) -> Self {
+    fn from(accounts: RemovePerpLpSharesInExpiringMarketAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
         }
     }
 }
-impl From<&RemovePerpLpSharesInExpiringMarketKeys>
+impl From<RemovePerpLpSharesInExpiringMarketKeys>
     for [AccountMeta; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &RemovePerpLpSharesInExpiringMarketKeys) -> Self {
+    fn from(keys: RemovePerpLpSharesInExpiringMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -5350,10 +5350,10 @@ impl From<[Pubkey; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>>
+impl<'info> From<RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -5422,7 +5422,7 @@ pub fn remove_perp_lp_shares_in_expiring_market_ix<
 ) -> std::io::Result<Instruction> {
     let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: RemovePerpLpSharesInExpiringMarketIxArgs = args.into();
     let data: RemovePerpLpSharesInExpiringMarketIxData = args_full.into();
     Ok(Instruction {
@@ -5435,7 +5435,7 @@ pub fn remove_perp_lp_shares_in_expiring_market_invoke<
     'info,
     A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
 >(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_perp_lp_shares_in_expiring_market_ix(accounts, args)?;
@@ -5447,7 +5447,7 @@ pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
     'info,
     A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
 >(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5457,21 +5457,21 @@ pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn remove_perp_lp_shares_in_expiring_market_verify_account_keys(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
-    keys: &RemovePerpLpSharesInExpiringMarketKeys,
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
+    keys: RemovePerpLpSharesInExpiringMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn remove_perp_lp_shares_in_expiring_market_verify_account_privileges<'me, 'info>(
-    accounts: &RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info>,
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -5491,16 +5491,16 @@ pub struct UpdateUserNameKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&UpdateUserNameAccounts<'_, '_>> for UpdateUserNameKeys {
-    fn from(accounts: &UpdateUserNameAccounts) -> Self {
+impl From<UpdateUserNameAccounts<'_, '_>> for UpdateUserNameKeys {
+    fn from(accounts: UpdateUserNameAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&UpdateUserNameKeys> for [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateUserNameKeys) -> Self {
+impl From<UpdateUserNameKeys> for [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateUserNameKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -5523,10 +5523,10 @@ impl From<[Pubkey; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]> for UpdateUserNameKeys {
         }
     }
 }
-impl<'info> From<&UpdateUserNameAccounts<'_, 'info>>
+impl<'info> From<UpdateUserNameAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserNameAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserNameAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -5585,7 +5585,7 @@ pub fn update_user_name_ix<K: Into<UpdateUserNameKeys>, A: Into<UpdateUserNameIx
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserNameKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateUserNameIxArgs = args.into();
     let data: UpdateUserNameIxData = args_full.into();
     Ok(Instruction {
@@ -5595,7 +5595,7 @@ pub fn update_user_name_ix<K: Into<UpdateUserNameKeys>, A: Into<UpdateUserNameIx
     })
 }
 pub fn update_user_name_invoke<'info, A: Into<UpdateUserNameIxArgs>>(
-    accounts: &UpdateUserNameAccounts<'_, 'info>,
+    accounts: UpdateUserNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_name_ix(accounts, args)?;
@@ -5603,7 +5603,7 @@ pub fn update_user_name_invoke<'info, A: Into<UpdateUserNameIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
-    accounts: &UpdateUserNameAccounts<'_, 'info>,
+    accounts: UpdateUserNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5612,21 +5612,21 @@ pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_name_verify_account_keys(
-    accounts: &UpdateUserNameAccounts<'_, '_>,
-    keys: &UpdateUserNameKeys,
+    accounts: UpdateUserNameAccounts<'_, '_>,
+    keys: UpdateUserNameKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_name_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserNameAccounts<'me, 'info>,
+    accounts: UpdateUserNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -5651,18 +5651,18 @@ pub struct UpdateUserCustomMarginRatioKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&UpdateUserCustomMarginRatioAccounts<'_, '_>> for UpdateUserCustomMarginRatioKeys {
-    fn from(accounts: &UpdateUserCustomMarginRatioAccounts) -> Self {
+impl From<UpdateUserCustomMarginRatioAccounts<'_, '_>> for UpdateUserCustomMarginRatioKeys {
+    fn from(accounts: UpdateUserCustomMarginRatioAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&UpdateUserCustomMarginRatioKeys>
+impl From<UpdateUserCustomMarginRatioKeys>
     for [AccountMeta; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateUserCustomMarginRatioKeys) -> Self {
+    fn from(keys: UpdateUserCustomMarginRatioKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -5687,10 +5687,10 @@ impl From<[Pubkey; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateUserCustomMarginRatioAccounts<'_, 'info>>
+impl<'info> From<UpdateUserCustomMarginRatioAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserCustomMarginRatioAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -5756,7 +5756,7 @@ pub fn update_user_custom_margin_ratio_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateUserCustomMarginRatioIxArgs = args.into();
     let data: UpdateUserCustomMarginRatioIxData = args_full.into();
     Ok(Instruction {
@@ -5766,7 +5766,7 @@ pub fn update_user_custom_margin_ratio_ix<
     })
 }
 pub fn update_user_custom_margin_ratio_invoke<'info, A: Into<UpdateUserCustomMarginRatioIxArgs>>(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>,
+    accounts: UpdateUserCustomMarginRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_custom_margin_ratio_ix(accounts, args)?;
@@ -5778,7 +5778,7 @@ pub fn update_user_custom_margin_ratio_invoke_signed<
     'info,
     A: Into<UpdateUserCustomMarginRatioIxArgs>,
 >(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'_, 'info>,
+    accounts: UpdateUserCustomMarginRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5788,21 +5788,21 @@ pub fn update_user_custom_margin_ratio_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_custom_margin_ratio_verify_account_keys(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'_, '_>,
-    keys: &UpdateUserCustomMarginRatioKeys,
+    accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
+    keys: UpdateUserCustomMarginRatioKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_custom_margin_ratio_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserCustomMarginRatioAccounts<'me, 'info>,
+    accounts: UpdateUserCustomMarginRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -5827,18 +5827,18 @@ pub struct UpdateUserMarginTradingEnabledKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&UpdateUserMarginTradingEnabledAccounts<'_, '_>> for UpdateUserMarginTradingEnabledKeys {
-    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts) -> Self {
+impl From<UpdateUserMarginTradingEnabledAccounts<'_, '_>> for UpdateUserMarginTradingEnabledKeys {
+    fn from(accounts: UpdateUserMarginTradingEnabledAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&UpdateUserMarginTradingEnabledKeys>
+impl From<UpdateUserMarginTradingEnabledKeys>
     for [AccountMeta; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateUserMarginTradingEnabledKeys) -> Self {
+    fn from(keys: UpdateUserMarginTradingEnabledKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -5863,10 +5863,10 @@ impl From<[Pubkey; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateUserMarginTradingEnabledAccounts<'_, 'info>>
+impl<'info> From<UpdateUserMarginTradingEnabledAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserMarginTradingEnabledAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -5933,7 +5933,7 @@ pub fn update_user_margin_trading_enabled_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateUserMarginTradingEnabledIxArgs = args.into();
     let data: UpdateUserMarginTradingEnabledIxData = args_full.into();
     Ok(Instruction {
@@ -5946,7 +5946,7 @@ pub fn update_user_margin_trading_enabled_invoke<
     'info,
     A: Into<UpdateUserMarginTradingEnabledIxArgs>,
 >(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
+    accounts: UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_margin_trading_enabled_ix(accounts, args)?;
@@ -5958,7 +5958,7 @@ pub fn update_user_margin_trading_enabled_invoke_signed<
     'info,
     A: Into<UpdateUserMarginTradingEnabledIxArgs>,
 >(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
+    accounts: UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5968,21 +5968,21 @@ pub fn update_user_margin_trading_enabled_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_margin_trading_enabled_verify_account_keys(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'_, '_>,
-    keys: &UpdateUserMarginTradingEnabledKeys,
+    accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
+    keys: UpdateUserMarginTradingEnabledKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_margin_trading_enabled_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserMarginTradingEnabledAccounts<'me, 'info>,
+    accounts: UpdateUserMarginTradingEnabledAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -6007,16 +6007,16 @@ pub struct UpdateUserDelegateKeys {
     pub user: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&UpdateUserDelegateAccounts<'_, '_>> for UpdateUserDelegateKeys {
-    fn from(accounts: &UpdateUserDelegateAccounts) -> Self {
+impl From<UpdateUserDelegateAccounts<'_, '_>> for UpdateUserDelegateKeys {
+    fn from(accounts: UpdateUserDelegateAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&UpdateUserDelegateKeys> for [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateUserDelegateKeys) -> Self {
+impl From<UpdateUserDelegateKeys> for [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateUserDelegateKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -6039,10 +6039,10 @@ impl From<[Pubkey; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]> for UpdateUserDelegate
         }
     }
 }
-impl<'info> From<&UpdateUserDelegateAccounts<'_, 'info>>
+impl<'info> From<UpdateUserDelegateAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserDelegateAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserDelegateAccounts<'_, 'info>) -> Self {
         [accounts.user.clone(), accounts.authority.clone()]
     }
 }
@@ -6104,7 +6104,7 @@ pub fn update_user_delegate_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserDelegateKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateUserDelegateIxArgs = args.into();
     let data: UpdateUserDelegateIxData = args_full.into();
     Ok(Instruction {
@@ -6114,7 +6114,7 @@ pub fn update_user_delegate_ix<
     })
 }
 pub fn update_user_delegate_invoke<'info, A: Into<UpdateUserDelegateIxArgs>>(
-    accounts: &UpdateUserDelegateAccounts<'_, 'info>,
+    accounts: UpdateUserDelegateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_user_delegate_ix(accounts, args)?;
@@ -6122,7 +6122,7 @@ pub fn update_user_delegate_invoke<'info, A: Into<UpdateUserDelegateIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArgs>>(
-    accounts: &UpdateUserDelegateAccounts<'_, 'info>,
+    accounts: UpdateUserDelegateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -6131,21 +6131,21 @@ pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArg
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_delegate_verify_account_keys(
-    accounts: &UpdateUserDelegateAccounts<'_, '_>,
-    keys: &UpdateUserDelegateKeys,
+    accounts: UpdateUserDelegateAccounts<'_, '_>,
+    keys: UpdateUserDelegateKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_delegate_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserDelegateAccounts<'me, 'info>,
+    accounts: UpdateUserDelegateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -6174,8 +6174,8 @@ pub struct DeleteUserKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&DeleteUserAccounts<'_, '_>> for DeleteUserKeys {
-    fn from(accounts: &DeleteUserAccounts) -> Self {
+impl From<DeleteUserAccounts<'_, '_>> for DeleteUserKeys {
+    fn from(accounts: DeleteUserAccounts) -> Self {
         Self {
             user: *accounts.user.key,
             user_stats: *accounts.user_stats.key,
@@ -6184,8 +6184,8 @@ impl From<&DeleteUserAccounts<'_, '_>> for DeleteUserKeys {
         }
     }
 }
-impl From<&DeleteUserKeys> for [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &DeleteUserKeys) -> Self {
+impl From<DeleteUserKeys> for [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] {
+    fn from(keys: DeleteUserKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.user,
@@ -6220,10 +6220,10 @@ impl From<[Pubkey; DELETE_USER_IX_ACCOUNTS_LEN]> for DeleteUserKeys {
         }
     }
 }
-impl<'info> From<&DeleteUserAccounts<'_, 'info>>
+impl<'info> From<DeleteUserAccounts<'_, 'info>>
     for [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeleteUserAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeleteUserAccounts<'_, 'info>) -> Self {
         [
             accounts.user.clone(),
             accounts.user_stats.clone(),
@@ -6274,20 +6274,20 @@ impl DeleteUserIxData {
 }
 pub fn delete_user_ix<K: Into<DeleteUserKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: DeleteUserKeys = accounts.into();
-    let metas: [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: DeleteUserIxData.try_to_vec()?,
     })
 }
-pub fn delete_user_invoke<'info>(accounts: &DeleteUserAccounts<'_, 'info>) -> ProgramResult {
+pub fn delete_user_invoke<'info>(accounts: DeleteUserAccounts<'_, 'info>) -> ProgramResult {
     let ix = delete_user_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn delete_user_invoke_signed<'info>(
-    accounts: &DeleteUserAccounts<'_, 'info>,
+    accounts: DeleteUserAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = delete_user_ix(accounts)?;
@@ -6295,23 +6295,23 @@ pub fn delete_user_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn delete_user_verify_account_keys(
-    accounts: &DeleteUserAccounts<'_, '_>,
-    keys: &DeleteUserKeys,
+    accounts: DeleteUserAccounts<'_, '_>,
+    keys: DeleteUserKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn delete_user_verify_account_privileges<'me, 'info>(
-    accounts: &DeleteUserAccounts<'me, 'info>,
+    accounts: DeleteUserAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats, accounts.state] {
         if !should_be_writable.is_writable {
@@ -6344,8 +6344,8 @@ pub struct FillPerpOrderKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&FillPerpOrderAccounts<'_, '_>> for FillPerpOrderKeys {
-    fn from(accounts: &FillPerpOrderAccounts) -> Self {
+impl From<FillPerpOrderAccounts<'_, '_>> for FillPerpOrderKeys {
+    fn from(accounts: FillPerpOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -6356,8 +6356,8 @@ impl From<&FillPerpOrderAccounts<'_, '_>> for FillPerpOrderKeys {
         }
     }
 }
-impl From<&FillPerpOrderKeys> for [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &FillPerpOrderKeys) -> Self {
+impl From<FillPerpOrderKeys> for [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: FillPerpOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -6404,10 +6404,10 @@ impl From<[Pubkey; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]> for FillPerpOrderKeys {
         }
     }
 }
-impl<'info> From<&FillPerpOrderAccounts<'_, 'info>>
+impl<'info> From<FillPerpOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &FillPerpOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: FillPerpOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -6477,7 +6477,7 @@ pub fn fill_perp_order_ix<K: Into<FillPerpOrderKeys>, A: Into<FillPerpOrderIxArg
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: FillPerpOrderKeys = accounts.into();
-    let metas: [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: FillPerpOrderIxArgs = args.into();
     let data: FillPerpOrderIxData = args_full.into();
     Ok(Instruction {
@@ -6487,7 +6487,7 @@ pub fn fill_perp_order_ix<K: Into<FillPerpOrderKeys>, A: Into<FillPerpOrderIxArg
     })
 }
 pub fn fill_perp_order_invoke<'info, A: Into<FillPerpOrderIxArgs>>(
-    accounts: &FillPerpOrderAccounts<'_, 'info>,
+    accounts: FillPerpOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = fill_perp_order_ix(accounts, args)?;
@@ -6495,7 +6495,7 @@ pub fn fill_perp_order_invoke<'info, A: Into<FillPerpOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
-    accounts: &FillPerpOrderAccounts<'_, 'info>,
+    accounts: FillPerpOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -6504,25 +6504,25 @@ pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn fill_perp_order_verify_account_keys(
-    accounts: &FillPerpOrderAccounts<'_, '_>,
-    keys: &FillPerpOrderKeys,
+    accounts: FillPerpOrderAccounts<'_, '_>,
+    keys: FillPerpOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.filler_stats.key, &keys.filler_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.filler_stats.key, keys.filler_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn fill_perp_order_verify_account_privileges<'me, 'info>(
-    accounts: &FillPerpOrderAccounts<'me, 'info>,
+    accounts: FillPerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.filler,
@@ -6556,8 +6556,8 @@ pub struct RevertFillKeys {
     pub filler: Pubkey,
     pub filler_stats: Pubkey,
 }
-impl From<&RevertFillAccounts<'_, '_>> for RevertFillKeys {
-    fn from(accounts: &RevertFillAccounts) -> Self {
+impl From<RevertFillAccounts<'_, '_>> for RevertFillKeys {
+    fn from(accounts: RevertFillAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -6566,8 +6566,8 @@ impl From<&RevertFillAccounts<'_, '_>> for RevertFillKeys {
         }
     }
 }
-impl From<&RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RevertFillKeys) -> Self {
+impl From<RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
+    fn from(keys: RevertFillKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -6602,10 +6602,10 @@ impl From<[Pubkey; REVERT_FILL_IX_ACCOUNTS_LEN]> for RevertFillKeys {
         }
     }
 }
-impl<'info> From<&RevertFillAccounts<'_, 'info>>
+impl<'info> From<RevertFillAccounts<'_, 'info>>
     for [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RevertFillAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RevertFillAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -6656,20 +6656,20 @@ impl RevertFillIxData {
 }
 pub fn revert_fill_ix<K: Into<RevertFillKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: RevertFillKeys = accounts.into();
-    let metas: [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: RevertFillIxData.try_to_vec()?,
     })
 }
-pub fn revert_fill_invoke<'info>(accounts: &RevertFillAccounts<'_, 'info>) -> ProgramResult {
+pub fn revert_fill_invoke<'info>(accounts: RevertFillAccounts<'_, 'info>) -> ProgramResult {
     let ix = revert_fill_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn revert_fill_invoke_signed<'info>(
-    accounts: &RevertFillAccounts<'_, 'info>,
+    accounts: RevertFillAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = revert_fill_ix(accounts)?;
@@ -6677,23 +6677,23 @@ pub fn revert_fill_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn revert_fill_verify_account_keys(
-    accounts: &RevertFillAccounts<'_, '_>,
-    keys: &RevertFillKeys,
+    accounts: RevertFillAccounts<'_, '_>,
+    keys: RevertFillKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.filler_stats.key, &keys.filler_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.filler_stats.key, keys.filler_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn revert_fill_verify_account_privileges<'me, 'info>(
-    accounts: &RevertFillAccounts<'me, 'info>,
+    accounts: RevertFillAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.filler_stats] {
         if !should_be_writable.is_writable {
@@ -6726,8 +6726,8 @@ pub struct FillSpotOrderKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&FillSpotOrderAccounts<'_, '_>> for FillSpotOrderKeys {
-    fn from(accounts: &FillSpotOrderAccounts) -> Self {
+impl From<FillSpotOrderAccounts<'_, '_>> for FillSpotOrderKeys {
+    fn from(accounts: FillSpotOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -6738,8 +6738,8 @@ impl From<&FillSpotOrderAccounts<'_, '_>> for FillSpotOrderKeys {
         }
     }
 }
-impl From<&FillSpotOrderKeys> for [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &FillSpotOrderKeys) -> Self {
+impl From<FillSpotOrderKeys> for [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: FillSpotOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -6786,10 +6786,10 @@ impl From<[Pubkey; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]> for FillSpotOrderKeys {
         }
     }
 }
-impl<'info> From<&FillSpotOrderAccounts<'_, 'info>>
+impl<'info> From<FillSpotOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &FillSpotOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: FillSpotOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -6860,7 +6860,7 @@ pub fn fill_spot_order_ix<K: Into<FillSpotOrderKeys>, A: Into<FillSpotOrderIxArg
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: FillSpotOrderKeys = accounts.into();
-    let metas: [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: FillSpotOrderIxArgs = args.into();
     let data: FillSpotOrderIxData = args_full.into();
     Ok(Instruction {
@@ -6870,7 +6870,7 @@ pub fn fill_spot_order_ix<K: Into<FillSpotOrderKeys>, A: Into<FillSpotOrderIxArg
     })
 }
 pub fn fill_spot_order_invoke<'info, A: Into<FillSpotOrderIxArgs>>(
-    accounts: &FillSpotOrderAccounts<'_, 'info>,
+    accounts: FillSpotOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = fill_spot_order_ix(accounts, args)?;
@@ -6878,7 +6878,7 @@ pub fn fill_spot_order_invoke<'info, A: Into<FillSpotOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
-    accounts: &FillSpotOrderAccounts<'_, 'info>,
+    accounts: FillSpotOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -6887,25 +6887,25 @@ pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn fill_spot_order_verify_account_keys(
-    accounts: &FillSpotOrderAccounts<'_, '_>,
-    keys: &FillSpotOrderKeys,
+    accounts: FillSpotOrderAccounts<'_, '_>,
+    keys: FillSpotOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.filler_stats.key, &keys.filler_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.filler_stats.key, keys.filler_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn fill_spot_order_verify_account_privileges<'me, 'info>(
-    accounts: &FillSpotOrderAccounts<'me, 'info>,
+    accounts: FillSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.filler,
@@ -6939,8 +6939,8 @@ pub struct TriggerOrderKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl From<&TriggerOrderAccounts<'_, '_>> for TriggerOrderKeys {
-    fn from(accounts: &TriggerOrderAccounts) -> Self {
+impl From<TriggerOrderAccounts<'_, '_>> for TriggerOrderKeys {
+    fn from(accounts: TriggerOrderAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -6949,8 +6949,8 @@ impl From<&TriggerOrderAccounts<'_, '_>> for TriggerOrderKeys {
         }
     }
 }
-impl From<&TriggerOrderKeys> for [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &TriggerOrderKeys) -> Self {
+impl From<TriggerOrderKeys> for [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: TriggerOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -6985,10 +6985,10 @@ impl From<[Pubkey; TRIGGER_ORDER_IX_ACCOUNTS_LEN]> for TriggerOrderKeys {
         }
     }
 }
-impl<'info> From<&TriggerOrderAccounts<'_, 'info>>
+impl<'info> From<TriggerOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &TriggerOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: TriggerOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -7053,7 +7053,7 @@ pub fn trigger_order_ix<K: Into<TriggerOrderKeys>, A: Into<TriggerOrderIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: TriggerOrderKeys = accounts.into();
-    let metas: [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: TriggerOrderIxArgs = args.into();
     let data: TriggerOrderIxData = args_full.into();
     Ok(Instruction {
@@ -7063,7 +7063,7 @@ pub fn trigger_order_ix<K: Into<TriggerOrderKeys>, A: Into<TriggerOrderIxArgs>>(
     })
 }
 pub fn trigger_order_invoke<'info, A: Into<TriggerOrderIxArgs>>(
-    accounts: &TriggerOrderAccounts<'_, 'info>,
+    accounts: TriggerOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = trigger_order_ix(accounts, args)?;
@@ -7071,7 +7071,7 @@ pub fn trigger_order_invoke<'info, A: Into<TriggerOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
-    accounts: &TriggerOrderAccounts<'_, 'info>,
+    accounts: TriggerOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -7080,23 +7080,23 @@ pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn trigger_order_verify_account_keys(
-    accounts: &TriggerOrderAccounts<'_, '_>,
-    keys: &TriggerOrderKeys,
+    accounts: TriggerOrderAccounts<'_, '_>,
+    keys: TriggerOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn trigger_order_verify_account_privileges<'me, 'info>(
-    accounts: &TriggerOrderAccounts<'me, 'info>,
+    accounts: TriggerOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
         if !should_be_writable.is_writable {
@@ -7125,8 +7125,8 @@ pub struct ForceCancelOrdersKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
-    fn from(accounts: &ForceCancelOrdersAccounts) -> Self {
+impl From<ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
+    fn from(accounts: ForceCancelOrdersAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -7135,8 +7135,8 @@ impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
         }
     }
 }
-impl From<&ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ForceCancelOrdersKeys) -> Self {
+impl From<ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
+    fn from(keys: ForceCancelOrdersKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7171,10 +7171,10 @@ impl From<[Pubkey; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]> for ForceCancelOrdersKe
         }
     }
 }
-impl<'info> From<&ForceCancelOrdersAccounts<'_, 'info>>
+impl<'info> From<ForceCancelOrdersAccounts<'_, 'info>>
     for [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ForceCancelOrdersAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ForceCancelOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -7227,7 +7227,7 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ForceCancelOrdersKeys = accounts.into();
-    let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7235,14 +7235,14 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>>(
     })
 }
 pub fn force_cancel_orders_invoke<'info>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
+    accounts: ForceCancelOrdersAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn force_cancel_orders_invoke_signed<'info>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
+    accounts: ForceCancelOrdersAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts)?;
@@ -7250,23 +7250,23 @@ pub fn force_cancel_orders_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn force_cancel_orders_verify_account_keys(
-    accounts: &ForceCancelOrdersAccounts<'_, '_>,
-    keys: &ForceCancelOrdersKeys,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+    keys: ForceCancelOrdersKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
-    accounts: &ForceCancelOrdersAccounts<'me, 'info>,
+    accounts: ForceCancelOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
         if !should_be_writable.is_writable {
@@ -7295,8 +7295,8 @@ pub struct UpdateUserIdleKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl From<&UpdateUserIdleAccounts<'_, '_>> for UpdateUserIdleKeys {
-    fn from(accounts: &UpdateUserIdleAccounts) -> Self {
+impl From<UpdateUserIdleAccounts<'_, '_>> for UpdateUserIdleKeys {
+    fn from(accounts: UpdateUserIdleAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -7305,8 +7305,8 @@ impl From<&UpdateUserIdleAccounts<'_, '_>> for UpdateUserIdleKeys {
         }
     }
 }
-impl From<&UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateUserIdleKeys) -> Self {
+impl From<UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateUserIdleKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7341,10 +7341,10 @@ impl From<[Pubkey; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]> for UpdateUserIdleKeys {
         }
     }
 }
-impl<'info> From<&UpdateUserIdleAccounts<'_, 'info>>
+impl<'info> From<UpdateUserIdleAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserIdleAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserIdleAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -7397,7 +7397,7 @@ pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserIdleKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7405,14 +7405,14 @@ pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>>(
     })
 }
 pub fn update_user_idle_invoke<'info>(
-    accounts: &UpdateUserIdleAccounts<'_, 'info>,
+    accounts: UpdateUserIdleAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_user_idle_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_user_idle_invoke_signed<'info>(
-    accounts: &UpdateUserIdleAccounts<'_, 'info>,
+    accounts: UpdateUserIdleAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_idle_ix(accounts)?;
@@ -7420,23 +7420,23 @@ pub fn update_user_idle_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_idle_verify_account_keys(
-    accounts: &UpdateUserIdleAccounts<'_, '_>,
-    keys: &UpdateUserIdleKeys,
+    accounts: UpdateUserIdleAccounts<'_, '_>,
+    keys: UpdateUserIdleKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_idle_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserIdleAccounts<'me, 'info>,
+    accounts: UpdateUserIdleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
         if !should_be_writable.is_writable {
@@ -7465,8 +7465,8 @@ pub struct UpdateUserOpenOrdersCountKeys {
     pub filler: Pubkey,
     pub user: Pubkey,
 }
-impl From<&UpdateUserOpenOrdersCountAccounts<'_, '_>> for UpdateUserOpenOrdersCountKeys {
-    fn from(accounts: &UpdateUserOpenOrdersCountAccounts) -> Self {
+impl From<UpdateUserOpenOrdersCountAccounts<'_, '_>> for UpdateUserOpenOrdersCountKeys {
+    fn from(accounts: UpdateUserOpenOrdersCountAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -7475,10 +7475,10 @@ impl From<&UpdateUserOpenOrdersCountAccounts<'_, '_>> for UpdateUserOpenOrdersCo
         }
     }
 }
-impl From<&UpdateUserOpenOrdersCountKeys>
+impl From<UpdateUserOpenOrdersCountKeys>
     for [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateUserOpenOrdersCountKeys) -> Self {
+    fn from(keys: UpdateUserOpenOrdersCountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7515,10 +7515,10 @@ impl From<[Pubkey; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateUserOpenOrdersCountAccounts<'_, 'info>>
+impl<'info> From<UpdateUserOpenOrdersCountAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserOpenOrdersCountAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -7571,7 +7571,7 @@ pub fn update_user_open_orders_count_ix<K: Into<UpdateUserOpenOrdersCountKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7579,7 +7579,7 @@ pub fn update_user_open_orders_count_ix<K: Into<UpdateUserOpenOrdersCountKeys>>(
     })
 }
 pub fn update_user_open_orders_count_invoke<'info>(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
+    accounts: UpdateUserOpenOrdersCountAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_user_open_orders_count_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
@@ -7587,7 +7587,7 @@ pub fn update_user_open_orders_count_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn update_user_open_orders_count_invoke_signed<'info>(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
+    accounts: UpdateUserOpenOrdersCountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_open_orders_count_ix(accounts)?;
@@ -7596,23 +7596,23 @@ pub fn update_user_open_orders_count_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_open_orders_count_verify_account_keys(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'_, '_>,
-    keys: &UpdateUserOpenOrdersCountKeys,
+    accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
+    keys: UpdateUserOpenOrdersCountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.filler.key, &keys.filler),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.filler.key, keys.filler),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_open_orders_count_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserOpenOrdersCountAccounts<'me, 'info>,
+    accounts: UpdateUserOpenOrdersCountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
         if !should_be_writable.is_writable {
@@ -7641,8 +7641,8 @@ pub struct SettlePnlKeys {
     pub authority: Pubkey,
     pub spot_market_vault: Pubkey,
 }
-impl From<&SettlePnlAccounts<'_, '_>> for SettlePnlKeys {
-    fn from(accounts: &SettlePnlAccounts) -> Self {
+impl From<SettlePnlAccounts<'_, '_>> for SettlePnlKeys {
+    fn from(accounts: SettlePnlAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
@@ -7651,8 +7651,8 @@ impl From<&SettlePnlAccounts<'_, '_>> for SettlePnlKeys {
         }
     }
 }
-impl From<&SettlePnlKeys> for [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SettlePnlKeys) -> Self {
+impl From<SettlePnlKeys> for [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] {
+    fn from(keys: SettlePnlKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7687,10 +7687,10 @@ impl From<[Pubkey; SETTLE_PNL_IX_ACCOUNTS_LEN]> for SettlePnlKeys {
         }
     }
 }
-impl<'info> From<&SettlePnlAccounts<'_, 'info>>
+impl<'info> From<SettlePnlAccounts<'_, 'info>>
     for [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettlePnlAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SettlePnlAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.user.clone(),
@@ -7755,7 +7755,7 @@ pub fn settle_pnl_ix<K: Into<SettlePnlKeys>, A: Into<SettlePnlIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettlePnlKeys = accounts.into();
-    let metas: [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SettlePnlIxArgs = args.into();
     let data: SettlePnlIxData = args_full.into();
     Ok(Instruction {
@@ -7765,7 +7765,7 @@ pub fn settle_pnl_ix<K: Into<SettlePnlKeys>, A: Into<SettlePnlIxArgs>>(
     })
 }
 pub fn settle_pnl_invoke<'info, A: Into<SettlePnlIxArgs>>(
-    accounts: &SettlePnlAccounts<'_, 'info>,
+    accounts: SettlePnlAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_pnl_ix(accounts, args)?;
@@ -7773,7 +7773,7 @@ pub fn settle_pnl_invoke<'info, A: Into<SettlePnlIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
-    accounts: &SettlePnlAccounts<'_, 'info>,
+    accounts: SettlePnlAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -7782,23 +7782,23 @@ pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_pnl_verify_account_keys(
-    accounts: &SettlePnlAccounts<'_, '_>,
-    keys: &SettlePnlKeys,
+    accounts: SettlePnlAccounts<'_, '_>,
+    keys: SettlePnlKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
-        (accounts.authority.key, &keys.authority),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_pnl_verify_account_privileges<'me, 'info>(
-    accounts: &SettlePnlAccounts<'me, 'info>,
+    accounts: SettlePnlAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -7823,16 +7823,16 @@ pub struct SettleFundingPaymentKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl From<&SettleFundingPaymentAccounts<'_, '_>> for SettleFundingPaymentKeys {
-    fn from(accounts: &SettleFundingPaymentAccounts) -> Self {
+impl From<SettleFundingPaymentAccounts<'_, '_>> for SettleFundingPaymentKeys {
+    fn from(accounts: SettleFundingPaymentAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
         }
     }
 }
-impl From<&SettleFundingPaymentKeys> for [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SettleFundingPaymentKeys) -> Self {
+impl From<SettleFundingPaymentKeys> for [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] {
+    fn from(keys: SettleFundingPaymentKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7855,10 +7855,10 @@ impl From<[Pubkey; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]> for SettleFundingPay
         }
     }
 }
-impl<'info> From<&SettleFundingPaymentAccounts<'_, 'info>>
+impl<'info> From<SettleFundingPaymentAccounts<'_, 'info>>
     for [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleFundingPaymentAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SettleFundingPaymentAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -7904,7 +7904,7 @@ pub fn settle_funding_payment_ix<K: Into<SettleFundingPaymentKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: SettleFundingPaymentKeys = accounts.into();
-    let metas: [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7912,7 +7912,7 @@ pub fn settle_funding_payment_ix<K: Into<SettleFundingPaymentKeys>>(
     })
 }
 pub fn settle_funding_payment_invoke<'info>(
-    accounts: &SettleFundingPaymentAccounts<'_, 'info>,
+    accounts: SettleFundingPaymentAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = settle_funding_payment_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
@@ -7920,7 +7920,7 @@ pub fn settle_funding_payment_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn settle_funding_payment_invoke_signed<'info>(
-    accounts: &SettleFundingPaymentAccounts<'_, 'info>,
+    accounts: SettleFundingPaymentAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_funding_payment_ix(accounts)?;
@@ -7929,21 +7929,21 @@ pub fn settle_funding_payment_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_funding_payment_verify_account_keys(
-    accounts: &SettleFundingPaymentAccounts<'_, '_>,
-    keys: &SettleFundingPaymentKeys,
+    accounts: SettleFundingPaymentAccounts<'_, '_>,
+    keys: SettleFundingPaymentKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_funding_payment_verify_account_privileges<'me, 'info>(
-    accounts: &SettleFundingPaymentAccounts<'me, 'info>,
+    accounts: SettleFundingPaymentAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -7963,16 +7963,16 @@ pub struct SettleLpKeys {
     pub state: Pubkey,
     pub user: Pubkey,
 }
-impl From<&SettleLpAccounts<'_, '_>> for SettleLpKeys {
-    fn from(accounts: &SettleLpAccounts) -> Self {
+impl From<SettleLpAccounts<'_, '_>> for SettleLpKeys {
+    fn from(accounts: SettleLpAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             user: *accounts.user.key,
         }
     }
 }
-impl From<&SettleLpKeys> for [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SettleLpKeys) -> Self {
+impl From<SettleLpKeys> for [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] {
+    fn from(keys: SettleLpKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -7995,8 +7995,8 @@ impl From<[Pubkey; SETTLE_LP_IX_ACCOUNTS_LEN]> for SettleLpKeys {
         }
     }
 }
-impl<'info> From<&SettleLpAccounts<'_, 'info>> for [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &SettleLpAccounts<'_, 'info>) -> Self {
+impl<'info> From<SettleLpAccounts<'_, 'info>> for [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] {
+    fn from(accounts: SettleLpAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.user.clone()]
     }
 }
@@ -8054,7 +8054,7 @@ pub fn settle_lp_ix<K: Into<SettleLpKeys>, A: Into<SettleLpIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettleLpKeys = accounts.into();
-    let metas: [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SettleLpIxArgs = args.into();
     let data: SettleLpIxData = args_full.into();
     Ok(Instruction {
@@ -8064,7 +8064,7 @@ pub fn settle_lp_ix<K: Into<SettleLpKeys>, A: Into<SettleLpIxArgs>>(
     })
 }
 pub fn settle_lp_invoke<'info, A: Into<SettleLpIxArgs>>(
-    accounts: &SettleLpAccounts<'_, 'info>,
+    accounts: SettleLpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_lp_ix(accounts, args)?;
@@ -8072,7 +8072,7 @@ pub fn settle_lp_invoke<'info, A: Into<SettleLpIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
-    accounts: &SettleLpAccounts<'_, 'info>,
+    accounts: SettleLpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -8081,21 +8081,21 @@ pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_lp_verify_account_keys(
-    accounts: &SettleLpAccounts<'_, '_>,
-    keys: &SettleLpKeys,
+    accounts: SettleLpAccounts<'_, '_>,
+    keys: SettleLpKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.user.key, &keys.user),
+        (*accounts.state.key, keys.state),
+        (*accounts.user.key, keys.user),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_lp_verify_account_privileges<'me, 'info>(
-    accounts: &SettleLpAccounts<'me, 'info>,
+    accounts: SettleLpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
         if !should_be_writable.is_writable {
@@ -8115,16 +8115,16 @@ pub struct SettleExpiredMarketKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&SettleExpiredMarketAccounts<'_, '_>> for SettleExpiredMarketKeys {
-    fn from(accounts: &SettleExpiredMarketAccounts) -> Self {
+impl From<SettleExpiredMarketAccounts<'_, '_>> for SettleExpiredMarketKeys {
+    fn from(accounts: SettleExpiredMarketAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&SettleExpiredMarketKeys> for [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SettleExpiredMarketKeys) -> Self {
+impl From<SettleExpiredMarketKeys> for [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] {
+    fn from(keys: SettleExpiredMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -8147,10 +8147,10 @@ impl From<[Pubkey; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]> for SettleExpiredMark
         }
     }
 }
-impl<'info> From<&SettleExpiredMarketAccounts<'_, 'info>>
+impl<'info> From<SettleExpiredMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleExpiredMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SettleExpiredMarketAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.authority.clone()]
     }
 }
@@ -8211,7 +8211,7 @@ pub fn settle_expired_market_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettleExpiredMarketKeys = accounts.into();
-    let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SettleExpiredMarketIxArgs = args.into();
     let data: SettleExpiredMarketIxData = args_full.into();
     Ok(Instruction {
@@ -8221,7 +8221,7 @@ pub fn settle_expired_market_ix<
     })
 }
 pub fn settle_expired_market_invoke<'info, A: Into<SettleExpiredMarketIxArgs>>(
-    accounts: &SettleExpiredMarketAccounts<'_, 'info>,
+    accounts: SettleExpiredMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_expired_market_ix(accounts, args)?;
@@ -8229,7 +8229,7 @@ pub fn settle_expired_market_invoke<'info, A: Into<SettleExpiredMarketIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxArgs>>(
-    accounts: &SettleExpiredMarketAccounts<'_, 'info>,
+    accounts: SettleExpiredMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -8238,21 +8238,21 @@ pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxA
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_expired_market_verify_account_keys(
-    accounts: &SettleExpiredMarketAccounts<'_, '_>,
-    keys: &SettleExpiredMarketKeys,
+    accounts: SettleExpiredMarketAccounts<'_, '_>,
+    keys: SettleExpiredMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_expired_market_verify_account_privileges<'me, 'info>(
-    accounts: &SettleExpiredMarketAccounts<'me, 'info>,
+    accounts: SettleExpiredMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
@@ -8280,8 +8280,8 @@ pub struct LiquidatePerpKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&LiquidatePerpAccounts<'_, '_>> for LiquidatePerpKeys {
-    fn from(accounts: &LiquidatePerpAccounts) -> Self {
+impl From<LiquidatePerpAccounts<'_, '_>> for LiquidatePerpKeys {
+    fn from(accounts: LiquidatePerpAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -8292,8 +8292,8 @@ impl From<&LiquidatePerpAccounts<'_, '_>> for LiquidatePerpKeys {
         }
     }
 }
-impl From<&LiquidatePerpKeys> for [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] {
-    fn from(keys: &LiquidatePerpKeys) -> Self {
+impl From<LiquidatePerpKeys> for [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] {
+    fn from(keys: LiquidatePerpKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -8340,10 +8340,10 @@ impl From<[Pubkey; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]> for LiquidatePerpKeys {
         }
     }
 }
-impl<'info> From<&LiquidatePerpAccounts<'_, 'info>>
+impl<'info> From<LiquidatePerpAccounts<'_, 'info>>
     for [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidatePerpAccounts<'_, 'info>) -> Self {
+    fn from(accounts: LiquidatePerpAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -8414,7 +8414,7 @@ pub fn liquidate_perp_ix<K: Into<LiquidatePerpKeys>, A: Into<LiquidatePerpIxArgs
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: LiquidatePerpKeys = accounts.into();
-    let metas: [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: LiquidatePerpIxArgs = args.into();
     let data: LiquidatePerpIxData = args_full.into();
     Ok(Instruction {
@@ -8424,7 +8424,7 @@ pub fn liquidate_perp_ix<K: Into<LiquidatePerpKeys>, A: Into<LiquidatePerpIxArgs
     })
 }
 pub fn liquidate_perp_invoke<'info, A: Into<LiquidatePerpIxArgs>>(
-    accounts: &LiquidatePerpAccounts<'_, 'info>,
+    accounts: LiquidatePerpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_perp_ix(accounts, args)?;
@@ -8432,7 +8432,7 @@ pub fn liquidate_perp_invoke<'info, A: Into<LiquidatePerpIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
-    accounts: &LiquidatePerpAccounts<'_, 'info>,
+    accounts: LiquidatePerpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -8441,25 +8441,25 @@ pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn liquidate_perp_verify_account_keys(
-    accounts: &LiquidatePerpAccounts<'_, '_>,
-    keys: &LiquidatePerpKeys,
+    accounts: LiquidatePerpAccounts<'_, '_>,
+    keys: LiquidatePerpKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn liquidate_perp_verify_account_privileges<'me, 'info>(
-    accounts: &LiquidatePerpAccounts<'me, 'info>,
+    accounts: LiquidatePerpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -8497,8 +8497,8 @@ pub struct LiquidateSpotKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&LiquidateSpotAccounts<'_, '_>> for LiquidateSpotKeys {
-    fn from(accounts: &LiquidateSpotAccounts) -> Self {
+impl From<LiquidateSpotAccounts<'_, '_>> for LiquidateSpotKeys {
+    fn from(accounts: LiquidateSpotAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -8509,8 +8509,8 @@ impl From<&LiquidateSpotAccounts<'_, '_>> for LiquidateSpotKeys {
         }
     }
 }
-impl From<&LiquidateSpotKeys> for [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &LiquidateSpotKeys) -> Self {
+impl From<LiquidateSpotKeys> for [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] {
+    fn from(keys: LiquidateSpotKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -8557,10 +8557,10 @@ impl From<[Pubkey; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]> for LiquidateSpotKeys {
         }
     }
 }
-impl<'info> From<&LiquidateSpotAccounts<'_, 'info>>
+impl<'info> From<LiquidateSpotAccounts<'_, 'info>>
     for [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidateSpotAccounts<'_, 'info>) -> Self {
+    fn from(accounts: LiquidateSpotAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -8632,7 +8632,7 @@ pub fn liquidate_spot_ix<K: Into<LiquidateSpotKeys>, A: Into<LiquidateSpotIxArgs
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: LiquidateSpotKeys = accounts.into();
-    let metas: [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: LiquidateSpotIxArgs = args.into();
     let data: LiquidateSpotIxData = args_full.into();
     Ok(Instruction {
@@ -8642,7 +8642,7 @@ pub fn liquidate_spot_ix<K: Into<LiquidateSpotKeys>, A: Into<LiquidateSpotIxArgs
     })
 }
 pub fn liquidate_spot_invoke<'info, A: Into<LiquidateSpotIxArgs>>(
-    accounts: &LiquidateSpotAccounts<'_, 'info>,
+    accounts: LiquidateSpotAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_spot_ix(accounts, args)?;
@@ -8650,7 +8650,7 @@ pub fn liquidate_spot_invoke<'info, A: Into<LiquidateSpotIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
-    accounts: &LiquidateSpotAccounts<'_, 'info>,
+    accounts: LiquidateSpotAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -8659,25 +8659,25 @@ pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn liquidate_spot_verify_account_keys(
-    accounts: &LiquidateSpotAccounts<'_, '_>,
-    keys: &LiquidateSpotKeys,
+    accounts: LiquidateSpotAccounts<'_, '_>,
+    keys: LiquidateSpotKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn liquidate_spot_verify_account_privileges<'me, 'info>(
-    accounts: &LiquidateSpotAccounts<'me, 'info>,
+    accounts: LiquidateSpotAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -8715,8 +8715,8 @@ pub struct LiquidateBorrowForPerpPnlKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&LiquidateBorrowForPerpPnlAccounts<'_, '_>> for LiquidateBorrowForPerpPnlKeys {
-    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts) -> Self {
+impl From<LiquidateBorrowForPerpPnlAccounts<'_, '_>> for LiquidateBorrowForPerpPnlKeys {
+    fn from(accounts: LiquidateBorrowForPerpPnlAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -8727,10 +8727,10 @@ impl From<&LiquidateBorrowForPerpPnlAccounts<'_, '_>> for LiquidateBorrowForPerp
         }
     }
 }
-impl From<&LiquidateBorrowForPerpPnlKeys>
+impl From<LiquidateBorrowForPerpPnlKeys>
     for [AccountMeta; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &LiquidateBorrowForPerpPnlKeys) -> Self {
+    fn from(keys: LiquidateBorrowForPerpPnlKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -8779,10 +8779,10 @@ impl From<[Pubkey; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&LiquidateBorrowForPerpPnlAccounts<'_, 'info>>
+impl<'info> From<LiquidateBorrowForPerpPnlAccounts<'_, 'info>>
     for [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>) -> Self {
+    fn from(accounts: LiquidateBorrowForPerpPnlAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -8859,7 +8859,7 @@ pub fn liquidate_borrow_for_perp_pnl_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
-    let metas: [AccountMeta; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: LiquidateBorrowForPerpPnlIxArgs = args.into();
     let data: LiquidateBorrowForPerpPnlIxData = args_full.into();
     Ok(Instruction {
@@ -8869,7 +8869,7 @@ pub fn liquidate_borrow_for_perp_pnl_ix<
     })
 }
 pub fn liquidate_borrow_for_perp_pnl_invoke<'info, A: Into<LiquidateBorrowForPerpPnlIxArgs>>(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
+    accounts: LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_borrow_for_perp_pnl_ix(accounts, args)?;
@@ -8881,7 +8881,7 @@ pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
     'info,
     A: Into<LiquidateBorrowForPerpPnlIxArgs>,
 >(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
+    accounts: LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -8891,25 +8891,25 @@ pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn liquidate_borrow_for_perp_pnl_verify_account_keys(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'_, '_>,
-    keys: &LiquidateBorrowForPerpPnlKeys,
+    accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
+    keys: LiquidateBorrowForPerpPnlKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn liquidate_borrow_for_perp_pnl_verify_account_privileges<'me, 'info>(
-    accounts: &LiquidateBorrowForPerpPnlAccounts<'me, 'info>,
+    accounts: LiquidateBorrowForPerpPnlAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -8947,8 +8947,8 @@ pub struct LiquidatePerpPnlForDepositKeys {
     pub user: Pubkey,
     pub user_stats: Pubkey,
 }
-impl From<&LiquidatePerpPnlForDepositAccounts<'_, '_>> for LiquidatePerpPnlForDepositKeys {
-    fn from(accounts: &LiquidatePerpPnlForDepositAccounts) -> Self {
+impl From<LiquidatePerpPnlForDepositAccounts<'_, '_>> for LiquidatePerpPnlForDepositKeys {
+    fn from(accounts: LiquidatePerpPnlForDepositAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -8959,10 +8959,10 @@ impl From<&LiquidatePerpPnlForDepositAccounts<'_, '_>> for LiquidatePerpPnlForDe
         }
     }
 }
-impl From<&LiquidatePerpPnlForDepositKeys>
+impl From<LiquidatePerpPnlForDepositKeys>
     for [AccountMeta; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &LiquidatePerpPnlForDepositKeys) -> Self {
+    fn from(keys: LiquidatePerpPnlForDepositKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -9011,10 +9011,10 @@ impl From<[Pubkey; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&LiquidatePerpPnlForDepositAccounts<'_, 'info>>
+impl<'info> From<LiquidatePerpPnlForDepositAccounts<'_, 'info>>
     for [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>) -> Self {
+    fn from(accounts: LiquidatePerpPnlForDepositAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -9093,7 +9093,7 @@ pub fn liquidate_perp_pnl_for_deposit_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
-    let metas: [AccountMeta; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: LiquidatePerpPnlForDepositIxArgs = args.into();
     let data: LiquidatePerpPnlForDepositIxData = args_full.into();
     Ok(Instruction {
@@ -9103,7 +9103,7 @@ pub fn liquidate_perp_pnl_for_deposit_ix<
     })
 }
 pub fn liquidate_perp_pnl_for_deposit_invoke<'info, A: Into<LiquidatePerpPnlForDepositIxArgs>>(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>,
+    accounts: LiquidatePerpPnlForDepositAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = liquidate_perp_pnl_for_deposit_ix(accounts, args)?;
@@ -9115,7 +9115,7 @@ pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
     'info,
     A: Into<LiquidatePerpPnlForDepositIxArgs>,
 >(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'_, 'info>,
+    accounts: LiquidatePerpPnlForDepositAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -9125,25 +9125,25 @@ pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn liquidate_perp_pnl_for_deposit_verify_account_keys(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'_, '_>,
-    keys: &LiquidatePerpPnlForDepositKeys,
+    accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
+    keys: LiquidatePerpPnlForDepositKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn liquidate_perp_pnl_for_deposit_verify_account_privileges<'me, 'info>(
-    accounts: &LiquidatePerpPnlForDepositAccounts<'me, 'info>,
+    accounts: LiquidatePerpPnlForDepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -9181,8 +9181,8 @@ pub struct ResolvePerpPnlDeficitKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&ResolvePerpPnlDeficitAccounts<'_, '_>> for ResolvePerpPnlDeficitKeys {
-    fn from(accounts: &ResolvePerpPnlDeficitAccounts) -> Self {
+impl From<ResolvePerpPnlDeficitAccounts<'_, '_>> for ResolvePerpPnlDeficitKeys {
+    fn from(accounts: ResolvePerpPnlDeficitAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -9193,8 +9193,8 @@ impl From<&ResolvePerpPnlDeficitAccounts<'_, '_>> for ResolvePerpPnlDeficitKeys 
         }
     }
 }
-impl From<&ResolvePerpPnlDeficitKeys> for [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ResolvePerpPnlDeficitKeys) -> Self {
+impl From<ResolvePerpPnlDeficitKeys> for [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] {
+    fn from(keys: ResolvePerpPnlDeficitKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -9241,10 +9241,10 @@ impl From<[Pubkey; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]> for ResolvePerpPnl
         }
     }
 }
-impl<'info> From<&ResolvePerpPnlDeficitAccounts<'_, 'info>>
+impl<'info> From<ResolvePerpPnlDeficitAccounts<'_, 'info>>
     for [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ResolvePerpPnlDeficitAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -9317,7 +9317,7 @@ pub fn resolve_perp_pnl_deficit_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ResolvePerpPnlDeficitKeys = accounts.into();
-    let metas: [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ResolvePerpPnlDeficitIxArgs = args.into();
     let data: ResolvePerpPnlDeficitIxData = args_full.into();
     Ok(Instruction {
@@ -9327,7 +9327,7 @@ pub fn resolve_perp_pnl_deficit_ix<
     })
 }
 pub fn resolve_perp_pnl_deficit_invoke<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
-    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>,
+    accounts: ResolvePerpPnlDeficitAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_perp_pnl_deficit_ix(accounts, args)?;
@@ -9336,7 +9336,7 @@ pub fn resolve_perp_pnl_deficit_invoke<'info, A: Into<ResolvePerpPnlDeficitIxArg
     invoke(&ix, &account_info)
 }
 pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
-    accounts: &ResolvePerpPnlDeficitAccounts<'_, 'info>,
+    accounts: ResolvePerpPnlDeficitAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -9346,28 +9346,28 @@ pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDefic
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn resolve_perp_pnl_deficit_verify_account_keys(
-    accounts: &ResolvePerpPnlDeficitAccounts<'_, '_>,
-    keys: &ResolvePerpPnlDeficitKeys,
+    accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
+    keys: ResolvePerpPnlDeficitKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn resolve_perp_pnl_deficit_verify_account_privileges<'me, 'info>(
-    accounts: &ResolvePerpPnlDeficitAccounts<'me, 'info>,
+    accounts: ResolvePerpPnlDeficitAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market_vault, accounts.insurance_fund_vault] {
         if !should_be_writable.is_writable {
@@ -9408,8 +9408,8 @@ pub struct ResolvePerpBankruptcyKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&ResolvePerpBankruptcyAccounts<'_, '_>> for ResolvePerpBankruptcyKeys {
-    fn from(accounts: &ResolvePerpBankruptcyAccounts) -> Self {
+impl From<ResolvePerpBankruptcyAccounts<'_, '_>> for ResolvePerpBankruptcyKeys {
+    fn from(accounts: ResolvePerpBankruptcyAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -9424,8 +9424,8 @@ impl From<&ResolvePerpBankruptcyAccounts<'_, '_>> for ResolvePerpBankruptcyKeys 
         }
     }
 }
-impl From<&ResolvePerpBankruptcyKeys> for [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ResolvePerpBankruptcyKeys) -> Self {
+impl From<ResolvePerpBankruptcyKeys> for [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] {
+    fn from(keys: ResolvePerpBankruptcyKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -9496,10 +9496,10 @@ impl From<[Pubkey; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]> for ResolvePerpBank
         }
     }
 }
-impl<'info> From<&ResolvePerpBankruptcyAccounts<'_, 'info>>
+impl<'info> From<ResolvePerpBankruptcyAccounts<'_, 'info>>
     for [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ResolvePerpBankruptcyAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -9580,7 +9580,7 @@ pub fn resolve_perp_bankruptcy_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ResolvePerpBankruptcyKeys = accounts.into();
-    let metas: [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ResolvePerpBankruptcyIxArgs = args.into();
     let data: ResolvePerpBankruptcyIxData = args_full.into();
     Ok(Instruction {
@@ -9590,7 +9590,7 @@ pub fn resolve_perp_bankruptcy_ix<
     })
 }
 pub fn resolve_perp_bankruptcy_invoke<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
-    accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>,
+    accounts: ResolvePerpBankruptcyAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_perp_bankruptcy_ix(accounts, args)?;
@@ -9599,7 +9599,7 @@ pub fn resolve_perp_bankruptcy_invoke<'info, A: Into<ResolvePerpBankruptcyIxArgs
     invoke(&ix, &account_info)
 }
 pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
-    accounts: &ResolvePerpBankruptcyAccounts<'_, 'info>,
+    accounts: ResolvePerpBankruptcyAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -9609,32 +9609,32 @@ pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn resolve_perp_bankruptcy_verify_account_keys(
-    accounts: &ResolvePerpBankruptcyAccounts<'_, '_>,
-    keys: &ResolvePerpBankruptcyKeys,
+    accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
+    keys: ResolvePerpBankruptcyKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn resolve_perp_bankruptcy_verify_account_privileges<'me, 'info>(
-    accounts: &ResolvePerpBankruptcyAccounts<'me, 'info>,
+    accounts: ResolvePerpBankruptcyAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -9682,8 +9682,8 @@ pub struct ResolveSpotBankruptcyKeys {
     pub drift_signer: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&ResolveSpotBankruptcyAccounts<'_, '_>> for ResolveSpotBankruptcyKeys {
-    fn from(accounts: &ResolveSpotBankruptcyAccounts) -> Self {
+impl From<ResolveSpotBankruptcyAccounts<'_, '_>> for ResolveSpotBankruptcyKeys {
+    fn from(accounts: ResolveSpotBankruptcyAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
@@ -9698,8 +9698,8 @@ impl From<&ResolveSpotBankruptcyAccounts<'_, '_>> for ResolveSpotBankruptcyKeys 
         }
     }
 }
-impl From<&ResolveSpotBankruptcyKeys> for [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ResolveSpotBankruptcyKeys) -> Self {
+impl From<ResolveSpotBankruptcyKeys> for [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] {
+    fn from(keys: ResolveSpotBankruptcyKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -9770,10 +9770,10 @@ impl From<[Pubkey; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]> for ResolveSpotBank
         }
     }
 }
-impl<'info> From<&ResolveSpotBankruptcyAccounts<'_, 'info>>
+impl<'info> From<ResolveSpotBankruptcyAccounts<'_, 'info>>
     for [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ResolveSpotBankruptcyAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.authority.clone(),
@@ -9853,7 +9853,7 @@ pub fn resolve_spot_bankruptcy_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ResolveSpotBankruptcyKeys = accounts.into();
-    let metas: [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ResolveSpotBankruptcyIxArgs = args.into();
     let data: ResolveSpotBankruptcyIxData = args_full.into();
     Ok(Instruction {
@@ -9863,7 +9863,7 @@ pub fn resolve_spot_bankruptcy_ix<
     })
 }
 pub fn resolve_spot_bankruptcy_invoke<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
-    accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>,
+    accounts: ResolveSpotBankruptcyAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = resolve_spot_bankruptcy_ix(accounts, args)?;
@@ -9872,7 +9872,7 @@ pub fn resolve_spot_bankruptcy_invoke<'info, A: Into<ResolveSpotBankruptcyIxArgs
     invoke(&ix, &account_info)
 }
 pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
-    accounts: &ResolveSpotBankruptcyAccounts<'_, 'info>,
+    accounts: ResolveSpotBankruptcyAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -9882,32 +9882,32 @@ pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn resolve_spot_bankruptcy_verify_account_keys(
-    accounts: &ResolveSpotBankruptcyAccounts<'_, '_>,
-    keys: &ResolveSpotBankruptcyKeys,
+    accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
+    keys: ResolveSpotBankruptcyKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.liquidator.key, &keys.liquidator),
-        (accounts.liquidator_stats.key, &keys.liquidator_stats),
-        (accounts.user.key, &keys.user),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.liquidator.key, keys.liquidator),
+        (*accounts.liquidator_stats.key, keys.liquidator_stats),
+        (*accounts.user.key, keys.user),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn resolve_spot_bankruptcy_verify_account_privileges<'me, 'info>(
-    accounts: &ResolveSpotBankruptcyAccounts<'me, 'info>,
+    accounts: ResolveSpotBankruptcyAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.liquidator,
@@ -9947,8 +9947,8 @@ pub struct SettleRevenueToInsuranceFundKeys {
     pub insurance_fund_vault: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&SettleRevenueToInsuranceFundAccounts<'_, '_>> for SettleRevenueToInsuranceFundKeys {
-    fn from(accounts: &SettleRevenueToInsuranceFundAccounts) -> Self {
+impl From<SettleRevenueToInsuranceFundAccounts<'_, '_>> for SettleRevenueToInsuranceFundKeys {
+    fn from(accounts: SettleRevenueToInsuranceFundAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -9959,10 +9959,10 @@ impl From<&SettleRevenueToInsuranceFundAccounts<'_, '_>> for SettleRevenueToInsu
         }
     }
 }
-impl From<&SettleRevenueToInsuranceFundKeys>
+impl From<SettleRevenueToInsuranceFundKeys>
     for [AccountMeta; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &SettleRevenueToInsuranceFundKeys) -> Self {
+    fn from(keys: SettleRevenueToInsuranceFundKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -10011,10 +10011,10 @@ impl From<[Pubkey; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&SettleRevenueToInsuranceFundAccounts<'_, 'info>>
+impl<'info> From<SettleRevenueToInsuranceFundAccounts<'_, 'info>>
     for [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SettleRevenueToInsuranceFundAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -10091,7 +10091,7 @@ pub fn settle_revenue_to_insurance_fund_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
-    let metas: [AccountMeta; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SettleRevenueToInsuranceFundIxArgs = args.into();
     let data: SettleRevenueToInsuranceFundIxData = args_full.into();
     Ok(Instruction {
@@ -10104,7 +10104,7 @@ pub fn settle_revenue_to_insurance_fund_invoke<
     'info,
     A: Into<SettleRevenueToInsuranceFundIxArgs>,
 >(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>,
+    accounts: SettleRevenueToInsuranceFundAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = settle_revenue_to_insurance_fund_ix(accounts, args)?;
@@ -10116,7 +10116,7 @@ pub fn settle_revenue_to_insurance_fund_invoke_signed<
     'info,
     A: Into<SettleRevenueToInsuranceFundIxArgs>,
 >(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'_, 'info>,
+    accounts: SettleRevenueToInsuranceFundAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -10126,28 +10126,28 @@ pub fn settle_revenue_to_insurance_fund_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_revenue_to_insurance_fund_verify_account_keys(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'_, '_>,
-    keys: &SettleRevenueToInsuranceFundKeys,
+    accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
+    keys: SettleRevenueToInsuranceFundKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
-        (accounts.drift_signer.key, &keys.drift_signer),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
+        (*accounts.drift_signer.key, keys.drift_signer),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_revenue_to_insurance_fund_verify_account_privileges<'me, 'info>(
-    accounts: &SettleRevenueToInsuranceFundAccounts<'me, 'info>,
+    accounts: SettleRevenueToInsuranceFundAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.spot_market,
@@ -10173,8 +10173,8 @@ pub struct UpdateFundingRateKeys {
     pub perp_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl From<&UpdateFundingRateAccounts<'_, '_>> for UpdateFundingRateKeys {
-    fn from(accounts: &UpdateFundingRateAccounts) -> Self {
+impl From<UpdateFundingRateAccounts<'_, '_>> for UpdateFundingRateKeys {
+    fn from(accounts: UpdateFundingRateAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -10182,8 +10182,8 @@ impl From<&UpdateFundingRateAccounts<'_, '_>> for UpdateFundingRateKeys {
         }
     }
 }
-impl From<&UpdateFundingRateKeys> for [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateFundingRateKeys) -> Self {
+impl From<UpdateFundingRateKeys> for [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateFundingRateKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -10212,10 +10212,10 @@ impl From<[Pubkey; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]> for UpdateFundingRateKe
         }
     }
 }
-impl<'info> From<&UpdateFundingRateAccounts<'_, 'info>>
+impl<'info> From<UpdateFundingRateAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateFundingRateAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateFundingRateAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -10278,7 +10278,7 @@ pub fn update_funding_rate_ix<K: Into<UpdateFundingRateKeys>, A: Into<UpdateFund
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateFundingRateKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateFundingRateIxArgs = args.into();
     let data: UpdateFundingRateIxData = args_full.into();
     Ok(Instruction {
@@ -10288,7 +10288,7 @@ pub fn update_funding_rate_ix<K: Into<UpdateFundingRateKeys>, A: Into<UpdateFund
     })
 }
 pub fn update_funding_rate_invoke<'info, A: Into<UpdateFundingRateIxArgs>>(
-    accounts: &UpdateFundingRateAccounts<'_, 'info>,
+    accounts: UpdateFundingRateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_funding_rate_ix(accounts, args)?;
@@ -10296,7 +10296,7 @@ pub fn update_funding_rate_invoke<'info, A: Into<UpdateFundingRateIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>>(
-    accounts: &UpdateFundingRateAccounts<'_, 'info>,
+    accounts: UpdateFundingRateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -10305,22 +10305,22 @@ pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_funding_rate_verify_account_keys(
-    accounts: &UpdateFundingRateAccounts<'_, '_>,
-    keys: &UpdateFundingRateKeys,
+    accounts: UpdateFundingRateAccounts<'_, '_>,
+    keys: UpdateFundingRateKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_funding_rate_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateFundingRateAccounts<'me, 'info>,
+    accounts: UpdateFundingRateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -10342,10 +10342,10 @@ pub struct UpdateSpotMarketCumulativeInterestKeys {
     pub spot_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl From<&UpdateSpotMarketCumulativeInterestAccounts<'_, '_>>
+impl From<UpdateSpotMarketCumulativeInterestAccounts<'_, '_>>
     for UpdateSpotMarketCumulativeInterestKeys
 {
-    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts) -> Self {
+    fn from(accounts: UpdateSpotMarketCumulativeInterestAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -10353,10 +10353,10 @@ impl From<&UpdateSpotMarketCumulativeInterestAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateSpotMarketCumulativeInterestKeys>
+impl From<UpdateSpotMarketCumulativeInterestKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketCumulativeInterestKeys) -> Self {
+    fn from(keys: UpdateSpotMarketCumulativeInterestKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -10387,10 +10387,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -10447,8 +10447,7 @@ pub fn update_spot_market_cumulative_interest_ix<
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -10456,7 +10455,7 @@ pub fn update_spot_market_cumulative_interest_ix<
     })
 }
 pub fn update_spot_market_cumulative_interest_invoke<'info>(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_spot_market_cumulative_interest_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
@@ -10464,7 +10463,7 @@ pub fn update_spot_market_cumulative_interest_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_cumulative_interest_invoke_signed<'info>(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_spot_market_cumulative_interest_ix(accounts)?;
@@ -10473,22 +10472,22 @@ pub fn update_spot_market_cumulative_interest_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_cumulative_interest_verify_account_keys(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
-    keys: &UpdateSpotMarketCumulativeInterestKeys,
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
+    keys: UpdateSpotMarketCumulativeInterestKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
-        (accounts.oracle.key, &keys.oracle),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
+        (*accounts.oracle.key, keys.oracle),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_cumulative_interest_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketCumulativeInterestAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -10508,16 +10507,16 @@ pub struct UpdateAmmsKeys {
     pub state: Pubkey,
     pub authority: Pubkey,
 }
-impl From<&UpdateAmmsAccounts<'_, '_>> for UpdateAmmsKeys {
-    fn from(accounts: &UpdateAmmsAccounts) -> Self {
+impl From<UpdateAmmsAccounts<'_, '_>> for UpdateAmmsKeys {
+    fn from(accounts: UpdateAmmsAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             authority: *accounts.authority.key,
         }
     }
 }
-impl From<&UpdateAmmsKeys> for [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateAmmsKeys) -> Self {
+impl From<UpdateAmmsKeys> for [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateAmmsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -10540,10 +10539,10 @@ impl From<[Pubkey; UPDATE_AMMS_IX_ACCOUNTS_LEN]> for UpdateAmmsKeys {
         }
     }
 }
-impl<'info> From<&UpdateAmmsAccounts<'_, 'info>>
+impl<'info> From<UpdateAmmsAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateAmmsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateAmmsAccounts<'_, 'info>) -> Self {
         [accounts.state.clone(), accounts.authority.clone()]
     }
 }
@@ -10601,7 +10600,7 @@ pub fn update_amms_ix<K: Into<UpdateAmmsKeys>, A: Into<UpdateAmmsIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateAmmsKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateAmmsIxArgs = args.into();
     let data: UpdateAmmsIxData = args_full.into();
     Ok(Instruction {
@@ -10611,7 +10610,7 @@ pub fn update_amms_ix<K: Into<UpdateAmmsKeys>, A: Into<UpdateAmmsIxArgs>>(
     })
 }
 pub fn update_amms_invoke<'info, A: Into<UpdateAmmsIxArgs>>(
-    accounts: &UpdateAmmsAccounts<'_, 'info>,
+    accounts: UpdateAmmsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_amms_ix(accounts, args)?;
@@ -10619,7 +10618,7 @@ pub fn update_amms_invoke<'info, A: Into<UpdateAmmsIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
-    accounts: &UpdateAmmsAccounts<'_, 'info>,
+    accounts: UpdateAmmsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -10628,21 +10627,21 @@ pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_amms_verify_account_keys(
-    accounts: &UpdateAmmsAccounts<'_, '_>,
-    keys: &UpdateAmmsKeys,
+    accounts: UpdateAmmsAccounts<'_, '_>,
+    keys: UpdateAmmsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_amms_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateAmmsAccounts<'me, 'info>,
+    accounts: UpdateAmmsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
@@ -10664,8 +10663,8 @@ pub struct UpdateSpotMarketExpiryKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketExpiryAccounts<'_, '_>> for UpdateSpotMarketExpiryKeys {
-    fn from(accounts: &UpdateSpotMarketExpiryAccounts) -> Self {
+impl From<UpdateSpotMarketExpiryAccounts<'_, '_>> for UpdateSpotMarketExpiryKeys {
+    fn from(accounts: UpdateSpotMarketExpiryAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -10673,10 +10672,8 @@ impl From<&UpdateSpotMarketExpiryAccounts<'_, '_>> for UpdateSpotMarketExpiryKey
         }
     }
 }
-impl From<&UpdateSpotMarketExpiryKeys>
-    for [AccountMeta; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdateSpotMarketExpiryKeys) -> Self {
+impl From<UpdateSpotMarketExpiryKeys> for [AccountMeta; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSpotMarketExpiryKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -10705,10 +10702,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]> for UpdateSpotMar
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketExpiryAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketExpiryAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketExpiryAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -10776,7 +10773,7 @@ pub fn update_spot_market_expiry_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketExpiryKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketExpiryIxArgs = args.into();
     let data: UpdateSpotMarketExpiryIxData = args_full.into();
     Ok(Instruction {
@@ -10786,7 +10783,7 @@ pub fn update_spot_market_expiry_ix<
     })
 }
 pub fn update_spot_market_expiry_invoke<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
-    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketExpiryAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_expiry_ix(accounts, args)?;
@@ -10795,7 +10792,7 @@ pub fn update_spot_market_expiry_invoke<'info, A: Into<UpdateSpotMarketExpiryIxA
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
-    accounts: &UpdateSpotMarketExpiryAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketExpiryAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -10805,22 +10802,22 @@ pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketEx
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_expiry_verify_account_keys(
-    accounts: &UpdateSpotMarketExpiryAccounts<'_, '_>,
-    keys: &UpdateSpotMarketExpiryKeys,
+    accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
+    keys: UpdateSpotMarketExpiryKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_expiry_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketExpiryAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketExpiryAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -10853,10 +10850,10 @@ pub struct UpdateUserQuoteAssetInsuranceStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>>
+impl From<UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>>
     for UpdateUserQuoteAssetInsuranceStakeKeys
 {
-    fn from(accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts) -> Self {
+    fn from(accounts: UpdateUserQuoteAssetInsuranceStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -10867,10 +10864,10 @@ impl From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateUserQuoteAssetInsuranceStakeKeys>
+impl From<UpdateUserQuoteAssetInsuranceStakeKeys>
     for [AccountMeta; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateUserQuoteAssetInsuranceStakeKeys) -> Self {
+    fn from(keys: UpdateUserQuoteAssetInsuranceStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -10919,10 +10916,10 @@ impl From<[Pubkey; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>>
+impl<'info> From<UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -10985,8 +10982,7 @@ pub fn update_user_quote_asset_insurance_stake_ix<
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -10994,7 +10990,7 @@ pub fn update_user_quote_asset_insurance_stake_ix<
     })
 }
 pub fn update_user_quote_asset_insurance_stake_invoke<'info>(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
@@ -11002,7 +10998,7 @@ pub fn update_user_quote_asset_insurance_stake_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn update_user_quote_asset_insurance_stake_invoke_signed<'info>(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
@@ -11011,31 +11007,31 @@ pub fn update_user_quote_asset_insurance_stake_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_user_quote_asset_insurance_stake_verify_account_keys(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
-    keys: &UpdateUserQuoteAssetInsuranceStakeKeys,
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
+    keys: UpdateUserQuoteAssetInsuranceStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_user_quote_asset_insurance_stake_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>,
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -11076,8 +11072,8 @@ pub struct InitializeInsuranceFundStakeKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializeInsuranceFundStakeAccounts<'_, '_>> for InitializeInsuranceFundStakeKeys {
-    fn from(accounts: &InitializeInsuranceFundStakeAccounts) -> Self {
+impl From<InitializeInsuranceFundStakeAccounts<'_, '_>> for InitializeInsuranceFundStakeKeys {
+    fn from(accounts: InitializeInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -11090,10 +11086,10 @@ impl From<&InitializeInsuranceFundStakeAccounts<'_, '_>> for InitializeInsurance
         }
     }
 }
-impl From<&InitializeInsuranceFundStakeKeys>
+impl From<InitializeInsuranceFundStakeKeys>
     for [AccountMeta; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &InitializeInsuranceFundStakeKeys) -> Self {
+    fn from(keys: InitializeInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.spot_market,
@@ -11154,10 +11150,10 @@ impl From<[Pubkey; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&InitializeInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<InitializeInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -11237,7 +11233,7 @@ pub fn initialize_insurance_fund_stake_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeInsuranceFundStakeKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeInsuranceFundStakeIxArgs = args.into();
     let data: InitializeInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -11250,7 +11246,7 @@ pub fn initialize_insurance_fund_stake_invoke<
     'info,
     A: Into<InitializeInsuranceFundStakeIxArgs>,
 >(
-    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: InitializeInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_insurance_fund_stake_ix(accounts, args)?;
@@ -11262,7 +11258,7 @@ pub fn initialize_insurance_fund_stake_invoke_signed<
     'info,
     A: Into<InitializeInsuranceFundStakeIxArgs>,
 >(
-    accounts: &InitializeInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: InitializeInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -11272,30 +11268,30 @@ pub fn initialize_insurance_fund_stake_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_insurance_fund_stake_verify_account_keys(
-    accounts: &InitializeInsuranceFundStakeAccounts<'_, '_>,
-    keys: &InitializeInsuranceFundStakeKeys,
+    accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
+    keys: InitializeInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.state.key, &keys.state),
-        (accounts.authority.key, &keys.authority),
-        (accounts.payer.key, &keys.payer),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.state.key, keys.state),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: InitializeInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -11340,8 +11336,8 @@ pub struct AddInsuranceFundStakeKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&AddInsuranceFundStakeAccounts<'_, '_>> for AddInsuranceFundStakeKeys {
-    fn from(accounts: &AddInsuranceFundStakeAccounts) -> Self {
+impl From<AddInsuranceFundStakeAccounts<'_, '_>> for AddInsuranceFundStakeKeys {
+    fn from(accounts: AddInsuranceFundStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -11356,8 +11352,8 @@ impl From<&AddInsuranceFundStakeAccounts<'_, '_>> for AddInsuranceFundStakeKeys 
         }
     }
 }
-impl From<&AddInsuranceFundStakeKeys> for [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &AddInsuranceFundStakeKeys) -> Self {
+impl From<AddInsuranceFundStakeKeys> for [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] {
+    fn from(keys: AddInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -11428,10 +11424,10 @@ impl From<[Pubkey; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]> for AddInsuranceFu
         }
     }
 }
-impl<'info> From<&AddInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<AddInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &AddInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: AddInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -11512,7 +11508,7 @@ pub fn add_insurance_fund_stake_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: AddInsuranceFundStakeKeys = accounts.into();
-    let metas: [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: AddInsuranceFundStakeIxArgs = args.into();
     let data: AddInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -11522,7 +11518,7 @@ pub fn add_insurance_fund_stake_ix<
     })
 }
 pub fn add_insurance_fund_stake_invoke<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
-    accounts: &AddInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: AddInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = add_insurance_fund_stake_ix(accounts, args)?;
@@ -11531,7 +11527,7 @@ pub fn add_insurance_fund_stake_invoke<'info, A: Into<AddInsuranceFundStakeIxArg
     invoke(&ix, &account_info)
 }
 pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
-    accounts: &AddInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: AddInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -11541,35 +11537,35 @@ pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundSta
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn add_insurance_fund_stake_verify_account_keys(
-    accounts: &AddInsuranceFundStakeAccounts<'_, '_>,
-    keys: &AddInsuranceFundStakeKeys,
+    accounts: AddInsuranceFundStakeAccounts<'_, '_>,
+    keys: AddInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.user_token_account.key, &keys.user_token_account),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.user_token_account.key, keys.user_token_account),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn add_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &AddInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: AddInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -11606,10 +11602,8 @@ pub struct RequestRemoveInsuranceFundStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl From<&RequestRemoveInsuranceFundStakeAccounts<'_, '_>>
-    for RequestRemoveInsuranceFundStakeKeys
-{
-    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts) -> Self {
+impl From<RequestRemoveInsuranceFundStakeAccounts<'_, '_>> for RequestRemoveInsuranceFundStakeKeys {
+    fn from(accounts: RequestRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -11619,10 +11613,10 @@ impl From<&RequestRemoveInsuranceFundStakeAccounts<'_, '_>>
         }
     }
 }
-impl From<&RequestRemoveInsuranceFundStakeKeys>
+impl From<RequestRemoveInsuranceFundStakeKeys>
     for [AccountMeta; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &RequestRemoveInsuranceFundStakeKeys) -> Self {
+    fn from(keys: RequestRemoveInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.spot_market,
@@ -11665,10 +11659,10 @@ impl From<[Pubkey; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&RequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<RequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -11745,7 +11739,7 @@ pub fn request_remove_insurance_fund_stake_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
-    let metas: [AccountMeta; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: RequestRemoveInsuranceFundStakeIxArgs = args.into();
     let data: RequestRemoveInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -11758,7 +11752,7 @@ pub fn request_remove_insurance_fund_stake_invoke<
     'info,
     A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = request_remove_insurance_fund_stake_ix(accounts, args)?;
@@ -11770,7 +11764,7 @@ pub fn request_remove_insurance_fund_stake_invoke_signed<
     'info,
     A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -11780,30 +11774,30 @@ pub fn request_remove_insurance_fund_stake_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn request_remove_insurance_fund_stake_verify_account_keys(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
-    keys: &RequestRemoveInsuranceFundStakeKeys,
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: RequestRemoveInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &RequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -11838,10 +11832,10 @@ pub struct CancelRequestRemoveInsuranceFundStakeKeys {
     pub authority: Pubkey,
     pub insurance_fund_vault: Pubkey,
 }
-impl From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>>
+impl From<CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>>
     for CancelRequestRemoveInsuranceFundStakeKeys
 {
-    fn from(accounts: &CancelRequestRemoveInsuranceFundStakeAccounts) -> Self {
+    fn from(accounts: CancelRequestRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             insurance_fund_stake: *accounts.insurance_fund_stake.key,
@@ -11851,10 +11845,10 @@ impl From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>>
         }
     }
 }
-impl From<&CancelRequestRemoveInsuranceFundStakeKeys>
+impl From<CancelRequestRemoveInsuranceFundStakeKeys>
     for [AccountMeta; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CancelRequestRemoveInsuranceFundStakeKeys) -> Self {
+    fn from(keys: CancelRequestRemoveInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.spot_market,
@@ -11897,10 +11891,10 @@ impl From<[Pubkey; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.insurance_fund_stake.clone(),
@@ -11981,7 +11975,7 @@ pub fn cancel_request_remove_insurance_fund_stake_ix<
 ) -> std::io::Result<Instruction> {
     let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: CancelRequestRemoveInsuranceFundStakeIxArgs = args.into();
     let data: CancelRequestRemoveInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -11994,7 +11988,7 @@ pub fn cancel_request_remove_insurance_fund_stake_invoke<
     'info,
     A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_request_remove_insurance_fund_stake_ix(accounts, args)?;
@@ -12006,7 +12000,7 @@ pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
     'info,
     A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -12016,30 +12010,30 @@ pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_request_remove_insurance_fund_stake_verify_account_keys(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
-    keys: &CancelRequestRemoveInsuranceFundStakeKeys,
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: CancelRequestRemoveInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn cancel_request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -12082,8 +12076,8 @@ pub struct RemoveInsuranceFundStakeKeys {
     pub user_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&RemoveInsuranceFundStakeAccounts<'_, '_>> for RemoveInsuranceFundStakeKeys {
-    fn from(accounts: &RemoveInsuranceFundStakeAccounts) -> Self {
+impl From<RemoveInsuranceFundStakeAccounts<'_, '_>> for RemoveInsuranceFundStakeKeys {
+    fn from(accounts: RemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             spot_market: *accounts.spot_market.key,
@@ -12097,10 +12091,10 @@ impl From<&RemoveInsuranceFundStakeAccounts<'_, '_>> for RemoveInsuranceFundStak
         }
     }
 }
-impl From<&RemoveInsuranceFundStakeKeys>
+impl From<RemoveInsuranceFundStakeKeys>
     for [AccountMeta; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &RemoveInsuranceFundStakeKeys) -> Self {
+    fn from(keys: RemoveInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -12165,10 +12159,10 @@ impl From<[Pubkey; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]> for RemoveInsur
         }
     }
 }
-impl<'info> From<&RemoveInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<RemoveInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.spot_market.clone(),
@@ -12248,7 +12242,7 @@ pub fn remove_insurance_fund_stake_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RemoveInsuranceFundStakeKeys = accounts.into();
-    let metas: [AccountMeta; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: RemoveInsuranceFundStakeIxArgs = args.into();
     let data: RemoveInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -12258,7 +12252,7 @@ pub fn remove_insurance_fund_stake_ix<
     })
 }
 pub fn remove_insurance_fund_stake_invoke<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
-    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: RemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_insurance_fund_stake_ix(accounts, args)?;
@@ -12267,7 +12261,7 @@ pub fn remove_insurance_fund_stake_invoke<'info, A: Into<RemoveInsuranceFundStak
     invoke(&ix, &account_info)
 }
 pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
-    accounts: &RemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: RemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -12277,34 +12271,34 @@ pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceF
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn remove_insurance_fund_stake_verify_account_keys(
-    accounts: &RemoveInsuranceFundStakeAccounts<'_, '_>,
-    keys: &RemoveInsuranceFundStakeKeys,
+    accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: RemoveInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_stake.key,
-            &keys.insurance_fund_stake,
+            *accounts.insurance_fund_stake.key,
+            keys.insurance_fund_stake,
         ),
-        (accounts.user_stats.key, &keys.user_stats),
-        (accounts.authority.key, &keys.authority),
+        (*accounts.user_stats.key, keys.user_stats),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.user_token_account.key, &keys.user_token_account),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.user_token_account.key, keys.user_token_account),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &RemoveInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: RemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.insurance_fund_stake,
@@ -12344,8 +12338,8 @@ pub struct InitializeKeys {
     pub system_program: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&InitializeAccounts<'_, '_>> for InitializeKeys {
-    fn from(accounts: &InitializeAccounts) -> Self {
+impl From<InitializeAccounts<'_, '_>> for InitializeKeys {
+    fn from(accounts: InitializeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -12357,8 +12351,8 @@ impl From<&InitializeAccounts<'_, '_>> for InitializeKeys {
         }
     }
 }
-impl From<&InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeKeys) -> Self {
+impl From<InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -12411,10 +12405,10 @@ impl From<[Pubkey; INITIALIZE_IX_ACCOUNTS_LEN]> for InitializeKeys {
         }
     }
 }
-impl<'info> From<&InitializeAccounts<'_, 'info>>
+impl<'info> From<InitializeAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -12471,20 +12465,20 @@ impl InitializeIxData {
 }
 pub fn initialize_ix<K: Into<InitializeKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: InitializeKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: InitializeIxData.try_to_vec()?,
     })
 }
-pub fn initialize_invoke<'info>(accounts: &InitializeAccounts<'_, 'info>) -> ProgramResult {
+pub fn initialize_invoke<'info>(accounts: InitializeAccounts<'_, 'info>) -> ProgramResult {
     let ix = initialize_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn initialize_invoke_signed<'info>(
-    accounts: &InitializeAccounts<'_, 'info>,
+    accounts: InitializeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = initialize_ix(accounts)?;
@@ -12492,26 +12486,26 @@ pub fn initialize_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_verify_account_keys(
-    accounts: &InitializeAccounts<'_, '_>,
-    keys: &InitializeKeys,
+    accounts: InitializeAccounts<'_, '_>,
+    keys: InitializeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.quote_asset_mint.key, &keys.quote_asset_mint),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.quote_asset_mint.key, keys.quote_asset_mint),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeAccounts<'me, 'info>,
+    accounts: InitializeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state] {
         if !should_be_writable.is_writable {
@@ -12554,8 +12548,8 @@ pub struct InitializeSpotMarketKeys {
     pub system_program: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&InitializeSpotMarketAccounts<'_, '_>> for InitializeSpotMarketKeys {
-    fn from(accounts: &InitializeSpotMarketAccounts) -> Self {
+impl From<InitializeSpotMarketAccounts<'_, '_>> for InitializeSpotMarketKeys {
+    fn from(accounts: InitializeSpotMarketAccounts) -> Self {
         Self {
             spot_market: *accounts.spot_market.key,
             spot_market_mint: *accounts.spot_market_mint.key,
@@ -12571,8 +12565,8 @@ impl From<&InitializeSpotMarketAccounts<'_, '_>> for InitializeSpotMarketKeys {
         }
     }
 }
-impl From<&InitializeSpotMarketKeys> for [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeSpotMarketKeys) -> Self {
+impl From<InitializeSpotMarketKeys> for [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeSpotMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.spot_market,
@@ -12649,10 +12643,10 @@ impl From<[Pubkey; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]> for InitializeSpotMa
         }
     }
 }
-impl<'info> From<&InitializeSpotMarketAccounts<'_, 'info>>
+impl<'info> From<InitializeSpotMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeSpotMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeSpotMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.spot_market.clone(),
             accounts.spot_market_mint.clone(),
@@ -12745,7 +12739,7 @@ pub fn initialize_spot_market_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeSpotMarketKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeSpotMarketIxArgs = args.into();
     let data: InitializeSpotMarketIxData = args_full.into();
     Ok(Instruction {
@@ -12755,7 +12749,7 @@ pub fn initialize_spot_market_ix<
     })
 }
 pub fn initialize_spot_market_invoke<'info, A: Into<InitializeSpotMarketIxArgs>>(
-    accounts: &InitializeSpotMarketAccounts<'_, 'info>,
+    accounts: InitializeSpotMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_spot_market_ix(accounts, args)?;
@@ -12764,7 +12758,7 @@ pub fn initialize_spot_market_invoke<'info, A: Into<InitializeSpotMarketIxArgs>>
     invoke(&ix, &account_info)
 }
 pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketIxArgs>>(
-    accounts: &InitializeSpotMarketAccounts<'_, 'info>,
+    accounts: InitializeSpotMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -12774,33 +12768,33 @@ pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketI
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_spot_market_verify_account_keys(
-    accounts: &InitializeSpotMarketAccounts<'_, '_>,
-    keys: &InitializeSpotMarketKeys,
+    accounts: InitializeSpotMarketAccounts<'_, '_>,
+    keys: InitializeSpotMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.spot_market.key, &keys.spot_market),
-        (accounts.spot_market_mint.key, &keys.spot_market_mint),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
+        (*accounts.spot_market.key, keys.spot_market),
+        (*accounts.spot_market_mint.key, keys.spot_market_mint),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.state.key, &keys.state),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.admin.key, &keys.admin),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.state.key, keys.state),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_spot_market_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeSpotMarketAccounts<'me, 'info>,
+    accounts: InitializeSpotMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.spot_market,
@@ -12849,10 +12843,10 @@ pub struct InitializeSerumFulfillmentConfigKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializeSerumFulfillmentConfigAccounts<'_, '_>>
+impl From<InitializeSerumFulfillmentConfigAccounts<'_, '_>>
     for InitializeSerumFulfillmentConfigKeys
 {
-    fn from(accounts: &InitializeSerumFulfillmentConfigAccounts) -> Self {
+    fn from(accounts: InitializeSerumFulfillmentConfigAccounts) -> Self {
         Self {
             base_spot_market: *accounts.base_spot_market.key,
             quote_spot_market: *accounts.quote_spot_market.key,
@@ -12868,10 +12862,10 @@ impl From<&InitializeSerumFulfillmentConfigAccounts<'_, '_>>
         }
     }
 }
-impl From<&InitializeSerumFulfillmentConfigKeys>
+impl From<InitializeSerumFulfillmentConfigKeys>
     for [AccountMeta; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &InitializeSerumFulfillmentConfigKeys) -> Self {
+    fn from(keys: InitializeSerumFulfillmentConfigKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.base_spot_market,
@@ -12950,10 +12944,10 @@ impl From<[Pubkey; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&InitializeSerumFulfillmentConfigAccounts<'_, 'info>>
+impl<'info> From<InitializeSerumFulfillmentConfigAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeSerumFulfillmentConfigAccounts<'_, 'info>) -> Self {
         [
             accounts.base_spot_market.clone(),
             accounts.quote_spot_market.clone(),
@@ -13041,7 +13035,7 @@ pub fn initialize_serum_fulfillment_config_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeSerumFulfillmentConfigIxArgs = args.into();
     let data: InitializeSerumFulfillmentConfigIxData = args_full.into();
     Ok(Instruction {
@@ -13054,7 +13048,7 @@ pub fn initialize_serum_fulfillment_config_invoke<
     'info,
     A: Into<InitializeSerumFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
+    accounts: InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_serum_fulfillment_config_ix(accounts, args)?;
@@ -13066,7 +13060,7 @@ pub fn initialize_serum_fulfillment_config_invoke_signed<
     'info,
     A: Into<InitializeSerumFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
+    accounts: InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -13076,33 +13070,33 @@ pub fn initialize_serum_fulfillment_config_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_serum_fulfillment_config_verify_account_keys(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<'_, '_>,
-    keys: &InitializeSerumFulfillmentConfigKeys,
+    accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
+    keys: InitializeSerumFulfillmentConfigKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.base_spot_market.key, &keys.base_spot_market),
-        (accounts.quote_spot_market.key, &keys.quote_spot_market),
-        (accounts.state.key, &keys.state),
-        (accounts.serum_program.key, &keys.serum_program),
-        (accounts.serum_market.key, &keys.serum_market),
-        (accounts.serum_open_orders.key, &keys.serum_open_orders),
-        (accounts.drift_signer.key, &keys.drift_signer),
+        (*accounts.base_spot_market.key, keys.base_spot_market),
+        (*accounts.quote_spot_market.key, keys.quote_spot_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.serum_program.key, keys.serum_program),
+        (*accounts.serum_market.key, keys.serum_market),
+        (*accounts.serum_open_orders.key, keys.serum_open_orders),
+        (*accounts.drift_signer.key, keys.drift_signer),
         (
-            accounts.serum_fulfillment_config.key,
-            &keys.serum_fulfillment_config,
+            *accounts.serum_fulfillment_config.key,
+            keys.serum_fulfillment_config,
         ),
-        (accounts.admin.key, &keys.admin),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_serum_fulfillment_config_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeSerumFulfillmentConfigAccounts<'me, 'info>,
+    accounts: InitializeSerumFulfillmentConfigAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.state,
@@ -13134,10 +13128,10 @@ pub struct UpdateSerumFulfillmentConfigStatusKeys {
     pub serum_fulfillment_config: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>>
+impl From<UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>>
     for UpdateSerumFulfillmentConfigStatusKeys
 {
-    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts) -> Self {
+    fn from(accounts: UpdateSerumFulfillmentConfigStatusAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             serum_fulfillment_config: *accounts.serum_fulfillment_config.key,
@@ -13145,10 +13139,10 @@ impl From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateSerumFulfillmentConfigStatusKeys>
+impl From<UpdateSerumFulfillmentConfigStatusKeys>
     for [AccountMeta; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSerumFulfillmentConfigStatusKeys) -> Self {
+    fn from(keys: UpdateSerumFulfillmentConfigStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -13179,10 +13173,10 @@ impl From<[Pubkey; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>>
+impl<'info> From<UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.serum_fulfillment_config.clone(),
@@ -13254,8 +13248,7 @@ pub fn update_serum_fulfillment_config_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSerumFulfillmentConfigStatusIxArgs = args.into();
     let data: UpdateSerumFulfillmentConfigStatusIxData = args_full.into();
     Ok(Instruction {
@@ -13268,7 +13261,7 @@ pub fn update_serum_fulfillment_config_status_invoke<
     'info,
     A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_serum_fulfillment_config_status_ix(accounts, args)?;
@@ -13280,7 +13273,7 @@ pub fn update_serum_fulfillment_config_status_invoke_signed<
     'info,
     A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -13290,25 +13283,25 @@ pub fn update_serum_fulfillment_config_status_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_serum_fulfillment_config_status_verify_account_keys(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
-    keys: &UpdateSerumFulfillmentConfigStatusKeys,
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
+    keys: UpdateSerumFulfillmentConfigStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
+        (*accounts.state.key, keys.state),
         (
-            accounts.serum_fulfillment_config.key,
-            &keys.serum_fulfillment_config,
+            *accounts.serum_fulfillment_config.key,
+            keys.serum_fulfillment_config,
         ),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_serum_fulfillment_config_status_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>,
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.serum_fulfillment_config, accounts.admin] {
         if !should_be_writable.is_writable {
@@ -13349,10 +13342,10 @@ pub struct InitializePhoenixFulfillmentConfigKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializePhoenixFulfillmentConfigAccounts<'_, '_>>
+impl From<InitializePhoenixFulfillmentConfigAccounts<'_, '_>>
     for InitializePhoenixFulfillmentConfigKeys
 {
-    fn from(accounts: &InitializePhoenixFulfillmentConfigAccounts) -> Self {
+    fn from(accounts: InitializePhoenixFulfillmentConfigAccounts) -> Self {
         Self {
             base_spot_market: *accounts.base_spot_market.key,
             quote_spot_market: *accounts.quote_spot_market.key,
@@ -13367,10 +13360,10 @@ impl From<&InitializePhoenixFulfillmentConfigAccounts<'_, '_>>
         }
     }
 }
-impl From<&InitializePhoenixFulfillmentConfigKeys>
+impl From<InitializePhoenixFulfillmentConfigKeys>
     for [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &InitializePhoenixFulfillmentConfigKeys) -> Self {
+    fn from(keys: InitializePhoenixFulfillmentConfigKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.base_spot_market,
@@ -13443,10 +13436,10 @@ impl From<[Pubkey; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&InitializePhoenixFulfillmentConfigAccounts<'_, 'info>>
+impl<'info> From<InitializePhoenixFulfillmentConfigAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializePhoenixFulfillmentConfigAccounts<'_, 'info>) -> Self {
         [
             accounts.base_spot_market.clone(),
             accounts.quote_spot_market.clone(),
@@ -13532,8 +13525,7 @@ pub fn initialize_phoenix_fulfillment_config_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializePhoenixFulfillmentConfigIxArgs = args.into();
     let data: InitializePhoenixFulfillmentConfigIxData = args_full.into();
     Ok(Instruction {
@@ -13546,7 +13538,7 @@ pub fn initialize_phoenix_fulfillment_config_invoke<
     'info,
     A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
@@ -13558,7 +13550,7 @@ pub fn initialize_phoenix_fulfillment_config_invoke_signed<
     'info,
     A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
 >(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -13568,32 +13560,32 @@ pub fn initialize_phoenix_fulfillment_config_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_phoenix_fulfillment_config_verify_account_keys(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
-    keys: &InitializePhoenixFulfillmentConfigKeys,
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
+    keys: InitializePhoenixFulfillmentConfigKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.base_spot_market.key, &keys.base_spot_market),
-        (accounts.quote_spot_market.key, &keys.quote_spot_market),
-        (accounts.state.key, &keys.state),
-        (accounts.phoenix_program.key, &keys.phoenix_program),
-        (accounts.phoenix_market.key, &keys.phoenix_market),
-        (accounts.drift_signer.key, &keys.drift_signer),
+        (*accounts.base_spot_market.key, keys.base_spot_market),
+        (*accounts.quote_spot_market.key, keys.quote_spot_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.phoenix_program.key, keys.phoenix_program),
+        (*accounts.phoenix_market.key, keys.phoenix_market),
+        (*accounts.drift_signer.key, keys.drift_signer),
         (
-            accounts.phoenix_fulfillment_config.key,
-            &keys.phoenix_fulfillment_config,
+            *accounts.phoenix_fulfillment_config.key,
+            keys.phoenix_fulfillment_config,
         ),
-        (accounts.admin.key, &keys.admin),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_phoenix_fulfillment_config_verify_account_privileges<'me, 'info>(
-    accounts: &InitializePhoenixFulfillmentConfigAccounts<'me, 'info>,
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.state,
@@ -13624,8 +13616,8 @@ pub struct PhoenixFulfillmentConfigStatusKeys {
     pub phoenix_fulfillment_config: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&PhoenixFulfillmentConfigStatusAccounts<'_, '_>> for PhoenixFulfillmentConfigStatusKeys {
-    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts) -> Self {
+impl From<PhoenixFulfillmentConfigStatusAccounts<'_, '_>> for PhoenixFulfillmentConfigStatusKeys {
+    fn from(accounts: PhoenixFulfillmentConfigStatusAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             phoenix_fulfillment_config: *accounts.phoenix_fulfillment_config.key,
@@ -13633,10 +13625,10 @@ impl From<&PhoenixFulfillmentConfigStatusAccounts<'_, '_>> for PhoenixFulfillmen
         }
     }
 }
-impl From<&PhoenixFulfillmentConfigStatusKeys>
+impl From<PhoenixFulfillmentConfigStatusKeys>
     for [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &PhoenixFulfillmentConfigStatusKeys) -> Self {
+    fn from(keys: PhoenixFulfillmentConfigStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -13667,10 +13659,10 @@ impl From<[Pubkey; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&PhoenixFulfillmentConfigStatusAccounts<'_, 'info>>
+impl<'info> From<PhoenixFulfillmentConfigStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PhoenixFulfillmentConfigStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.phoenix_fulfillment_config.clone(),
@@ -13740,7 +13732,7 @@ pub fn phoenix_fulfillment_config_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
-    let metas: [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PhoenixFulfillmentConfigStatusIxArgs = args.into();
     let data: PhoenixFulfillmentConfigStatusIxData = args_full.into();
     Ok(Instruction {
@@ -13753,7 +13745,7 @@ pub fn phoenix_fulfillment_config_status_invoke<
     'info,
     A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
@@ -13765,7 +13757,7 @@ pub fn phoenix_fulfillment_config_status_invoke_signed<
     'info,
     A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
 >(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -13775,25 +13767,25 @@ pub fn phoenix_fulfillment_config_status_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn phoenix_fulfillment_config_status_verify_account_keys(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
-    keys: &PhoenixFulfillmentConfigStatusKeys,
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
+    keys: PhoenixFulfillmentConfigStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
+        (*accounts.state.key, keys.state),
         (
-            accounts.phoenix_fulfillment_config.key,
-            &keys.phoenix_fulfillment_config,
+            *accounts.phoenix_fulfillment_config.key,
+            keys.phoenix_fulfillment_config,
         ),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn phoenix_fulfillment_config_status_verify_account_privileges<'me, 'info>(
-    accounts: &PhoenixFulfillmentConfigStatusAccounts<'me, 'info>,
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.phoenix_fulfillment_config, accounts.admin] {
         if !should_be_writable.is_writable {
@@ -13820,8 +13812,8 @@ pub struct UpdateSerumVaultKeys {
     pub admin: Pubkey,
     pub srm_vault: Pubkey,
 }
-impl From<&UpdateSerumVaultAccounts<'_, '_>> for UpdateSerumVaultKeys {
-    fn from(accounts: &UpdateSerumVaultAccounts) -> Self {
+impl From<UpdateSerumVaultAccounts<'_, '_>> for UpdateSerumVaultKeys {
+    fn from(accounts: UpdateSerumVaultAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             admin: *accounts.admin.key,
@@ -13829,8 +13821,8 @@ impl From<&UpdateSerumVaultAccounts<'_, '_>> for UpdateSerumVaultKeys {
         }
     }
 }
-impl From<&UpdateSerumVaultKeys> for [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateSerumVaultKeys) -> Self {
+impl From<UpdateSerumVaultKeys> for [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSerumVaultKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -13859,10 +13851,10 @@ impl From<[Pubkey; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]> for UpdateSerumVaultKeys
         }
     }
 }
-impl<'info> From<&UpdateSerumVaultAccounts<'_, 'info>>
+impl<'info> From<UpdateSerumVaultAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSerumVaultAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSerumVaultAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.admin.clone(),
@@ -13913,7 +13905,7 @@ pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSerumVaultKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -13921,14 +13913,14 @@ pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>>(
     })
 }
 pub fn update_serum_vault_invoke<'info>(
-    accounts: &UpdateSerumVaultAccounts<'_, 'info>,
+    accounts: UpdateSerumVaultAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_serum_vault_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn update_serum_vault_invoke_signed<'info>(
-    accounts: &UpdateSerumVaultAccounts<'_, 'info>,
+    accounts: UpdateSerumVaultAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_serum_vault_ix(accounts)?;
@@ -13936,22 +13928,22 @@ pub fn update_serum_vault_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_serum_vault_verify_account_keys(
-    accounts: &UpdateSerumVaultAccounts<'_, '_>,
-    keys: &UpdateSerumVaultKeys,
+    accounts: UpdateSerumVaultAccounts<'_, '_>,
+    keys: UpdateSerumVaultKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.admin.key, &keys.admin),
-        (accounts.srm_vault.key, &keys.srm_vault),
+        (*accounts.state.key, keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.srm_vault.key, keys.srm_vault),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_serum_vault_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSerumVaultAccounts<'me, 'info>,
+    accounts: UpdateSerumVaultAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.admin] {
         if !should_be_writable.is_writable {
@@ -13984,8 +13976,8 @@ pub struct InitializePerpMarketKeys {
     pub rent: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitializePerpMarketAccounts<'_, '_>> for InitializePerpMarketKeys {
-    fn from(accounts: &InitializePerpMarketAccounts) -> Self {
+impl From<InitializePerpMarketAccounts<'_, '_>> for InitializePerpMarketKeys {
+    fn from(accounts: InitializePerpMarketAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -13996,8 +13988,8 @@ impl From<&InitializePerpMarketAccounts<'_, '_>> for InitializePerpMarketKeys {
         }
     }
 }
-impl From<&InitializePerpMarketKeys> for [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializePerpMarketKeys) -> Self {
+impl From<InitializePerpMarketKeys> for [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializePerpMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -14044,10 +14036,10 @@ impl From<[Pubkey; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]> for InitializePerpMa
         }
     }
 }
-impl<'info> From<&InitializePerpMarketAccounts<'_, 'info>>
+impl<'info> From<InitializePerpMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializePerpMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializePerpMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -14129,7 +14121,7 @@ pub fn initialize_perp_market_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializePerpMarketKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializePerpMarketIxArgs = args.into();
     let data: InitializePerpMarketIxData = args_full.into();
     Ok(Instruction {
@@ -14139,7 +14131,7 @@ pub fn initialize_perp_market_ix<
     })
 }
 pub fn initialize_perp_market_invoke<'info, A: Into<InitializePerpMarketIxArgs>>(
-    accounts: &InitializePerpMarketAccounts<'_, 'info>,
+    accounts: InitializePerpMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_perp_market_ix(accounts, args)?;
@@ -14148,7 +14140,7 @@ pub fn initialize_perp_market_invoke<'info, A: Into<InitializePerpMarketIxArgs>>
     invoke(&ix, &account_info)
 }
 pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketIxArgs>>(
-    accounts: &InitializePerpMarketAccounts<'_, 'info>,
+    accounts: InitializePerpMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -14158,25 +14150,25 @@ pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketI
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_perp_market_verify_account_keys(
-    accounts: &InitializePerpMarketAccounts<'_, '_>,
-    keys: &InitializePerpMarketKeys,
+    accounts: InitializePerpMarketAccounts<'_, '_>,
+    keys: InitializePerpMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.rent.key, &keys.rent),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.rent.key, keys.rent),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn initialize_perp_market_verify_account_privileges<'me, 'info>(
-    accounts: &InitializePerpMarketAccounts<'me, 'info>,
+    accounts: InitializePerpMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -14203,8 +14195,8 @@ pub struct DeleteInitializedPerpMarketKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&DeleteInitializedPerpMarketAccounts<'_, '_>> for DeleteInitializedPerpMarketKeys {
-    fn from(accounts: &DeleteInitializedPerpMarketAccounts) -> Self {
+impl From<DeleteInitializedPerpMarketAccounts<'_, '_>> for DeleteInitializedPerpMarketKeys {
+    fn from(accounts: DeleteInitializedPerpMarketAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -14212,10 +14204,10 @@ impl From<&DeleteInitializedPerpMarketAccounts<'_, '_>> for DeleteInitializedPer
         }
     }
 }
-impl From<&DeleteInitializedPerpMarketKeys>
+impl From<DeleteInitializedPerpMarketKeys>
     for [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeleteInitializedPerpMarketKeys) -> Self {
+    fn from(keys: DeleteInitializedPerpMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -14246,10 +14238,10 @@ impl From<[Pubkey; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeleteInitializedPerpMarketAccounts<'_, 'info>>
+impl<'info> From<DeleteInitializedPerpMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeleteInitializedPerpMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -14319,7 +14311,7 @@ pub fn delete_initialized_perp_market_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeleteInitializedPerpMarketKeys = accounts.into();
-    let metas: [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DeleteInitializedPerpMarketIxArgs = args.into();
     let data: DeleteInitializedPerpMarketIxData = args_full.into();
     Ok(Instruction {
@@ -14329,7 +14321,7 @@ pub fn delete_initialized_perp_market_ix<
     })
 }
 pub fn delete_initialized_perp_market_invoke<'info, A: Into<DeleteInitializedPerpMarketIxArgs>>(
-    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>,
+    accounts: DeleteInitializedPerpMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = delete_initialized_perp_market_ix(accounts, args)?;
@@ -14341,7 +14333,7 @@ pub fn delete_initialized_perp_market_invoke_signed<
     'info,
     A: Into<DeleteInitializedPerpMarketIxArgs>,
 >(
-    accounts: &DeleteInitializedPerpMarketAccounts<'_, 'info>,
+    accounts: DeleteInitializedPerpMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -14351,22 +14343,22 @@ pub fn delete_initialized_perp_market_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn delete_initialized_perp_market_verify_account_keys(
-    accounts: &DeleteInitializedPerpMarketAccounts<'_, '_>,
-    keys: &DeleteInitializedPerpMarketKeys,
+    accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
+    keys: DeleteInitializedPerpMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn delete_initialized_perp_market_verify_account_privileges<'me, 'info>(
-    accounts: &DeleteInitializedPerpMarketAccounts<'me, 'info>,
+    accounts: DeleteInitializedPerpMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -14393,8 +14385,8 @@ pub struct MoveAmmPriceKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&MoveAmmPriceAccounts<'_, '_>> for MoveAmmPriceKeys {
-    fn from(accounts: &MoveAmmPriceAccounts) -> Self {
+impl From<MoveAmmPriceAccounts<'_, '_>> for MoveAmmPriceKeys {
+    fn from(accounts: MoveAmmPriceAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -14402,8 +14394,8 @@ impl From<&MoveAmmPriceAccounts<'_, '_>> for MoveAmmPriceKeys {
         }
     }
 }
-impl From<&MoveAmmPriceKeys> for [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &MoveAmmPriceKeys) -> Self {
+impl From<MoveAmmPriceKeys> for [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] {
+    fn from(keys: MoveAmmPriceKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -14432,10 +14424,10 @@ impl From<[Pubkey; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]> for MoveAmmPriceKeys {
         }
     }
 }
-impl<'info> From<&MoveAmmPriceAccounts<'_, 'info>>
+impl<'info> From<MoveAmmPriceAccounts<'_, 'info>>
     for [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &MoveAmmPriceAccounts<'_, 'info>) -> Self {
+    fn from(accounts: MoveAmmPriceAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -14500,7 +14492,7 @@ pub fn move_amm_price_ix<K: Into<MoveAmmPriceKeys>, A: Into<MoveAmmPriceIxArgs>>
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: MoveAmmPriceKeys = accounts.into();
-    let metas: [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: MoveAmmPriceIxArgs = args.into();
     let data: MoveAmmPriceIxData = args_full.into();
     Ok(Instruction {
@@ -14510,7 +14502,7 @@ pub fn move_amm_price_ix<K: Into<MoveAmmPriceKeys>, A: Into<MoveAmmPriceIxArgs>>
     })
 }
 pub fn move_amm_price_invoke<'info, A: Into<MoveAmmPriceIxArgs>>(
-    accounts: &MoveAmmPriceAccounts<'_, 'info>,
+    accounts: MoveAmmPriceAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = move_amm_price_ix(accounts, args)?;
@@ -14518,7 +14510,7 @@ pub fn move_amm_price_invoke<'info, A: Into<MoveAmmPriceIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
-    accounts: &MoveAmmPriceAccounts<'_, 'info>,
+    accounts: MoveAmmPriceAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -14527,22 +14519,22 @@ pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn move_amm_price_verify_account_keys(
-    accounts: &MoveAmmPriceAccounts<'_, '_>,
-    keys: &MoveAmmPriceKeys,
+    accounts: MoveAmmPriceAccounts<'_, '_>,
+    keys: MoveAmmPriceKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn move_amm_price_verify_account_privileges<'me, 'info>(
-    accounts: &MoveAmmPriceAccounts<'me, 'info>,
+    accounts: MoveAmmPriceAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -14569,8 +14561,8 @@ pub struct UpdatePerpMarketExpiryKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketExpiryAccounts<'_, '_>> for UpdatePerpMarketExpiryKeys {
-    fn from(accounts: &UpdatePerpMarketExpiryAccounts) -> Self {
+impl From<UpdatePerpMarketExpiryAccounts<'_, '_>> for UpdatePerpMarketExpiryKeys {
+    fn from(accounts: UpdatePerpMarketExpiryAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -14578,10 +14570,8 @@ impl From<&UpdatePerpMarketExpiryAccounts<'_, '_>> for UpdatePerpMarketExpiryKey
         }
     }
 }
-impl From<&UpdatePerpMarketExpiryKeys>
-    for [AccountMeta; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdatePerpMarketExpiryKeys) -> Self {
+impl From<UpdatePerpMarketExpiryKeys> for [AccountMeta; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdatePerpMarketExpiryKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -14610,10 +14600,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]> for UpdatePerpMar
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketExpiryAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketExpiryAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketExpiryAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -14681,7 +14671,7 @@ pub fn update_perp_market_expiry_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketExpiryKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketExpiryIxArgs = args.into();
     let data: UpdatePerpMarketExpiryIxData = args_full.into();
     Ok(Instruction {
@@ -14691,7 +14681,7 @@ pub fn update_perp_market_expiry_ix<
     })
 }
 pub fn update_perp_market_expiry_invoke<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
-    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketExpiryAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_expiry_ix(accounts, args)?;
@@ -14700,7 +14690,7 @@ pub fn update_perp_market_expiry_invoke<'info, A: Into<UpdatePerpMarketExpiryIxA
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
-    accounts: &UpdatePerpMarketExpiryAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketExpiryAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -14710,22 +14700,22 @@ pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketEx
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_expiry_verify_account_keys(
-    accounts: &UpdatePerpMarketExpiryAccounts<'_, '_>,
-    keys: &UpdatePerpMarketExpiryKeys,
+    accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
+    keys: UpdatePerpMarketExpiryKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_expiry_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketExpiryAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketExpiryAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -14754,10 +14744,10 @@ pub struct SettleExpiredMarketPoolsToRevenuePoolKeys {
     pub spot_market: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>>
+impl From<SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>>
     for SettleExpiredMarketPoolsToRevenuePoolKeys
 {
-    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts) -> Self {
+    fn from(accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             admin: *accounts.admin.key,
@@ -14766,10 +14756,10 @@ impl From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>>
         }
     }
 }
-impl From<&SettleExpiredMarketPoolsToRevenuePoolKeys>
+impl From<SettleExpiredMarketPoolsToRevenuePoolKeys>
     for [AccountMeta; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &SettleExpiredMarketPoolsToRevenuePoolKeys) -> Self {
+    fn from(keys: SettleExpiredMarketPoolsToRevenuePoolKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -14808,10 +14798,10 @@ impl From<[Pubkey; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>>
+impl<'info> From<SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>>
     for [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.admin.clone(),
@@ -14871,7 +14861,7 @@ pub fn settle_expired_market_pools_to_revenue_pool_ix<
 ) -> std::io::Result<Instruction> {
     let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -14879,7 +14869,7 @@ pub fn settle_expired_market_pools_to_revenue_pool_ix<
     })
 }
 pub fn settle_expired_market_pools_to_revenue_pool_invoke<'info>(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
@@ -14887,7 +14877,7 @@ pub fn settle_expired_market_pools_to_revenue_pool_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<'info>(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
@@ -14896,23 +14886,23 @@ pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn settle_expired_market_pools_to_revenue_pool_verify_account_keys(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
-    keys: &SettleExpiredMarketPoolsToRevenuePoolKeys,
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
+    keys: SettleExpiredMarketPoolsToRevenuePoolKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.admin.key, &keys.admin),
-        (accounts.spot_market.key, &keys.spot_market),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.state.key, keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.spot_market.key, keys.spot_market),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn settle_expired_market_pools_to_revenue_pool_verify_account_privileges<'me, 'info>(
-    accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>,
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market, accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -14949,8 +14939,8 @@ pub struct DepositIntoPerpMarketFeePoolKeys {
     pub spot_market_vault: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&DepositIntoPerpMarketFeePoolAccounts<'_, '_>> for DepositIntoPerpMarketFeePoolKeys {
-    fn from(accounts: &DepositIntoPerpMarketFeePoolAccounts) -> Self {
+impl From<DepositIntoPerpMarketFeePoolAccounts<'_, '_>> for DepositIntoPerpMarketFeePoolKeys {
+    fn from(accounts: DepositIntoPerpMarketFeePoolAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -14963,10 +14953,10 @@ impl From<&DepositIntoPerpMarketFeePoolAccounts<'_, '_>> for DepositIntoPerpMark
         }
     }
 }
-impl From<&DepositIntoPerpMarketFeePoolKeys>
+impl From<DepositIntoPerpMarketFeePoolKeys>
     for [AccountMeta; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DepositIntoPerpMarketFeePoolKeys) -> Self {
+    fn from(keys: DepositIntoPerpMarketFeePoolKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -15027,10 +15017,10 @@ impl From<[Pubkey; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DepositIntoPerpMarketFeePoolAccounts<'_, 'info>>
+impl<'info> From<DepositIntoPerpMarketFeePoolAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DepositIntoPerpMarketFeePoolAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -15110,7 +15100,7 @@ pub fn deposit_into_perp_market_fee_pool_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
-    let metas: [AccountMeta; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DepositIntoPerpMarketFeePoolIxArgs = args.into();
     let data: DepositIntoPerpMarketFeePoolIxData = args_full.into();
     Ok(Instruction {
@@ -15123,7 +15113,7 @@ pub fn deposit_into_perp_market_fee_pool_invoke<
     'info,
     A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
 >(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deposit_into_perp_market_fee_pool_ix(accounts, args)?;
@@ -15135,7 +15125,7 @@ pub fn deposit_into_perp_market_fee_pool_invoke_signed<
     'info,
     A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
 >(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -15145,27 +15135,27 @@ pub fn deposit_into_perp_market_fee_pool_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deposit_into_perp_market_fee_pool_verify_account_keys(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
-    keys: &DepositIntoPerpMarketFeePoolKeys,
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
+    keys: DepositIntoPerpMarketFeePoolKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.admin.key, &keys.admin),
-        (accounts.source_vault.key, &keys.source_vault),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.quote_spot_market.key, &keys.quote_spot_market),
-        (accounts.spot_market_vault.key, &keys.spot_market_vault),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.source_vault.key, keys.source_vault),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.quote_spot_market.key, keys.quote_spot_market),
+        (*accounts.spot_market_vault.key, keys.spot_market_vault),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn deposit_into_perp_market_fee_pool_verify_account_privileges<'me, 'info>(
-    accounts: &DepositIntoPerpMarketFeePoolAccounts<'me, 'info>,
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.state,
@@ -15200,8 +15190,8 @@ pub struct RepegAmmCurveKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&RepegAmmCurveAccounts<'_, '_>> for RepegAmmCurveKeys {
-    fn from(accounts: &RepegAmmCurveAccounts) -> Self {
+impl From<RepegAmmCurveAccounts<'_, '_>> for RepegAmmCurveKeys {
+    fn from(accounts: RepegAmmCurveAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -15210,8 +15200,8 @@ impl From<&RepegAmmCurveAccounts<'_, '_>> for RepegAmmCurveKeys {
         }
     }
 }
-impl From<&RepegAmmCurveKeys> for [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RepegAmmCurveKeys) -> Self {
+impl From<RepegAmmCurveKeys> for [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] {
+    fn from(keys: RepegAmmCurveKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -15246,10 +15236,10 @@ impl From<[Pubkey; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]> for RepegAmmCurveKeys {
         }
     }
 }
-impl<'info> From<&RepegAmmCurveAccounts<'_, 'info>>
+impl<'info> From<RepegAmmCurveAccounts<'_, 'info>>
     for [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RepegAmmCurveAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RepegAmmCurveAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -15314,7 +15304,7 @@ pub fn repeg_amm_curve_ix<K: Into<RepegAmmCurveKeys>, A: Into<RepegAmmCurveIxArg
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RepegAmmCurveKeys = accounts.into();
-    let metas: [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: RepegAmmCurveIxArgs = args.into();
     let data: RepegAmmCurveIxData = args_full.into();
     Ok(Instruction {
@@ -15324,7 +15314,7 @@ pub fn repeg_amm_curve_ix<K: Into<RepegAmmCurveKeys>, A: Into<RepegAmmCurveIxArg
     })
 }
 pub fn repeg_amm_curve_invoke<'info, A: Into<RepegAmmCurveIxArgs>>(
-    accounts: &RepegAmmCurveAccounts<'_, 'info>,
+    accounts: RepegAmmCurveAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = repeg_amm_curve_ix(accounts, args)?;
@@ -15332,7 +15322,7 @@ pub fn repeg_amm_curve_invoke<'info, A: Into<RepegAmmCurveIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
-    accounts: &RepegAmmCurveAccounts<'_, 'info>,
+    accounts: RepegAmmCurveAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -15341,23 +15331,23 @@ pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn repeg_amm_curve_verify_account_keys(
-    accounts: &RepegAmmCurveAccounts<'_, '_>,
-    keys: &RepegAmmCurveKeys,
+    accounts: RepegAmmCurveAccounts<'_, '_>,
+    keys: RepegAmmCurveKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn repeg_amm_curve_verify_account_privileges<'me, 'info>(
-    accounts: &RepegAmmCurveAccounts<'me, 'info>,
+    accounts: RepegAmmCurveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -15386,8 +15376,8 @@ pub struct UpdatePerpMarketAmmOracleTwapKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>> for UpdatePerpMarketAmmOracleTwapKeys {
-    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts) -> Self {
+impl From<UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>> for UpdatePerpMarketAmmOracleTwapKeys {
+    fn from(accounts: UpdatePerpMarketAmmOracleTwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -15396,10 +15386,10 @@ impl From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>> for UpdatePerpMarketAm
         }
     }
 }
-impl From<&UpdatePerpMarketAmmOracleTwapKeys>
+impl From<UpdatePerpMarketAmmOracleTwapKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketAmmOracleTwapKeys) -> Self {
+    fn from(keys: UpdatePerpMarketAmmOracleTwapKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -15436,10 +15426,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -15495,7 +15485,7 @@ pub fn update_perp_market_amm_oracle_twap_ix<K: Into<UpdatePerpMarketAmmOracleTw
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -15503,7 +15493,7 @@ pub fn update_perp_market_amm_oracle_twap_ix<K: Into<UpdatePerpMarketAmmOracleTw
     })
 }
 pub fn update_perp_market_amm_oracle_twap_invoke<'info>(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
@@ -15511,7 +15501,7 @@ pub fn update_perp_market_amm_oracle_twap_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_amm_oracle_twap_invoke_signed<'info>(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
@@ -15520,23 +15510,23 @@ pub fn update_perp_market_amm_oracle_twap_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_amm_oracle_twap_verify_account_keys(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
-    keys: &UpdatePerpMarketAmmOracleTwapKeys,
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
+    keys: UpdatePerpMarketAmmOracleTwapKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -15565,8 +15555,8 @@ pub struct ResetPerpMarketAmmOracleTwapKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&ResetPerpMarketAmmOracleTwapAccounts<'_, '_>> for ResetPerpMarketAmmOracleTwapKeys {
-    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts) -> Self {
+impl From<ResetPerpMarketAmmOracleTwapAccounts<'_, '_>> for ResetPerpMarketAmmOracleTwapKeys {
+    fn from(accounts: ResetPerpMarketAmmOracleTwapAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -15575,10 +15565,10 @@ impl From<&ResetPerpMarketAmmOracleTwapAccounts<'_, '_>> for ResetPerpMarketAmmO
         }
     }
 }
-impl From<&ResetPerpMarketAmmOracleTwapKeys>
+impl From<ResetPerpMarketAmmOracleTwapKeys>
     for [AccountMeta; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &ResetPerpMarketAmmOracleTwapKeys) -> Self {
+    fn from(keys: ResetPerpMarketAmmOracleTwapKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -15615,10 +15605,10 @@ impl From<[Pubkey; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>>
+impl<'info> From<ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>>
     for [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -15674,7 +15664,7 @@ pub fn reset_perp_market_amm_oracle_twap_ix<K: Into<ResetPerpMarketAmmOracleTwap
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
-    let metas: [AccountMeta; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -15682,7 +15672,7 @@ pub fn reset_perp_market_amm_oracle_twap_ix<K: Into<ResetPerpMarketAmmOracleTwap
     })
 }
 pub fn reset_perp_market_amm_oracle_twap_invoke<'info>(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
@@ -15690,7 +15680,7 @@ pub fn reset_perp_market_amm_oracle_twap_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn reset_perp_market_amm_oracle_twap_invoke_signed<'info>(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
@@ -15699,23 +15689,23 @@ pub fn reset_perp_market_amm_oracle_twap_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn reset_perp_market_amm_oracle_twap_verify_account_keys(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
-    keys: &ResetPerpMarketAmmOracleTwapKeys,
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
+    keys: ResetPerpMarketAmmOracleTwapKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn reset_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
-    accounts: &ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>,
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -15744,8 +15734,8 @@ pub struct UpdateKKeys {
     pub perp_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl From<&UpdateKAccounts<'_, '_>> for UpdateKKeys {
-    fn from(accounts: &UpdateKAccounts) -> Self {
+impl From<UpdateKAccounts<'_, '_>> for UpdateKKeys {
+    fn from(accounts: UpdateKAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -15754,8 +15744,8 @@ impl From<&UpdateKAccounts<'_, '_>> for UpdateKKeys {
         }
     }
 }
-impl From<&UpdateKKeys> for [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateKKeys) -> Self {
+impl From<UpdateKKeys> for [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateKKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -15790,8 +15780,8 @@ impl From<[Pubkey; UPDATE_K_IX_ACCOUNTS_LEN]> for UpdateKKeys {
         }
     }
 }
-impl<'info> From<&UpdateKAccounts<'_, 'info>> for [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &UpdateKAccounts<'_, 'info>) -> Self {
+impl<'info> From<UpdateKAccounts<'_, 'info>> for [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] {
+    fn from(accounts: UpdateKAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -15856,7 +15846,7 @@ pub fn update_k_ix<K: Into<UpdateKKeys>, A: Into<UpdateKIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateKKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateKIxArgs = args.into();
     let data: UpdateKIxData = args_full.into();
     Ok(Instruction {
@@ -15866,7 +15856,7 @@ pub fn update_k_ix<K: Into<UpdateKKeys>, A: Into<UpdateKIxArgs>>(
     })
 }
 pub fn update_k_invoke<'info, A: Into<UpdateKIxArgs>>(
-    accounts: &UpdateKAccounts<'_, 'info>,
+    accounts: UpdateKAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_k_ix(accounts, args)?;
@@ -15874,7 +15864,7 @@ pub fn update_k_invoke<'info, A: Into<UpdateKIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
-    accounts: &UpdateKAccounts<'_, 'info>,
+    accounts: UpdateKAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -15883,23 +15873,23 @@ pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_k_verify_account_keys(
-    accounts: &UpdateKAccounts<'_, '_>,
-    keys: &UpdateKKeys,
+    accounts: UpdateKAccounts<'_, '_>,
+    keys: UpdateKKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_k_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateKAccounts<'me, 'info>,
+    accounts: UpdateKAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -15926,8 +15916,8 @@ pub struct UpdatePerpMarketMarginRatioKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMarginRatioAccounts<'_, '_>> for UpdatePerpMarketMarginRatioKeys {
-    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts) -> Self {
+impl From<UpdatePerpMarketMarginRatioAccounts<'_, '_>> for UpdatePerpMarketMarginRatioKeys {
+    fn from(accounts: UpdatePerpMarketMarginRatioAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -15935,10 +15925,10 @@ impl From<&UpdatePerpMarketMarginRatioAccounts<'_, '_>> for UpdatePerpMarketMarg
         }
     }
 }
-impl From<&UpdatePerpMarketMarginRatioKeys>
+impl From<UpdatePerpMarketMarginRatioKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMarginRatioKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMarginRatioKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -15969,10 +15959,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMarginRatioAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMarginRatioAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMarginRatioAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -16044,7 +16034,7 @@ pub fn update_perp_market_margin_ratio_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMarginRatioIxArgs = args.into();
     let data: UpdatePerpMarketMarginRatioIxData = args_full.into();
     Ok(Instruction {
@@ -16054,7 +16044,7 @@ pub fn update_perp_market_margin_ratio_ix<
     })
 }
 pub fn update_perp_market_margin_ratio_invoke<'info, A: Into<UpdatePerpMarketMarginRatioIxArgs>>(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_margin_ratio_ix(accounts, args)?;
@@ -16066,7 +16056,7 @@ pub fn update_perp_market_margin_ratio_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMarginRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -16076,22 +16066,22 @@ pub fn update_perp_market_margin_ratio_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_margin_ratio_verify_account_keys(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMarginRatioKeys,
+    accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
+    keys: UpdatePerpMarketMarginRatioKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_margin_ratio_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMarginRatioAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMarginRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -16118,8 +16108,8 @@ pub struct UpdatePerpMarketMaxImbalancesKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMaxImbalancesAccounts<'_, '_>> for UpdatePerpMarketMaxImbalancesKeys {
-    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts) -> Self {
+impl From<UpdatePerpMarketMaxImbalancesAccounts<'_, '_>> for UpdatePerpMarketMaxImbalancesKeys {
+    fn from(accounts: UpdatePerpMarketMaxImbalancesAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -16127,10 +16117,10 @@ impl From<&UpdatePerpMarketMaxImbalancesAccounts<'_, '_>> for UpdatePerpMarketMa
         }
     }
 }
-impl From<&UpdatePerpMarketMaxImbalancesKeys>
+impl From<UpdatePerpMarketMaxImbalancesKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMaxImbalancesKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMaxImbalancesKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -16161,10 +16151,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -16236,7 +16226,7 @@ pub fn update_perp_market_max_imbalances_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMaxImbalancesIxArgs = args.into();
     let data: UpdatePerpMarketMaxImbalancesIxData = args_full.into();
     Ok(Instruction {
@@ -16249,7 +16239,7 @@ pub fn update_perp_market_max_imbalances_invoke<
     'info,
     A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_imbalances_ix(accounts, args)?;
@@ -16261,7 +16251,7 @@ pub fn update_perp_market_max_imbalances_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -16271,22 +16261,22 @@ pub fn update_perp_market_max_imbalances_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_max_imbalances_verify_account_keys(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMaxImbalancesKeys,
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
+    keys: UpdatePerpMarketMaxImbalancesKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_max_imbalances_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -16313,8 +16303,8 @@ pub struct UpdatePerpMarketLiquidationFeeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketLiquidationFeeAccounts<'_, '_>> for UpdatePerpMarketLiquidationFeeKeys {
-    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts) -> Self {
+impl From<UpdatePerpMarketLiquidationFeeAccounts<'_, '_>> for UpdatePerpMarketLiquidationFeeKeys {
+    fn from(accounts: UpdatePerpMarketLiquidationFeeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -16322,10 +16312,10 @@ impl From<&UpdatePerpMarketLiquidationFeeAccounts<'_, '_>> for UpdatePerpMarketL
         }
     }
 }
-impl From<&UpdatePerpMarketLiquidationFeeKeys>
+impl From<UpdatePerpMarketLiquidationFeeKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketLiquidationFeeKeys) -> Self {
+    fn from(keys: UpdatePerpMarketLiquidationFeeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -16356,10 +16346,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -16430,7 +16420,7 @@ pub fn update_perp_market_liquidation_fee_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketLiquidationFeeIxArgs = args.into();
     let data: UpdatePerpMarketLiquidationFeeIxData = args_full.into();
     Ok(Instruction {
@@ -16443,7 +16433,7 @@ pub fn update_perp_market_liquidation_fee_invoke<
     'info,
     A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_liquidation_fee_ix(accounts, args)?;
@@ -16455,7 +16445,7 @@ pub fn update_perp_market_liquidation_fee_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -16465,22 +16455,22 @@ pub fn update_perp_market_liquidation_fee_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_liquidation_fee_verify_account_keys(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
-    keys: &UpdatePerpMarketLiquidationFeeKeys,
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
+    keys: UpdatePerpMarketLiquidationFeeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_liquidation_fee_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -16507,10 +16497,10 @@ pub struct UpdateInsuranceFundUnstakingPeriodKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>>
+impl From<UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>>
     for UpdateInsuranceFundUnstakingPeriodKeys
 {
-    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts) -> Self {
+    fn from(accounts: UpdateInsuranceFundUnstakingPeriodAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -16518,10 +16508,10 @@ impl From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateInsuranceFundUnstakingPeriodKeys>
+impl From<UpdateInsuranceFundUnstakingPeriodKeys>
     for [AccountMeta; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateInsuranceFundUnstakingPeriodKeys) -> Self {
+    fn from(keys: UpdateInsuranceFundUnstakingPeriodKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -16552,10 +16542,10 @@ impl From<[Pubkey; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>>
+impl<'info> From<UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -16627,8 +16617,7 @@ pub fn update_insurance_fund_unstaking_period_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateInsuranceFundUnstakingPeriodIxArgs = args.into();
     let data: UpdateInsuranceFundUnstakingPeriodIxData = args_full.into();
     Ok(Instruction {
@@ -16641,7 +16630,7 @@ pub fn update_insurance_fund_unstaking_period_invoke<
     'info,
     A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
 >(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_insurance_fund_unstaking_period_ix(accounts, args)?;
@@ -16653,7 +16642,7 @@ pub fn update_insurance_fund_unstaking_period_invoke_signed<
     'info,
     A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
 >(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -16663,22 +16652,22 @@ pub fn update_insurance_fund_unstaking_period_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_insurance_fund_unstaking_period_verify_account_keys(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
-    keys: &UpdateInsuranceFundUnstakingPeriodKeys,
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
+    keys: UpdateInsuranceFundUnstakingPeriodKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_insurance_fund_unstaking_period_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>,
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -16705,8 +16694,8 @@ pub struct UpdateSpotMarketLiquidationFeeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketLiquidationFeeAccounts<'_, '_>> for UpdateSpotMarketLiquidationFeeKeys {
-    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts) -> Self {
+impl From<UpdateSpotMarketLiquidationFeeAccounts<'_, '_>> for UpdateSpotMarketLiquidationFeeKeys {
+    fn from(accounts: UpdateSpotMarketLiquidationFeeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -16714,10 +16703,10 @@ impl From<&UpdateSpotMarketLiquidationFeeAccounts<'_, '_>> for UpdateSpotMarketL
         }
     }
 }
-impl From<&UpdateSpotMarketLiquidationFeeKeys>
+impl From<UpdateSpotMarketLiquidationFeeKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketLiquidationFeeKeys) -> Self {
+    fn from(keys: UpdateSpotMarketLiquidationFeeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -16748,10 +16737,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -16823,7 +16812,7 @@ pub fn update_spot_market_liquidation_fee_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketLiquidationFeeIxArgs = args.into();
     let data: UpdateSpotMarketLiquidationFeeIxData = args_full.into();
     Ok(Instruction {
@@ -16836,7 +16825,7 @@ pub fn update_spot_market_liquidation_fee_invoke<
     'info,
     A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_liquidation_fee_ix(accounts, args)?;
@@ -16848,7 +16837,7 @@ pub fn update_spot_market_liquidation_fee_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -16858,22 +16847,22 @@ pub fn update_spot_market_liquidation_fee_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_liquidation_fee_verify_account_keys(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
-    keys: &UpdateSpotMarketLiquidationFeeKeys,
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
+    keys: UpdateSpotMarketLiquidationFeeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_liquidation_fee_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -16900,8 +16889,8 @@ pub struct UpdateWithdrawGuardThresholdKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateWithdrawGuardThresholdAccounts<'_, '_>> for UpdateWithdrawGuardThresholdKeys {
-    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts) -> Self {
+impl From<UpdateWithdrawGuardThresholdAccounts<'_, '_>> for UpdateWithdrawGuardThresholdKeys {
+    fn from(accounts: UpdateWithdrawGuardThresholdAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -16909,10 +16898,10 @@ impl From<&UpdateWithdrawGuardThresholdAccounts<'_, '_>> for UpdateWithdrawGuard
         }
     }
 }
-impl From<&UpdateWithdrawGuardThresholdKeys>
+impl From<UpdateWithdrawGuardThresholdKeys>
     for [AccountMeta; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateWithdrawGuardThresholdKeys) -> Self {
+    fn from(keys: UpdateWithdrawGuardThresholdKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -16943,10 +16932,10 @@ impl From<[Pubkey; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateWithdrawGuardThresholdAccounts<'_, 'info>>
+impl<'info> From<UpdateWithdrawGuardThresholdAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateWithdrawGuardThresholdAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17016,7 +17005,7 @@ pub fn update_withdraw_guard_threshold_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateWithdrawGuardThresholdIxArgs = args.into();
     let data: UpdateWithdrawGuardThresholdIxData = args_full.into();
     Ok(Instruction {
@@ -17029,7 +17018,7 @@ pub fn update_withdraw_guard_threshold_invoke<
     'info,
     A: Into<UpdateWithdrawGuardThresholdIxArgs>,
 >(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
+    accounts: UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_withdraw_guard_threshold_ix(accounts, args)?;
@@ -17041,7 +17030,7 @@ pub fn update_withdraw_guard_threshold_invoke_signed<
     'info,
     A: Into<UpdateWithdrawGuardThresholdIxArgs>,
 >(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
+    accounts: UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -17051,22 +17040,22 @@ pub fn update_withdraw_guard_threshold_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_withdraw_guard_threshold_verify_account_keys(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'_, '_>,
-    keys: &UpdateWithdrawGuardThresholdKeys,
+    accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
+    keys: UpdateWithdrawGuardThresholdKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_withdraw_guard_threshold_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateWithdrawGuardThresholdAccounts<'me, 'info>,
+    accounts: UpdateWithdrawGuardThresholdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -17093,8 +17082,8 @@ pub struct UpdateSpotMarketIfFactorKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketIfFactorAccounts<'_, '_>> for UpdateSpotMarketIfFactorKeys {
-    fn from(accounts: &UpdateSpotMarketIfFactorAccounts) -> Self {
+impl From<UpdateSpotMarketIfFactorAccounts<'_, '_>> for UpdateSpotMarketIfFactorKeys {
+    fn from(accounts: UpdateSpotMarketIfFactorAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -17102,10 +17091,10 @@ impl From<&UpdateSpotMarketIfFactorAccounts<'_, '_>> for UpdateSpotMarketIfFacto
         }
     }
 }
-impl From<&UpdateSpotMarketIfFactorKeys>
+impl From<UpdateSpotMarketIfFactorKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketIfFactorKeys) -> Self {
+    fn from(keys: UpdateSpotMarketIfFactorKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -17134,10 +17123,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]> for UpdateSpot
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketIfFactorAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketIfFactorAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketIfFactorAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17207,7 +17196,7 @@ pub fn update_spot_market_if_factor_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketIfFactorIxArgs = args.into();
     let data: UpdateSpotMarketIfFactorIxData = args_full.into();
     Ok(Instruction {
@@ -17217,7 +17206,7 @@ pub fn update_spot_market_if_factor_ix<
     })
 }
 pub fn update_spot_market_if_factor_invoke<'info, A: Into<UpdateSpotMarketIfFactorIxArgs>>(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketIfFactorAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_if_factor_ix(accounts, args)?;
@@ -17229,7 +17218,7 @@ pub fn update_spot_market_if_factor_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketIfFactorIxArgs>,
 >(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketIfFactorAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -17239,22 +17228,22 @@ pub fn update_spot_market_if_factor_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_if_factor_verify_account_keys(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'_, '_>,
-    keys: &UpdateSpotMarketIfFactorKeys,
+    accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
+    keys: UpdateSpotMarketIfFactorKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_if_factor_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketIfFactorAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketIfFactorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -17281,10 +17270,10 @@ pub struct UpdateSpotMarketRevenueSettlePeriodKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>>
+impl From<UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>>
     for UpdateSpotMarketRevenueSettlePeriodKeys
 {
-    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts) -> Self {
+    fn from(accounts: UpdateSpotMarketRevenueSettlePeriodAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -17292,10 +17281,10 @@ impl From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateSpotMarketRevenueSettlePeriodKeys>
+impl From<UpdateSpotMarketRevenueSettlePeriodKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketRevenueSettlePeriodKeys) -> Self {
+    fn from(keys: UpdateSpotMarketRevenueSettlePeriodKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -17326,10 +17315,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17402,7 +17391,7 @@ pub fn update_spot_market_revenue_settle_period_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdateSpotMarketRevenueSettlePeriodIxArgs = args.into();
     let data: UpdateSpotMarketRevenueSettlePeriodIxData = args_full.into();
     Ok(Instruction {
@@ -17415,7 +17404,7 @@ pub fn update_spot_market_revenue_settle_period_invoke<
     'info,
     A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
 >(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_revenue_settle_period_ix(accounts, args)?;
@@ -17427,7 +17416,7 @@ pub fn update_spot_market_revenue_settle_period_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
 >(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -17437,22 +17426,22 @@ pub fn update_spot_market_revenue_settle_period_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_revenue_settle_period_verify_account_keys(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
-    keys: &UpdateSpotMarketRevenueSettlePeriodKeys,
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
+    keys: UpdateSpotMarketRevenueSettlePeriodKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_revenue_settle_period_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -17479,8 +17468,8 @@ pub struct UpdateSpotMarketStatusKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketStatusAccounts<'_, '_>> for UpdateSpotMarketStatusKeys {
-    fn from(accounts: &UpdateSpotMarketStatusAccounts) -> Self {
+impl From<UpdateSpotMarketStatusAccounts<'_, '_>> for UpdateSpotMarketStatusKeys {
+    fn from(accounts: UpdateSpotMarketStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -17488,10 +17477,8 @@ impl From<&UpdateSpotMarketStatusAccounts<'_, '_>> for UpdateSpotMarketStatusKey
         }
     }
 }
-impl From<&UpdateSpotMarketStatusKeys>
-    for [AccountMeta; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdateSpotMarketStatusKeys) -> Self {
+impl From<UpdateSpotMarketStatusKeys> for [AccountMeta; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSpotMarketStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -17520,10 +17507,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]> for UpdateSpotMar
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketStatusAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17591,7 +17578,7 @@ pub fn update_spot_market_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketStatusKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketStatusIxArgs = args.into();
     let data: UpdateSpotMarketStatusIxData = args_full.into();
     Ok(Instruction {
@@ -17601,7 +17588,7 @@ pub fn update_spot_market_status_ix<
     })
 }
 pub fn update_spot_market_status_invoke<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
-    accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_status_ix(accounts, args)?;
@@ -17610,7 +17597,7 @@ pub fn update_spot_market_status_invoke<'info, A: Into<UpdateSpotMarketStatusIxA
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
-    accounts: &UpdateSpotMarketStatusAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -17620,22 +17607,22 @@ pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketSt
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_status_verify_account_keys(
-    accounts: &UpdateSpotMarketStatusAccounts<'_, '_>,
-    keys: &UpdateSpotMarketStatusKeys,
+    accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
+    keys: UpdateSpotMarketStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_status_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketStatusAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -17662,8 +17649,8 @@ pub struct UpdateSpotMarketAssetTierKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketAssetTierAccounts<'_, '_>> for UpdateSpotMarketAssetTierKeys {
-    fn from(accounts: &UpdateSpotMarketAssetTierAccounts) -> Self {
+impl From<UpdateSpotMarketAssetTierAccounts<'_, '_>> for UpdateSpotMarketAssetTierKeys {
+    fn from(accounts: UpdateSpotMarketAssetTierAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -17671,10 +17658,10 @@ impl From<&UpdateSpotMarketAssetTierAccounts<'_, '_>> for UpdateSpotMarketAssetT
         }
     }
 }
-impl From<&UpdateSpotMarketAssetTierKeys>
+impl From<UpdateSpotMarketAssetTierKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketAssetTierKeys) -> Self {
+    fn from(keys: UpdateSpotMarketAssetTierKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -17705,10 +17692,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketAssetTierAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketAssetTierAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketAssetTierAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17776,7 +17763,7 @@ pub fn update_spot_market_asset_tier_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketAssetTierIxArgs = args.into();
     let data: UpdateSpotMarketAssetTierIxData = args_full.into();
     Ok(Instruction {
@@ -17786,7 +17773,7 @@ pub fn update_spot_market_asset_tier_ix<
     })
 }
 pub fn update_spot_market_asset_tier_invoke<'info, A: Into<UpdateSpotMarketAssetTierIxArgs>>(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketAssetTierAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_asset_tier_ix(accounts, args)?;
@@ -17798,7 +17785,7 @@ pub fn update_spot_market_asset_tier_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketAssetTierIxArgs>,
 >(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketAssetTierAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -17808,22 +17795,22 @@ pub fn update_spot_market_asset_tier_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_asset_tier_verify_account_keys(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'_, '_>,
-    keys: &UpdateSpotMarketAssetTierKeys,
+    accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
+    keys: UpdateSpotMarketAssetTierKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_asset_tier_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketAssetTierAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketAssetTierAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -17850,8 +17837,8 @@ pub struct UpdateSpotMarketMarginWeightsKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketMarginWeightsAccounts<'_, '_>> for UpdateSpotMarketMarginWeightsKeys {
-    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts) -> Self {
+impl From<UpdateSpotMarketMarginWeightsAccounts<'_, '_>> for UpdateSpotMarketMarginWeightsKeys {
+    fn from(accounts: UpdateSpotMarketMarginWeightsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -17859,10 +17846,10 @@ impl From<&UpdateSpotMarketMarginWeightsAccounts<'_, '_>> for UpdateSpotMarketMa
         }
     }
 }
-impl From<&UpdateSpotMarketMarginWeightsKeys>
+impl From<UpdateSpotMarketMarginWeightsKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketMarginWeightsKeys) -> Self {
+    fn from(keys: UpdateSpotMarketMarginWeightsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -17893,10 +17880,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketMarginWeightsAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketMarginWeightsAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketMarginWeightsAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -17970,7 +17957,7 @@ pub fn update_spot_market_margin_weights_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketMarginWeightsIxArgs = args.into();
     let data: UpdateSpotMarketMarginWeightsIxData = args_full.into();
     Ok(Instruction {
@@ -17983,7 +17970,7 @@ pub fn update_spot_market_margin_weights_invoke<
     'info,
     A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_margin_weights_ix(accounts, args)?;
@@ -17995,7 +17982,7 @@ pub fn update_spot_market_margin_weights_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18005,22 +17992,22 @@ pub fn update_spot_market_margin_weights_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_margin_weights_verify_account_keys(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
-    keys: &UpdateSpotMarketMarginWeightsKeys,
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
+    keys: UpdateSpotMarketMarginWeightsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_margin_weights_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketMarginWeightsAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -18047,8 +18034,8 @@ pub struct UpdateSpotMarketBorrowRateKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketBorrowRateAccounts<'_, '_>> for UpdateSpotMarketBorrowRateKeys {
-    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts) -> Self {
+impl From<UpdateSpotMarketBorrowRateAccounts<'_, '_>> for UpdateSpotMarketBorrowRateKeys {
+    fn from(accounts: UpdateSpotMarketBorrowRateAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -18056,10 +18043,10 @@ impl From<&UpdateSpotMarketBorrowRateAccounts<'_, '_>> for UpdateSpotMarketBorro
         }
     }
 }
-impl From<&UpdateSpotMarketBorrowRateKeys>
+impl From<UpdateSpotMarketBorrowRateKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketBorrowRateKeys) -> Self {
+    fn from(keys: UpdateSpotMarketBorrowRateKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -18090,10 +18077,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketBorrowRateAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketBorrowRateAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketBorrowRateAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -18165,7 +18152,7 @@ pub fn update_spot_market_borrow_rate_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketBorrowRateIxArgs = args.into();
     let data: UpdateSpotMarketBorrowRateIxData = args_full.into();
     Ok(Instruction {
@@ -18175,7 +18162,7 @@ pub fn update_spot_market_borrow_rate_ix<
     })
 }
 pub fn update_spot_market_borrow_rate_invoke<'info, A: Into<UpdateSpotMarketBorrowRateIxArgs>>(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_borrow_rate_ix(accounts, args)?;
@@ -18187,7 +18174,7 @@ pub fn update_spot_market_borrow_rate_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketBorrowRateIxArgs>,
 >(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18197,22 +18184,22 @@ pub fn update_spot_market_borrow_rate_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_borrow_rate_verify_account_keys(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'_, '_>,
-    keys: &UpdateSpotMarketBorrowRateKeys,
+    accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
+    keys: UpdateSpotMarketBorrowRateKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_borrow_rate_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketBorrowRateAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketBorrowRateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -18239,10 +18226,10 @@ pub struct UpdateSpotMarketMaxTokenDepositsKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>>
+impl From<UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>>
     for UpdateSpotMarketMaxTokenDepositsKeys
 {
-    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts) -> Self {
+    fn from(accounts: UpdateSpotMarketMaxTokenDepositsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -18250,10 +18237,10 @@ impl From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateSpotMarketMaxTokenDepositsKeys>
+impl From<UpdateSpotMarketMaxTokenDepositsKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketMaxTokenDepositsKeys) -> Self {
+    fn from(keys: UpdateSpotMarketMaxTokenDepositsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -18284,10 +18271,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -18359,8 +18346,7 @@ pub fn update_spot_market_max_token_deposits_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketMaxTokenDepositsIxArgs = args.into();
     let data: UpdateSpotMarketMaxTokenDepositsIxData = args_full.into();
     Ok(Instruction {
@@ -18373,7 +18359,7 @@ pub fn update_spot_market_max_token_deposits_invoke<
     'info,
     A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_max_token_deposits_ix(accounts, args)?;
@@ -18385,7 +18371,7 @@ pub fn update_spot_market_max_token_deposits_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18395,22 +18381,22 @@ pub fn update_spot_market_max_token_deposits_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_max_token_deposits_verify_account_keys(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
-    keys: &UpdateSpotMarketMaxTokenDepositsKeys,
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
+    keys: UpdateSpotMarketMaxTokenDepositsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_max_token_deposits_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -18439,8 +18425,8 @@ pub struct UpdateSpotMarketOracleKeys {
     pub spot_market: Pubkey,
     pub oracle: Pubkey,
 }
-impl From<&UpdateSpotMarketOracleAccounts<'_, '_>> for UpdateSpotMarketOracleKeys {
-    fn from(accounts: &UpdateSpotMarketOracleAccounts) -> Self {
+impl From<UpdateSpotMarketOracleAccounts<'_, '_>> for UpdateSpotMarketOracleKeys {
+    fn from(accounts: UpdateSpotMarketOracleAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -18449,10 +18435,8 @@ impl From<&UpdateSpotMarketOracleAccounts<'_, '_>> for UpdateSpotMarketOracleKey
         }
     }
 }
-impl From<&UpdateSpotMarketOracleKeys>
-    for [AccountMeta; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdateSpotMarketOracleKeys) -> Self {
+impl From<UpdateSpotMarketOracleKeys> for [AccountMeta; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSpotMarketOracleKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -18487,10 +18471,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]> for UpdateSpotMar
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketOracleAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketOracleAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketOracleAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -18561,7 +18545,7 @@ pub fn update_spot_market_oracle_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketOracleKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketOracleIxArgs = args.into();
     let data: UpdateSpotMarketOracleIxData = args_full.into();
     Ok(Instruction {
@@ -18571,7 +18555,7 @@ pub fn update_spot_market_oracle_ix<
     })
 }
 pub fn update_spot_market_oracle_invoke<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
-    accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketOracleAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_oracle_ix(accounts, args)?;
@@ -18580,7 +18564,7 @@ pub fn update_spot_market_oracle_invoke<'info, A: Into<UpdateSpotMarketOracleIxA
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
-    accounts: &UpdateSpotMarketOracleAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketOracleAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18590,23 +18574,23 @@ pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_oracle_verify_account_keys(
-    accounts: &UpdateSpotMarketOracleAccounts<'_, '_>,
-    keys: &UpdateSpotMarketOracleKeys,
+    accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
+    keys: UpdateSpotMarketOracleKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
-        (accounts.oracle.key, &keys.oracle),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
+        (*accounts.oracle.key, keys.oracle),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_oracle_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketOracleAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketOracleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -18633,10 +18617,10 @@ pub struct UpdateSpotMarketStepSizeAndTickSizeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>>
+impl From<UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>>
     for UpdateSpotMarketStepSizeAndTickSizeKeys
 {
-    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts) -> Self {
+    fn from(accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -18644,10 +18628,10 @@ impl From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdateSpotMarketStepSizeAndTickSizeKeys>
+impl From<UpdateSpotMarketStepSizeAndTickSizeKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketStepSizeAndTickSizeKeys) -> Self {
+    fn from(keys: UpdateSpotMarketStepSizeAndTickSizeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -18678,10 +18662,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -18755,7 +18739,7 @@ pub fn update_spot_market_step_size_and_tick_size_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdateSpotMarketStepSizeAndTickSizeIxArgs = args.into();
     let data: UpdateSpotMarketStepSizeAndTickSizeIxData = args_full.into();
     Ok(Instruction {
@@ -18768,7 +18752,7 @@ pub fn update_spot_market_step_size_and_tick_size_invoke<
     'info,
     A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_step_size_and_tick_size_ix(accounts, args)?;
@@ -18780,7 +18764,7 @@ pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18790,22 +18774,22 @@ pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_step_size_and_tick_size_verify_account_keys(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
-    keys: &UpdateSpotMarketStepSizeAndTickSizeKeys,
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    keys: UpdateSpotMarketStepSizeAndTickSizeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -18832,8 +18816,8 @@ pub struct UpdateSpotMarketMinOrderSizeKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketMinOrderSizeAccounts<'_, '_>> for UpdateSpotMarketMinOrderSizeKeys {
-    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts) -> Self {
+impl From<UpdateSpotMarketMinOrderSizeAccounts<'_, '_>> for UpdateSpotMarketMinOrderSizeKeys {
+    fn from(accounts: UpdateSpotMarketMinOrderSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -18841,10 +18825,10 @@ impl From<&UpdateSpotMarketMinOrderSizeAccounts<'_, '_>> for UpdateSpotMarketMin
         }
     }
 }
-impl From<&UpdateSpotMarketMinOrderSizeKeys>
+impl From<UpdateSpotMarketMinOrderSizeKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketMinOrderSizeKeys) -> Self {
+    fn from(keys: UpdateSpotMarketMinOrderSizeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -18875,10 +18859,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -18948,7 +18932,7 @@ pub fn update_spot_market_min_order_size_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketMinOrderSizeIxArgs = args.into();
     let data: UpdateSpotMarketMinOrderSizeIxData = args_full.into();
     Ok(Instruction {
@@ -18961,7 +18945,7 @@ pub fn update_spot_market_min_order_size_invoke<
     'info,
     A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_min_order_size_ix(accounts, args)?;
@@ -18973,7 +18957,7 @@ pub fn update_spot_market_min_order_size_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -18983,22 +18967,22 @@ pub fn update_spot_market_min_order_size_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_min_order_size_verify_account_keys(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
-    keys: &UpdateSpotMarketMinOrderSizeKeys,
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
+    keys: UpdateSpotMarketMinOrderSizeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_min_order_size_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -19025,8 +19009,8 @@ pub struct UpdateSpotMarketOrdersEnabledKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketOrdersEnabledAccounts<'_, '_>> for UpdateSpotMarketOrdersEnabledKeys {
-    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts) -> Self {
+impl From<UpdateSpotMarketOrdersEnabledAccounts<'_, '_>> for UpdateSpotMarketOrdersEnabledKeys {
+    fn from(accounts: UpdateSpotMarketOrdersEnabledAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19034,10 +19018,10 @@ impl From<&UpdateSpotMarketOrdersEnabledAccounts<'_, '_>> for UpdateSpotMarketOr
         }
     }
 }
-impl From<&UpdateSpotMarketOrdersEnabledKeys>
+impl From<UpdateSpotMarketOrdersEnabledKeys>
     for [AccountMeta; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotMarketOrdersEnabledKeys) -> Self {
+    fn from(keys: UpdateSpotMarketOrdersEnabledKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -19068,10 +19052,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -19142,7 +19126,7 @@ pub fn update_spot_market_orders_enabled_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketOrdersEnabledIxArgs = args.into();
     let data: UpdateSpotMarketOrdersEnabledIxData = args_full.into();
     Ok(Instruction {
@@ -19155,7 +19139,7 @@ pub fn update_spot_market_orders_enabled_invoke<
     'info,
     A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
 >(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_orders_enabled_ix(accounts, args)?;
@@ -19167,7 +19151,7 @@ pub fn update_spot_market_orders_enabled_invoke_signed<
     'info,
     A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
 >(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -19177,22 +19161,22 @@ pub fn update_spot_market_orders_enabled_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_orders_enabled_verify_account_keys(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
-    keys: &UpdateSpotMarketOrdersEnabledKeys,
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
+    keys: UpdateSpotMarketOrdersEnabledKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_orders_enabled_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -19219,8 +19203,8 @@ pub struct UpdateSpotMarketNameKeys {
     pub state: Pubkey,
     pub spot_market: Pubkey,
 }
-impl From<&UpdateSpotMarketNameAccounts<'_, '_>> for UpdateSpotMarketNameKeys {
-    fn from(accounts: &UpdateSpotMarketNameAccounts) -> Self {
+impl From<UpdateSpotMarketNameAccounts<'_, '_>> for UpdateSpotMarketNameKeys {
+    fn from(accounts: UpdateSpotMarketNameAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19228,8 +19212,8 @@ impl From<&UpdateSpotMarketNameAccounts<'_, '_>> for UpdateSpotMarketNameKeys {
         }
     }
 }
-impl From<&UpdateSpotMarketNameKeys> for [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateSpotMarketNameKeys) -> Self {
+impl From<UpdateSpotMarketNameKeys> for [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSpotMarketNameKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -19258,10 +19242,10 @@ impl From<[Pubkey; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]> for UpdateSpotMarke
         }
     }
 }
-impl<'info> From<&UpdateSpotMarketNameAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotMarketNameAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotMarketNameAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotMarketNameAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -19327,7 +19311,7 @@ pub fn update_spot_market_name_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketNameKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotMarketNameIxArgs = args.into();
     let data: UpdateSpotMarketNameIxData = args_full.into();
     Ok(Instruction {
@@ -19337,7 +19321,7 @@ pub fn update_spot_market_name_ix<
     })
 }
 pub fn update_spot_market_name_invoke<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
-    accounts: &UpdateSpotMarketNameAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_market_name_ix(accounts, args)?;
@@ -19346,7 +19330,7 @@ pub fn update_spot_market_name_invoke<'info, A: Into<UpdateSpotMarketNameIxArgs>
     invoke(&ix, &account_info)
 }
 pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
-    accounts: &UpdateSpotMarketNameAccounts<'_, 'info>,
+    accounts: UpdateSpotMarketNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -19356,22 +19340,22 @@ pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketName
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_market_name_verify_account_keys(
-    accounts: &UpdateSpotMarketNameAccounts<'_, '_>,
-    keys: &UpdateSpotMarketNameKeys,
+    accounts: UpdateSpotMarketNameAccounts<'_, '_>,
+    keys: UpdateSpotMarketNameKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_market_name_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotMarketNameAccounts<'me, 'info>,
+    accounts: UpdateSpotMarketNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
         if !should_be_writable.is_writable {
@@ -19398,8 +19382,8 @@ pub struct UpdatePerpMarketStatusKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketStatusAccounts<'_, '_>> for UpdatePerpMarketStatusKeys {
-    fn from(accounts: &UpdatePerpMarketStatusAccounts) -> Self {
+impl From<UpdatePerpMarketStatusAccounts<'_, '_>> for UpdatePerpMarketStatusKeys {
+    fn from(accounts: UpdatePerpMarketStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19407,10 +19391,8 @@ impl From<&UpdatePerpMarketStatusAccounts<'_, '_>> for UpdatePerpMarketStatusKey
         }
     }
 }
-impl From<&UpdatePerpMarketStatusKeys>
-    for [AccountMeta; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdatePerpMarketStatusKeys) -> Self {
+impl From<UpdatePerpMarketStatusKeys> for [AccountMeta; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdatePerpMarketStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -19439,10 +19421,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]> for UpdatePerpMar
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketStatusAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -19510,7 +19492,7 @@ pub fn update_perp_market_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketStatusKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketStatusIxArgs = args.into();
     let data: UpdatePerpMarketStatusIxData = args_full.into();
     Ok(Instruction {
@@ -19520,7 +19502,7 @@ pub fn update_perp_market_status_ix<
     })
 }
 pub fn update_perp_market_status_invoke<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
-    accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_status_ix(accounts, args)?;
@@ -19529,7 +19511,7 @@ pub fn update_perp_market_status_invoke<'info, A: Into<UpdatePerpMarketStatusIxA
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
-    accounts: &UpdatePerpMarketStatusAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -19539,22 +19521,22 @@ pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketSt
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_status_verify_account_keys(
-    accounts: &UpdatePerpMarketStatusAccounts<'_, '_>,
-    keys: &UpdatePerpMarketStatusKeys,
+    accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
+    keys: UpdatePerpMarketStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_status_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketStatusAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -19581,8 +19563,8 @@ pub struct UpdatePerpMarketContractTierKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketContractTierAccounts<'_, '_>> for UpdatePerpMarketContractTierKeys {
-    fn from(accounts: &UpdatePerpMarketContractTierAccounts) -> Self {
+impl From<UpdatePerpMarketContractTierAccounts<'_, '_>> for UpdatePerpMarketContractTierKeys {
+    fn from(accounts: UpdatePerpMarketContractTierAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19590,10 +19572,10 @@ impl From<&UpdatePerpMarketContractTierAccounts<'_, '_>> for UpdatePerpMarketCon
         }
     }
 }
-impl From<&UpdatePerpMarketContractTierKeys>
+impl From<UpdatePerpMarketContractTierKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketContractTierKeys) -> Self {
+    fn from(keys: UpdatePerpMarketContractTierKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -19624,10 +19606,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketContractTierAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketContractTierAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketContractTierAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -19698,7 +19680,7 @@ pub fn update_perp_market_contract_tier_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketContractTierKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketContractTierIxArgs = args.into();
     let data: UpdatePerpMarketContractTierIxData = args_full.into();
     Ok(Instruction {
@@ -19711,7 +19693,7 @@ pub fn update_perp_market_contract_tier_invoke<
     'info,
     A: Into<UpdatePerpMarketContractTierIxArgs>,
 >(
-    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketContractTierAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_contract_tier_ix(accounts, args)?;
@@ -19723,7 +19705,7 @@ pub fn update_perp_market_contract_tier_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketContractTierIxArgs>,
 >(
-    accounts: &UpdatePerpMarketContractTierAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketContractTierAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -19733,22 +19715,22 @@ pub fn update_perp_market_contract_tier_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_contract_tier_verify_account_keys(
-    accounts: &UpdatePerpMarketContractTierAccounts<'_, '_>,
-    keys: &UpdatePerpMarketContractTierKeys,
+    accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
+    keys: UpdatePerpMarketContractTierKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_contract_tier_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketContractTierAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketContractTierAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -19775,8 +19757,8 @@ pub struct UpdatePerpMarketImfFactorKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketImfFactorAccounts<'_, '_>> for UpdatePerpMarketImfFactorKeys {
-    fn from(accounts: &UpdatePerpMarketImfFactorAccounts) -> Self {
+impl From<UpdatePerpMarketImfFactorAccounts<'_, '_>> for UpdatePerpMarketImfFactorKeys {
+    fn from(accounts: UpdatePerpMarketImfFactorAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19784,10 +19766,10 @@ impl From<&UpdatePerpMarketImfFactorAccounts<'_, '_>> for UpdatePerpMarketImfFac
         }
     }
 }
-impl From<&UpdatePerpMarketImfFactorKeys>
+impl From<UpdatePerpMarketImfFactorKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketImfFactorKeys) -> Self {
+    fn from(keys: UpdatePerpMarketImfFactorKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -19818,10 +19800,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketImfFactorAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketImfFactorAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketImfFactorAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -19890,7 +19872,7 @@ pub fn update_perp_market_imf_factor_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketImfFactorIxArgs = args.into();
     let data: UpdatePerpMarketImfFactorIxData = args_full.into();
     Ok(Instruction {
@@ -19900,7 +19882,7 @@ pub fn update_perp_market_imf_factor_ix<
     })
 }
 pub fn update_perp_market_imf_factor_invoke<'info, A: Into<UpdatePerpMarketImfFactorIxArgs>>(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketImfFactorAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_imf_factor_ix(accounts, args)?;
@@ -19912,7 +19894,7 @@ pub fn update_perp_market_imf_factor_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketImfFactorIxArgs>,
 >(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketImfFactorAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -19922,22 +19904,22 @@ pub fn update_perp_market_imf_factor_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_imf_factor_verify_account_keys(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'_, '_>,
-    keys: &UpdatePerpMarketImfFactorKeys,
+    accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
+    keys: UpdatePerpMarketImfFactorKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_imf_factor_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketImfFactorAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketImfFactorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -19964,10 +19946,10 @@ pub struct UpdatePerpMarketUnrealizedAssetWeightKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>>
+impl From<UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>>
     for UpdatePerpMarketUnrealizedAssetWeightKeys
 {
-    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -19975,10 +19957,10 @@ impl From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketUnrealizedAssetWeightKeys>
+impl From<UpdatePerpMarketUnrealizedAssetWeightKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketUnrealizedAssetWeightKeys) -> Self {
+    fn from(keys: UpdatePerpMarketUnrealizedAssetWeightKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20009,10 +19991,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -20090,7 +20072,7 @@ pub fn update_perp_market_unrealized_asset_weight_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdatePerpMarketUnrealizedAssetWeightIxArgs = args.into();
     let data: UpdatePerpMarketUnrealizedAssetWeightIxData = args_full.into();
     Ok(Instruction {
@@ -20103,7 +20085,7 @@ pub fn update_perp_market_unrealized_asset_weight_invoke<
     'info,
     A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
 >(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_unrealized_asset_weight_ix(accounts, args)?;
@@ -20115,7 +20097,7 @@ pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
 >(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -20125,22 +20107,22 @@ pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_unrealized_asset_weight_verify_account_keys(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
-    keys: &UpdatePerpMarketUnrealizedAssetWeightKeys,
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
+    keys: UpdatePerpMarketUnrealizedAssetWeightKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_unrealized_asset_weight_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -20167,10 +20149,10 @@ pub struct UpdatePerpMarketConcentrationCoefKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketConcentrationCoefAccounts<'_, '_>>
+impl From<UpdatePerpMarketConcentrationCoefAccounts<'_, '_>>
     for UpdatePerpMarketConcentrationCoefKeys
 {
-    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketConcentrationCoefAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -20178,10 +20160,10 @@ impl From<&UpdatePerpMarketConcentrationCoefAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketConcentrationCoefKeys>
+impl From<UpdatePerpMarketConcentrationCoefKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketConcentrationCoefKeys) -> Self {
+    fn from(keys: UpdatePerpMarketConcentrationCoefKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20212,10 +20194,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -20287,8 +20269,7 @@ pub fn update_perp_market_concentration_coef_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketConcentrationCoefIxArgs = args.into();
     let data: UpdatePerpMarketConcentrationCoefIxData = args_full.into();
     Ok(Instruction {
@@ -20301,7 +20282,7 @@ pub fn update_perp_market_concentration_coef_invoke<
     'info,
     A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
 >(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_concentration_coef_ix(accounts, args)?;
@@ -20313,7 +20294,7 @@ pub fn update_perp_market_concentration_coef_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
 >(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -20323,22 +20304,22 @@ pub fn update_perp_market_concentration_coef_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_concentration_coef_verify_account_keys(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
-    keys: &UpdatePerpMarketConcentrationCoefKeys,
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
+    keys: UpdatePerpMarketConcentrationCoefKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_concentration_coef_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -20365,10 +20346,10 @@ pub struct UpdatePerpMarketCurveUpdateIntensityKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>>
+impl From<UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>>
     for UpdatePerpMarketCurveUpdateIntensityKeys
 {
-    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketCurveUpdateIntensityAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -20376,10 +20357,10 @@ impl From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketCurveUpdateIntensityKeys>
+impl From<UpdatePerpMarketCurveUpdateIntensityKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketCurveUpdateIntensityKeys) -> Self {
+    fn from(keys: UpdatePerpMarketCurveUpdateIntensityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20410,10 +20391,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -20490,7 +20471,7 @@ pub fn update_perp_market_curve_update_intensity_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdatePerpMarketCurveUpdateIntensityIxArgs = args.into();
     let data: UpdatePerpMarketCurveUpdateIntensityIxData = args_full.into();
     Ok(Instruction {
@@ -20503,7 +20484,7 @@ pub fn update_perp_market_curve_update_intensity_invoke<
     'info,
     A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
 >(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_curve_update_intensity_ix(accounts, args)?;
@@ -20515,7 +20496,7 @@ pub fn update_perp_market_curve_update_intensity_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
 >(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -20525,22 +20506,22 @@ pub fn update_perp_market_curve_update_intensity_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_curve_update_intensity_verify_account_keys(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
-    keys: &UpdatePerpMarketCurveUpdateIntensityKeys,
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
+    keys: UpdatePerpMarketCurveUpdateIntensityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_curve_update_intensity_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -20567,10 +20548,10 @@ pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>>
+impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>>
     for UpdatePerpMarketTargetBaseAssetAmountPerLpKeys
 {
-    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -20578,10 +20559,10 @@ impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
+impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketTargetBaseAssetAmountPerLpKeys) -> Self {
+    fn from(keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20614,10 +20595,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNT
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -20697,7 +20678,7 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs = args.into();
     let data: UpdatePerpMarketTargetBaseAssetAmountPerLpIxData = args_full.into();
     Ok(Instruction {
@@ -20710,7 +20691,7 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_invoke<
     'info,
     A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
 >(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
@@ -20722,7 +20703,7 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
 >(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -20732,22 +20713,22 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_keys(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
-    keys: &UpdatePerpMarketTargetBaseAssetAmountPerLpKeys,
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
+    keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -20772,16 +20753,16 @@ pub struct UpdateLpCooldownTimeKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateLpCooldownTimeAccounts<'_, '_>> for UpdateLpCooldownTimeKeys {
-    fn from(accounts: &UpdateLpCooldownTimeAccounts) -> Self {
+impl From<UpdateLpCooldownTimeAccounts<'_, '_>> for UpdateLpCooldownTimeKeys {
+    fn from(accounts: UpdateLpCooldownTimeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateLpCooldownTimeKeys> for [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateLpCooldownTimeKeys) -> Self {
+impl From<UpdateLpCooldownTimeKeys> for [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateLpCooldownTimeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20804,10 +20785,10 @@ impl From<[Pubkey; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]> for UpdateLpCooldow
         }
     }
 }
-impl<'info> From<&UpdateLpCooldownTimeAccounts<'_, 'info>>
+impl<'info> From<UpdateLpCooldownTimeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateLpCooldownTimeAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -20868,7 +20849,7 @@ pub fn update_lp_cooldown_time_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateLpCooldownTimeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateLpCooldownTimeIxArgs = args.into();
     let data: UpdateLpCooldownTimeIxData = args_full.into();
     Ok(Instruction {
@@ -20878,7 +20859,7 @@ pub fn update_lp_cooldown_time_ix<
     })
 }
 pub fn update_lp_cooldown_time_invoke<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
-    accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>,
+    accounts: UpdateLpCooldownTimeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_lp_cooldown_time_ix(accounts, args)?;
@@ -20887,7 +20868,7 @@ pub fn update_lp_cooldown_time_invoke<'info, A: Into<UpdateLpCooldownTimeIxArgs>
     invoke(&ix, &account_info)
 }
 pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
-    accounts: &UpdateLpCooldownTimeAccounts<'_, 'info>,
+    accounts: UpdateLpCooldownTimeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -20897,21 +20878,21 @@ pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTime
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_lp_cooldown_time_verify_account_keys(
-    accounts: &UpdateLpCooldownTimeAccounts<'_, '_>,
-    keys: &UpdateLpCooldownTimeKeys,
+    accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
+    keys: UpdateLpCooldownTimeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_lp_cooldown_time_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateLpCooldownTimeAccounts<'me, 'info>,
+    accounts: UpdateLpCooldownTimeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -20936,18 +20917,16 @@ pub struct UpdatePerpFeeStructureKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdatePerpFeeStructureAccounts<'_, '_>> for UpdatePerpFeeStructureKeys {
-    fn from(accounts: &UpdatePerpFeeStructureAccounts) -> Self {
+impl From<UpdatePerpFeeStructureAccounts<'_, '_>> for UpdatePerpFeeStructureKeys {
+    fn from(accounts: UpdatePerpFeeStructureAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdatePerpFeeStructureKeys>
-    for [AccountMeta; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdatePerpFeeStructureKeys) -> Self {
+impl From<UpdatePerpFeeStructureKeys> for [AccountMeta; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdatePerpFeeStructureKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -20970,10 +20949,10 @@ impl From<[Pubkey; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]> for UpdatePerpFee
         }
     }
 }
-impl<'info> From<&UpdatePerpFeeStructureAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpFeeStructureAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpFeeStructureAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21036,7 +21015,7 @@ pub fn update_perp_fee_structure_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpFeeStructureKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpFeeStructureIxArgs = args.into();
     let data: UpdatePerpFeeStructureIxData = args_full.into();
     Ok(Instruction {
@@ -21046,7 +21025,7 @@ pub fn update_perp_fee_structure_ix<
     })
 }
 pub fn update_perp_fee_structure_invoke<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
-    accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>,
+    accounts: UpdatePerpFeeStructureAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_fee_structure_ix(accounts, args)?;
@@ -21055,7 +21034,7 @@ pub fn update_perp_fee_structure_invoke<'info, A: Into<UpdatePerpFeeStructureIxA
     invoke(&ix, &account_info)
 }
 pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
-    accounts: &UpdatePerpFeeStructureAccounts<'_, 'info>,
+    accounts: UpdatePerpFeeStructureAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21065,21 +21044,21 @@ pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStruc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_fee_structure_verify_account_keys(
-    accounts: &UpdatePerpFeeStructureAccounts<'_, '_>,
-    keys: &UpdatePerpFeeStructureKeys,
+    accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
+    keys: UpdatePerpFeeStructureKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_fee_structure_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpFeeStructureAccounts<'me, 'info>,
+    accounts: UpdatePerpFeeStructureAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21104,18 +21083,16 @@ pub struct UpdateSpotFeeStructureKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateSpotFeeStructureAccounts<'_, '_>> for UpdateSpotFeeStructureKeys {
-    fn from(accounts: &UpdateSpotFeeStructureAccounts) -> Self {
+impl From<UpdateSpotFeeStructureAccounts<'_, '_>> for UpdateSpotFeeStructureKeys {
+    fn from(accounts: UpdateSpotFeeStructureAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateSpotFeeStructureKeys>
-    for [AccountMeta; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdateSpotFeeStructureKeys) -> Self {
+impl From<UpdateSpotFeeStructureKeys> for [AccountMeta; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateSpotFeeStructureKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -21138,10 +21115,10 @@ impl From<[Pubkey; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]> for UpdateSpotFee
         }
     }
 }
-impl<'info> From<&UpdateSpotFeeStructureAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotFeeStructureAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotFeeStructureAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21204,7 +21181,7 @@ pub fn update_spot_fee_structure_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotFeeStructureKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotFeeStructureIxArgs = args.into();
     let data: UpdateSpotFeeStructureIxData = args_full.into();
     Ok(Instruction {
@@ -21214,7 +21191,7 @@ pub fn update_spot_fee_structure_ix<
     })
 }
 pub fn update_spot_fee_structure_invoke<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
-    accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>,
+    accounts: UpdateSpotFeeStructureAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_fee_structure_ix(accounts, args)?;
@@ -21223,7 +21200,7 @@ pub fn update_spot_fee_structure_invoke<'info, A: Into<UpdateSpotFeeStructureIxA
     invoke(&ix, &account_info)
 }
 pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
-    accounts: &UpdateSpotFeeStructureAccounts<'_, 'info>,
+    accounts: UpdateSpotFeeStructureAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21233,21 +21210,21 @@ pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStruc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_fee_structure_verify_account_keys(
-    accounts: &UpdateSpotFeeStructureAccounts<'_, '_>,
-    keys: &UpdateSpotFeeStructureKeys,
+    accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
+    keys: UpdateSpotFeeStructureKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_fee_structure_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotFeeStructureAccounts<'me, 'info>,
+    accounts: UpdateSpotFeeStructureAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21272,18 +21249,18 @@ pub struct UpdateInitialPctToLiquidateKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateInitialPctToLiquidateAccounts<'_, '_>> for UpdateInitialPctToLiquidateKeys {
-    fn from(accounts: &UpdateInitialPctToLiquidateAccounts) -> Self {
+impl From<UpdateInitialPctToLiquidateAccounts<'_, '_>> for UpdateInitialPctToLiquidateKeys {
+    fn from(accounts: UpdateInitialPctToLiquidateAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateInitialPctToLiquidateKeys>
+impl From<UpdateInitialPctToLiquidateKeys>
     for [AccountMeta; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateInitialPctToLiquidateKeys) -> Self {
+    fn from(keys: UpdateInitialPctToLiquidateKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -21308,10 +21285,10 @@ impl From<[Pubkey; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateInitialPctToLiquidateAccounts<'_, 'info>>
+impl<'info> From<UpdateInitialPctToLiquidateAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateInitialPctToLiquidateAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21377,7 +21354,7 @@ pub fn update_initial_pct_to_liquidate_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateInitialPctToLiquidateIxArgs = args.into();
     let data: UpdateInitialPctToLiquidateIxData = args_full.into();
     Ok(Instruction {
@@ -21387,7 +21364,7 @@ pub fn update_initial_pct_to_liquidate_ix<
     })
 }
 pub fn update_initial_pct_to_liquidate_invoke<'info, A: Into<UpdateInitialPctToLiquidateIxArgs>>(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>,
+    accounts: UpdateInitialPctToLiquidateAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_initial_pct_to_liquidate_ix(accounts, args)?;
@@ -21399,7 +21376,7 @@ pub fn update_initial_pct_to_liquidate_invoke_signed<
     'info,
     A: Into<UpdateInitialPctToLiquidateIxArgs>,
 >(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'_, 'info>,
+    accounts: UpdateInitialPctToLiquidateAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21409,21 +21386,21 @@ pub fn update_initial_pct_to_liquidate_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_initial_pct_to_liquidate_verify_account_keys(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'_, '_>,
-    keys: &UpdateInitialPctToLiquidateKeys,
+    accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
+    keys: UpdateInitialPctToLiquidateKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_initial_pct_to_liquidate_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateInitialPctToLiquidateAccounts<'me, 'info>,
+    accounts: UpdateInitialPctToLiquidateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21448,18 +21425,18 @@ pub struct UpdateLiquidationDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateLiquidationDurationAccounts<'_, '_>> for UpdateLiquidationDurationKeys {
-    fn from(accounts: &UpdateLiquidationDurationAccounts) -> Self {
+impl From<UpdateLiquidationDurationAccounts<'_, '_>> for UpdateLiquidationDurationKeys {
+    fn from(accounts: UpdateLiquidationDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateLiquidationDurationKeys>
+impl From<UpdateLiquidationDurationKeys>
     for [AccountMeta; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateLiquidationDurationKeys) -> Self {
+    fn from(keys: UpdateLiquidationDurationKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -21482,10 +21459,10 @@ impl From<[Pubkey; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]> for UpdateLiqui
         }
     }
 }
-impl<'info> From<&UpdateLiquidationDurationAccounts<'_, 'info>>
+impl<'info> From<UpdateLiquidationDurationAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateLiquidationDurationAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateLiquidationDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21548,7 +21525,7 @@ pub fn update_liquidation_duration_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateLiquidationDurationKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateLiquidationDurationIxArgs = args.into();
     let data: UpdateLiquidationDurationIxData = args_full.into();
     Ok(Instruction {
@@ -21558,7 +21535,7 @@ pub fn update_liquidation_duration_ix<
     })
 }
 pub fn update_liquidation_duration_invoke<'info, A: Into<UpdateLiquidationDurationIxArgs>>(
-    accounts: &UpdateLiquidationDurationAccounts<'_, 'info>,
+    accounts: UpdateLiquidationDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_liquidation_duration_ix(accounts, args)?;
@@ -21570,7 +21547,7 @@ pub fn update_liquidation_duration_invoke_signed<
     'info,
     A: Into<UpdateLiquidationDurationIxArgs>,
 >(
-    accounts: &UpdateLiquidationDurationAccounts<'_, 'info>,
+    accounts: UpdateLiquidationDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21580,21 +21557,21 @@ pub fn update_liquidation_duration_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_liquidation_duration_verify_account_keys(
-    accounts: &UpdateLiquidationDurationAccounts<'_, '_>,
-    keys: &UpdateLiquidationDurationKeys,
+    accounts: UpdateLiquidationDurationAccounts<'_, '_>,
+    keys: UpdateLiquidationDurationKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_liquidation_duration_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateLiquidationDurationAccounts<'me, 'info>,
+    accounts: UpdateLiquidationDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21619,18 +21596,16 @@ pub struct UpdateOracleGuardRailsKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateOracleGuardRailsAccounts<'_, '_>> for UpdateOracleGuardRailsKeys {
-    fn from(accounts: &UpdateOracleGuardRailsAccounts) -> Self {
+impl From<UpdateOracleGuardRailsAccounts<'_, '_>> for UpdateOracleGuardRailsKeys {
+    fn from(accounts: UpdateOracleGuardRailsAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateOracleGuardRailsKeys>
-    for [AccountMeta; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdateOracleGuardRailsKeys) -> Self {
+impl From<UpdateOracleGuardRailsKeys> for [AccountMeta; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateOracleGuardRailsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -21653,10 +21628,10 @@ impl From<[Pubkey; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]> for UpdateOracleG
         }
     }
 }
-impl<'info> From<&UpdateOracleGuardRailsAccounts<'_, 'info>>
+impl<'info> From<UpdateOracleGuardRailsAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateOracleGuardRailsAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21719,7 +21694,7 @@ pub fn update_oracle_guard_rails_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateOracleGuardRailsKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateOracleGuardRailsIxArgs = args.into();
     let data: UpdateOracleGuardRailsIxData = args_full.into();
     Ok(Instruction {
@@ -21729,7 +21704,7 @@ pub fn update_oracle_guard_rails_ix<
     })
 }
 pub fn update_oracle_guard_rails_invoke<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
-    accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>,
+    accounts: UpdateOracleGuardRailsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_oracle_guard_rails_ix(accounts, args)?;
@@ -21738,7 +21713,7 @@ pub fn update_oracle_guard_rails_invoke<'info, A: Into<UpdateOracleGuardRailsIxA
     invoke(&ix, &account_info)
 }
 pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
-    accounts: &UpdateOracleGuardRailsAccounts<'_, 'info>,
+    accounts: UpdateOracleGuardRailsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21748,21 +21723,21 @@ pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardR
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_oracle_guard_rails_verify_account_keys(
-    accounts: &UpdateOracleGuardRailsAccounts<'_, '_>,
-    keys: &UpdateOracleGuardRailsKeys,
+    accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
+    keys: UpdateOracleGuardRailsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_oracle_guard_rails_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateOracleGuardRailsAccounts<'me, 'info>,
+    accounts: UpdateOracleGuardRailsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21787,18 +21762,18 @@ pub struct UpdateStateSettlementDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateStateSettlementDurationAccounts<'_, '_>> for UpdateStateSettlementDurationKeys {
-    fn from(accounts: &UpdateStateSettlementDurationAccounts) -> Self {
+impl From<UpdateStateSettlementDurationAccounts<'_, '_>> for UpdateStateSettlementDurationKeys {
+    fn from(accounts: UpdateStateSettlementDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateStateSettlementDurationKeys>
+impl From<UpdateStateSettlementDurationKeys>
     for [AccountMeta; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateStateSettlementDurationKeys) -> Self {
+    fn from(keys: UpdateStateSettlementDurationKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -21823,10 +21798,10 @@ impl From<[Pubkey; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateStateSettlementDurationAccounts<'_, 'info>>
+impl<'info> From<UpdateStateSettlementDurationAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateStateSettlementDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -21891,7 +21866,7 @@ pub fn update_state_settlement_duration_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateStateSettlementDurationKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateStateSettlementDurationIxArgs = args.into();
     let data: UpdateStateSettlementDurationIxData = args_full.into();
     Ok(Instruction {
@@ -21904,7 +21879,7 @@ pub fn update_state_settlement_duration_invoke<
     'info,
     A: Into<UpdateStateSettlementDurationIxArgs>,
 >(
-    accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>,
+    accounts: UpdateStateSettlementDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_state_settlement_duration_ix(accounts, args)?;
@@ -21916,7 +21891,7 @@ pub fn update_state_settlement_duration_invoke_signed<
     'info,
     A: Into<UpdateStateSettlementDurationIxArgs>,
 >(
-    accounts: &UpdateStateSettlementDurationAccounts<'_, 'info>,
+    accounts: UpdateStateSettlementDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -21926,21 +21901,21 @@ pub fn update_state_settlement_duration_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_state_settlement_duration_verify_account_keys(
-    accounts: &UpdateStateSettlementDurationAccounts<'_, '_>,
-    keys: &UpdateStateSettlementDurationKeys,
+    accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
+    keys: UpdateStateSettlementDurationKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_state_settlement_duration_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateStateSettlementDurationAccounts<'me, 'info>,
+    accounts: UpdateStateSettlementDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -21969,8 +21944,8 @@ pub struct UpdatePerpMarketOracleKeys {
     pub oracle: Pubkey,
     pub admin: Pubkey,
 }
-impl From<&UpdatePerpMarketOracleAccounts<'_, '_>> for UpdatePerpMarketOracleKeys {
-    fn from(accounts: &UpdatePerpMarketOracleAccounts) -> Self {
+impl From<UpdatePerpMarketOracleAccounts<'_, '_>> for UpdatePerpMarketOracleKeys {
+    fn from(accounts: UpdatePerpMarketOracleAccounts) -> Self {
         Self {
             state: *accounts.state.key,
             perp_market: *accounts.perp_market.key,
@@ -21979,10 +21954,8 @@ impl From<&UpdatePerpMarketOracleAccounts<'_, '_>> for UpdatePerpMarketOracleKey
         }
     }
 }
-impl From<&UpdatePerpMarketOracleKeys>
-    for [AccountMeta; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &UpdatePerpMarketOracleKeys) -> Self {
+impl From<UpdatePerpMarketOracleKeys> for [AccountMeta; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdatePerpMarketOracleKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.state,
@@ -22017,10 +21990,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]> for UpdatePerpMar
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketOracleAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketOracleAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketOracleAccounts<'_, 'info>) -> Self {
         [
             accounts.state.clone(),
             accounts.perp_market.clone(),
@@ -22091,7 +22064,7 @@ pub fn update_perp_market_oracle_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketOracleKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketOracleIxArgs = args.into();
     let data: UpdatePerpMarketOracleIxData = args_full.into();
     Ok(Instruction {
@@ -22101,7 +22074,7 @@ pub fn update_perp_market_oracle_ix<
     })
 }
 pub fn update_perp_market_oracle_invoke<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
-    accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketOracleAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_oracle_ix(accounts, args)?;
@@ -22110,7 +22083,7 @@ pub fn update_perp_market_oracle_invoke<'info, A: Into<UpdatePerpMarketOracleIxA
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
-    accounts: &UpdatePerpMarketOracleAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketOracleAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -22120,23 +22093,23 @@ pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOr
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_oracle_verify_account_keys(
-    accounts: &UpdatePerpMarketOracleAccounts<'_, '_>,
-    keys: &UpdatePerpMarketOracleKeys,
+    accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
+    keys: UpdatePerpMarketOracleKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
-        (accounts.oracle.key, &keys.oracle),
-        (accounts.admin.key, &keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
+        (*accounts.oracle.key, keys.oracle),
+        (*accounts.admin.key, keys.admin),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_oracle_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketOracleAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketOracleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -22163,8 +22136,8 @@ pub struct UpdatePerpMarketBaseSpreadKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketBaseSpreadAccounts<'_, '_>> for UpdatePerpMarketBaseSpreadKeys {
-    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts) -> Self {
+impl From<UpdatePerpMarketBaseSpreadAccounts<'_, '_>> for UpdatePerpMarketBaseSpreadKeys {
+    fn from(accounts: UpdatePerpMarketBaseSpreadAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -22172,10 +22145,10 @@ impl From<&UpdatePerpMarketBaseSpreadAccounts<'_, '_>> for UpdatePerpMarketBaseS
         }
     }
 }
-impl From<&UpdatePerpMarketBaseSpreadKeys>
+impl From<UpdatePerpMarketBaseSpreadKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketBaseSpreadKeys) -> Self {
+    fn from(keys: UpdatePerpMarketBaseSpreadKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -22206,10 +22179,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketBaseSpreadAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketBaseSpreadAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketBaseSpreadAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -22279,7 +22252,7 @@ pub fn update_perp_market_base_spread_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketBaseSpreadIxArgs = args.into();
     let data: UpdatePerpMarketBaseSpreadIxData = args_full.into();
     Ok(Instruction {
@@ -22289,7 +22262,7 @@ pub fn update_perp_market_base_spread_ix<
     })
 }
 pub fn update_perp_market_base_spread_invoke<'info, A: Into<UpdatePerpMarketBaseSpreadIxArgs>>(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_base_spread_ix(accounts, args)?;
@@ -22301,7 +22274,7 @@ pub fn update_perp_market_base_spread_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketBaseSpreadIxArgs>,
 >(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -22311,22 +22284,22 @@ pub fn update_perp_market_base_spread_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_base_spread_verify_account_keys(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
-    keys: &UpdatePerpMarketBaseSpreadKeys,
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
+    keys: UpdatePerpMarketBaseSpreadKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_base_spread_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketBaseSpreadAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -22353,8 +22326,8 @@ pub struct UpdateAmmJitIntensityKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdateAmmJitIntensityAccounts<'_, '_>> for UpdateAmmJitIntensityKeys {
-    fn from(accounts: &UpdateAmmJitIntensityAccounts) -> Self {
+impl From<UpdateAmmJitIntensityAccounts<'_, '_>> for UpdateAmmJitIntensityKeys {
+    fn from(accounts: UpdateAmmJitIntensityAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -22362,8 +22335,8 @@ impl From<&UpdateAmmJitIntensityAccounts<'_, '_>> for UpdateAmmJitIntensityKeys 
         }
     }
 }
-impl From<&UpdateAmmJitIntensityKeys> for [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateAmmJitIntensityKeys) -> Self {
+impl From<UpdateAmmJitIntensityKeys> for [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateAmmJitIntensityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -22392,10 +22365,10 @@ impl From<[Pubkey; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]> for UpdateAmmJitIn
         }
     }
 }
-impl<'info> From<&UpdateAmmJitIntensityAccounts<'_, 'info>>
+impl<'info> From<UpdateAmmJitIntensityAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateAmmJitIntensityAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -22461,7 +22434,7 @@ pub fn update_amm_jit_intensity_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateAmmJitIntensityKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateAmmJitIntensityIxArgs = args.into();
     let data: UpdateAmmJitIntensityIxData = args_full.into();
     Ok(Instruction {
@@ -22471,7 +22444,7 @@ pub fn update_amm_jit_intensity_ix<
     })
 }
 pub fn update_amm_jit_intensity_invoke<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
-    accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>,
+    accounts: UpdateAmmJitIntensityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_amm_jit_intensity_ix(accounts, args)?;
@@ -22480,7 +22453,7 @@ pub fn update_amm_jit_intensity_invoke<'info, A: Into<UpdateAmmJitIntensityIxArg
     invoke(&ix, &account_info)
 }
 pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
-    accounts: &UpdateAmmJitIntensityAccounts<'_, 'info>,
+    accounts: UpdateAmmJitIntensityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -22490,22 +22463,22 @@ pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensi
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_amm_jit_intensity_verify_account_keys(
-    accounts: &UpdateAmmJitIntensityAccounts<'_, '_>,
-    keys: &UpdateAmmJitIntensityKeys,
+    accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
+    keys: UpdateAmmJitIntensityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_amm_jit_intensity_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateAmmJitIntensityAccounts<'me, 'info>,
+    accounts: UpdateAmmJitIntensityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -22532,8 +22505,8 @@ pub struct UpdatePerpMarketMaxSpreadKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMaxSpreadAccounts<'_, '_>> for UpdatePerpMarketMaxSpreadKeys {
-    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts) -> Self {
+impl From<UpdatePerpMarketMaxSpreadAccounts<'_, '_>> for UpdatePerpMarketMaxSpreadKeys {
+    fn from(accounts: UpdatePerpMarketMaxSpreadAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -22541,10 +22514,10 @@ impl From<&UpdatePerpMarketMaxSpreadAccounts<'_, '_>> for UpdatePerpMarketMaxSpr
         }
     }
 }
-impl From<&UpdatePerpMarketMaxSpreadKeys>
+impl From<UpdatePerpMarketMaxSpreadKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMaxSpreadKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMaxSpreadKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -22575,10 +22548,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMaxSpreadAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMaxSpreadAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxSpreadAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -22646,7 +22619,7 @@ pub fn update_perp_market_max_spread_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMaxSpreadIxArgs = args.into();
     let data: UpdatePerpMarketMaxSpreadIxData = args_full.into();
     Ok(Instruction {
@@ -22656,7 +22629,7 @@ pub fn update_perp_market_max_spread_ix<
     })
 }
 pub fn update_perp_market_max_spread_invoke<'info, A: Into<UpdatePerpMarketMaxSpreadIxArgs>>(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_spread_ix(accounts, args)?;
@@ -22668,7 +22641,7 @@ pub fn update_perp_market_max_spread_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMaxSpreadIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -22678,22 +22651,22 @@ pub fn update_perp_market_max_spread_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_max_spread_verify_account_keys(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMaxSpreadKeys,
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
+    keys: UpdatePerpMarketMaxSpreadKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_max_spread_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMaxSpreadAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -22720,10 +22693,10 @@ pub struct UpdatePerpMarketStepSizeAndTickSizeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>>
+impl From<UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>>
     for UpdatePerpMarketStepSizeAndTickSizeKeys
 {
-    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -22731,10 +22704,10 @@ impl From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketStepSizeAndTickSizeKeys>
+impl From<UpdatePerpMarketStepSizeAndTickSizeKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketStepSizeAndTickSizeKeys) -> Self {
+    fn from(keys: UpdatePerpMarketStepSizeAndTickSizeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -22765,10 +22738,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -22842,7 +22815,7 @@ pub fn update_perp_market_step_size_and_tick_size_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdatePerpMarketStepSizeAndTickSizeIxArgs = args.into();
     let data: UpdatePerpMarketStepSizeAndTickSizeIxData = args_full.into();
     Ok(Instruction {
@@ -22855,7 +22828,7 @@ pub fn update_perp_market_step_size_and_tick_size_invoke<
     'info,
     A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_step_size_and_tick_size_ix(accounts, args)?;
@@ -22867,7 +22840,7 @@ pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -22877,22 +22850,22 @@ pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_step_size_and_tick_size_verify_account_keys(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
-    keys: &UpdatePerpMarketStepSizeAndTickSizeKeys,
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    keys: UpdatePerpMarketStepSizeAndTickSizeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -22919,8 +22892,8 @@ pub struct UpdatePerpMarketNameKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketNameAccounts<'_, '_>> for UpdatePerpMarketNameKeys {
-    fn from(accounts: &UpdatePerpMarketNameAccounts) -> Self {
+impl From<UpdatePerpMarketNameAccounts<'_, '_>> for UpdatePerpMarketNameKeys {
+    fn from(accounts: UpdatePerpMarketNameAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -22928,8 +22901,8 @@ impl From<&UpdatePerpMarketNameAccounts<'_, '_>> for UpdatePerpMarketNameKeys {
         }
     }
 }
-impl From<&UpdatePerpMarketNameKeys> for [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdatePerpMarketNameKeys) -> Self {
+impl From<UpdatePerpMarketNameKeys> for [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdatePerpMarketNameKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -22958,10 +22931,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]> for UpdatePerpMarke
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketNameAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketNameAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketNameAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketNameAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -23027,7 +23000,7 @@ pub fn update_perp_market_name_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketNameKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketNameIxArgs = args.into();
     let data: UpdatePerpMarketNameIxData = args_full.into();
     Ok(Instruction {
@@ -23037,7 +23010,7 @@ pub fn update_perp_market_name_ix<
     })
 }
 pub fn update_perp_market_name_invoke<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
-    accounts: &UpdatePerpMarketNameAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketNameAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_name_ix(accounts, args)?;
@@ -23046,7 +23019,7 @@ pub fn update_perp_market_name_invoke<'info, A: Into<UpdatePerpMarketNameIxArgs>
     invoke(&ix, &account_info)
 }
 pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
-    accounts: &UpdatePerpMarketNameAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketNameAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -23056,22 +23029,22 @@ pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketName
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_name_verify_account_keys(
-    accounts: &UpdatePerpMarketNameAccounts<'_, '_>,
-    keys: &UpdatePerpMarketNameKeys,
+    accounts: UpdatePerpMarketNameAccounts<'_, '_>,
+    keys: UpdatePerpMarketNameKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_name_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketNameAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -23098,8 +23071,8 @@ pub struct UpdatePerpMarketMinOrderSizeKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMinOrderSizeAccounts<'_, '_>> for UpdatePerpMarketMinOrderSizeKeys {
-    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts) -> Self {
+impl From<UpdatePerpMarketMinOrderSizeAccounts<'_, '_>> for UpdatePerpMarketMinOrderSizeKeys {
+    fn from(accounts: UpdatePerpMarketMinOrderSizeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -23107,10 +23080,10 @@ impl From<&UpdatePerpMarketMinOrderSizeAccounts<'_, '_>> for UpdatePerpMarketMin
         }
     }
 }
-impl From<&UpdatePerpMarketMinOrderSizeKeys>
+impl From<UpdatePerpMarketMinOrderSizeKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMinOrderSizeKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMinOrderSizeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -23141,10 +23114,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -23214,7 +23187,7 @@ pub fn update_perp_market_min_order_size_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMinOrderSizeIxArgs = args.into();
     let data: UpdatePerpMarketMinOrderSizeIxData = args_full.into();
     Ok(Instruction {
@@ -23227,7 +23200,7 @@ pub fn update_perp_market_min_order_size_invoke<
     'info,
     A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_min_order_size_ix(accounts, args)?;
@@ -23239,7 +23212,7 @@ pub fn update_perp_market_min_order_size_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -23249,22 +23222,22 @@ pub fn update_perp_market_min_order_size_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_min_order_size_verify_account_keys(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMinOrderSizeKeys,
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
+    keys: UpdatePerpMarketMinOrderSizeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_min_order_size_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -23291,10 +23264,10 @@ pub struct UpdatePerpMarketMaxSlippageRatioKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>>
+impl From<UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>>
     for UpdatePerpMarketMaxSlippageRatioKeys
 {
-    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxSlippageRatioAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -23302,10 +23275,10 @@ impl From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketMaxSlippageRatioKeys>
+impl From<UpdatePerpMarketMaxSlippageRatioKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMaxSlippageRatioKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMaxSlippageRatioKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -23336,10 +23309,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -23411,8 +23384,7 @@ pub fn update_perp_market_max_slippage_ratio_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMaxSlippageRatioIxArgs = args.into();
     let data: UpdatePerpMarketMaxSlippageRatioIxData = args_full.into();
     Ok(Instruction {
@@ -23425,7 +23397,7 @@ pub fn update_perp_market_max_slippage_ratio_invoke<
     'info,
     A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_slippage_ratio_ix(accounts, args)?;
@@ -23437,7 +23409,7 @@ pub fn update_perp_market_max_slippage_ratio_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -23447,22 +23419,22 @@ pub fn update_perp_market_max_slippage_ratio_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_max_slippage_ratio_verify_account_keys(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMaxSlippageRatioKeys,
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
+    keys: UpdatePerpMarketMaxSlippageRatioKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_max_slippage_ratio_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -23489,10 +23461,10 @@ pub struct UpdatePerpMarketMaxFillReserveFractionKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>>
+impl From<UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>>
     for UpdatePerpMarketMaxFillReserveFractionKeys
 {
-    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxFillReserveFractionAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -23500,10 +23472,10 @@ impl From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketMaxFillReserveFractionKeys>
+impl From<UpdatePerpMarketMaxFillReserveFractionKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMaxFillReserveFractionKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMaxFillReserveFractionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -23536,10 +23508,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -23617,7 +23589,7 @@ pub fn update_perp_market_max_fill_reserve_fraction_ix<
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: UpdatePerpMarketMaxFillReserveFractionIxArgs = args.into();
     let data: UpdatePerpMarketMaxFillReserveFractionIxData = args_full.into();
     Ok(Instruction {
@@ -23630,7 +23602,7 @@ pub fn update_perp_market_max_fill_reserve_fraction_invoke<
     'info,
     A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_fill_reserve_fraction_ix(accounts, args)?;
@@ -23642,7 +23614,7 @@ pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -23652,22 +23624,22 @@ pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_max_fill_reserve_fraction_verify_account_keys(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMaxFillReserveFractionKeys,
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
+    keys: UpdatePerpMarketMaxFillReserveFractionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_max_fill_reserve_fraction_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -23694,10 +23666,8 @@ pub struct UpdatePerpMarketMaxOpenInterestKeys {
     pub state: Pubkey,
     pub perp_market: Pubkey,
 }
-impl From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>>
-    for UpdatePerpMarketMaxOpenInterestKeys
-{
-    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts) -> Self {
+impl From<UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>> for UpdatePerpMarketMaxOpenInterestKeys {
+    fn from(accounts: UpdatePerpMarketMaxOpenInterestAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -23705,10 +23675,10 @@ impl From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePerpMarketMaxOpenInterestKeys>
+impl From<UpdatePerpMarketMaxOpenInterestKeys>
     for [AccountMeta; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpMarketMaxOpenInterestKeys) -> Self {
+    fn from(keys: UpdatePerpMarketMaxOpenInterestKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -23739,10 +23709,10 @@ impl From<[Pubkey; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -23814,7 +23784,7 @@ pub fn update_perp_market_max_open_interest_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpMarketMaxOpenInterestIxArgs = args.into();
     let data: UpdatePerpMarketMaxOpenInterestIxData = args_full.into();
     Ok(Instruction {
@@ -23827,7 +23797,7 @@ pub fn update_perp_market_max_open_interest_invoke<
     'info,
     A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_market_max_open_interest_ix(accounts, args)?;
@@ -23839,7 +23809,7 @@ pub fn update_perp_market_max_open_interest_invoke_signed<
     'info,
     A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
 >(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -23849,22 +23819,22 @@ pub fn update_perp_market_max_open_interest_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_market_max_open_interest_verify_account_keys(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
-    keys: &UpdatePerpMarketMaxOpenInterestKeys,
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
+    keys: UpdatePerpMarketMaxOpenInterestKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.perp_market.key, &keys.perp_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.perp_market.key, keys.perp_market),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_market_max_open_interest_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>,
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
         if !should_be_writable.is_writable {
@@ -23889,16 +23859,16 @@ pub struct UpdateAdminKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateAdminAccounts<'_, '_>> for UpdateAdminKeys {
-    fn from(accounts: &UpdateAdminAccounts) -> Self {
+impl From<UpdateAdminAccounts<'_, '_>> for UpdateAdminKeys {
+    fn from(accounts: UpdateAdminAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateAdminKeys> for [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateAdminKeys) -> Self {
+impl From<UpdateAdminKeys> for [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateAdminKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -23921,10 +23891,10 @@ impl From<[Pubkey; UPDATE_ADMIN_IX_ACCOUNTS_LEN]> for UpdateAdminKeys {
         }
     }
 }
-impl<'info> From<&UpdateAdminAccounts<'_, 'info>>
+impl<'info> From<UpdateAdminAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateAdminAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateAdminAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -23982,7 +23952,7 @@ pub fn update_admin_ix<K: Into<UpdateAdminKeys>, A: Into<UpdateAdminIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateAdminKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateAdminIxArgs = args.into();
     let data: UpdateAdminIxData = args_full.into();
     Ok(Instruction {
@@ -23992,7 +23962,7 @@ pub fn update_admin_ix<K: Into<UpdateAdminKeys>, A: Into<UpdateAdminIxArgs>>(
     })
 }
 pub fn update_admin_invoke<'info, A: Into<UpdateAdminIxArgs>>(
-    accounts: &UpdateAdminAccounts<'_, 'info>,
+    accounts: UpdateAdminAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_admin_ix(accounts, args)?;
@@ -24000,7 +23970,7 @@ pub fn update_admin_invoke<'info, A: Into<UpdateAdminIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
-    accounts: &UpdateAdminAccounts<'_, 'info>,
+    accounts: UpdateAdminAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24009,21 +23979,21 @@ pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_admin_verify_account_keys(
-    accounts: &UpdateAdminAccounts<'_, '_>,
-    keys: &UpdateAdminKeys,
+    accounts: UpdateAdminAccounts<'_, '_>,
+    keys: UpdateAdminKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_admin_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateAdminAccounts<'me, 'info>,
+    accounts: UpdateAdminAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24048,16 +24018,16 @@ pub struct UpdateWhitelistMintKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateWhitelistMintAccounts<'_, '_>> for UpdateWhitelistMintKeys {
-    fn from(accounts: &UpdateWhitelistMintAccounts) -> Self {
+impl From<UpdateWhitelistMintAccounts<'_, '_>> for UpdateWhitelistMintKeys {
+    fn from(accounts: UpdateWhitelistMintAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateWhitelistMintKeys> for [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateWhitelistMintKeys) -> Self {
+impl From<UpdateWhitelistMintKeys> for [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateWhitelistMintKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24080,10 +24050,10 @@ impl From<[Pubkey; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]> for UpdateWhitelistMi
         }
     }
 }
-impl<'info> From<&UpdateWhitelistMintAccounts<'_, 'info>>
+impl<'info> From<UpdateWhitelistMintAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateWhitelistMintAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateWhitelistMintAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -24144,7 +24114,7 @@ pub fn update_whitelist_mint_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateWhitelistMintKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateWhitelistMintIxArgs = args.into();
     let data: UpdateWhitelistMintIxData = args_full.into();
     Ok(Instruction {
@@ -24154,7 +24124,7 @@ pub fn update_whitelist_mint_ix<
     })
 }
 pub fn update_whitelist_mint_invoke<'info, A: Into<UpdateWhitelistMintIxArgs>>(
-    accounts: &UpdateWhitelistMintAccounts<'_, 'info>,
+    accounts: UpdateWhitelistMintAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_whitelist_mint_ix(accounts, args)?;
@@ -24162,7 +24132,7 @@ pub fn update_whitelist_mint_invoke<'info, A: Into<UpdateWhitelistMintIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxArgs>>(
-    accounts: &UpdateWhitelistMintAccounts<'_, 'info>,
+    accounts: UpdateWhitelistMintAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24171,21 +24141,21 @@ pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxA
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_whitelist_mint_verify_account_keys(
-    accounts: &UpdateWhitelistMintAccounts<'_, '_>,
-    keys: &UpdateWhitelistMintKeys,
+    accounts: UpdateWhitelistMintAccounts<'_, '_>,
+    keys: UpdateWhitelistMintKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_whitelist_mint_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateWhitelistMintAccounts<'me, 'info>,
+    accounts: UpdateWhitelistMintAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24210,16 +24180,16 @@ pub struct UpdateDiscountMintKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateDiscountMintAccounts<'_, '_>> for UpdateDiscountMintKeys {
-    fn from(accounts: &UpdateDiscountMintAccounts) -> Self {
+impl From<UpdateDiscountMintAccounts<'_, '_>> for UpdateDiscountMintKeys {
+    fn from(accounts: UpdateDiscountMintAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateDiscountMintKeys> for [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateDiscountMintKeys) -> Self {
+impl From<UpdateDiscountMintKeys> for [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateDiscountMintKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24242,10 +24212,10 @@ impl From<[Pubkey; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]> for UpdateDiscountMint
         }
     }
 }
-impl<'info> From<&UpdateDiscountMintAccounts<'_, 'info>>
+impl<'info> From<UpdateDiscountMintAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateDiscountMintAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateDiscountMintAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -24306,7 +24276,7 @@ pub fn update_discount_mint_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateDiscountMintKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateDiscountMintIxArgs = args.into();
     let data: UpdateDiscountMintIxData = args_full.into();
     Ok(Instruction {
@@ -24316,7 +24286,7 @@ pub fn update_discount_mint_ix<
     })
 }
 pub fn update_discount_mint_invoke<'info, A: Into<UpdateDiscountMintIxArgs>>(
-    accounts: &UpdateDiscountMintAccounts<'_, 'info>,
+    accounts: UpdateDiscountMintAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_discount_mint_ix(accounts, args)?;
@@ -24324,7 +24294,7 @@ pub fn update_discount_mint_invoke<'info, A: Into<UpdateDiscountMintIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArgs>>(
-    accounts: &UpdateDiscountMintAccounts<'_, 'info>,
+    accounts: UpdateDiscountMintAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24333,21 +24303,21 @@ pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArg
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_discount_mint_verify_account_keys(
-    accounts: &UpdateDiscountMintAccounts<'_, '_>,
-    keys: &UpdateDiscountMintKeys,
+    accounts: UpdateDiscountMintAccounts<'_, '_>,
+    keys: UpdateDiscountMintKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_discount_mint_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateDiscountMintAccounts<'me, 'info>,
+    accounts: UpdateDiscountMintAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24372,16 +24342,16 @@ pub struct UpdateExchangeStatusKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateExchangeStatusAccounts<'_, '_>> for UpdateExchangeStatusKeys {
-    fn from(accounts: &UpdateExchangeStatusAccounts) -> Self {
+impl From<UpdateExchangeStatusAccounts<'_, '_>> for UpdateExchangeStatusKeys {
+    fn from(accounts: UpdateExchangeStatusAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateExchangeStatusKeys> for [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateExchangeStatusKeys) -> Self {
+impl From<UpdateExchangeStatusKeys> for [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateExchangeStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24404,10 +24374,10 @@ impl From<[Pubkey; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]> for UpdateExchangeSt
         }
     }
 }
-impl<'info> From<&UpdateExchangeStatusAccounts<'_, 'info>>
+impl<'info> From<UpdateExchangeStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateExchangeStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateExchangeStatusAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -24468,7 +24438,7 @@ pub fn update_exchange_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateExchangeStatusKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateExchangeStatusIxArgs = args.into();
     let data: UpdateExchangeStatusIxData = args_full.into();
     Ok(Instruction {
@@ -24478,7 +24448,7 @@ pub fn update_exchange_status_ix<
     })
 }
 pub fn update_exchange_status_invoke<'info, A: Into<UpdateExchangeStatusIxArgs>>(
-    accounts: &UpdateExchangeStatusAccounts<'_, 'info>,
+    accounts: UpdateExchangeStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_exchange_status_ix(accounts, args)?;
@@ -24487,7 +24457,7 @@ pub fn update_exchange_status_invoke<'info, A: Into<UpdateExchangeStatusIxArgs>>
     invoke(&ix, &account_info)
 }
 pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusIxArgs>>(
-    accounts: &UpdateExchangeStatusAccounts<'_, 'info>,
+    accounts: UpdateExchangeStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24497,21 +24467,21 @@ pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusI
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_exchange_status_verify_account_keys(
-    accounts: &UpdateExchangeStatusAccounts<'_, '_>,
-    keys: &UpdateExchangeStatusKeys,
+    accounts: UpdateExchangeStatusAccounts<'_, '_>,
+    keys: UpdateExchangeStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_exchange_status_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateExchangeStatusAccounts<'me, 'info>,
+    accounts: UpdateExchangeStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24536,18 +24506,18 @@ pub struct UpdatePerpAuctionDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdatePerpAuctionDurationAccounts<'_, '_>> for UpdatePerpAuctionDurationKeys {
-    fn from(accounts: &UpdatePerpAuctionDurationAccounts) -> Self {
+impl From<UpdatePerpAuctionDurationAccounts<'_, '_>> for UpdatePerpAuctionDurationKeys {
+    fn from(accounts: UpdatePerpAuctionDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdatePerpAuctionDurationKeys>
+impl From<UpdatePerpAuctionDurationKeys>
     for [AccountMeta; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePerpAuctionDurationKeys) -> Self {
+    fn from(keys: UpdatePerpAuctionDurationKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24572,10 +24542,10 @@ impl From<[Pubkey; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePerpAuctionDurationAccounts<'_, 'info>>
+impl<'info> From<UpdatePerpAuctionDurationAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePerpAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -24638,7 +24608,7 @@ pub fn update_perp_auction_duration_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpAuctionDurationKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdatePerpAuctionDurationIxArgs = args.into();
     let data: UpdatePerpAuctionDurationIxData = args_full.into();
     Ok(Instruction {
@@ -24648,7 +24618,7 @@ pub fn update_perp_auction_duration_ix<
     })
 }
 pub fn update_perp_auction_duration_invoke<'info, A: Into<UpdatePerpAuctionDurationIxArgs>>(
-    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>,
+    accounts: UpdatePerpAuctionDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_perp_auction_duration_ix(accounts, args)?;
@@ -24660,7 +24630,7 @@ pub fn update_perp_auction_duration_invoke_signed<
     'info,
     A: Into<UpdatePerpAuctionDurationIxArgs>,
 >(
-    accounts: &UpdatePerpAuctionDurationAccounts<'_, 'info>,
+    accounts: UpdatePerpAuctionDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24670,21 +24640,21 @@ pub fn update_perp_auction_duration_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_perp_auction_duration_verify_account_keys(
-    accounts: &UpdatePerpAuctionDurationAccounts<'_, '_>,
-    keys: &UpdatePerpAuctionDurationKeys,
+    accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
+    keys: UpdatePerpAuctionDurationKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_perp_auction_duration_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePerpAuctionDurationAccounts<'me, 'info>,
+    accounts: UpdatePerpAuctionDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24709,18 +24679,18 @@ pub struct UpdateSpotAuctionDurationKeys {
     pub admin: Pubkey,
     pub state: Pubkey,
 }
-impl From<&UpdateSpotAuctionDurationAccounts<'_, '_>> for UpdateSpotAuctionDurationKeys {
-    fn from(accounts: &UpdateSpotAuctionDurationAccounts) -> Self {
+impl From<UpdateSpotAuctionDurationAccounts<'_, '_>> for UpdateSpotAuctionDurationKeys {
+    fn from(accounts: UpdateSpotAuctionDurationAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
         }
     }
 }
-impl From<&UpdateSpotAuctionDurationKeys>
+impl From<UpdateSpotAuctionDurationKeys>
     for [AccountMeta; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateSpotAuctionDurationKeys) -> Self {
+    fn from(keys: UpdateSpotAuctionDurationKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24745,10 +24715,10 @@ impl From<[Pubkey; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdateSpotAuctionDurationAccounts<'_, 'info>>
+impl<'info> From<UpdateSpotAuctionDurationAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateSpotAuctionDurationAccounts<'_, 'info>) -> Self {
         [accounts.admin.clone(), accounts.state.clone()]
     }
 }
@@ -24811,7 +24781,7 @@ pub fn update_spot_auction_duration_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotAuctionDurationKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateSpotAuctionDurationIxArgs = args.into();
     let data: UpdateSpotAuctionDurationIxData = args_full.into();
     Ok(Instruction {
@@ -24821,7 +24791,7 @@ pub fn update_spot_auction_duration_ix<
     })
 }
 pub fn update_spot_auction_duration_invoke<'info, A: Into<UpdateSpotAuctionDurationIxArgs>>(
-    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>,
+    accounts: UpdateSpotAuctionDurationAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_spot_auction_duration_ix(accounts, args)?;
@@ -24833,7 +24803,7 @@ pub fn update_spot_auction_duration_invoke_signed<
     'info,
     A: Into<UpdateSpotAuctionDurationIxArgs>,
 >(
-    accounts: &UpdateSpotAuctionDurationAccounts<'_, 'info>,
+    accounts: UpdateSpotAuctionDurationAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -24843,21 +24813,21 @@ pub fn update_spot_auction_duration_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_spot_auction_duration_verify_account_keys(
-    accounts: &UpdateSpotAuctionDurationAccounts<'_, '_>,
-    keys: &UpdateSpotAuctionDurationKeys,
+    accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
+    keys: UpdateSpotAuctionDurationKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn update_spot_auction_duration_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateSpotAuctionDurationAccounts<'me, 'info>,
+    accounts: UpdateSpotAuctionDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
         if !should_be_writable.is_writable {
@@ -24892,8 +24862,8 @@ pub struct AdminRemoveInsuranceFundStakeKeys {
     pub admin_token_account: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&AdminRemoveInsuranceFundStakeAccounts<'_, '_>> for AdminRemoveInsuranceFundStakeKeys {
-    fn from(accounts: &AdminRemoveInsuranceFundStakeAccounts) -> Self {
+impl From<AdminRemoveInsuranceFundStakeAccounts<'_, '_>> for AdminRemoveInsuranceFundStakeKeys {
+    fn from(accounts: AdminRemoveInsuranceFundStakeAccounts) -> Self {
         Self {
             admin: *accounts.admin.key,
             state: *accounts.state.key,
@@ -24905,10 +24875,10 @@ impl From<&AdminRemoveInsuranceFundStakeAccounts<'_, '_>> for AdminRemoveInsuran
         }
     }
 }
-impl From<&AdminRemoveInsuranceFundStakeKeys>
+impl From<AdminRemoveInsuranceFundStakeKeys>
     for [AccountMeta; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &AdminRemoveInsuranceFundStakeKeys) -> Self {
+    fn from(keys: AdminRemoveInsuranceFundStakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.admin,
@@ -24963,10 +24933,10 @@ impl From<[Pubkey; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&AdminRemoveInsuranceFundStakeAccounts<'_, 'info>>
+impl<'info> From<AdminRemoveInsuranceFundStakeAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: AdminRemoveInsuranceFundStakeAccounts<'_, 'info>) -> Self {
         [
             accounts.admin.clone(),
             accounts.state.clone(),
@@ -25046,7 +25016,7 @@ pub fn admin_remove_insurance_fund_stake_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
-    let metas: [AccountMeta; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: AdminRemoveInsuranceFundStakeIxArgs = args.into();
     let data: AdminRemoveInsuranceFundStakeIxData = args_full.into();
     Ok(Instruction {
@@ -25059,7 +25029,7 @@ pub fn admin_remove_insurance_fund_stake_invoke<
     'info,
     A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = admin_remove_insurance_fund_stake_ix(accounts, args)?;
@@ -25071,7 +25041,7 @@ pub fn admin_remove_insurance_fund_stake_invoke_signed<
     'info,
     A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
 >(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -25081,29 +25051,29 @@ pub fn admin_remove_insurance_fund_stake_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn admin_remove_insurance_fund_stake_verify_account_keys(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
-    keys: &AdminRemoveInsuranceFundStakeKeys,
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
+    keys: AdminRemoveInsuranceFundStakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.admin.key, &keys.admin),
-        (accounts.state.key, &keys.state),
-        (accounts.spot_market.key, &keys.spot_market),
+        (*accounts.admin.key, keys.admin),
+        (*accounts.state.key, keys.state),
+        (*accounts.spot_market.key, keys.spot_market),
         (
-            accounts.insurance_fund_vault.key,
-            &keys.insurance_fund_vault,
+            *accounts.insurance_fund_vault.key,
+            keys.insurance_fund_vault,
         ),
-        (accounts.drift_signer.key, &keys.drift_signer),
-        (accounts.admin_token_account.key, &keys.admin_token_account),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.drift_signer.key, keys.drift_signer),
+        (*accounts.admin_token_account.key, keys.admin_token_account),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn admin_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
-    accounts: &AdminRemoveInsuranceFundStakeAccounts<'me, 'info>,
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.insurance_fund_vault, accounts.admin_token_account] {
         if !should_be_writable.is_writable {

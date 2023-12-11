@@ -103,8 +103,8 @@ pub struct InitProtocolFeeKeys {
     pub protocol_fee_account: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&InitProtocolFeeAccounts<'_, '_>> for InitProtocolFeeKeys {
-    fn from(accounts: &InitProtocolFeeAccounts) -> Self {
+impl From<InitProtocolFeeAccounts<'_, '_>> for InitProtocolFeeKeys {
+    fn from(accounts: InitProtocolFeeAccounts) -> Self {
         Self {
             payer: *accounts.payer.key,
             protocol_fee_account: *accounts.protocol_fee_account.key,
@@ -112,8 +112,8 @@ impl From<&InitProtocolFeeAccounts<'_, '_>> for InitProtocolFeeKeys {
         }
     }
 }
-impl From<&InitProtocolFeeKeys> for [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitProtocolFeeKeys) -> Self {
+impl From<InitProtocolFeeKeys> for [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitProtocolFeeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.payer,
@@ -142,10 +142,10 @@ impl From<[Pubkey; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN]> for InitProtocolFeeKeys {
         }
     }
 }
-impl<'info> From<&InitProtocolFeeAccounts<'_, 'info>>
+impl<'info> From<InitProtocolFeeAccounts<'_, 'info>>
     for [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitProtocolFeeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitProtocolFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.payer.clone(),
             accounts.protocol_fee_account.clone(),
@@ -196,7 +196,7 @@ pub fn init_protocol_fee_ix<K: Into<InitProtocolFeeKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: InitProtocolFeeKeys = accounts.into();
-    let metas: [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -204,14 +204,14 @@ pub fn init_protocol_fee_ix<K: Into<InitProtocolFeeKeys>>(
     })
 }
 pub fn init_protocol_fee_invoke<'info>(
-    accounts: &InitProtocolFeeAccounts<'_, 'info>,
+    accounts: InitProtocolFeeAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = init_protocol_fee_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn init_protocol_fee_invoke_signed<'info>(
-    accounts: &InitProtocolFeeAccounts<'_, 'info>,
+    accounts: InitProtocolFeeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = init_protocol_fee_ix(accounts)?;
@@ -219,25 +219,25 @@ pub fn init_protocol_fee_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn init_protocol_fee_verify_account_keys(
-    accounts: &InitProtocolFeeAccounts<'_, '_>,
-    keys: &InitProtocolFeeKeys,
+    accounts: InitProtocolFeeAccounts<'_, '_>,
+    keys: InitProtocolFeeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.payer.key, &keys.payer),
+        (*accounts.payer.key, keys.payer),
         (
-            accounts.protocol_fee_account.key,
-            &keys.protocol_fee_account,
+            *accounts.protocol_fee_account.key,
+            keys.protocol_fee_account,
         ),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn init_protocol_fee_verify_account_privileges<'me, 'info>(
-    accounts: &InitProtocolFeeAccounts<'me, 'info>,
+    accounts: InitProtocolFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.payer, accounts.protocol_fee_account] {
         if !should_be_writable.is_writable {
@@ -262,16 +262,16 @@ pub struct SetProtocolFeeKeys {
     pub authority: Pubkey,
     pub protocol_fee_account: Pubkey,
 }
-impl From<&SetProtocolFeeAccounts<'_, '_>> for SetProtocolFeeKeys {
-    fn from(accounts: &SetProtocolFeeAccounts) -> Self {
+impl From<SetProtocolFeeAccounts<'_, '_>> for SetProtocolFeeKeys {
+    fn from(accounts: SetProtocolFeeAccounts) -> Self {
         Self {
             authority: *accounts.authority.key,
             protocol_fee_account: *accounts.protocol_fee_account.key,
         }
     }
 }
-impl From<&SetProtocolFeeKeys> for [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SetProtocolFeeKeys) -> Self {
+impl From<SetProtocolFeeKeys> for [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
+    fn from(keys: SetProtocolFeeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.authority,
@@ -294,10 +294,10 @@ impl From<[Pubkey; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN]> for SetProtocolFeeKeys {
         }
     }
 }
-impl<'info> From<&SetProtocolFeeAccounts<'_, 'info>>
+impl<'info> From<SetProtocolFeeAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SetProtocolFeeAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SetProtocolFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.authority.clone(),
             accounts.protocol_fee_account.clone(),
@@ -358,7 +358,7 @@ pub fn set_protocol_fee_ix<K: Into<SetProtocolFeeKeys>, A: Into<SetProtocolFeeIx
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SetProtocolFeeKeys = accounts.into();
-    let metas: [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SetProtocolFeeIxArgs = args.into();
     let data: SetProtocolFeeIxData = args_full.into();
     Ok(Instruction {
@@ -368,7 +368,7 @@ pub fn set_protocol_fee_ix<K: Into<SetProtocolFeeKeys>, A: Into<SetProtocolFeeIx
     })
 }
 pub fn set_protocol_fee_invoke<'info, A: Into<SetProtocolFeeIxArgs>>(
-    accounts: &SetProtocolFeeAccounts<'_, 'info>,
+    accounts: SetProtocolFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = set_protocol_fee_ix(accounts, args)?;
@@ -376,7 +376,7 @@ pub fn set_protocol_fee_invoke<'info, A: Into<SetProtocolFeeIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn set_protocol_fee_invoke_signed<'info, A: Into<SetProtocolFeeIxArgs>>(
-    accounts: &SetProtocolFeeAccounts<'_, 'info>,
+    accounts: SetProtocolFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -385,24 +385,24 @@ pub fn set_protocol_fee_invoke_signed<'info, A: Into<SetProtocolFeeIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn set_protocol_fee_verify_account_keys(
-    accounts: &SetProtocolFeeAccounts<'_, '_>,
-    keys: &SetProtocolFeeKeys,
+    accounts: SetProtocolFeeAccounts<'_, '_>,
+    keys: SetProtocolFeeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.authority.key, &keys.authority),
+        (*accounts.authority.key, keys.authority),
         (
-            accounts.protocol_fee_account.key,
-            &keys.protocol_fee_account,
+            *accounts.protocol_fee_account.key,
+            keys.protocol_fee_account,
         ),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn set_protocol_fee_verify_account_privileges<'me, 'info>(
-    accounts: &SetProtocolFeeAccounts<'me, 'info>,
+    accounts: SetProtocolFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.protocol_fee_account] {
         if !should_be_writable.is_writable {
@@ -441,8 +441,8 @@ pub struct CreatePoolKeys {
     pub system_program: Pubkey,
     pub rent: Pubkey,
 }
-impl From<&CreatePoolAccounts<'_, '_>> for CreatePoolKeys {
-    fn from(accounts: &CreatePoolAccounts) -> Self {
+impl From<CreatePoolAccounts<'_, '_>> for CreatePoolKeys {
+    fn from(accounts: CreatePoolAccounts) -> Self {
         Self {
             payer: *accounts.payer.key,
             fee_authority: *accounts.fee_authority.key,
@@ -456,8 +456,8 @@ impl From<&CreatePoolAccounts<'_, '_>> for CreatePoolKeys {
         }
     }
 }
-impl From<&CreatePoolKeys> for [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CreatePoolKeys) -> Self {
+impl From<CreatePoolKeys> for [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] {
+    fn from(keys: CreatePoolKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.payer,
@@ -522,10 +522,10 @@ impl From<[Pubkey; CREATE_POOL_IX_ACCOUNTS_LEN]> for CreatePoolKeys {
         }
     }
 }
-impl<'info> From<&CreatePoolAccounts<'_, 'info>>
+impl<'info> From<CreatePoolAccounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CreatePoolAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CreatePoolAccounts<'_, 'info>) -> Self {
         [
             accounts.payer.clone(),
             accounts.fee_authority.clone(),
@@ -600,7 +600,7 @@ pub fn create_pool_ix<K: Into<CreatePoolKeys>, A: Into<CreatePoolIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CreatePoolKeys = accounts.into();
-    let metas: [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CreatePoolIxArgs = args.into();
     let data: CreatePoolIxData = args_full.into();
     Ok(Instruction {
@@ -610,7 +610,7 @@ pub fn create_pool_ix<K: Into<CreatePoolKeys>, A: Into<CreatePoolIxArgs>>(
     })
 }
 pub fn create_pool_invoke<'info, A: Into<CreatePoolIxArgs>>(
-    accounts: &CreatePoolAccounts<'_, 'info>,
+    accounts: CreatePoolAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = create_pool_ix(accounts, args)?;
@@ -618,7 +618,7 @@ pub fn create_pool_invoke<'info, A: Into<CreatePoolIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn create_pool_invoke_signed<'info, A: Into<CreatePoolIxArgs>>(
-    accounts: &CreatePoolAccounts<'_, 'info>,
+    accounts: CreatePoolAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -627,28 +627,28 @@ pub fn create_pool_invoke_signed<'info, A: Into<CreatePoolIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn create_pool_verify_account_keys(
-    accounts: &CreatePoolAccounts<'_, '_>,
-    keys: &CreatePoolKeys,
+    accounts: CreatePoolAccounts<'_, '_>,
+    keys: CreatePoolKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.payer.key, &keys.payer),
-        (accounts.fee_authority.key, &keys.fee_authority),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.fee_account.key, &keys.fee_account),
-        (accounts.lp_mint.key, &keys.lp_mint),
-        (accounts.token_program.key, &keys.token_program),
-        (accounts.system_program.key, &keys.system_program),
-        (accounts.rent.key, &keys.rent),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.fee_authority.key, keys.fee_authority),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.fee_account.key, keys.fee_account),
+        (*accounts.lp_mint.key, keys.lp_mint),
+        (*accounts.token_program.key, keys.token_program),
+        (*accounts.system_program.key, keys.system_program),
+        (*accounts.rent.key, keys.rent),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn create_pool_verify_account_privileges<'me, 'info>(
-    accounts: &CreatePoolAccounts<'me, 'info>,
+    accounts: CreatePoolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,
@@ -693,8 +693,8 @@ pub struct AddLiquidityKeys {
     pub token_program: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&AddLiquidityAccounts<'_, '_>> for AddLiquidityKeys {
-    fn from(accounts: &AddLiquidityAccounts) -> Self {
+impl From<AddLiquidityAccounts<'_, '_>> for AddLiquidityKeys {
+    fn from(accounts: AddLiquidityAccounts) -> Self {
         Self {
             from: *accounts.from.key,
             pool_account: *accounts.pool_account.key,
@@ -706,8 +706,8 @@ impl From<&AddLiquidityAccounts<'_, '_>> for AddLiquidityKeys {
         }
     }
 }
-impl From<&AddLiquidityKeys> for [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &AddLiquidityKeys) -> Self {
+impl From<AddLiquidityKeys> for [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: AddLiquidityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.from,
@@ -760,10 +760,10 @@ impl From<[Pubkey; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]> for AddLiquidityKeys {
         }
     }
 }
-impl<'info> From<&AddLiquidityAccounts<'_, 'info>>
+impl<'info> From<AddLiquidityAccounts<'_, 'info>>
     for [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &AddLiquidityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: AddLiquidityAccounts<'_, 'info>) -> Self {
         [
             accounts.from.clone(),
             accounts.pool_account.clone(),
@@ -834,7 +834,7 @@ pub fn add_liquidity_ix<K: Into<AddLiquidityKeys>, A: Into<AddLiquidityIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: AddLiquidityKeys = accounts.into();
-    let metas: [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: AddLiquidityIxArgs = args.into();
     let data: AddLiquidityIxData = args_full.into();
     Ok(Instruction {
@@ -844,7 +844,7 @@ pub fn add_liquidity_ix<K: Into<AddLiquidityKeys>, A: Into<AddLiquidityIxArgs>>(
     })
 }
 pub fn add_liquidity_invoke<'info, A: Into<AddLiquidityIxArgs>>(
-    accounts: &AddLiquidityAccounts<'_, 'info>,
+    accounts: AddLiquidityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = add_liquidity_ix(accounts, args)?;
@@ -852,7 +852,7 @@ pub fn add_liquidity_invoke<'info, A: Into<AddLiquidityIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn add_liquidity_invoke_signed<'info, A: Into<AddLiquidityIxArgs>>(
-    accounts: &AddLiquidityAccounts<'_, 'info>,
+    accounts: AddLiquidityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -861,26 +861,26 @@ pub fn add_liquidity_invoke_signed<'info, A: Into<AddLiquidityIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn add_liquidity_verify_account_keys(
-    accounts: &AddLiquidityAccounts<'_, '_>,
-    keys: &AddLiquidityKeys,
+    accounts: AddLiquidityAccounts<'_, '_>,
+    keys: AddLiquidityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.from.key, &keys.from),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.lp_mint.key, &keys.lp_mint),
-        (accounts.mint_lp_tokens_to.key, &keys.mint_lp_tokens_to),
-        (accounts.token_program.key, &keys.token_program),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.from.key, keys.from),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.lp_mint.key, keys.lp_mint),
+        (*accounts.mint_lp_tokens_to.key, keys.mint_lp_tokens_to),
+        (*accounts.token_program.key, keys.token_program),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn add_liquidity_verify_account_privileges<'me, 'info>(
-    accounts: &AddLiquidityAccounts<'me, 'info>,
+    accounts: AddLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.from,
@@ -923,8 +923,8 @@ pub struct RemoveLiquidityKeys {
     pub token_program: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&RemoveLiquidityAccounts<'_, '_>> for RemoveLiquidityKeys {
-    fn from(accounts: &RemoveLiquidityAccounts) -> Self {
+impl From<RemoveLiquidityAccounts<'_, '_>> for RemoveLiquidityKeys {
+    fn from(accounts: RemoveLiquidityAccounts) -> Self {
         Self {
             burn_lp_tokens_from_authority: *accounts.burn_lp_tokens_from_authority.key,
             to: *accounts.to.key,
@@ -937,8 +937,8 @@ impl From<&RemoveLiquidityAccounts<'_, '_>> for RemoveLiquidityKeys {
         }
     }
 }
-impl From<&RemoveLiquidityKeys> for [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RemoveLiquidityKeys) -> Self {
+impl From<RemoveLiquidityKeys> for [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: RemoveLiquidityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.burn_lp_tokens_from_authority,
@@ -997,10 +997,10 @@ impl From<[Pubkey; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]> for RemoveLiquidityKeys {
         }
     }
 }
-impl<'info> From<&RemoveLiquidityAccounts<'_, 'info>>
+impl<'info> From<RemoveLiquidityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemoveLiquidityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RemoveLiquidityAccounts<'_, 'info>) -> Self {
         [
             accounts.burn_lp_tokens_from_authority.clone(),
             accounts.to.clone(),
@@ -1073,7 +1073,7 @@ pub fn remove_liquidity_ix<K: Into<RemoveLiquidityKeys>, A: Into<RemoveLiquidity
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RemoveLiquidityKeys = accounts.into();
-    let metas: [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: RemoveLiquidityIxArgs = args.into();
     let data: RemoveLiquidityIxData = args_full.into();
     Ok(Instruction {
@@ -1083,7 +1083,7 @@ pub fn remove_liquidity_ix<K: Into<RemoveLiquidityKeys>, A: Into<RemoveLiquidity
     })
 }
 pub fn remove_liquidity_invoke<'info, A: Into<RemoveLiquidityIxArgs>>(
-    accounts: &RemoveLiquidityAccounts<'_, 'info>,
+    accounts: RemoveLiquidityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = remove_liquidity_ix(accounts, args)?;
@@ -1091,7 +1091,7 @@ pub fn remove_liquidity_invoke<'info, A: Into<RemoveLiquidityIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn remove_liquidity_invoke_signed<'info, A: Into<RemoveLiquidityIxArgs>>(
-    accounts: &RemoveLiquidityAccounts<'_, 'info>,
+    accounts: RemoveLiquidityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1100,30 +1100,30 @@ pub fn remove_liquidity_invoke_signed<'info, A: Into<RemoveLiquidityIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn remove_liquidity_verify_account_keys(
-    accounts: &RemoveLiquidityAccounts<'_, '_>,
-    keys: &RemoveLiquidityKeys,
+    accounts: RemoveLiquidityAccounts<'_, '_>,
+    keys: RemoveLiquidityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (
-            accounts.burn_lp_tokens_from_authority.key,
-            &keys.burn_lp_tokens_from_authority,
+            *accounts.burn_lp_tokens_from_authority.key,
+            keys.burn_lp_tokens_from_authority,
         ),
-        (accounts.to.key, &keys.to),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.lp_mint.key, &keys.lp_mint),
-        (accounts.burn_lp_tokens_from.key, &keys.burn_lp_tokens_from),
-        (accounts.token_program.key, &keys.token_program),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.to.key, keys.to),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.lp_mint.key, keys.lp_mint),
+        (*accounts.burn_lp_tokens_from.key, keys.burn_lp_tokens_from),
+        (*accounts.token_program.key, keys.token_program),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
-    accounts: &RemoveLiquidityAccounts<'me, 'info>,
+    accounts: RemoveLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.to,
@@ -1160,8 +1160,8 @@ pub struct SetFeeKeys {
     pub system_program: Pubkey,
     pub rent: Pubkey,
 }
-impl From<&SetFeeAccounts<'_, '_>> for SetFeeKeys {
-    fn from(accounts: &SetFeeAccounts) -> Self {
+impl From<SetFeeAccounts<'_, '_>> for SetFeeKeys {
+    fn from(accounts: SetFeeAccounts) -> Self {
         Self {
             fee_authority: *accounts.fee_authority.key,
             pool_account: *accounts.pool_account.key,
@@ -1171,8 +1171,8 @@ impl From<&SetFeeAccounts<'_, '_>> for SetFeeKeys {
         }
     }
 }
-impl From<&SetFeeKeys> for [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SetFeeKeys) -> Self {
+impl From<SetFeeKeys> for [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] {
+    fn from(keys: SetFeeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.fee_authority,
@@ -1213,8 +1213,8 @@ impl From<[Pubkey; SET_FEE_IX_ACCOUNTS_LEN]> for SetFeeKeys {
         }
     }
 }
-impl<'info> From<&SetFeeAccounts<'_, 'info>> for [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &SetFeeAccounts<'_, 'info>) -> Self {
+impl<'info> From<SetFeeAccounts<'_, 'info>> for [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN] {
+    fn from(accounts: SetFeeAccounts<'_, 'info>) -> Self {
         [
             accounts.fee_authority.clone(),
             accounts.pool_account.clone(),
@@ -1281,7 +1281,7 @@ pub fn set_fee_ix<K: Into<SetFeeKeys>, A: Into<SetFeeIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SetFeeKeys = accounts.into();
-    let metas: [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SetFeeIxArgs = args.into();
     let data: SetFeeIxData = args_full.into();
     Ok(Instruction {
@@ -1291,7 +1291,7 @@ pub fn set_fee_ix<K: Into<SetFeeKeys>, A: Into<SetFeeIxArgs>>(
     })
 }
 pub fn set_fee_invoke<'info, A: Into<SetFeeIxArgs>>(
-    accounts: &SetFeeAccounts<'_, 'info>,
+    accounts: SetFeeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = set_fee_ix(accounts, args)?;
@@ -1299,7 +1299,7 @@ pub fn set_fee_invoke<'info, A: Into<SetFeeIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn set_fee_invoke_signed<'info, A: Into<SetFeeIxArgs>>(
-    accounts: &SetFeeAccounts<'_, 'info>,
+    accounts: SetFeeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1308,24 +1308,24 @@ pub fn set_fee_invoke_signed<'info, A: Into<SetFeeIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn set_fee_verify_account_keys(
-    accounts: &SetFeeAccounts<'_, '_>,
-    keys: &SetFeeKeys,
+    accounts: SetFeeAccounts<'_, '_>,
+    keys: SetFeeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.fee_authority.key, &keys.fee_authority),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.fee_account.key, &keys.fee_account),
-        (accounts.system_program.key, &keys.system_program),
-        (accounts.rent.key, &keys.rent),
+        (*accounts.fee_authority.key, keys.fee_authority),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.fee_account.key, keys.fee_account),
+        (*accounts.system_program.key, keys.system_program),
+        (*accounts.rent.key, keys.rent),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn set_fee_verify_account_privileges<'me, 'info>(
-    accounts: &SetFeeAccounts<'me, 'info>,
+    accounts: SetFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.fee_account] {
         if !should_be_writable.is_writable {
@@ -1352,8 +1352,8 @@ pub struct SetFeeAuthorityKeys {
     pub pool_account: Pubkey,
     pub new_fee_authority: Pubkey,
 }
-impl From<&SetFeeAuthorityAccounts<'_, '_>> for SetFeeAuthorityKeys {
-    fn from(accounts: &SetFeeAuthorityAccounts) -> Self {
+impl From<SetFeeAuthorityAccounts<'_, '_>> for SetFeeAuthorityKeys {
+    fn from(accounts: SetFeeAuthorityAccounts) -> Self {
         Self {
             fee_authority: *accounts.fee_authority.key,
             pool_account: *accounts.pool_account.key,
@@ -1361,8 +1361,8 @@ impl From<&SetFeeAuthorityAccounts<'_, '_>> for SetFeeAuthorityKeys {
         }
     }
 }
-impl From<&SetFeeAuthorityKeys> for [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SetFeeAuthorityKeys) -> Self {
+impl From<SetFeeAuthorityKeys> for [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: SetFeeAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.fee_authority,
@@ -1391,10 +1391,10 @@ impl From<[Pubkey; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN]> for SetFeeAuthorityKeys {
         }
     }
 }
-impl<'info> From<&SetFeeAuthorityAccounts<'_, 'info>>
+impl<'info> From<SetFeeAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SetFeeAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SetFeeAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.fee_authority.clone(),
             accounts.pool_account.clone(),
@@ -1445,7 +1445,7 @@ pub fn set_fee_authority_ix<K: Into<SetFeeAuthorityKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: SetFeeAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1453,14 +1453,14 @@ pub fn set_fee_authority_ix<K: Into<SetFeeAuthorityKeys>>(
     })
 }
 pub fn set_fee_authority_invoke<'info>(
-    accounts: &SetFeeAuthorityAccounts<'_, 'info>,
+    accounts: SetFeeAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = set_fee_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn set_fee_authority_invoke_signed<'info>(
-    accounts: &SetFeeAuthorityAccounts<'_, 'info>,
+    accounts: SetFeeAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = set_fee_authority_ix(accounts)?;
@@ -1468,22 +1468,22 @@ pub fn set_fee_authority_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn set_fee_authority_verify_account_keys(
-    accounts: &SetFeeAuthorityAccounts<'_, '_>,
-    keys: &SetFeeAuthorityKeys,
+    accounts: SetFeeAuthorityAccounts<'_, '_>,
+    keys: SetFeeAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.fee_authority.key, &keys.fee_authority),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.new_fee_authority.key, &keys.new_fee_authority),
+        (*accounts.fee_authority.key, keys.fee_authority),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.new_fee_authority.key, keys.new_fee_authority),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn set_fee_authority_verify_account_privileges<'me, 'info>(
-    accounts: &SetFeeAuthorityAccounts<'me, 'info>,
+    accounts: SetFeeAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.pool_account] {
         if !should_be_writable.is_writable {
@@ -1514,8 +1514,8 @@ pub struct DeactivateStakeAccountKeys {
     pub clock: Pubkey,
     pub stake_program: Pubkey,
 }
-impl From<&DeactivateStakeAccountAccounts<'_, '_>> for DeactivateStakeAccountKeys {
-    fn from(accounts: &DeactivateStakeAccountAccounts) -> Self {
+impl From<DeactivateStakeAccountAccounts<'_, '_>> for DeactivateStakeAccountKeys {
+    fn from(accounts: DeactivateStakeAccountAccounts) -> Self {
         Self {
             stake_account: *accounts.stake_account.key,
             pool_account: *accounts.pool_account.key,
@@ -1525,8 +1525,8 @@ impl From<&DeactivateStakeAccountAccounts<'_, '_>> for DeactivateStakeAccountKey
         }
     }
 }
-impl From<&DeactivateStakeAccountKeys> for [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &DeactivateStakeAccountKeys) -> Self {
+impl From<DeactivateStakeAccountKeys> for [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: DeactivateStakeAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.stake_account,
@@ -1567,10 +1567,10 @@ impl From<[Pubkey; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]> for DeactivateStak
         }
     }
 }
-impl<'info> From<&DeactivateStakeAccountAccounts<'_, 'info>>
+impl<'info> From<DeactivateStakeAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeactivateStakeAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeactivateStakeAccountAccounts<'_, 'info>) -> Self {
         [
             accounts.stake_account.clone(),
             accounts.pool_account.clone(),
@@ -1625,7 +1625,7 @@ pub fn deactivate_stake_account_ix<K: Into<DeactivateStakeAccountKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: DeactivateStakeAccountKeys = accounts.into();
-    let metas: [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1633,7 +1633,7 @@ pub fn deactivate_stake_account_ix<K: Into<DeactivateStakeAccountKeys>>(
     })
 }
 pub fn deactivate_stake_account_invoke<'info>(
-    accounts: &DeactivateStakeAccountAccounts<'_, 'info>,
+    accounts: DeactivateStakeAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = deactivate_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] =
@@ -1641,7 +1641,7 @@ pub fn deactivate_stake_account_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn deactivate_stake_account_invoke_signed<'info>(
-    accounts: &DeactivateStakeAccountAccounts<'_, 'info>,
+    accounts: DeactivateStakeAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = deactivate_stake_account_ix(accounts)?;
@@ -1650,24 +1650,24 @@ pub fn deactivate_stake_account_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deactivate_stake_account_verify_account_keys(
-    accounts: &DeactivateStakeAccountAccounts<'_, '_>,
-    keys: &DeactivateStakeAccountKeys,
+    accounts: DeactivateStakeAccountAccounts<'_, '_>,
+    keys: DeactivateStakeAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.stake_account.key, &keys.stake_account),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.clock.key, &keys.clock),
-        (accounts.stake_program.key, &keys.stake_program),
+        (*accounts.stake_account.key, keys.stake_account),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.clock.key, keys.clock),
+        (*accounts.stake_program.key, keys.stake_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn deactivate_stake_account_verify_account_privileges<'me, 'info>(
-    accounts: &DeactivateStakeAccountAccounts<'me, 'info>,
+    accounts: DeactivateStakeAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.stake_account] {
         if !should_be_writable.is_writable {
@@ -1697,8 +1697,8 @@ pub struct ReclaimStakeAccountKeys {
     pub stake_history: Pubkey,
     pub stake_program: Pubkey,
 }
-impl From<&ReclaimStakeAccountAccounts<'_, '_>> for ReclaimStakeAccountKeys {
-    fn from(accounts: &ReclaimStakeAccountAccounts) -> Self {
+impl From<ReclaimStakeAccountAccounts<'_, '_>> for ReclaimStakeAccountKeys {
+    fn from(accounts: ReclaimStakeAccountAccounts) -> Self {
         Self {
             stake_account: *accounts.stake_account.key,
             pool_account: *accounts.pool_account.key,
@@ -1710,8 +1710,8 @@ impl From<&ReclaimStakeAccountAccounts<'_, '_>> for ReclaimStakeAccountKeys {
         }
     }
 }
-impl From<&ReclaimStakeAccountKeys> for [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ReclaimStakeAccountKeys) -> Self {
+impl From<ReclaimStakeAccountKeys> for [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: ReclaimStakeAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.stake_account,
@@ -1764,10 +1764,10 @@ impl From<[Pubkey; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]> for ReclaimStakeAccou
         }
     }
 }
-impl<'info> From<&ReclaimStakeAccountAccounts<'_, 'info>>
+impl<'info> From<ReclaimStakeAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ReclaimStakeAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ReclaimStakeAccountAccounts<'_, 'info>) -> Self {
         [
             accounts.stake_account.clone(),
             accounts.pool_account.clone(),
@@ -1826,7 +1826,7 @@ pub fn reclaim_stake_account_ix<K: Into<ReclaimStakeAccountKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ReclaimStakeAccountKeys = accounts.into();
-    let metas: [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1834,14 +1834,14 @@ pub fn reclaim_stake_account_ix<K: Into<ReclaimStakeAccountKeys>>(
     })
 }
 pub fn reclaim_stake_account_invoke<'info>(
-    accounts: &ReclaimStakeAccountAccounts<'_, 'info>,
+    accounts: ReclaimStakeAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = reclaim_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn reclaim_stake_account_invoke_signed<'info>(
-    accounts: &ReclaimStakeAccountAccounts<'_, 'info>,
+    accounts: ReclaimStakeAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = reclaim_stake_account_ix(accounts)?;
@@ -1849,29 +1849,29 @@ pub fn reclaim_stake_account_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn reclaim_stake_account_verify_account_keys(
-    accounts: &ReclaimStakeAccountAccounts<'_, '_>,
-    keys: &ReclaimStakeAccountKeys,
+    accounts: ReclaimStakeAccountAccounts<'_, '_>,
+    keys: ReclaimStakeAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.stake_account.key, &keys.stake_account),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
+        (*accounts.stake_account.key, keys.stake_account),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
         (
-            accounts.stake_account_record_account.key,
-            &keys.stake_account_record_account,
+            *accounts.stake_account_record_account.key,
+            keys.stake_account_record_account,
         ),
-        (accounts.clock.key, &keys.clock),
-        (accounts.stake_history.key, &keys.stake_history),
-        (accounts.stake_program.key, &keys.stake_program),
+        (*accounts.clock.key, keys.clock),
+        (*accounts.stake_history.key, keys.stake_history),
+        (*accounts.stake_program.key, keys.stake_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn reclaim_stake_account_verify_account_privileges<'me, 'info>(
-    accounts: &ReclaimStakeAccountAccounts<'me, 'info>,
+    accounts: ReclaimStakeAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.stake_account,
@@ -1918,8 +1918,8 @@ pub struct UnstakeKeys {
     pub stake_program: Pubkey,
     pub system_program: Pubkey,
 }
-impl From<&UnstakeAccounts<'_, '_>> for UnstakeKeys {
-    fn from(accounts: &UnstakeAccounts) -> Self {
+impl From<UnstakeAccounts<'_, '_>> for UnstakeKeys {
+    fn from(accounts: UnstakeAccounts) -> Self {
         Self {
             payer: *accounts.payer.key,
             unstaker: *accounts.unstaker.key,
@@ -1937,8 +1937,8 @@ impl From<&UnstakeAccounts<'_, '_>> for UnstakeKeys {
         }
     }
 }
-impl From<&UnstakeKeys> for [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UnstakeKeys) -> Self {
+impl From<UnstakeKeys> for [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UnstakeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.payer,
@@ -2027,8 +2027,8 @@ impl From<[Pubkey; UNSTAKE_IX_ACCOUNTS_LEN]> for UnstakeKeys {
         }
     }
 }
-impl<'info> From<&UnstakeAccounts<'_, 'info>> for [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &UnstakeAccounts<'_, 'info>) -> Self {
+impl<'info> From<UnstakeAccounts<'_, 'info>> for [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] {
+    fn from(accounts: UnstakeAccounts<'_, 'info>) -> Self {
         [
             accounts.payer.clone(),
             accounts.unstaker.clone(),
@@ -2097,20 +2097,20 @@ impl UnstakeIxData {
 }
 pub fn unstake_ix<K: Into<UnstakeKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: UnstakeKeys = accounts.into();
-    let metas: [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: UnstakeIxData.try_to_vec()?,
     })
 }
-pub fn unstake_invoke<'info>(accounts: &UnstakeAccounts<'_, 'info>) -> ProgramResult {
+pub fn unstake_invoke<'info>(accounts: UnstakeAccounts<'_, 'info>) -> ProgramResult {
     let ix = unstake_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn unstake_invoke_signed<'info>(
-    accounts: &UnstakeAccounts<'_, 'info>,
+    accounts: UnstakeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = unstake_ix(accounts)?;
@@ -2118,41 +2118,41 @@ pub fn unstake_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn unstake_verify_account_keys(
-    accounts: &UnstakeAccounts<'_, '_>,
-    keys: &UnstakeKeys,
+    accounts: UnstakeAccounts<'_, '_>,
+    keys: UnstakeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.payer.key, &keys.payer),
-        (accounts.unstaker.key, &keys.unstaker),
-        (accounts.stake_account.key, &keys.stake_account),
-        (accounts.destination.key, &keys.destination),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.fee_account.key, &keys.fee_account),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.unstaker.key, keys.unstaker),
+        (*accounts.stake_account.key, keys.stake_account),
+        (*accounts.destination.key, keys.destination),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.fee_account.key, keys.fee_account),
         (
-            accounts.stake_account_record_account.key,
-            &keys.stake_account_record_account,
+            *accounts.stake_account_record_account.key,
+            keys.stake_account_record_account,
         ),
         (
-            accounts.protocol_fee_account.key,
-            &keys.protocol_fee_account,
+            *accounts.protocol_fee_account.key,
+            keys.protocol_fee_account,
         ),
         (
-            accounts.protocol_fee_destination.key,
-            &keys.protocol_fee_destination,
+            *accounts.protocol_fee_destination.key,
+            keys.protocol_fee_destination,
         ),
-        (accounts.clock.key, &keys.clock),
-        (accounts.stake_program.key, &keys.stake_program),
-        (accounts.system_program.key, &keys.system_program),
+        (*accounts.clock.key, keys.clock),
+        (*accounts.stake_program.key, keys.stake_program),
+        (*accounts.system_program.key, keys.system_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn unstake_verify_account_privileges<'me, 'info>(
-    accounts: &UnstakeAccounts<'me, 'info>,
+    accounts: UnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,
@@ -2209,8 +2209,8 @@ pub struct UnstakeWsolKeys {
     pub system_program: Pubkey,
     pub token_program: Pubkey,
 }
-impl From<&UnstakeWsolAccounts<'_, '_>> for UnstakeWsolKeys {
-    fn from(accounts: &UnstakeWsolAccounts) -> Self {
+impl From<UnstakeWsolAccounts<'_, '_>> for UnstakeWsolKeys {
+    fn from(accounts: UnstakeWsolAccounts) -> Self {
         Self {
             payer: *accounts.payer.key,
             unstaker: *accounts.unstaker.key,
@@ -2229,8 +2229,8 @@ impl From<&UnstakeWsolAccounts<'_, '_>> for UnstakeWsolKeys {
         }
     }
 }
-impl From<&UnstakeWsolKeys> for [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UnstakeWsolKeys) -> Self {
+impl From<UnstakeWsolKeys> for [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] {
+    fn from(keys: UnstakeWsolKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.payer,
@@ -2325,10 +2325,10 @@ impl From<[Pubkey; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]> for UnstakeWsolKeys {
         }
     }
 }
-impl<'info> From<&UnstakeWsolAccounts<'_, 'info>>
+impl<'info> From<UnstakeWsolAccounts<'_, 'info>>
     for [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UnstakeWsolAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UnstakeWsolAccounts<'_, 'info>) -> Self {
         [
             accounts.payer.clone(),
             accounts.unstaker.clone(),
@@ -2399,20 +2399,20 @@ impl UnstakeWsolIxData {
 }
 pub fn unstake_wsol_ix<K: Into<UnstakeWsolKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: UnstakeWsolKeys = accounts.into();
-    let metas: [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: UnstakeWsolIxData.try_to_vec()?,
     })
 }
-pub fn unstake_wsol_invoke<'info>(accounts: &UnstakeWsolAccounts<'_, 'info>) -> ProgramResult {
+pub fn unstake_wsol_invoke<'info>(accounts: UnstakeWsolAccounts<'_, 'info>) -> ProgramResult {
     let ix = unstake_wsol_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn unstake_wsol_invoke_signed<'info>(
-    accounts: &UnstakeWsolAccounts<'_, 'info>,
+    accounts: UnstakeWsolAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = unstake_wsol_ix(accounts)?;
@@ -2420,42 +2420,42 @@ pub fn unstake_wsol_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn unstake_wsol_verify_account_keys(
-    accounts: &UnstakeWsolAccounts<'_, '_>,
-    keys: &UnstakeWsolKeys,
+    accounts: UnstakeWsolAccounts<'_, '_>,
+    keys: UnstakeWsolKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
-        (accounts.payer.key, &keys.payer),
-        (accounts.unstaker.key, &keys.unstaker),
-        (accounts.stake_account.key, &keys.stake_account),
-        (accounts.destination.key, &keys.destination),
-        (accounts.pool_account.key, &keys.pool_account),
-        (accounts.pool_sol_reserves.key, &keys.pool_sol_reserves),
-        (accounts.fee_account.key, &keys.fee_account),
+        (*accounts.payer.key, keys.payer),
+        (*accounts.unstaker.key, keys.unstaker),
+        (*accounts.stake_account.key, keys.stake_account),
+        (*accounts.destination.key, keys.destination),
+        (*accounts.pool_account.key, keys.pool_account),
+        (*accounts.pool_sol_reserves.key, keys.pool_sol_reserves),
+        (*accounts.fee_account.key, keys.fee_account),
         (
-            accounts.stake_account_record_account.key,
-            &keys.stake_account_record_account,
+            *accounts.stake_account_record_account.key,
+            keys.stake_account_record_account,
         ),
         (
-            accounts.protocol_fee_account.key,
-            &keys.protocol_fee_account,
+            *accounts.protocol_fee_account.key,
+            keys.protocol_fee_account,
         ),
         (
-            accounts.protocol_fee_destination.key,
-            &keys.protocol_fee_destination,
+            *accounts.protocol_fee_destination.key,
+            keys.protocol_fee_destination,
         ),
-        (accounts.clock.key, &keys.clock),
-        (accounts.stake_program.key, &keys.stake_program),
-        (accounts.system_program.key, &keys.system_program),
-        (accounts.token_program.key, &keys.token_program),
+        (*accounts.clock.key, keys.clock),
+        (*accounts.stake_program.key, keys.stake_program),
+        (*accounts.system_program.key, keys.system_program),
+        (*accounts.token_program.key, keys.token_program),
     ] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn unstake_wsol_verify_account_privileges<'me, 'info>(
-    accounts: &UnstakeWsolAccounts<'me, 'info>,
+    accounts: UnstakeWsolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.payer,

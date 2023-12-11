@@ -44,13 +44,13 @@ pub struct NoArgsIxAccounts<'me, 'info> {
 pub struct NoArgsIxKeys {
     pub b: Pubkey,
 }
-impl From<&NoArgsIxAccounts<'_, '_>> for NoArgsIxKeys {
-    fn from(accounts: &NoArgsIxAccounts) -> Self {
+impl From<NoArgsIxAccounts<'_, '_>> for NoArgsIxKeys {
+    fn from(accounts: NoArgsIxAccounts) -> Self {
         Self { b: *accounts.b.key }
     }
 }
-impl From<&NoArgsIxKeys> for [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] {
-    fn from(keys: &NoArgsIxKeys) -> Self {
+impl From<NoArgsIxKeys> for [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] {
+    fn from(keys: NoArgsIxKeys) -> Self {
         [AccountMeta {
             pubkey: keys.b,
             is_signer: false,
@@ -63,10 +63,8 @@ impl From<[Pubkey; NO_ARGS_IX_IX_ACCOUNTS_LEN]> for NoArgsIxKeys {
         Self { b: pubkeys[0] }
     }
 }
-impl<'info> From<&NoArgsIxAccounts<'_, 'info>>
-    for [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN]
-{
-    fn from(accounts: &NoArgsIxAccounts<'_, 'info>) -> Self {
+impl<'info> From<NoArgsIxAccounts<'_, 'info>> for [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] {
+    fn from(accounts: NoArgsIxAccounts<'_, 'info>) -> Self {
         [accounts.b.clone()]
     }
 }
@@ -107,20 +105,20 @@ impl NoArgsIxIxData {
 }
 pub fn no_args_ix_ix<K: Into<NoArgsIxKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: NoArgsIxKeys = accounts.into();
-    let metas: [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: NoArgsIxIxData.try_to_vec()?,
     })
 }
-pub fn no_args_ix_invoke<'info>(accounts: &NoArgsIxAccounts<'_, 'info>) -> ProgramResult {
+pub fn no_args_ix_invoke<'info>(accounts: NoArgsIxAccounts<'_, 'info>) -> ProgramResult {
     let ix = no_args_ix_ix(accounts)?;
     let account_info: [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn no_args_ix_invoke_signed<'info>(
-    accounts: &NoArgsIxAccounts<'_, 'info>,
+    accounts: NoArgsIxAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = no_args_ix_ix(accounts)?;
@@ -128,18 +126,18 @@ pub fn no_args_ix_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn no_args_ix_verify_account_keys(
-    accounts: &NoArgsIxAccounts<'_, '_>,
-    keys: &NoArgsIxKeys,
+    accounts: NoArgsIxAccounts<'_, '_>,
+    keys: NoArgsIxKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
-    for (actual, expected) in [(accounts.b.key, &keys.b)] {
+    for (actual, expected) in [(*accounts.b.key, keys.b)] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
 }
 pub fn no_args_ix_verify_account_privileges<'me, 'info>(
-    accounts: &NoArgsIxAccounts<'me, 'info>,
+    accounts: NoArgsIxAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.b] {
         if !should_be_writable.is_writable {

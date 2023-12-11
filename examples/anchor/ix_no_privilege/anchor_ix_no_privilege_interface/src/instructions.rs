@@ -49,13 +49,13 @@ pub struct NoPrivilegedAccountIxAccounts<'me, 'info> {
 pub struct NoPrivilegedAccountIxKeys {
     pub a: Pubkey,
 }
-impl From<&NoPrivilegedAccountIxAccounts<'_, '_>> for NoPrivilegedAccountIxKeys {
-    fn from(accounts: &NoPrivilegedAccountIxAccounts) -> Self {
+impl From<NoPrivilegedAccountIxAccounts<'_, '_>> for NoPrivilegedAccountIxKeys {
+    fn from(accounts: NoPrivilegedAccountIxAccounts) -> Self {
         Self { a: *accounts.a.key }
     }
 }
-impl From<&NoPrivilegedAccountIxKeys> for [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] {
-    fn from(keys: &NoPrivilegedAccountIxKeys) -> Self {
+impl From<NoPrivilegedAccountIxKeys> for [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] {
+    fn from(keys: NoPrivilegedAccountIxKeys) -> Self {
         [AccountMeta {
             pubkey: keys.a,
             is_signer: false,
@@ -68,10 +68,10 @@ impl From<[Pubkey; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN]> for NoPrivilegedAc
         Self { a: pubkeys[0] }
     }
 }
-impl<'info> From<&NoPrivilegedAccountIxAccounts<'_, 'info>>
+impl<'info> From<NoPrivilegedAccountIxAccounts<'_, 'info>>
     for [AccountInfo<'info>; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &NoPrivilegedAccountIxAccounts<'_, 'info>) -> Self {
+    fn from(accounts: NoPrivilegedAccountIxAccounts<'_, 'info>) -> Self {
         [accounts.a.clone()]
     }
 }
@@ -129,7 +129,7 @@ pub fn no_privileged_account_ix_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: NoPrivilegedAccountIxKeys = accounts.into();
-    let metas: [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: NoPrivilegedAccountIxIxArgs = args.into();
     let data: NoPrivilegedAccountIxIxData = args_full.into();
     Ok(Instruction {
@@ -139,7 +139,7 @@ pub fn no_privileged_account_ix_ix<
     })
 }
 pub fn no_privileged_account_ix_invoke<'info, A: Into<NoPrivilegedAccountIxIxArgs>>(
-    accounts: &NoPrivilegedAccountIxAccounts<'_, 'info>,
+    accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = no_privileged_account_ix_ix(accounts, args)?;
@@ -148,7 +148,7 @@ pub fn no_privileged_account_ix_invoke<'info, A: Into<NoPrivilegedAccountIxIxArg
     invoke(&ix, &account_info)
 }
 pub fn no_privileged_account_ix_invoke_signed<'info, A: Into<NoPrivilegedAccountIxIxArgs>>(
-    accounts: &NoPrivilegedAccountIxAccounts<'_, 'info>,
+    accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -158,12 +158,12 @@ pub fn no_privileged_account_ix_invoke_signed<'info, A: Into<NoPrivilegedAccount
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn no_privileged_account_ix_verify_account_keys(
-    accounts: &NoPrivilegedAccountIxAccounts<'_, '_>,
-    keys: &NoPrivilegedAccountIxKeys,
+    accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
+    keys: NoPrivilegedAccountIxKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
-    for (actual, expected) in [(accounts.a.key, &keys.a)] {
+    for (actual, expected) in [(*accounts.a.key, keys.a)] {
         if actual != expected {
-            return Err((*actual, *expected));
+            return Err((actual, expected));
         }
     }
     Ok(())
