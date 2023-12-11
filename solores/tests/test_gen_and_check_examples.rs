@@ -86,6 +86,20 @@ fn test_anchor_ix_no_args() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_anchor_ix_no_accounts() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "anchor/ix_no_accounts";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "anchor_ix_no_accounts_interface")
+}
+
+#[test]
+fn test_anchor_ix_blank() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "anchor/ix_blank";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "anchor_ix_blank_interface")
+}
+
+#[test]
 fn test_shank_ix_no_privilege() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "shank/ix_no_privilege";
     gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
@@ -97,6 +111,20 @@ fn test_shank_ix_no_args() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "shank/ix_no_args";
     gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
     check_example(EXAMPLE_PATH, "shank_ix_no_args_interface")
+}
+
+#[test]
+fn test_shank_ix_no_accounts() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "shank/ix_no_accounts";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "shank_ix_no_accounts_interface")
+}
+
+#[test]
+fn test_shank_ix_blank() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "shank/ix_blank";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "shank_ix_blank_interface")
 }
 
 #[test]

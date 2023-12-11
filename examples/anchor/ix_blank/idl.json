@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "name": "anchor_ix_blank",
+  "instructions": [
+    {
+      "name": "blankIx"
+    }
+  ]
+}

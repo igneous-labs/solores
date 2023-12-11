@@ -27,12 +27,27 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 break;
             }
         }
-        let mut solana_program_imports = quote! {
-            account_info::AccountInfo,
-            entrypoint::ProgramResult,
-            instruction::{AccountMeta, Instruction},
-            program::{invoke, invoke_signed},
-            pubkey::Pubkey,
+        let mut has_accounts = false;
+        for ix in self.instructions {
+            if ix.has_accounts() {
+                has_accounts = true;
+                break;
+            }
+        }
+        let mut solana_program_imports = if has_accounts {
+            quote! {
+                account_info::AccountInfo,
+                entrypoint::ProgramResult,
+                instruction::{AccountMeta, Instruction},
+                program::{invoke, invoke_signed},
+                pubkey::Pubkey,
+            }
+        } else {
+            quote! {
+                entrypoint::ProgramResult,
+                instruction::Instruction,
+                program::{invoke, invoke_signed},
+            }
         };
         for ix in self.instructions {
             if ix.has_privileged_accounts() {

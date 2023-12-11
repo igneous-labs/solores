@@ -1,0 +1,15 @@
+{
+  "version": "0.0.0",
+  "name": "anchor_ix_no_accounts",
+  "instructions": [
+    {
+      "name": "noAccountsIx",
+      "args": [
+        {
+          "name": "arg",
+          "type": "u8"
+        }
+      ]
+    }
+  ]
+}

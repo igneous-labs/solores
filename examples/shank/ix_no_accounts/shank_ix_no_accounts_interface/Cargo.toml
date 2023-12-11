@@ -1,0 +1,14 @@
+[package]
+name = "shank_ix_no_accounts_interface"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies.borsh]
+workspace = true
+
+[dependencies.solana-program]
+workspace = true
+
+[dependencies.serde]
+optional = true
+workspace = true

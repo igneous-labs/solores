@@ -14,7 +14,7 @@ use crate::{idl_format::anchor::typedefs::TypedefField, utils::unique_by_report_
 #[derive(Deserialize)]
 pub struct NamedInstruction {
     pub name: String,
-    pub accounts: Vec<IxAccountEntry>,
+    pub accounts: Option<Vec<IxAccountEntry>>,
     pub args: Option<Vec<TypedefField>>,
 }
 
@@ -55,6 +55,14 @@ impl NamedInstruction {
         !args.is_empty()
     }
 
+    pub fn has_accounts(&self) -> bool {
+        let accounts = match &self.accounts {
+            Some(a) => a,
+            None => return false,
+        };
+        !accounts.is_empty()
+    }
+
     pub fn args_has_defined_type(&self) -> bool {
         let args = if !self.has_ix_args() {
             return false;
@@ -65,7 +73,12 @@ impl NamedInstruction {
     }
 
     pub fn has_privileged_accounts(&self) -> bool {
-        self.accounts
+        let accounts = if !self.has_accounts() {
+            return false;
+        } else {
+            self.accounts.as_ref().unwrap()
+        };
+        accounts
             .iter()
             .map(|a| a.has_privileged_accounts())
             .any(|b| b)
@@ -73,6 +86,9 @@ impl NamedInstruction {
 
     /// export accounts_len as const
     pub fn write_accounts_len(&self, tokens: &mut TokenStream, accounts_len: usize) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_len_ident = self.accounts_len_ident();
         let n_accounts_lit = LitInt::new(&accounts_len.to_string(), Span::call_site());
         tokens.extend(quote! {
@@ -81,6 +97,9 @@ impl NamedInstruction {
     }
 
     pub fn write_accounts_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_ident = self.accounts_ident();
         let accounts_fields = unique_accounts.iter().map(|acc| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
@@ -97,6 +116,9 @@ impl NamedInstruction {
     }
 
     pub fn write_keys_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
+        if !self.has_accounts() {
+            return;
+        }
         let keys_ident = self.keys_ident();
         let keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
@@ -118,6 +140,9 @@ impl NamedInstruction {
         tokens: &mut TokenStream,
         unique_accounts: &[&IxAccount],
     ) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_ident = self.accounts_ident();
         let keys_ident = self.keys_ident();
         let from_keys_fields = unique_accounts.iter().map(|acc| {
@@ -139,6 +164,9 @@ impl NamedInstruction {
 
     /// From <&XKeys> for [AccountMeta]
     pub fn write_from_keys_for_meta_arr(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+        if !self.has_accounts() {
+            return;
+        }
         let keys_ident = self.keys_ident();
         let accounts_len_ident = self.accounts_len_ident();
         let from_keys_meta = accounts.iter().map(|acc| acc.to_keys_account_meta_tokens());
@@ -159,6 +187,9 @@ impl NamedInstruction {
         tokens: &mut TokenStream,
         unique_accounts: &[&IxAccount],
     ) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_len_ident = self.accounts_len_ident();
         let keys_ident = self.keys_ident();
         let from_pubkey_arr_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
@@ -185,6 +216,9 @@ impl NamedInstruction {
         tokens: &mut TokenStream,
         accounts: &[IxAccount],
     ) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_ident = self.accounts_ident();
         let accounts_len_ident = self.accounts_len_ident();
         let account_info_clone = accounts.iter().map(|acc| {
@@ -210,6 +244,9 @@ impl NamedInstruction {
         tokens: &mut TokenStream,
         accounts: &[IxAccount],
     ) {
+        if !self.has_accounts() {
+            return;
+        }
         let accounts_ident = self.accounts_ident();
         let accounts_len_ident = self.accounts_len_ident();
         let from_account_info_fields = accounts.iter().enumerate().map(|(i, acc)| {
@@ -355,19 +392,44 @@ impl NamedInstruction {
         let accounts_len_ident = self.accounts_len_ident();
         let ix_data_ident = self.ix_data_ident();
 
-        let mut fn_generics = quote! { K: Into<#keys_ident>,};
-        if self.has_ix_args() {
-            fn_generics.extend(quote! { A: Into<#ix_args_ident> })
-        }
+        let fn_generics = if !self.has_accounts() && !self.has_ix_args() {
+            quote! {}
+        } else {
+            let mut g = quote! {};
+            if self.has_accounts() {
+                g.extend(quote! { K: Into<#keys_ident>, });
+            }
+            if self.has_ix_args() {
+                g.extend(quote! {  A: Into<#ix_args_ident> });
+            }
+            g
+        };
 
-        let mut fn_params = quote! { accounts: K, };
+        let mut fn_params = quote! {};
+        if self.has_accounts() {
+            fn_params.extend(quote! { accounts: K, });
+        }
         if self.has_ix_args() {
             fn_params.extend(quote! { args: A,  });
         }
 
-        let mut fn_body = quote! {
-            let keys: #keys_ident = accounts.into();
-            let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
+        let (mut fn_body, accounts_expr) = if self.has_accounts() {
+            (
+                quote! {
+                    let keys: #keys_ident = accounts.into();
+                    let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
+                },
+                quote! {
+                    Vec::from(metas)
+                },
+            )
+        } else {
+            (
+                quote! {},
+                quote! {
+                    Vec::new()
+                },
+            )
         };
         if self.has_ix_args() {
             fn_body.extend(quote! {
@@ -381,12 +443,18 @@ impl NamedInstruction {
             quote! { #ix_data_ident.try_to_vec()? }
         };
 
+        let fn_decl = if fn_generics.is_empty() {
+            quote! { #ix_fn_ident(#fn_params) }
+        } else {
+            quote! { #ix_fn_ident<#fn_generics>(#fn_params) }
+        };
+
         tokens.extend(quote! {
-            pub fn #ix_fn_ident<#fn_generics>(#fn_params) -> std::io::Result<Instruction> {
+            pub fn #fn_decl -> std::io::Result<Instruction> {
                 #fn_body
                 Ok(Instruction {
                     program_id: crate::ID,
-                    accounts: Vec::from(metas),
+                    accounts: #accounts_expr,
                     data: #data_expr,
                 })
             }
@@ -394,7 +462,13 @@ impl NamedInstruction {
     }
 
     fn invoke_fn_generics(&self) -> TokenStream {
-        let mut res = quote! {'info,};
+        if !self.has_accounts() && !self.has_ix_args() {
+            return quote! {};
+        }
+        let mut res = quote! {};
+        if self.has_accounts() {
+            res.extend(quote! {'info,})
+        }
         if self.has_ix_args() {
             let ix_args_ident = self.ix_args_ident();
             res.extend(quote! { A: Into<#ix_args_ident> });
@@ -404,7 +478,10 @@ impl NamedInstruction {
 
     fn invoke_fn_params_prefix(&self) -> TokenStream {
         let accounts_ident = self.accounts_ident();
-        let mut fn_params = quote! {accounts: &#accounts_ident<'_, 'info>,};
+        let mut fn_params = quote! {};
+        if self.has_accounts() {
+            fn_params.extend(quote! {accounts: &#accounts_ident<'_, 'info>,});
+        }
         if self.has_ix_args() {
             fn_params.extend(quote! { args: A, })
         }
@@ -413,10 +490,15 @@ impl NamedInstruction {
 
     fn ix_fn_call_assign(&self) -> TokenStream {
         let ix_fn_ident = self.ix_fn_ident();
+        let mut args = quote! {};
+        if self.has_accounts() {
+            args.extend(quote! { accounts, });
+        }
         if self.has_ix_args() {
-            quote! { let ix = #ix_fn_ident(accounts, args)?; }
-        } else {
-            quote! { let ix = #ix_fn_ident(accounts)?; }
+            args.extend(quote! { args });
+        }
+        quote! {
+            let ix = #ix_fn_ident(#args)?;
         }
     }
 
@@ -426,12 +508,26 @@ impl NamedInstruction {
         let accounts_len_ident = self.accounts_len_ident();
         let fn_generics = self.invoke_fn_generics();
         let fn_params = self.invoke_fn_params_prefix();
+        let fn_decl = if fn_generics.is_empty() {
+            quote! { #invoke_fn_ident(#fn_params) }
+        } else {
+            quote! { #invoke_fn_ident<#fn_generics>(#fn_params) }
+        };
         let call_assign = self.ix_fn_call_assign();
-        tokens.extend(quote! {
-            pub fn #invoke_fn_ident<#fn_generics>(#fn_params) -> ProgramResult {
-                #call_assign
+        let invoke = if self.has_accounts() {
+            quote! {
                 let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke(&ix, &account_info)
+            }
+        } else {
+            quote! {
+                invoke(&ix, &[])
+            }
+        };
+        tokens.extend(quote! {
+            pub fn #fn_decl -> ProgramResult {
+                #call_assign
+                #invoke
             }
         });
     }
@@ -443,12 +539,26 @@ impl NamedInstruction {
         let fn_generics = self.invoke_fn_generics();
         let mut fn_params = self.invoke_fn_params_prefix();
         fn_params.extend(quote! { seeds: &[&[&[u8]]], });
+        let fn_decl = if fn_generics.is_empty() {
+            quote! { #invoke_signed_fn_ident(#fn_params) }
+        } else {
+            quote! { #invoke_signed_fn_ident<#fn_generics>(#fn_params) }
+        };
         let call_assign = self.ix_fn_call_assign();
-        tokens.extend(quote! {
-            pub fn #invoke_signed_fn_ident<#fn_generics>(#fn_params) -> ProgramResult {
-                #call_assign
+        let invoke = if self.has_accounts() {
+            quote! {
                 let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke_signed(&ix, &account_info, seeds)
+            }
+        } else {
+            quote! {
+                invoke_signed(&ix, &[], seeds)
+            }
+        };
+        tokens.extend(quote! {
+            pub fn #fn_decl -> ProgramResult {
+                #call_assign
+                #invoke
             }
         });
     }
@@ -459,6 +569,9 @@ impl NamedInstruction {
         tokens: &mut TokenStream,
         unique_accounts: &[&IxAccount],
     ) {
+        if !self.has_accounts() {
+            return;
+        }
         let verify_account_keys_fn_ident =
             format_ident!("{}_verify_account_keys", self.name.to_snake_case());
         let accounts_ident = self.accounts_ident();
@@ -569,7 +682,10 @@ impl NamedInstruction {
 
 impl ToTokens for NamedInstruction {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let accounts = to_ix_accounts(&self.accounts);
+        let accounts = self
+            .accounts
+            .as_ref()
+            .map_or(Vec::new(), |v| to_ix_accounts(v));
         let n_accounts = accounts.len();
 
         let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());

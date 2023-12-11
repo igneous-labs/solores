@@ -1,0 +1,17 @@
+{
+  "version": "0.0.0",
+  "name": "shank_ix_blank",
+  "instructions": [
+    {
+      "name": "blankIx",
+      "discriminant": {
+        "type": "u8",
+        "value": 69
+      }
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111"
+  }
+}
