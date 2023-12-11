@@ -143,9 +143,21 @@ impl From<&InitProtocolFeeAccounts<'_, '_>> for InitProtocolFeeKeys {
 impl From<&InitProtocolFeeKeys> for [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitProtocolFeeKeys) -> Self {
         [
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new(keys.protocol_fee_account, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -180,12 +192,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LE
         }
     }
 }
+pub const INIT_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [225, 155, 167, 170, 29, 145, 165, 90];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitProtocolFeeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitProtocolFeeIxData(pub InitProtocolFeeIxArgs);
-pub const INIT_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [225, 155, 167, 170, 29, 145, 165, 90];
 impl From<InitProtocolFeeIxArgs> for InitProtocolFeeIxData {
     fn from(args: InitProtocolFeeIxArgs) -> Self {
         Self(args)
@@ -304,8 +316,16 @@ impl From<&SetProtocolFeeAccounts<'_, '_>> for SetProtocolFeeKeys {
 impl From<&SetProtocolFeeKeys> for [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] {
     fn from(keys: &SetProtocolFeeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.protocol_fee_account, false),
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_account,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -337,6 +357,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const SET_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [173, 239, 83, 242, 136, 43, 144, 217];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetProtocolFeeIxArgs {
@@ -344,7 +365,6 @@ pub struct SetProtocolFeeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SetProtocolFeeIxData(pub SetProtocolFeeIxArgs);
-pub const SET_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [173, 239, 83, 242, 136, 43, 144, 217];
 impl From<SetProtocolFeeIxArgs> for SetProtocolFeeIxData {
     fn from(args: SetProtocolFeeIxArgs) -> Self {
         Self(args)
@@ -483,15 +503,51 @@ impl From<&CreatePoolAccounts<'_, '_>> for CreatePoolKeys {
 impl From<&CreatePoolKeys> for [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] {
     fn from(keys: &CreatePoolKeys) -> Self {
         [
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.fee_authority, true),
-            AccountMeta::new(keys.pool_account, true),
-            AccountMeta::new_readonly(keys.pool_sol_reserves, false),
-            AccountMeta::new(keys.fee_account, false),
-            AccountMeta::new(keys.lp_mint, true),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.fee_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.fee_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.lp_mint,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -544,6 +600,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const CREATE_POOL_IX_DISCM: [u8; 8] = [233, 146, 209, 142, 207, 104, 64, 188];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreatePoolIxArgs {
@@ -551,7 +608,6 @@ pub struct CreatePoolIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CreatePoolIxData(pub CreatePoolIxArgs);
-pub const CREATE_POOL_IX_DISCM: [u8; 8] = [233, 146, 209, 142, 207, 104, 64, 188];
 impl From<CreatePoolIxArgs> for CreatePoolIxData {
     fn from(args: CreatePoolIxArgs) -> Self {
         Self(args)
@@ -698,13 +754,41 @@ impl From<&AddLiquidityAccounts<'_, '_>> for AddLiquidityKeys {
 impl From<&AddLiquidityKeys> for [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &AddLiquidityKeys) -> Self {
         [
-            AccountMeta::new(keys.from, true),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new(keys.pool_sol_reserves, false),
-            AccountMeta::new(keys.lp_mint, false),
-            AccountMeta::new(keys.mint_lp_tokens_to, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.from,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.lp_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint_lp_tokens_to,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -751,6 +835,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const ADD_LIQUIDITY_IX_DISCM: [u8; 8] = [181, 157, 89, 67, 143, 182, 52, 72];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddLiquidityIxArgs {
@@ -758,7 +843,6 @@ pub struct AddLiquidityIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddLiquidityIxData(pub AddLiquidityIxArgs);
-pub const ADD_LIQUIDITY_IX_DISCM: [u8; 8] = [181, 157, 89, 67, 143, 182, 52, 72];
 impl From<AddLiquidityIxArgs> for AddLiquidityIxData {
     fn from(args: AddLiquidityIxArgs) -> Self {
         Self(args)
@@ -902,14 +986,46 @@ impl From<&RemoveLiquidityAccounts<'_, '_>> for RemoveLiquidityKeys {
 impl From<&RemoveLiquidityKeys> for [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &RemoveLiquidityKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.burn_lp_tokens_from_authority, true),
-            AccountMeta::new(keys.to, false),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new(keys.pool_sol_reserves, false),
-            AccountMeta::new(keys.lp_mint, false),
-            AccountMeta::new(keys.burn_lp_tokens_from, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.burn_lp_tokens_from_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.to,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.lp_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.burn_lp_tokens_from,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -959,6 +1075,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const REMOVE_LIQUIDITY_IX_DISCM: [u8; 8] = [80, 85, 209, 72, 24, 206, 177, 108];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveLiquidityIxArgs {
@@ -966,7 +1083,6 @@ pub struct RemoveLiquidityIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RemoveLiquidityIxData(pub RemoveLiquidityIxArgs);
-pub const REMOVE_LIQUIDITY_IX_DISCM: [u8; 8] = [80, 85, 209, 72, 24, 206, 177, 108];
 impl From<RemoveLiquidityIxArgs> for RemoveLiquidityIxData {
     fn from(args: RemoveLiquidityIxArgs) -> Self {
         Self(args)
@@ -1105,11 +1221,31 @@ impl From<&SetFeeAccounts<'_, '_>> for SetFeeKeys {
 impl From<&SetFeeKeys> for [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] {
     fn from(keys: &SetFeeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.fee_authority, true),
-            AccountMeta::new_readonly(keys.pool_account, false),
-            AccountMeta::new(keys.fee_account, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.fee_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.fee_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1148,6 +1284,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const SET_FEE_IX_DISCM: [u8; 8] = [18, 154, 24, 18, 237, 214, 19, 80];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetFeeIxArgs {
@@ -1155,7 +1292,6 @@ pub struct SetFeeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SetFeeIxData(pub SetFeeIxArgs);
-pub const SET_FEE_IX_DISCM: [u8; 8] = [18, 154, 24, 18, 237, 214, 19, 80];
 impl From<SetFeeIxArgs> for SetFeeIxData {
     fn from(args: SetFeeIxArgs) -> Self {
         Self(args)
@@ -1276,9 +1412,21 @@ impl From<&SetFeeAuthorityAccounts<'_, '_>> for SetFeeAuthorityKeys {
 impl From<&SetFeeAuthorityKeys> for [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &SetFeeAuthorityKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.fee_authority, true),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new_readonly(keys.new_fee_authority, false),
+            AccountMeta {
+                pubkey: keys.fee_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_fee_authority,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1313,12 +1461,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LE
         }
     }
 }
+pub const SET_FEE_AUTHORITY_IX_DISCM: [u8; 8] = [31, 1, 50, 87, 237, 101, 97, 132];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetFeeAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct SetFeeAuthorityIxData(pub SetFeeAuthorityIxArgs);
-pub const SET_FEE_AUTHORITY_IX_DISCM: [u8; 8] = [31, 1, 50, 87, 237, 101, 97, 132];
 impl From<SetFeeAuthorityIxArgs> for SetFeeAuthorityIxData {
     fn from(args: SetFeeAuthorityIxArgs) -> Self {
         Self(args)
@@ -1443,11 +1591,31 @@ impl From<&DeactivateStakeAccountAccounts<'_, '_>> for DeactivateStakeAccountKey
 impl From<&DeactivateStakeAccountKeys> for [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &DeactivateStakeAccountKeys) -> Self {
         [
-            AccountMeta::new(keys.stake_account, false),
-            AccountMeta::new_readonly(keys.pool_account, false),
-            AccountMeta::new_readonly(keys.pool_sol_reserves, false),
-            AccountMeta::new_readonly(keys.clock, false),
-            AccountMeta::new_readonly(keys.stake_program, false),
+            AccountMeta {
+                pubkey: keys.stake_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.clock,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1488,12 +1656,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCO
         }
     }
 }
+pub const DEACTIVATE_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [217, 64, 76, 16, 216, 77, 123, 226];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeactivateStakeAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeactivateStakeAccountIxData(pub DeactivateStakeAccountIxArgs);
-pub const DEACTIVATE_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [217, 64, 76, 16, 216, 77, 123, 226];
 impl From<DeactivateStakeAccountIxArgs> for DeactivateStakeAccountIxData {
     fn from(args: DeactivateStakeAccountIxArgs) -> Self {
         Self(args)
@@ -1628,13 +1796,41 @@ impl From<&ReclaimStakeAccountAccounts<'_, '_>> for ReclaimStakeAccountKeys {
 impl From<&ReclaimStakeAccountKeys> for [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &ReclaimStakeAccountKeys) -> Self {
         [
-            AccountMeta::new(keys.stake_account, false),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new(keys.pool_sol_reserves, false),
-            AccountMeta::new(keys.stake_account_record_account, false),
-            AccountMeta::new_readonly(keys.clock, false),
-            AccountMeta::new_readonly(keys.stake_history, false),
-            AccountMeta::new_readonly(keys.stake_program, false),
+            AccountMeta {
+                pubkey: keys.stake_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.stake_account_record_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.clock,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_history,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1681,12 +1877,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNT
         }
     }
 }
+pub const RECLAIM_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [47, 127, 90, 221, 10, 160, 183, 117];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ReclaimStakeAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ReclaimStakeAccountIxData(pub ReclaimStakeAccountIxArgs);
-pub const RECLAIM_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [47, 127, 90, 221, 10, 160, 183, 117];
 impl From<ReclaimStakeAccountIxArgs> for ReclaimStakeAccountIxData {
     fn from(args: ReclaimStakeAccountIxArgs) -> Self {
         Self(args)
@@ -1845,19 +2041,71 @@ impl From<&UnstakeAccounts<'_, '_>> for UnstakeKeys {
 impl From<&UnstakeKeys> for [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] {
     fn from(keys: &UnstakeKeys) -> Self {
         [
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.unstaker, true),
-            AccountMeta::new(keys.stake_account, false),
-            AccountMeta::new(keys.destination, false),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new(keys.pool_sol_reserves, false),
-            AccountMeta::new_readonly(keys.fee_account, false),
-            AccountMeta::new(keys.stake_account_record_account, false),
-            AccountMeta::new_readonly(keys.protocol_fee_account, false),
-            AccountMeta::new(keys.protocol_fee_destination, false),
-            AccountMeta::new_readonly(keys.clock, false),
-            AccountMeta::new_readonly(keys.stake_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.unstaker,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.fee_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_account_record_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.clock,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1920,12 +2168,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UNSTAKE_IX_DISCM: [u8; 8] = [90, 95, 107, 42, 205, 124, 50, 225];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnstakeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UnstakeIxData(pub UnstakeIxArgs);
-pub const UNSTAKE_IX_DISCM: [u8; 8] = [90, 95, 107, 42, 205, 124, 50, 225];
 impl From<UnstakeIxArgs> for UnstakeIxData {
     fn from(args: UnstakeIxArgs) -> Self {
         Self(args)
@@ -2104,20 +2352,76 @@ impl From<&UnstakeWsolAccounts<'_, '_>> for UnstakeWsolKeys {
 impl From<&UnstakeWsolKeys> for [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] {
     fn from(keys: &UnstakeWsolKeys) -> Self {
         [
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.unstaker, true),
-            AccountMeta::new(keys.stake_account, false),
-            AccountMeta::new(keys.destination, false),
-            AccountMeta::new(keys.pool_account, false),
-            AccountMeta::new(keys.pool_sol_reserves, false),
-            AccountMeta::new_readonly(keys.fee_account, false),
-            AccountMeta::new(keys.stake_account_record_account, false),
-            AccountMeta::new_readonly(keys.protocol_fee_account, false),
-            AccountMeta::new(keys.protocol_fee_destination, false),
-            AccountMeta::new_readonly(keys.clock, false),
-            AccountMeta::new_readonly(keys.stake_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.unstaker,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.pool_sol_reserves,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.fee_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_account_record_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.protocol_fee_destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.clock,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.stake_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2185,12 +2489,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UNSTAKE_WSOL_IX_DISCM: [u8; 8] = [125, 93, 190, 135, 89, 174, 142, 149];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnstakeWsolIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UnstakeWsolIxData(pub UnstakeWsolIxArgs);
-pub const UNSTAKE_WSOL_IX_DISCM: [u8; 8] = [125, 93, 190, 135, 89, 174, 142, 149];
 impl From<UnstakeWsolIxArgs> for UnstakeWsolIxData {
     fn from(args: UnstakeWsolIxArgs) -> Self {
         Self(args)

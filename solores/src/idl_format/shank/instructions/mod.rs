@@ -18,17 +18,24 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
     }
 
     fn gen_head(&self) -> TokenStream {
-        // imports
+        let mut solana_program_imports = quote! {
+            account_info::AccountInfo,
+            entrypoint::ProgramResult,
+            instruction::{AccountMeta, Instruction},
+            program::{invoke, invoke_signed},
+            pubkey::Pubkey,
+        };
+        for ix in self.instructions {
+            if ix.has_privileged_accounts() {
+                solana_program_imports.extend(quote! {
+                    program_error::ProgramError,
+                });
+                break;
+            }
+        }
         let mut res = quote! {
             use borsh::{BorshDeserialize, BorshSerialize};
-            use solana_program::{
-                account_info::AccountInfo,
-                entrypoint::ProgramResult,
-                instruction::{AccountMeta, Instruction},
-                program::{invoke, invoke_signed},
-                program_error::ProgramError,
-                pubkey::Pubkey,
-            };
+            use solana_program::{#solana_program_imports};
         };
         for ix in self.instructions {
             if ix

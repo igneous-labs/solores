@@ -299,6 +299,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 }
 ```
 
+This function is not generated if the instruction has no privileged account inputs (only non-signer and non-writable accounts).
+
 ### Zero-copy/bytemuck support
 
 Pass `-z <name-of-type-or-account-in-idl>` to additionally derive `Pod + Zeroable + Copy` for the generated types. Accepts multiple options.

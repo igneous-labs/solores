@@ -336,13 +336,41 @@ impl From<&CreateMetadataAccountAccounts<'_, '_>> for CreateMetadataAccountKeys 
 impl From<&CreateMetadataAccountKeys> for [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &CreateMetadataAccountKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.update_authority, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -389,6 +417,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOU
         }
     }
 }
+pub const CREATE_METADATA_ACCOUNT_IX_DISCM: u8 = 0u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMetadataAccountIxArgs {
@@ -396,7 +425,6 @@ pub struct CreateMetadataAccountIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CreateMetadataAccountIxData(pub CreateMetadataAccountIxArgs);
-pub const CREATE_METADATA_ACCOUNT_IX_DISCM: u8 = 0u8;
 impl From<CreateMetadataAccountIxArgs> for CreateMetadataAccountIxData {
     fn from(args: CreateMetadataAccountIxArgs) -> Self {
         Self(args)
@@ -526,8 +554,16 @@ impl From<&UpdateMetadataAccountAccounts<'_, '_>> for UpdateMetadataAccountKeys 
 impl From<&UpdateMetadataAccountKeys> for [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateMetadataAccountKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -556,6 +592,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOU
         }
     }
 }
+pub const UPDATE_METADATA_ACCOUNT_IX_DISCM: u8 = 1u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateMetadataAccountIxArgs {
@@ -563,7 +600,6 @@ pub struct UpdateMetadataAccountIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateMetadataAccountIxData(pub UpdateMetadataAccountIxArgs);
-pub const UPDATE_METADATA_ACCOUNT_IX_DISCM: u8 = 1u8;
 impl From<UpdateMetadataAccountIxArgs> for UpdateMetadataAccountIxData {
     fn from(args: UpdateMetadataAccountIxArgs) -> Self {
         Self(args)
@@ -749,19 +785,71 @@ impl From<&DeprecatedCreateMasterEditionKeys>
 {
     fn from(keys: &DeprecatedCreateMasterEditionKeys) -> Self {
         [
-            AccountMeta::new(keys.edition, false),
-            AccountMeta::new(keys.mint, false),
-            AccountMeta::new(keys.printing_mint, false),
-            AccountMeta::new(keys.one_time_printing_authorization_mint, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.printing_mint_authority, true),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.one_time_printing_authorization_mint_authority, true),
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.one_time_printing_authorization_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.one_time_printing_authorization_mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -832,6 +920,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION
         }
     }
 }
+pub const DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM: u8 = 2u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedCreateMasterEditionIxArgs {
@@ -839,7 +928,6 @@ pub struct DeprecatedCreateMasterEditionIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeprecatedCreateMasterEditionIxData(pub DeprecatedCreateMasterEditionIxArgs);
-pub const DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM: u8 = 2u8;
 impl From<DeprecatedCreateMasterEditionIxArgs> for DeprecatedCreateMasterEditionIxData {
     fn from(args: DeprecatedCreateMasterEditionIxArgs) -> Self {
         Self(args)
@@ -1079,22 +1167,86 @@ impl From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>
 {
     fn from(keys: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new(keys.edition, false),
-            AccountMeta::new(keys.master_edition, false),
-            AccountMeta::new(keys.mint, false),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new(keys.printing_mint, false),
-            AccountMeta::new(keys.master_token_account, false),
-            AccountMeta::new(keys.edition_marker, false),
-            AccountMeta::new_readonly(keys.burn_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.master_update_authority, false),
-            AccountMeta::new_readonly(keys.master_metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new(keys.reservation_list, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.master_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition_marker,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.burn_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.master_update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.master_metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.reservation_list,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -1185,6 +1337,7 @@ impl<'me, 'info>
         }
     }
 }
+pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM: u8 = 3u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
@@ -1192,7 +1345,6 @@ pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
 pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData(
     pub DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs,
 );
-pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM: u8 = 3u8;
 impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>
     for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData
 {
@@ -1383,9 +1535,21 @@ impl From<&UpdatePrimarySaleHappenedViaTokenKeys>
 {
     fn from(keys: &UpdatePrimarySaleHappenedViaTokenKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.owner, true),
-            AccountMeta::new_readonly(keys.token, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.owner,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1425,12 +1589,12 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM: u8 = 4u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePrimarySaleHappenedViaTokenIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePrimarySaleHappenedViaTokenIxData(pub UpdatePrimarySaleHappenedViaTokenIxArgs);
-pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM: u8 = 4u8;
 impl From<UpdatePrimarySaleHappenedViaTokenIxArgs> for UpdatePrimarySaleHappenedViaTokenIxData {
     fn from(args: UpdatePrimarySaleHappenedViaTokenIxArgs) -> Self {
         Self(args)
@@ -1572,9 +1736,21 @@ impl From<&DeprecatedSetReservationListKeys>
 {
     fn from(keys: &DeprecatedSetReservationListKeys) -> Self {
         [
-            AccountMeta::new(keys.master_edition, false),
-            AccountMeta::new(keys.reservation_list, false),
-            AccountMeta::new_readonly(keys.resource, true),
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.reservation_list,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.resource,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1613,6 +1789,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_
         }
     }
 }
+pub const DEPRECATED_SET_RESERVATION_LIST_IX_DISCM: u8 = 5u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedSetReservationListIxArgs {
@@ -1620,7 +1797,6 @@ pub struct DeprecatedSetReservationListIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeprecatedSetReservationListIxData(pub DeprecatedSetReservationListIxArgs);
-pub const DEPRECATED_SET_RESERVATION_LIST_IX_DISCM: u8 = 5u8;
 impl From<DeprecatedSetReservationListIxArgs> for DeprecatedSetReservationListIxData {
     fn from(args: DeprecatedSetReservationListIxArgs) -> Self {
         Self(args)
@@ -1788,14 +1964,46 @@ impl From<&DeprecatedCreateReservationListKeys>
 {
     fn from(keys: &DeprecatedCreateReservationListKeys) -> Self {
         [
-            AccountMeta::new(keys.reservation_list, false),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.master_edition, false),
-            AccountMeta::new_readonly(keys.resource, false),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.reservation_list,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.resource,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1849,12 +2057,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LI
         }
     }
 }
+pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM: u8 = 6u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedCreateReservationListIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeprecatedCreateReservationListIxData(pub DeprecatedCreateReservationListIxArgs);
-pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM: u8 = 6u8;
 impl From<DeprecatedCreateReservationListIxArgs> for DeprecatedCreateReservationListIxData {
     fn from(args: DeprecatedCreateReservationListIxArgs) -> Self {
         Self(args)
@@ -1993,8 +2201,16 @@ impl From<&SignMetadataAccounts<'_, '_>> for SignMetadataKeys {
 impl From<&SignMetadataKeys> for [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] {
     fn from(keys: &SignMetadataKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.creator, true),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.creator,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2023,12 +2239,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const SIGN_METADATA_IX_DISCM: u8 = 7u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SignMetadataIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct SignMetadataIxData(pub SignMetadataIxArgs);
-pub const SIGN_METADATA_IX_DISCM: u8 = 7u8;
 impl From<SignMetadataIxArgs> for SignMetadataIxData {
     fn from(args: SignMetadataIxArgs) -> Self {
         Self(args)
@@ -2189,15 +2405,51 @@ impl From<&DeprecatedMintPrintingTokensViaTokenKeys>
 {
     fn from(keys: &DeprecatedMintPrintingTokensViaTokenKeys) -> Self {
         [
-            AccountMeta::new(keys.destination, false),
-            AccountMeta::new(keys.token, false),
-            AccountMeta::new(keys.one_time_printing_authorization_mint, false),
-            AccountMeta::new(keys.printing_mint, false),
-            AccountMeta::new_readonly(keys.burn_authority, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.master_edition, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.one_time_printing_authorization_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.burn_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2255,6 +2507,7 @@ impl<'me, 'info>
         }
     }
 }
+pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM: u8 = 8u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
@@ -2264,7 +2517,6 @@ pub struct DeprecatedMintPrintingTokensViaTokenIxArgs {
 pub struct DeprecatedMintPrintingTokensViaTokenIxData(
     pub DeprecatedMintPrintingTokensViaTokenIxArgs,
 );
-pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM: u8 = 8u8;
 impl From<DeprecatedMintPrintingTokensViaTokenIxArgs>
     for DeprecatedMintPrintingTokensViaTokenIxData
 {
@@ -2442,13 +2694,41 @@ impl From<&DeprecatedMintPrintingTokensKeys>
 {
     fn from(keys: &DeprecatedMintPrintingTokensKeys) -> Self {
         [
-            AccountMeta::new(keys.destination, false),
-            AccountMeta::new(keys.printing_mint, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.master_edition, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.destination,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2499,6 +2779,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_
         }
     }
 }
+pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM: u8 = 9u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeprecatedMintPrintingTokensIxArgs {
@@ -2506,7 +2787,6 @@ pub struct DeprecatedMintPrintingTokensIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeprecatedMintPrintingTokensIxData(pub DeprecatedMintPrintingTokensIxArgs);
-pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM: u8 = 9u8;
 impl From<DeprecatedMintPrintingTokensIxArgs> for DeprecatedMintPrintingTokensIxData {
     fn from(args: DeprecatedMintPrintingTokensIxArgs) -> Self {
         Self(args)
@@ -2679,15 +2959,51 @@ impl From<&CreateMasterEditionAccounts<'_, '_>> for CreateMasterEditionKeys {
 impl From<&CreateMasterEditionKeys> for [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] {
     fn from(keys: &CreateMasterEditionKeys) -> Self {
         [
-            AccountMeta::new(keys.edition, false),
-            AccountMeta::new(keys.mint, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2740,6 +3056,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNT
         }
     }
 }
+pub const CREATE_MASTER_EDITION_IX_DISCM: u8 = 10u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMasterEditionIxArgs {
@@ -2747,7 +3064,6 @@ pub struct CreateMasterEditionIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CreateMasterEditionIxData(pub CreateMasterEditionIxArgs);
-pub const CREATE_MASTER_EDITION_IX_DISCM: u8 = 10u8;
 impl From<CreateMasterEditionIxArgs> for CreateMasterEditionIxData {
     fn from(args: CreateMasterEditionIxArgs) -> Self {
         Self(args)
@@ -2945,20 +3261,76 @@ impl From<&MintNewEditionFromMasterEditionViaTokenKeys>
 {
     fn from(keys: &MintNewEditionFromMasterEditionViaTokenKeys) -> Self {
         [
-            AccountMeta::new(keys.new_metadata, false),
-            AccountMeta::new(keys.new_edition, false),
-            AccountMeta::new(keys.master_edition, false),
-            AccountMeta::new(keys.new_mint, false),
-            AccountMeta::new(keys.edition_mark_pda, false),
-            AccountMeta::new_readonly(keys.new_mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.token_account_owner, true),
-            AccountMeta::new_readonly(keys.token_account, false),
-            AccountMeta::new_readonly(keys.new_metadata_update_authority, false),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.new_metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition_mark_pda,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_account_owner,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.new_metadata_update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3034,6 +3406,7 @@ impl<'me, 'info>
         }
     }
 }
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM: u8 = 11u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
@@ -3044,7 +3417,6 @@ pub struct MintNewEditionFromMasterEditionViaTokenIxArgs {
 pub struct MintNewEditionFromMasterEditionViaTokenIxData(
     pub MintNewEditionFromMasterEditionViaTokenIxArgs,
 );
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM: u8 = 11u8;
 impl From<MintNewEditionFromMasterEditionViaTokenIxArgs>
     for MintNewEditionFromMasterEditionViaTokenIxData
 {
@@ -3212,9 +3584,21 @@ impl From<&ConvertMasterEditionV1ToV2Keys>
 {
     fn from(keys: &ConvertMasterEditionV1ToV2Keys) -> Self {
         [
-            AccountMeta::new(keys.master_edition, false),
-            AccountMeta::new(keys.one_time_auth, false),
-            AccountMeta::new(keys.printing_mint, false),
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.one_time_auth,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.printing_mint,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -3253,12 +3637,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_
         }
     }
 }
+pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM: u8 = 12u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ConvertMasterEditionV1ToV2IxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ConvertMasterEditionV1ToV2IxData(pub ConvertMasterEditionV1ToV2IxArgs);
-pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM: u8 = 12u8;
 impl From<ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1ToV2IxData {
     fn from(args: ConvertMasterEditionV1ToV2IxArgs) -> Self {
         Self(args)
@@ -3467,23 +3851,91 @@ impl From<&MintNewEditionFromMasterEditionViaVaultProxyKeys>
 {
     fn from(keys: &MintNewEditionFromMasterEditionViaVaultProxyKeys) -> Self {
         [
-            AccountMeta::new(keys.new_metadata, false),
-            AccountMeta::new(keys.new_edition, false),
-            AccountMeta::new(keys.master_edition, false),
-            AccountMeta::new(keys.new_mint, false),
-            AccountMeta::new(keys.edition_mark_pda, false),
-            AccountMeta::new_readonly(keys.new_mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.vault_authority, true),
-            AccountMeta::new_readonly(keys.safety_deposit_store, false),
-            AccountMeta::new_readonly(keys.safety_deposit_box, false),
-            AccountMeta::new_readonly(keys.vault, false),
-            AccountMeta::new_readonly(keys.new_metadata_update_authority, false),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.token_vault_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.new_metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.master_edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition_mark_pda,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.vault_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.safety_deposit_store,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.safety_deposit_box,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.vault,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.new_metadata_update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_vault_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3570,6 +4022,7 @@ impl<'me, 'info>
         }
     }
 }
+pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM: u8 = 13u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
@@ -3580,7 +4033,6 @@ pub struct MintNewEditionFromMasterEditionViaVaultProxyIxArgs {
 pub struct MintNewEditionFromMasterEditionViaVaultProxyIxData(
     pub MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 );
-pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM: u8 = 13u8;
 impl From<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>
     for MintNewEditionFromMasterEditionViaVaultProxyIxData
 {
@@ -3744,7 +4196,11 @@ impl From<&PuffMetadataAccounts<'_, '_>> for PuffMetadataKeys {
 }
 impl From<&PuffMetadataKeys> for [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] {
     fn from(keys: &PuffMetadataKeys) -> Self {
-        [AccountMeta::new(keys.metadata, false)]
+        [AccountMeta {
+            pubkey: keys.metadata,
+            is_signer: false,
+            is_writable: true,
+        }]
     }
 }
 impl From<[Pubkey; PUFF_METADATA_IX_ACCOUNTS_LEN]> for PuffMetadataKeys {
@@ -3768,12 +4224,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]>
         Self { metadata: &arr[0] }
     }
 }
+pub const PUFF_METADATA_IX_DISCM: u8 = 14u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PuffMetadataIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct PuffMetadataIxData(pub PuffMetadataIxArgs);
-pub const PUFF_METADATA_IX_DISCM: u8 = 14u8;
 impl From<PuffMetadataIxArgs> for PuffMetadataIxData {
     fn from(args: PuffMetadataIxArgs) -> Self {
         Self(args)
@@ -3887,8 +4343,16 @@ impl From<&UpdateMetadataAccountV2Keys>
 {
     fn from(keys: &UpdateMetadataAccountV2Keys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3917,6 +4381,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_AC
         }
     }
 }
+pub const UPDATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 15u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateMetadataAccountV2IxArgs {
@@ -3924,7 +4389,6 @@ pub struct UpdateMetadataAccountV2IxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateMetadataAccountV2IxData(pub UpdateMetadataAccountV2IxArgs);
-pub const UPDATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 15u8;
 impl From<UpdateMetadataAccountV2IxArgs> for UpdateMetadataAccountV2IxData {
     fn from(args: UpdateMetadataAccountV2IxArgs) -> Self {
         Self(args)
@@ -4078,13 +4542,41 @@ impl From<&CreateMetadataAccountV2Keys>
 {
     fn from(keys: &CreateMetadataAccountV2Keys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.update_authority, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4131,6 +4623,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_AC
         }
     }
 }
+pub const CREATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 16u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMetadataAccountV2IxArgs {
@@ -4138,7 +4631,6 @@ pub struct CreateMetadataAccountV2IxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CreateMetadataAccountV2IxData(pub CreateMetadataAccountV2IxArgs);
-pub const CREATE_METADATA_ACCOUNT_V2_IX_DISCM: u8 = 16u8;
 impl From<CreateMetadataAccountV2IxArgs> for CreateMetadataAccountV2IxData {
     fn from(args: CreateMetadataAccountV2IxArgs) -> Self {
         Self(args)
@@ -4305,15 +4797,51 @@ impl From<&CreateMasterEditionV3Accounts<'_, '_>> for CreateMasterEditionV3Keys 
 impl From<&CreateMasterEditionV3Keys> for [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] {
     fn from(keys: &CreateMasterEditionV3Keys) -> Self {
         [
-            AccountMeta::new(keys.edition, false),
-            AccountMeta::new(keys.mint, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.mint_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4366,6 +4894,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCO
         }
     }
 }
+pub const CREATE_MASTER_EDITION_V3_IX_DISCM: u8 = 17u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CreateMasterEditionV3IxArgs {
@@ -4373,7 +4902,6 @@ pub struct CreateMasterEditionV3IxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CreateMasterEditionV3IxData(pub CreateMasterEditionV3IxArgs);
-pub const CREATE_MASTER_EDITION_V3_IX_DISCM: u8 = 17u8;
 impl From<CreateMasterEditionV3IxArgs> for CreateMasterEditionV3IxData {
     fn from(args: CreateMasterEditionV3IxArgs) -> Self {
         Self(args)
@@ -4529,12 +5057,36 @@ impl From<&VerifyCollectionAccounts<'_, '_>> for VerifyCollectionKeys {
 impl From<&VerifyCollectionKeys> for [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
     fn from(keys: &VerifyCollectionKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.collection_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.collection_mint, false),
-            AccountMeta::new_readonly(keys.collection, false),
-            AccountMeta::new_readonly(keys.collection_master_edition_account, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.collection_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_master_edition_account,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4578,12 +5130,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LE
         }
     }
 }
+pub const VERIFY_COLLECTION_IX_DISCM: u8 = 18u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VerifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct VerifyCollectionIxData(pub VerifyCollectionIxArgs);
-pub const VERIFY_COLLECTION_IX_DISCM: u8 = 18u8;
 impl From<VerifyCollectionIxArgs> for VerifyCollectionIxData {
     fn from(args: VerifyCollectionIxArgs) -> Self {
         Self(args)
@@ -4758,17 +5310,61 @@ impl From<&UtilizeAccounts<'_, '_>> for UtilizeKeys {
 impl From<&UtilizeKeys> for [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] {
     fn from(keys: &UtilizeKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new(keys.token_account, false),
-            AccountMeta::new(keys.mint, false),
-            AccountMeta::new_readonly(keys.use_authority, true),
-            AccountMeta::new_readonly(keys.owner, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.ata_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new(keys.use_authority_record, false),
-            AccountMeta::new_readonly(keys.burner, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.use_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.owner,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.ata_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.use_authority_record,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.burner,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4825,6 +5421,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UTILIZE_IX_DISCM: u8 = 19u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UtilizeIxArgs {
@@ -4832,7 +5429,6 @@ pub struct UtilizeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UtilizeIxData(pub UtilizeIxArgs);
-pub const UTILIZE_IX_DISCM: u8 = 19u8;
 impl From<UtilizeIxArgs> for UtilizeIxData {
     fn from(args: UtilizeIxArgs) -> Self {
         Self(args)
@@ -5014,17 +5610,61 @@ impl From<&ApproveUseAuthorityAccounts<'_, '_>> for ApproveUseAuthorityKeys {
 impl From<&ApproveUseAuthorityKeys> for [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &ApproveUseAuthorityKeys) -> Self {
         [
-            AccountMeta::new(keys.use_authority_record, false),
-            AccountMeta::new_readonly(keys.owner, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.user, false),
-            AccountMeta::new(keys.owner_token_account, false),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.burner, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.use_authority_record,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.owner,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.owner_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.burner,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5083,6 +5723,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNT
         }
     }
 }
+pub const APPROVE_USE_AUTHORITY_IX_DISCM: u8 = 20u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveUseAuthorityIxArgs {
@@ -5090,7 +5731,6 @@ pub struct ApproveUseAuthorityIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ApproveUseAuthorityIxData(pub ApproveUseAuthorityIxArgs);
-pub const APPROVE_USE_AUTHORITY_IX_DISCM: u8 = 20u8;
 impl From<ApproveUseAuthorityIxArgs> for ApproveUseAuthorityIxData {
     fn from(args: ApproveUseAuthorityIxArgs) -> Self {
         Self(args)
@@ -5260,15 +5900,51 @@ impl From<&RevokeUseAuthorityAccounts<'_, '_>> for RevokeUseAuthorityKeys {
 impl From<&RevokeUseAuthorityKeys> for [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &RevokeUseAuthorityKeys) -> Self {
         [
-            AccountMeta::new(keys.use_authority_record, false),
-            AccountMeta::new_readonly(keys.owner, true),
-            AccountMeta::new_readonly(keys.user, false),
-            AccountMeta::new(keys.owner_token_account, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.use_authority_record,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.owner,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.owner_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5321,12 +5997,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS
         }
     }
 }
+pub const REVOKE_USE_AUTHORITY_IX_DISCM: u8 = 21u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevokeUseAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct RevokeUseAuthorityIxData(pub RevokeUseAuthorityIxArgs);
-pub const REVOKE_USE_AUTHORITY_IX_DISCM: u8 = 21u8;
 impl From<RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData {
     fn from(args: RevokeUseAuthorityIxArgs) -> Self {
         Self(args)
@@ -5479,12 +6155,36 @@ impl From<&UnverifyCollectionAccounts<'_, '_>> for UnverifyCollectionKeys {
 impl From<&UnverifyCollectionKeys> for [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
     fn from(keys: &UnverifyCollectionKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.collection_authority, true),
-            AccountMeta::new_readonly(keys.collection_mint, false),
-            AccountMeta::new_readonly(keys.collection, false),
-            AccountMeta::new_readonly(keys.collection_master_edition_account, false),
-            AccountMeta::new_readonly(keys.collection_authority_record, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.collection_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_master_edition_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_authority_record,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5528,12 +6228,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_
         }
     }
 }
+pub const UNVERIFY_COLLECTION_IX_DISCM: u8 = 22u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UnverifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UnverifyCollectionIxData(pub UnverifyCollectionIxArgs);
-pub const UNVERIFY_COLLECTION_IX_DISCM: u8 = 22u8;
 impl From<UnverifyCollectionIxArgs> for UnverifyCollectionIxData {
     fn from(args: UnverifyCollectionIxArgs) -> Self {
         Self(args)
@@ -5701,14 +6401,46 @@ impl From<&ApproveCollectionAuthorityKeys>
 {
     fn from(keys: &ApproveCollectionAuthorityKeys) -> Self {
         [
-            AccountMeta::new(keys.collection_authority_record, false),
-            AccountMeta::new_readonly(keys.new_collection_authority, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.rent, false),
+            AccountMeta {
+                pubkey: keys.collection_authority_record,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.new_collection_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5760,12 +6492,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_
         }
     }
 }
+pub const APPROVE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 23u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ApproveCollectionAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ApproveCollectionAuthorityIxData(pub ApproveCollectionAuthorityIxArgs);
-pub const APPROVE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 23u8;
 impl From<ApproveCollectionAuthorityIxArgs> for ApproveCollectionAuthorityIxData {
     fn from(args: ApproveCollectionAuthorityIxArgs) -> Self {
         Self(args)
@@ -5919,10 +6651,26 @@ impl From<&RevokeCollectionAuthorityKeys>
 {
     fn from(keys: &RevokeCollectionAuthorityKeys) -> Self {
         [
-            AccountMeta::new(keys.collection_authority_record, false),
-            AccountMeta::new_readonly(keys.update_authority, true),
-            AccountMeta::new_readonly(keys.metadata, false),
-            AccountMeta::new_readonly(keys.mint, false),
+            AccountMeta {
+                pubkey: keys.collection_authority_record,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5960,12 +6708,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_A
         }
     }
 }
+pub const REVOKE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 24u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevokeCollectionAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct RevokeCollectionAuthorityIxData(pub RevokeCollectionAuthorityIxArgs);
-pub const REVOKE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 24u8;
 impl From<RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthorityIxData {
     fn from(args: RevokeCollectionAuthorityIxArgs) -> Self {
         Self(args)
@@ -6132,14 +6880,46 @@ impl From<&SetAndVerifyCollectionKeys>
 {
     fn from(keys: &SetAndVerifyCollectionKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.collection_authority, true),
-            AccountMeta::new_readonly(keys.payer, true),
-            AccountMeta::new_readonly(keys.update_authority, false),
-            AccountMeta::new_readonly(keys.collection_mint, false),
-            AccountMeta::new_readonly(keys.collection, false),
-            AccountMeta::new_readonly(keys.collection_master_edition_account, false),
-            AccountMeta::new_readonly(keys.collection_authority_record, false),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.collection_authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.update_authority,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_master_edition_account,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.collection_authority_record,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -6189,12 +6969,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACC
         }
     }
 }
+pub const SET_AND_VERIFY_COLLECTION_IX_DISCM: u8 = 25u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SetAndVerifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct SetAndVerifyCollectionIxData(pub SetAndVerifyCollectionIxArgs);
-pub const SET_AND_VERIFY_COLLECTION_IX_DISCM: u8 = 25u8;
 impl From<SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxData {
     fn from(args: SetAndVerifyCollectionIxArgs) -> Self {
         Self(args)
@@ -6351,11 +7131,31 @@ impl From<&FreezeDelegatedAccountAccounts<'_, '_>> for FreezeDelegatedAccountKey
 impl From<&FreezeDelegatedAccountKeys> for [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &FreezeDelegatedAccountKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.delegate, true),
-            AccountMeta::new(keys.token_account, false),
-            AccountMeta::new_readonly(keys.edition, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.delegate,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -6396,12 +7196,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCO
         }
     }
 }
+pub const FREEZE_DELEGATED_ACCOUNT_IX_DISCM: u8 = 26u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezeDelegatedAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct FreezeDelegatedAccountIxData(pub FreezeDelegatedAccountIxArgs);
-pub const FREEZE_DELEGATED_ACCOUNT_IX_DISCM: u8 = 26u8;
 impl From<FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxData {
     fn from(args: FreezeDelegatedAccountIxArgs) -> Self {
         Self(args)
@@ -6546,11 +7346,31 @@ impl From<&ThawDelegatedAccountAccounts<'_, '_>> for ThawDelegatedAccountKeys {
 impl From<&ThawDelegatedAccountKeys> for [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
     fn from(keys: &ThawDelegatedAccountKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.delegate, true),
-            AccountMeta::new(keys.token_account, false),
-            AccountMeta::new_readonly(keys.edition, false),
-            AccountMeta::new_readonly(keys.mint, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.delegate,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.edition,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -6591,12 +7411,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUN
         }
     }
 }
+pub const THAW_DELEGATED_ACCOUNT_IX_DISCM: u8 = 27u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ThawDelegatedAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ThawDelegatedAccountIxData(pub ThawDelegatedAccountIxArgs);
-pub const THAW_DELEGATED_ACCOUNT_IX_DISCM: u8 = 27u8;
 impl From<ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData {
     fn from(args: ThawDelegatedAccountIxArgs) -> Self {
         Self(args)
@@ -6726,8 +7546,16 @@ impl From<&RemoveCreatorVerificationKeys>
 {
     fn from(keys: &RemoveCreatorVerificationKeys) -> Self {
         [
-            AccountMeta::new(keys.metadata, false),
-            AccountMeta::new_readonly(keys.creator, true),
+            AccountMeta {
+                pubkey: keys.metadata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.creator,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -6756,12 +7584,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_A
         }
     }
 }
+pub const REMOVE_CREATOR_VERIFICATION_IX_DISCM: u8 = 28u8;
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveCreatorVerificationIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct RemoveCreatorVerificationIxData(pub RemoveCreatorVerificationIxArgs);
-pub const REMOVE_CREATOR_VERIFICATION_IX_DISCM: u8 = 28u8;
 impl From<RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificationIxData {
     fn from(args: RemoveCreatorVerificationIxArgs) -> Self {
         Self(args)
