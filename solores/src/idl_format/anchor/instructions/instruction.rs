@@ -490,10 +490,15 @@ impl NamedInstruction {
 
     fn ix_fn_call_assign(&self) -> TokenStream {
         let ix_fn_ident = self.ix_fn_ident();
+        let mut args = quote! {};
+        if self.has_accounts() {
+            args.extend(quote! { accounts, });
+        }
         if self.has_ix_args() {
-            quote! { let ix = #ix_fn_ident(accounts, args)?; }
-        } else {
-            quote! { let ix = #ix_fn_ident(accounts)?; }
+            args.extend(quote! { args });
+        }
+        quote! {
+            let ix = #ix_fn_ident(#args)?;
         }
     }
 
