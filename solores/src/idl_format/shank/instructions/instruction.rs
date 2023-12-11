@@ -223,16 +223,13 @@ impl ToTokens for NamedInstruction {
                 }
             }
 
-            impl BorshSerialize for #ix_data_ident {
-                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    writer.write_all(&[#discm_ident])?;
-                    self.0.serialize(writer)
-                }
-            }
-
             impl #ix_data_ident {
-                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm = u8::deserialize(buf)?;
+                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+                    use std::io::Read;
+                    let mut reader = buf;
+                    let mut maybe_discm_buf = [0u8; 1];
+                    reader.read_exact(&mut maybe_discm_buf)?;
+                    let maybe_discm = maybe_discm_buf[0];
                     if maybe_discm != #discm_ident {
                         return Err(
                             std::io::Error::new(
@@ -240,7 +237,18 @@ impl ToTokens for NamedInstruction {
                             )
                         );
                     }
-                    Ok(Self(#ix_args_ident::deserialize(buf)?))
+                    Ok(Self(#ix_args_ident::deserialize(&mut reader)?))
+                }
+
+                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+                    writer.write_all(&[#discm_ident])?;
+                    self.0.serialize(&mut writer)
+                }
+
+                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+                    let mut data = Vec::new();
+                    self.serialize(&mut data)?;
+                    Ok(data)
                 }
             }
         });

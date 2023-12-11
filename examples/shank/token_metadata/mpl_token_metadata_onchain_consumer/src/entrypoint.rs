@@ -27,7 +27,7 @@ fn process_instruction(
         return Err(err);
     }
 
-    let mut ix_data_reader = ix_data.as_ref();
+    let mut ix_data_reader = ix_data;
     let create_master_edition_ix_args_without_discm =
         CreateMasterEditionIxArgs::deserialize(&mut ix_data_reader)?;
 

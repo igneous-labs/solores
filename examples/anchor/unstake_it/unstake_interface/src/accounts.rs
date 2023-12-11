@@ -9,15 +9,12 @@ pub struct Fee {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct FeeAccount(pub Fee);
-impl BorshSerialize for FeeAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        FEE_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl FeeAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != FEE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -27,7 +24,16 @@ impl FeeAccount {
                 ),
             ));
         }
-        Ok(Self(Fee::deserialize(buf)?))
+        Ok(Self(Fee::deserialize(&mut reader)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&FEE_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const POOL_ACCOUNT_DISCM: [u8; 8] = [241, 154, 109, 4, 17, 177, 109, 188];
@@ -40,15 +46,12 @@ pub struct Pool {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PoolAccount(pub Pool);
-impl BorshSerialize for PoolAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        POOL_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl PoolAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != POOL_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -58,7 +61,16 @@ impl PoolAccount {
                 ),
             ));
         }
-        Ok(Self(Pool::deserialize(buf)?))
+        Ok(Self(Pool::deserialize(&mut reader)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&POOL_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const PROTOCOL_FEE_ACCOUNT_DISCM: [u8; 8] = [121, 127, 98, 139, 72, 110, 44, 118];
@@ -72,15 +84,12 @@ pub struct ProtocolFee {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ProtocolFeeAccount(pub ProtocolFee);
-impl BorshSerialize for ProtocolFeeAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        PROTOCOL_FEE_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl ProtocolFeeAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PROTOCOL_FEE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -90,7 +99,16 @@ impl ProtocolFeeAccount {
                 ),
             ));
         }
-        Ok(Self(ProtocolFee::deserialize(buf)?))
+        Ok(Self(ProtocolFee::deserialize(&mut reader)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PROTOCOL_FEE_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM: [u8; 8] = [144, 205, 183, 241, 3, 250, 208, 215];
@@ -101,15 +119,12 @@ pub struct StakeAccountRecord {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct StakeAccountRecordAccount(pub StakeAccountRecord);
-impl BorshSerialize for StakeAccountRecordAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl StakeAccountRecordAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -119,6 +134,15 @@ impl StakeAccountRecordAccount {
                 ),
             ));
         }
-        Ok(Self(StakeAccountRecord::deserialize(buf)?))
+        Ok(Self(StakeAccountRecord::deserialize(&mut reader)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }

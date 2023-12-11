@@ -3,8 +3,7 @@ use marinade_finance_interface::StateAccount;
 use solana_client::nonblocking::rpc_client::RpcClient;
 
 lazy_static! {
-    static ref RPC: RpcClient =
-        RpcClient::new("https://solana-mainnet.rpc.extrnode.com".to_owned());
+    static ref RPC: RpcClient = RpcClient::new("https://api.mainnet-beta.solana.com".to_owned());
 }
 
 mod marinade_state {
@@ -14,7 +13,6 @@ mod marinade_state {
 #[tokio::test]
 async fn test_read_serde_marinade_state() {
     let acc = RPC.get_account_data(&marinade_state::ID).await.unwrap();
-    let mut buf = acc.as_slice();
-    let sa = StateAccount::deserialize(&mut buf).unwrap();
+    let sa = StateAccount::deserialize(acc.as_slice()).unwrap();
     serde_json::to_string(&sa.0).unwrap();
 }

@@ -58,17 +58,12 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 #(#program_ix_enum_variants),*
             }
 
-            impl BorshSerialize for #program_ix_enum_ident {
-                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    match self {
-                        #(#serialize_variant_match_arms)*
-                    }
-                }
-            }
-
             impl #program_ix_enum_ident {
-                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+                    use std::io::Read;
+                    let mut reader = buf;
+                    let mut maybe_discm = [0u8; 8];
+                    reader.read_exact(&mut maybe_discm)?;
                     match maybe_discm {
                         #(#deserialize_variant_match_arms),*,
                         _ => Err(
@@ -77,6 +72,18 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                             )
                         ),
                     }
+                }
+
+                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+                    match self {
+                        #(#serialize_variant_match_arms)*
+                    }
+                }
+
+                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+                    let mut data = Vec::new();
+                    self.serialize(&mut data)?;
+                    Ok(data)
                 }
             }
         });
@@ -105,8 +112,8 @@ pub fn serialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let discm_ident = ix.discm_ident();
     quote! {
         Self::#variant_ident(args) => {
-            #discm_ident.serialize(writer)?;
-            args.serialize(writer)
+            #discm_ident.serialize(&mut writer)?;
+            args.serialize(&mut writer)
         }
     }
 }
@@ -116,6 +123,6 @@ pub fn deserialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let discm_ident = ix.discm_ident();
     let ix_args_ident = ix.ix_args_ident();
     quote! {
-        #discm_ident => Ok(Self::#variant_ident(#ix_args_ident::deserialize(buf)?))
+        #discm_ident => Ok(Self::#variant_ident(#ix_args_ident::deserialize(&mut reader)?))
     }
 }

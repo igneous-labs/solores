@@ -5,7 +5,7 @@ use std::{io::Write, path::Path, str::FromStr};
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
-const DEFAULT_ADDRESS: &str = "11111111111111111111111111111111";
+const DEFAULT_PROGRAM_ID_STR: &str = "TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111";
 
 pub fn write_lib(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
     let user_provided_id_opt = args.program_id.as_ref().and_then(|s| {
@@ -23,9 +23,9 @@ pub fn write_lib(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
             idl.program_address().unwrap_or_else(|| {
                 log::warn!(
                     "program address not in IDL, setting to default: {}",
-                    DEFAULT_ADDRESS
+                    DEFAULT_PROGRAM_ID_STR
                 );
-                DEFAULT_ADDRESS
+                DEFAULT_PROGRAM_ID_STR
             })
         });
 

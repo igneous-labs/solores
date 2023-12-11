@@ -2,13 +2,14 @@
 name = "unstake_onchain_consumer"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [features]
 no-entrypoint = []
 
 [dependencies]
-borsh = "^0.9"
-solana-program = "1.13.4"
+borsh = { workspace = true }
+solana-program = { workspace = true }
 unstake_interface = { path = "../unstake_interface" }
 
 [lib]

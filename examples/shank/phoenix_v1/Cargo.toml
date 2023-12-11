@@ -1,5 +1,0 @@
-[workspace]
-
-members = [
-    "phoenix_v1_interface",
-]

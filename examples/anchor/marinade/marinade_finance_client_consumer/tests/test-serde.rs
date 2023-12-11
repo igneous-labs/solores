@@ -1,7 +1,6 @@
-use borsh::BorshSerialize;
 use marinade_finance_interface::{
     ChangeAuthorityData, ChangeAuthorityIxArgs, ChangeAuthorityIxData, DepositIxArgs,
-    MarinadeFinanceProgramIx,
+    MarinadeFinanceProgramIx, CHANGE_AUTHORITY_IX_DISCM, DEPOSIT_IX_DISCM,
 };
 use solana_sdk::pubkey::Pubkey;
 
@@ -16,7 +15,8 @@ fn test_ix_data_borsh_roundtrip() {
         },
     });
     let serialized = sample.try_to_vec().unwrap();
-    let deserialized = ChangeAuthorityIxData::deserialize(&mut serialized.as_ref()).unwrap();
+    assert_eq!(serialized[..8], CHANGE_AUTHORITY_IX_DISCM);
+    let deserialized = ChangeAuthorityIxData::deserialize(&serialized).unwrap();
     assert_eq!(sample, deserialized);
 }
 
@@ -24,6 +24,7 @@ fn test_ix_data_borsh_roundtrip() {
 fn test_program_ix_borsh_roundtrip() {
     let program_ix = MarinadeFinanceProgramIx::Deposit(DepositIxArgs { lamports: 1000 });
     let serialized = program_ix.try_to_vec().unwrap();
-    let deserialized = MarinadeFinanceProgramIx::deserialize(&mut serialized.as_ref()).unwrap();
+    assert_eq!(serialized[..8], DEPOSIT_IX_DISCM);
+    let deserialized = MarinadeFinanceProgramIx::deserialize(&serialized).unwrap();
     assert_eq!(program_ix, deserialized);
 }

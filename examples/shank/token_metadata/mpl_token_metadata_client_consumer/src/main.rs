@@ -4,7 +4,7 @@ use solana_sdk::{pubkey::Pubkey, signature::read_keypair_file, signer::Signer};
 
 fn main() {
     let config_file = CONFIG_FILE.as_ref().unwrap();
-    let cli_config = Config::load(&config_file).unwrap();
+    let cli_config = Config::load(config_file).unwrap();
     let kp = read_keypair_file(cli_config.keypair_path).unwrap();
 
     let accounts = RemoveCreatorVerificationKeys {
