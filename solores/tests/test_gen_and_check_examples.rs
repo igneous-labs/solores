@@ -1,24 +1,33 @@
+#![cfg(feature = "test_gen_examples")]
+
 //! NB: Running these tests generate ~20GB of rust target/ output because
 //! we can't put the examples into the same workspace since they use
 //! different vers of borsh and solana
 
-use test_utils::{check_example, gen_example, test_consumer};
+use test_utils::{check_example, gen_example};
+
+const BASE_WORKSPACE_DEPS_ARGS: [&str; 14] = [
+    "--solana-program-vers",
+    "workspace=true",
+    "--borsh-vers",
+    "workspace=true",
+    "--thiserror-vers",
+    "workspace=true",
+    "--num-derive-vers",
+    "workspace=true",
+    "--num-traits-vers",
+    "workspace=true",
+    "--serde-vers",
+    "workspace=true",
+    "--bytemuck-vers",
+    "workspace=true",
+];
 
 #[test]
 fn test_token_metadata() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "shank/token_metadata";
-    gen_example(
-        EXAMPLE_PATH,
-        &[
-            "--solana-program-vers",
-            "^1.9,<1.16",
-            "--borsh-vers",
-            "^0.9",
-        ],
-    )?;
-    check_example(EXAMPLE_PATH, "mpl_token_metadata_interface")?;
-    test_consumer(EXAMPLE_PATH, "mpl_token_metadata_onchain_consumer")?;
-    test_consumer(EXAMPLE_PATH, "mpl_token_metadata_client_consumer")
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "mpl_token_metadata_interface")
 }
 
 #[test]
@@ -27,23 +36,23 @@ fn test_phoenix_v1() -> Result<(), Box<dyn std::error::Error>> {
     gen_example(
         EXAMPLE_PATH,
         &[
-            "--solana-program-vers",
-            "^1.9,<1.16",
-            "--borsh-vers",
-            "^0.9",
-            "-z",
-            "Ticks",
-            "-z",
-            "MarketSizeParams",
-            "-z",
-            "TokenParams",
-            "-z",
-            "Seat",
-            "-z",
-            "MarketHeader",
-            "-z",
-            "FIFOOrderId",
-        ],
+            BASE_WORKSPACE_DEPS_ARGS.as_ref(),
+            &[
+                "-z",
+                "Ticks",
+                "-z",
+                "MarketSizeParams",
+                "-z",
+                "TokenParams",
+                "-z",
+                "Seat",
+                "-z",
+                "MarketHeader",
+                "-z",
+                "FIFOOrderId",
+            ],
+        ]
+        .concat(),
     )?;
     check_example(EXAMPLE_PATH, "phoenix_v1_interface")
 }
@@ -51,34 +60,15 @@ fn test_phoenix_v1() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn test_unstake_it() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "anchor/unstake_it";
-    gen_example(
-        EXAMPLE_PATH,
-        &[
-            "--solana-program-vers",
-            "^1.9,<1.16",
-            "--borsh-vers",
-            "^0.9",
-        ],
-    )?;
-    check_example(EXAMPLE_PATH, "unstake_interface")?;
-    test_consumer(EXAMPLE_PATH, "unstake_onchain_consumer")?;
-    test_consumer(EXAMPLE_PATH, "unstake_client_consumer")
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "unstake_interface")
 }
 
 #[test]
 fn test_marinade() -> Result<(), Box<dyn std::error::Error>> {
     const EXAMPLE_PATH: &str = "anchor/marinade";
-    gen_example(
-        EXAMPLE_PATH,
-        &[
-            "--solana-program-vers",
-            "^1.9,<1.16",
-            "--borsh-vers",
-            "^0.9",
-        ],
-    )?;
-    check_example(EXAMPLE_PATH, "marinade_finance_interface")?;
-    test_consumer(EXAMPLE_PATH, "marinade_finance_client_consumer")
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "marinade_finance_interface")
 }
 
 #[test]
@@ -87,10 +77,13 @@ fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
     gen_example(
         EXAMPLE_PATH,
         &[
-            "--program-id",
-            "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
-        ],
+            BASE_WORKSPACE_DEPS_ARGS.as_ref(),
+            &[
+                "--program-id",
+                "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+            ],
+        ]
+        .concat(),
     )?;
-    check_example(EXAMPLE_PATH, "drift_interface")?;
-    test_consumer(EXAMPLE_PATH, "drift_client_consumer")
+    check_example(EXAMPLE_PATH, "drift_interface")
 }

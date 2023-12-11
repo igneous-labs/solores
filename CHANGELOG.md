@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Breaking
+
+- Program ID now defaults to `TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111` instead of system program ID if ID not provided in IDL
+
 ## [0.4.0] - 2023-08-07
 
 ### Breaking

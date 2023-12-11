@@ -1,7 +1,0 @@
-[workspace]
-
-members = [
-    "mpl_token_metadata_client_consumer",
-    "mpl_token_metadata_interface",
-    "mpl_token_metadata_onchain_consumer"
-]

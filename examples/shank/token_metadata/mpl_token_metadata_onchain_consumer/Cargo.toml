@@ -2,14 +2,15 @@
 name = "mpl_token_metadata_onchain_consumer"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [features]
 no-entrypoint = []
 
 [dependencies]
-borsh = "^0.9"
+borsh = { workspace = true }
 mpl_token_metadata_interface = { path = "../mpl_token_metadata_interface" }
-solana-program = "1.13.4"
+solana-program = { workspace = true }
 
 [lib]
 crate-type = ["cdylib", "lib"]

@@ -1,7 +1,0 @@
-[workspace]
-
-members = [
-    "unstake_client_consumer",
-    "unstake_interface",
-    "unstake_onchain_consumer"
-]

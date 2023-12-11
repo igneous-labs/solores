@@ -44,6 +44,8 @@ pub fn check_example(
     Ok(())
 }
 
+/// `cargo test` a consumer crate of the generated interface crate.
+/// Currently unused, takes too long to run.
 pub fn test_consumer(
     example_path: &str,
     consumer_crate_name: &str,

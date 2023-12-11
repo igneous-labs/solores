@@ -3,13 +3,21 @@ name = "drift_interface"
 version = "2.31.1-beta.9"
 edition = "2021"
 
-[dependencies]
-borsh = "^0.10"
-solana-program = "^1.16"
-thiserror = "^1.0"
-num-derive = "^0.3"
-num-traits = "^0.2"
+[dependencies.borsh]
+workspace = true
+
+[dependencies.solana-program]
+workspace = true
 
 [dependencies.serde]
 optional = true
-version = "^1.0"
+workspace = true
+
+[dependencies.thiserror]
+workspace = true
+
+[dependencies.num-derive]
+workspace = true
+
+[dependencies.num-traits]
+workspace = true
