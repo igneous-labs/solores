@@ -112,6 +112,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "anchor_ix_no_args_interface"
+version = "0.0.0"
+dependencies = [
+ "borsh 0.10.3",
+ "serde",
+ "solana-program",
+]
+
+[[package]]
 name = "anchor_ix_no_privilege_interface"
 version = "0.0.0"
 dependencies = [
@@ -3411,6 +3420,15 @@ checksum = "75872d278a8f37ef87fa0ddbda7802605cb18344497949862c0d4dcb291eba60"
 dependencies = [
  "digest 0.10.7",
  "keccak",
+]
+
+[[package]]
+name = "shank_ix_no_args_interface"
+version = "0.0.0"
+dependencies = [
+ "borsh 0.10.3",
+ "serde",
+ "solana-program",
 ]
 
 [[package]]

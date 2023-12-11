@@ -1,0 +1,24 @@
+{
+  "version": "0.0.0",
+  "name": "shank_ix_no_args",
+  "instructions": [
+    {
+      "name": "noArgsIx",
+      "accounts": [
+        {
+          "name": "b",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 69
+      }
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111"
+  }
+}

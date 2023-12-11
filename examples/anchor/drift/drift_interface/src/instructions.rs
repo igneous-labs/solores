@@ -8,10 +8,11 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
 pub enum DriftProgramIx {
     InitializeUser(InitializeUserIxArgs),
-    InitializeUserStats(InitializeUserStatsIxArgs),
+    InitializeUserStats,
     InitializeReferrerName(InitializeReferrerNameIxArgs),
     Deposit(DepositIxArgs),
     Withdraw(WithdrawIxArgs),
@@ -36,16 +37,16 @@ pub enum DriftProgramIx {
     UpdateUserCustomMarginRatio(UpdateUserCustomMarginRatioIxArgs),
     UpdateUserMarginTradingEnabled(UpdateUserMarginTradingEnabledIxArgs),
     UpdateUserDelegate(UpdateUserDelegateIxArgs),
-    DeleteUser(DeleteUserIxArgs),
+    DeleteUser,
     FillPerpOrder(FillPerpOrderIxArgs),
-    RevertFill(RevertFillIxArgs),
+    RevertFill,
     FillSpotOrder(FillSpotOrderIxArgs),
     TriggerOrder(TriggerOrderIxArgs),
-    ForceCancelOrders(ForceCancelOrdersIxArgs),
-    UpdateUserIdle(UpdateUserIdleIxArgs),
-    UpdateUserOpenOrdersCount(UpdateUserOpenOrdersCountIxArgs),
+    ForceCancelOrders,
+    UpdateUserIdle,
+    UpdateUserOpenOrdersCount,
     SettlePnl(SettlePnlIxArgs),
-    SettleFundingPayment(SettleFundingPaymentIxArgs),
+    SettleFundingPayment,
     SettleLp(SettleLpIxArgs),
     SettleExpiredMarket(SettleExpiredMarketIxArgs),
     LiquidatePerp(LiquidatePerpIxArgs),
@@ -57,31 +58,31 @@ pub enum DriftProgramIx {
     ResolveSpotBankruptcy(ResolveSpotBankruptcyIxArgs),
     SettleRevenueToInsuranceFund(SettleRevenueToInsuranceFundIxArgs),
     UpdateFundingRate(UpdateFundingRateIxArgs),
-    UpdateSpotMarketCumulativeInterest(UpdateSpotMarketCumulativeInterestIxArgs),
+    UpdateSpotMarketCumulativeInterest,
     UpdateAmms(UpdateAmmsIxArgs),
     UpdateSpotMarketExpiry(UpdateSpotMarketExpiryIxArgs),
-    UpdateUserQuoteAssetInsuranceStake(UpdateUserQuoteAssetInsuranceStakeIxArgs),
+    UpdateUserQuoteAssetInsuranceStake,
     InitializeInsuranceFundStake(InitializeInsuranceFundStakeIxArgs),
     AddInsuranceFundStake(AddInsuranceFundStakeIxArgs),
     RequestRemoveInsuranceFundStake(RequestRemoveInsuranceFundStakeIxArgs),
     CancelRequestRemoveInsuranceFundStake(CancelRequestRemoveInsuranceFundStakeIxArgs),
     RemoveInsuranceFundStake(RemoveInsuranceFundStakeIxArgs),
-    Initialize(InitializeIxArgs),
+    Initialize,
     InitializeSpotMarket(InitializeSpotMarketIxArgs),
     InitializeSerumFulfillmentConfig(InitializeSerumFulfillmentConfigIxArgs),
     UpdateSerumFulfillmentConfigStatus(UpdateSerumFulfillmentConfigStatusIxArgs),
     InitializePhoenixFulfillmentConfig(InitializePhoenixFulfillmentConfigIxArgs),
     PhoenixFulfillmentConfigStatus(PhoenixFulfillmentConfigStatusIxArgs),
-    UpdateSerumVault(UpdateSerumVaultIxArgs),
+    UpdateSerumVault,
     InitializePerpMarket(InitializePerpMarketIxArgs),
     DeleteInitializedPerpMarket(DeleteInitializedPerpMarketIxArgs),
     MoveAmmPrice(MoveAmmPriceIxArgs),
     UpdatePerpMarketExpiry(UpdatePerpMarketExpiryIxArgs),
-    SettleExpiredMarketPoolsToRevenuePool(SettleExpiredMarketPoolsToRevenuePoolIxArgs),
+    SettleExpiredMarketPoolsToRevenuePool,
     DepositIntoPerpMarketFeePool(DepositIntoPerpMarketFeePoolIxArgs),
     RepegAmmCurve(RepegAmmCurveIxArgs),
-    UpdatePerpMarketAmmOracleTwap(UpdatePerpMarketAmmOracleTwapIxArgs),
-    ResetPerpMarketAmmOracleTwap(ResetPerpMarketAmmOracleTwapIxArgs),
+    UpdatePerpMarketAmmOracleTwap,
+    ResetPerpMarketAmmOracleTwap,
     UpdateK(UpdateKIxArgs),
     UpdatePerpMarketMarginRatio(UpdatePerpMarketMarginRatioIxArgs),
     UpdatePerpMarketMaxImbalances(UpdatePerpMarketMaxImbalancesIxArgs),
@@ -135,7 +136,6 @@ pub enum DriftProgramIx {
 }
 impl DriftProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -143,9 +143,7 @@ impl DriftProgramIx {
             INITIALIZE_USER_IX_DISCM => Ok(Self::InitializeUser(
                 InitializeUserIxArgs::deserialize(&mut reader)?,
             )),
-            INITIALIZE_USER_STATS_IX_DISCM => Ok(Self::InitializeUserStats(
-                InitializeUserStatsIxArgs::deserialize(&mut reader)?,
-            )),
+            INITIALIZE_USER_STATS_IX_DISCM => Ok(Self::InitializeUserStats),
             INITIALIZE_REFERRER_NAME_IX_DISCM => Ok(Self::InitializeReferrerName(
                 InitializeReferrerNameIxArgs::deserialize(&mut reader)?,
             )),
@@ -214,34 +212,22 @@ impl DriftProgramIx {
             UPDATE_USER_DELEGATE_IX_DISCM => Ok(Self::UpdateUserDelegate(
                 UpdateUserDelegateIxArgs::deserialize(&mut reader)?,
             )),
-            DELETE_USER_IX_DISCM => Ok(Self::DeleteUser(DeleteUserIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            DELETE_USER_IX_DISCM => Ok(Self::DeleteUser),
             FILL_PERP_ORDER_IX_DISCM => Ok(Self::FillPerpOrder(FillPerpOrderIxArgs::deserialize(
                 &mut reader,
             )?)),
-            REVERT_FILL_IX_DISCM => Ok(Self::RevertFill(RevertFillIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            REVERT_FILL_IX_DISCM => Ok(Self::RevertFill),
             FILL_SPOT_ORDER_IX_DISCM => Ok(Self::FillSpotOrder(FillSpotOrderIxArgs::deserialize(
                 &mut reader,
             )?)),
             TRIGGER_ORDER_IX_DISCM => Ok(Self::TriggerOrder(TriggerOrderIxArgs::deserialize(
                 &mut reader,
             )?)),
-            FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders(
-                ForceCancelOrdersIxArgs::deserialize(&mut reader)?,
-            )),
-            UPDATE_USER_IDLE_IX_DISCM => Ok(Self::UpdateUserIdle(
-                UpdateUserIdleIxArgs::deserialize(&mut reader)?,
-            )),
-            UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM => Ok(Self::UpdateUserOpenOrdersCount(
-                UpdateUserOpenOrdersCountIxArgs::deserialize(&mut reader)?,
-            )),
+            FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders),
+            UPDATE_USER_IDLE_IX_DISCM => Ok(Self::UpdateUserIdle),
+            UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM => Ok(Self::UpdateUserOpenOrdersCount),
             SETTLE_PNL_IX_DISCM => Ok(Self::SettlePnl(SettlePnlIxArgs::deserialize(&mut reader)?)),
-            SETTLE_FUNDING_PAYMENT_IX_DISCM => Ok(Self::SettleFundingPayment(
-                SettleFundingPaymentIxArgs::deserialize(&mut reader)?,
-            )),
+            SETTLE_FUNDING_PAYMENT_IX_DISCM => Ok(Self::SettleFundingPayment),
             SETTLE_LP_IX_DISCM => Ok(Self::SettleLp(SettleLpIxArgs::deserialize(&mut reader)?)),
             SETTLE_EXPIRED_MARKET_IX_DISCM => Ok(Self::SettleExpiredMarket(
                 SettleExpiredMarketIxArgs::deserialize(&mut reader)?,
@@ -274,9 +260,7 @@ impl DriftProgramIx {
                 UpdateFundingRateIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM => {
-                Ok(Self::UpdateSpotMarketCumulativeInterest(
-                    UpdateSpotMarketCumulativeInterestIxArgs::deserialize(&mut reader)?,
-                ))
+                Ok(Self::UpdateSpotMarketCumulativeInterest)
             }
             UPDATE_AMMS_IX_DISCM => Ok(Self::UpdateAmms(UpdateAmmsIxArgs::deserialize(
                 &mut reader,
@@ -285,9 +269,7 @@ impl DriftProgramIx {
                 UpdateSpotMarketExpiryIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM => {
-                Ok(Self::UpdateUserQuoteAssetInsuranceStake(
-                    UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(&mut reader)?,
-                ))
+                Ok(Self::UpdateUserQuoteAssetInsuranceStake)
             }
             INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::InitializeInsuranceFundStake(
                 InitializeInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
@@ -308,9 +290,7 @@ impl DriftProgramIx {
             REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::RemoveInsuranceFundStake(
                 RemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
             )),
-            INITIALIZE_IX_DISCM => Ok(Self::Initialize(InitializeIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            INITIALIZE_IX_DISCM => Ok(Self::Initialize),
             INITIALIZE_SPOT_MARKET_IX_DISCM => Ok(Self::InitializeSpotMarket(
                 InitializeSpotMarketIxArgs::deserialize(&mut reader)?,
             )),
@@ -332,9 +312,7 @@ impl DriftProgramIx {
             PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM => Ok(Self::PhoenixFulfillmentConfigStatus(
                 PhoenixFulfillmentConfigStatusIxArgs::deserialize(&mut reader)?,
             )),
-            UPDATE_SERUM_VAULT_IX_DISCM => Ok(Self::UpdateSerumVault(
-                UpdateSerumVaultIxArgs::deserialize(&mut reader)?,
-            )),
+            UPDATE_SERUM_VAULT_IX_DISCM => Ok(Self::UpdateSerumVault),
             INITIALIZE_PERP_MARKET_IX_DISCM => Ok(Self::InitializePerpMarket(
                 InitializePerpMarketIxArgs::deserialize(&mut reader)?,
             )),
@@ -348,9 +326,7 @@ impl DriftProgramIx {
                 UpdatePerpMarketExpiryIxArgs::deserialize(&mut reader)?,
             )),
             SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM => {
-                Ok(Self::SettleExpiredMarketPoolsToRevenuePool(
-                    SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(&mut reader)?,
-                ))
+                Ok(Self::SettleExpiredMarketPoolsToRevenuePool)
             }
             DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM => Ok(Self::DepositIntoPerpMarketFeePool(
                 DepositIntoPerpMarketFeePoolIxArgs::deserialize(&mut reader)?,
@@ -358,12 +334,8 @@ impl DriftProgramIx {
             REPEG_AMM_CURVE_IX_DISCM => Ok(Self::RepegAmmCurve(RepegAmmCurveIxArgs::deserialize(
                 &mut reader,
             )?)),
-            UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::UpdatePerpMarketAmmOracleTwap(
-                UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(&mut reader)?,
-            )),
-            RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::ResetPerpMarketAmmOracleTwap(
-                ResetPerpMarketAmmOracleTwapIxArgs::deserialize(&mut reader)?,
-            )),
+            UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::UpdatePerpMarketAmmOracleTwap),
+            RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::ResetPerpMarketAmmOracleTwap),
             UPDATE_K_IX_DISCM => Ok(Self::UpdateK(UpdateKIxArgs::deserialize(&mut reader)?)),
             UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM => Ok(Self::UpdatePerpMarketMarginRatio(
                 UpdatePerpMarketMarginRatioIxArgs::deserialize(&mut reader)?,
@@ -549,492 +521,461 @@ impl DriftProgramIx {
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
             Self::InitializeUser(args) => {
-                INITIALIZE_USER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_USER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::InitializeUserStats(args) => {
-                INITIALIZE_USER_STATS_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::InitializeUserStats => writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM),
             Self::InitializeReferrerName(args) => {
-                INITIALIZE_REFERRER_NAME_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_REFERRER_NAME_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::Deposit(args) => {
-                DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&DEPOSIT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::Withdraw(args) => {
-                WITHDRAW_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&WITHDRAW_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::TransferDeposit(args) => {
-                TRANSFER_DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&TRANSFER_DEPOSIT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlacePerpOrder(args) => {
-                PLACE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_PERP_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::CancelOrder(args) => {
-                CANCEL_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&CANCEL_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::CancelOrderByUserId(args) => {
-                CANCEL_ORDER_BY_USER_ID_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&CANCEL_ORDER_BY_USER_ID_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::CancelOrders(args) => {
-                CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&CANCEL_ORDERS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::ModifyOrder(args) => {
-                MODIFY_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&MODIFY_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::ModifyOrderByUserId(args) => {
-                MODIFY_ORDER_BY_USER_ID_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&MODIFY_ORDER_BY_USER_ID_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlaceAndTakePerpOrder(args) => {
-                PLACE_AND_TAKE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_AND_TAKE_PERP_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlaceAndMakePerpOrder(args) => {
-                PLACE_AND_MAKE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_AND_MAKE_PERP_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlaceSpotOrder(args) => {
-                PLACE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_SPOT_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlaceAndTakeSpotOrder(args) => {
-                PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PlaceAndMakeSpotOrder(args) => {
-                PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::BeginSwap(args) => {
-                BEGIN_SWAP_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&BEGIN_SWAP_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::EndSwap(args) => {
-                END_SWAP_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&END_SWAP_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::AddPerpLpShares(args) => {
-                ADD_PERP_LP_SHARES_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&ADD_PERP_LP_SHARES_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RemovePerpLpShares(args) => {
-                REMOVE_PERP_LP_SHARES_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REMOVE_PERP_LP_SHARES_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RemovePerpLpSharesInExpiringMarket(args) => {
-                REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateUserName(args) => {
-                UPDATE_USER_NAME_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_USER_NAME_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateUserCustomMarginRatio(args) => {
-                UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateUserMarginTradingEnabled(args) => {
-                UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateUserDelegate(args) => {
-                UPDATE_USER_DELEGATE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_USER_DELEGATE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::DeleteUser(args) => {
-                DELETE_USER_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::DeleteUser => writer.write_all(&DELETE_USER_IX_DISCM),
             Self::FillPerpOrder(args) => {
-                FILL_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&FILL_PERP_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::RevertFill(args) => {
-                REVERT_FILL_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::RevertFill => writer.write_all(&REVERT_FILL_IX_DISCM),
             Self::FillSpotOrder(args) => {
-                FILL_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&FILL_SPOT_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::TriggerOrder(args) => {
-                TRIGGER_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&TRIGGER_ORDER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::ForceCancelOrders(args) => {
-                FORCE_CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::UpdateUserIdle(args) => {
-                UPDATE_USER_IDLE_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::UpdateUserOpenOrdersCount(args) => {
-                UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::ForceCancelOrders => writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM),
+            Self::UpdateUserIdle => writer.write_all(&UPDATE_USER_IDLE_IX_DISCM),
+            Self::UpdateUserOpenOrdersCount => {
+                writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)
             }
             Self::SettlePnl(args) => {
-                SETTLE_PNL_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SETTLE_PNL_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::SettleFundingPayment(args) => {
-                SETTLE_FUNDING_PAYMENT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::SettleFundingPayment => writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM),
             Self::SettleLp(args) => {
-                SETTLE_LP_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SETTLE_LP_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::SettleExpiredMarket(args) => {
-                SETTLE_EXPIRED_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SETTLE_EXPIRED_MARKET_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::LiquidatePerp(args) => {
-                LIQUIDATE_PERP_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&LIQUIDATE_PERP_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::LiquidateSpot(args) => {
-                LIQUIDATE_SPOT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&LIQUIDATE_SPOT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::LiquidateBorrowForPerpPnl(args) => {
-                LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::LiquidatePerpPnlForDeposit(args) => {
-                LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::ResolvePerpPnlDeficit(args) => {
-                RESOLVE_PERP_PNL_DEFICIT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&RESOLVE_PERP_PNL_DEFICIT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::ResolvePerpBankruptcy(args) => {
-                RESOLVE_PERP_BANKRUPTCY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&RESOLVE_PERP_BANKRUPTCY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::ResolveSpotBankruptcy(args) => {
-                RESOLVE_SPOT_BANKRUPTCY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&RESOLVE_SPOT_BANKRUPTCY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::SettleRevenueToInsuranceFund(args) => {
-                SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateFundingRate(args) => {
-                UPDATE_FUNDING_RATE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_FUNDING_RATE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::UpdateSpotMarketCumulativeInterest(args) => {
-                UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::UpdateSpotMarketCumulativeInterest => {
+                writer.write_all(&UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM)
             }
             Self::UpdateAmms(args) => {
-                UPDATE_AMMS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_AMMS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketExpiry(args) => {
-                UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::UpdateUserQuoteAssetInsuranceStake(args) => {
-                UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::UpdateUserQuoteAssetInsuranceStake => {
+                writer.write_all(&UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM)
             }
             Self::InitializeInsuranceFundStake(args) => {
-                INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::AddInsuranceFundStake(args) => {
-                ADD_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&ADD_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RequestRemoveInsuranceFundStake(args) => {
-                REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::CancelRequestRemoveInsuranceFundStake(args) => {
-                CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RemoveInsuranceFundStake(args) => {
-                REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::Initialize(args) => {
-                INITIALIZE_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::Initialize => writer.write_all(&INITIALIZE_IX_DISCM),
             Self::InitializeSpotMarket(args) => {
-                INITIALIZE_SPOT_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_SPOT_MARKET_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::InitializeSerumFulfillmentConfig(args) => {
-                INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSerumFulfillmentConfigStatus(args) => {
-                UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::InitializePhoenixFulfillmentConfig(args) => {
-                INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::PhoenixFulfillmentConfigStatus(args) => {
-                PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::UpdateSerumVault(args) => {
-                UPDATE_SERUM_VAULT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::UpdateSerumVault => writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM),
             Self::InitializePerpMarket(args) => {
-                INITIALIZE_PERP_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&INITIALIZE_PERP_MARKET_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::DeleteInitializedPerpMarket(args) => {
-                DELETE_INITIALIZED_PERP_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&DELETE_INITIALIZED_PERP_MARKET_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::MoveAmmPrice(args) => {
-                MOVE_AMM_PRICE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&MOVE_AMM_PRICE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketExpiry(args) => {
-                UPDATE_PERP_MARKET_EXPIRY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_EXPIRY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::SettleExpiredMarketPoolsToRevenuePool(args) => {
-                SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::SettleExpiredMarketPoolsToRevenuePool => {
+                writer.write_all(&SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM)
             }
             Self::DepositIntoPerpMarketFeePool(args) => {
-                DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RepegAmmCurve(args) => {
-                REPEG_AMM_CURVE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REPEG_AMM_CURVE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::UpdatePerpMarketAmmOracleTwap(args) => {
-                UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::UpdatePerpMarketAmmOracleTwap => {
+                writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)
             }
-            Self::ResetPerpMarketAmmOracleTwap(args) => {
-                RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::ResetPerpMarketAmmOracleTwap => {
+                writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)
             }
             Self::UpdateK(args) => {
-                UPDATE_K_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_K_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMarginRatio(args) => {
-                UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMaxImbalances(args) => {
-                UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketLiquidationFee(args) => {
-                UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateInsuranceFundUnstakingPeriod(args) => {
-                UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketLiquidationFee(args) => {
-                UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateWithdrawGuardThreshold(args) => {
-                UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketIfFactor(args) => {
-                UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketRevenueSettlePeriod(args) => {
-                UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketStatus(args) => {
-                UPDATE_SPOT_MARKET_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_STATUS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketAssetTier(args) => {
-                UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketMarginWeights(args) => {
-                UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketBorrowRate(args) => {
-                UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketMaxTokenDeposits(args) => {
-                UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketOracle(args) => {
-                UPDATE_SPOT_MARKET_ORACLE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_ORACLE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketStepSizeAndTickSize(args) => {
-                UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketMinOrderSize(args) => {
-                UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketOrdersEnabled(args) => {
-                UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotMarketName(args) => {
-                UPDATE_SPOT_MARKET_NAME_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_MARKET_NAME_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketStatus(args) => {
-                UPDATE_PERP_MARKET_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_STATUS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketContractTier(args) => {
-                UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketImfFactor(args) => {
-                UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketUnrealizedAssetWeight(args) => {
-                UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketConcentrationCoef(args) => {
-                UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketCurveUpdateIntensity(args) => {
-                UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(args) => {
-                UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM
-                    .serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateLpCooldownTime(args) => {
-                UPDATE_LP_COOLDOWN_TIME_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_LP_COOLDOWN_TIME_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpFeeStructure(args) => {
-                UPDATE_PERP_FEE_STRUCTURE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_FEE_STRUCTURE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotFeeStructure(args) => {
-                UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateInitialPctToLiquidate(args) => {
-                UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateLiquidationDuration(args) => {
-                UPDATE_LIQUIDATION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_LIQUIDATION_DURATION_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateOracleGuardRails(args) => {
-                UPDATE_ORACLE_GUARD_RAILS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_ORACLE_GUARD_RAILS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateStateSettlementDuration(args) => {
-                UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketOracle(args) => {
-                UPDATE_PERP_MARKET_ORACLE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_ORACLE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketBaseSpread(args) => {
-                UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateAmmJitIntensity(args) => {
-                UPDATE_AMM_JIT_INTENSITY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_AMM_JIT_INTENSITY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMaxSpread(args) => {
-                UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketStepSizeAndTickSize(args) => {
-                UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketName(args) => {
-                UPDATE_PERP_MARKET_NAME_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_NAME_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMinOrderSize(args) => {
-                UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMaxSlippageRatio(args) => {
-                UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMaxFillReserveFraction(args) => {
-                UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpMarketMaxOpenInterest(args) => {
-                UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateAdmin(args) => {
-                UPDATE_ADMIN_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_ADMIN_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateWhitelistMint(args) => {
-                UPDATE_WHITELIST_MINT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_WHITELIST_MINT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateDiscountMint(args) => {
-                UPDATE_DISCOUNT_MINT_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_DISCOUNT_MINT_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateExchangeStatus(args) => {
-                UPDATE_EXCHANGE_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_EXCHANGE_STATUS_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdatePerpAuctionDuration(args) => {
-                UPDATE_PERP_AUCTION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_PERP_AUCTION_DURATION_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::UpdateSpotAuctionDuration(args) => {
-                UPDATE_SPOT_AUCTION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&UPDATE_SPOT_AUCTION_DURATION_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::AdminRemoveInsuranceFundStake(args) => {
-                ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
         }
@@ -1179,7 +1120,6 @@ impl From<InitializeUserIxArgs> for InitializeUserIxData {
 }
 impl InitializeUserIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1382,19 +1322,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNT
     }
 }
 pub const INITIALIZE_USER_STATS_IX_DISCM: [u8; 8] = [254, 243, 72, 98, 251, 130, 168, 213];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InitializeUserStatsIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct InitializeUserStatsIxData(pub InitializeUserStatsIxArgs);
-impl From<InitializeUserStatsIxArgs> for InitializeUserStatsIxData {
-    fn from(args: InitializeUserStatsIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct InitializeUserStatsIxData;
 impl InitializeUserStatsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1407,11 +1338,10 @@ impl InitializeUserStatsIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeUserStatsIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1419,37 +1349,29 @@ impl InitializeUserStatsIxData {
         Ok(data)
     }
 }
-pub fn initialize_user_stats_ix<
-    K: Into<InitializeUserStatsKeys>,
-    A: Into<InitializeUserStatsIxArgs>,
->(
+pub fn initialize_user_stats_ix<K: Into<InitializeUserStatsKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeUserStatsKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: InitializeUserStatsIxArgs = args.into();
-    let data: InitializeUserStatsIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: InitializeUserStatsIxData.try_to_vec()?,
     })
 }
-pub fn initialize_user_stats_invoke<'info, A: Into<InitializeUserStatsIxArgs>>(
+pub fn initialize_user_stats_invoke<'info>(
     accounts: &InitializeUserStatsAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = initialize_user_stats_ix(accounts, args)?;
+    let ix = initialize_user_stats_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_user_stats_invoke_signed<'info, A: Into<InitializeUserStatsIxArgs>>(
+pub fn initialize_user_stats_invoke_signed<'info>(
     accounts: &InitializeUserStatsAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_user_stats_ix(accounts, args)?;
+    let ix = initialize_user_stats_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1619,7 +1541,6 @@ impl From<InitializeReferrerNameIxArgs> for InitializeReferrerNameIxData {
 }
 impl InitializeReferrerNameIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1854,7 +1775,6 @@ impl From<DepositIxArgs> for DepositIxData {
 }
 impl DepositIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2093,7 +2013,6 @@ impl From<WithdrawIxArgs> for WithdrawIxData {
 }
 impl WithdrawIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2312,7 +2231,6 @@ impl From<TransferDepositIxArgs> for TransferDepositIxData {
 }
 impl TransferDepositIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2490,7 +2408,6 @@ impl From<PlacePerpOrderIxArgs> for PlacePerpOrderIxData {
 }
 impl PlacePerpOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2665,7 +2582,6 @@ impl From<CancelOrderIxArgs> for CancelOrderIxData {
 }
 impl CancelOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2840,7 +2756,6 @@ impl From<CancelOrderByUserIdIxArgs> for CancelOrderByUserIdIxData {
 }
 impl CancelOrderByUserIdIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3022,7 +2937,6 @@ impl From<CancelOrdersIxArgs> for CancelOrdersIxData {
 }
 impl CancelOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3198,7 +3112,6 @@ impl From<ModifyOrderIxArgs> for ModifyOrderIxData {
 }
 impl ModifyOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3374,7 +3287,6 @@ impl From<ModifyOrderByUserIdIxArgs> for ModifyOrderByUserIdIxData {
 }
 impl ModifyOrderByUserIdIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3566,7 +3478,6 @@ impl From<PlaceAndTakePerpOrderIxArgs> for PlaceAndTakePerpOrderIxData {
 }
 impl PlaceAndTakePerpOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3781,7 +3692,6 @@ impl From<PlaceAndMakePerpOrderIxArgs> for PlaceAndMakePerpOrderIxData {
 }
 impl PlaceAndMakePerpOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -3969,7 +3879,6 @@ impl From<PlaceSpotOrderIxArgs> for PlaceSpotOrderIxData {
 }
 impl PlaceSpotOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -4157,7 +4066,6 @@ impl From<PlaceAndTakeSpotOrderIxArgs> for PlaceAndTakeSpotOrderIxData {
 }
 impl PlaceAndTakeSpotOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -4373,7 +4281,6 @@ impl From<PlaceAndMakeSpotOrderIxArgs> for PlaceAndMakeSpotOrderIxData {
 }
 impl PlaceAndMakeSpotOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -4651,7 +4558,6 @@ impl From<BeginSwapIxArgs> for BeginSwapIxData {
 }
 impl BeginSwapIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -4936,7 +4842,6 @@ impl From<EndSwapIxArgs> for EndSwapIxData {
 }
 impl EndSwapIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5133,7 +5038,6 @@ impl From<AddPerpLpSharesIxArgs> for AddPerpLpSharesIxData {
 }
 impl AddPerpLpSharesIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5309,7 +5213,6 @@ impl From<RemovePerpLpSharesIxArgs> for RemovePerpLpSharesIxData {
 }
 impl RemovePerpLpSharesIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5484,7 +5387,6 @@ impl From<RemovePerpLpSharesInExpiringMarketIxArgs> for RemovePerpLpSharesInExpi
 }
 impl RemovePerpLpSharesInExpiringMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5654,7 +5556,6 @@ impl From<UpdateUserNameIxArgs> for UpdateUserNameIxData {
 }
 impl UpdateUserNameIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5821,7 +5722,6 @@ impl From<UpdateUserCustomMarginRatioIxArgs> for UpdateUserCustomMarginRatioIxDa
 }
 impl UpdateUserCustomMarginRatioIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -5999,7 +5899,6 @@ impl From<UpdateUserMarginTradingEnabledIxArgs> for UpdateUserMarginTradingEnabl
 }
 impl UpdateUserMarginTradingEnabledIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -6173,7 +6072,6 @@ impl From<UpdateUserDelegateIxArgs> for UpdateUserDelegateIxData {
 }
 impl UpdateUserDelegateIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -6347,19 +6245,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]>
     }
 }
 pub const DELETE_USER_IX_DISCM: [u8; 8] = [186, 85, 17, 249, 219, 231, 98, 251];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DeleteUserIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct DeleteUserIxData(pub DeleteUserIxArgs);
-impl From<DeleteUserIxArgs> for DeleteUserIxData {
-    fn from(args: DeleteUserIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct DeleteUserIxData;
 impl DeleteUserIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -6372,11 +6261,10 @@ impl DeleteUserIxData {
                 ),
             ));
         }
-        Ok(Self(DeleteUserIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&DELETE_USER_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&DELETE_USER_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6384,34 +6272,25 @@ impl DeleteUserIxData {
         Ok(data)
     }
 }
-pub fn delete_user_ix<K: Into<DeleteUserKeys>, A: Into<DeleteUserIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn delete_user_ix<K: Into<DeleteUserKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: DeleteUserKeys = accounts.into();
     let metas: [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: DeleteUserIxArgs = args.into();
-    let data: DeleteUserIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: DeleteUserIxData.try_to_vec()?,
     })
 }
-pub fn delete_user_invoke<'info, A: Into<DeleteUserIxArgs>>(
-    accounts: &DeleteUserAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = delete_user_ix(accounts, args)?;
+pub fn delete_user_invoke<'info>(accounts: &DeleteUserAccounts<'_, 'info>) -> ProgramResult {
+    let ix = delete_user_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn delete_user_invoke_signed<'info, A: Into<DeleteUserIxArgs>>(
+pub fn delete_user_invoke_signed<'info>(
     accounts: &DeleteUserAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = delete_user_ix(accounts, args)?;
+    let ix = delete_user_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6569,7 +6448,6 @@ impl From<FillPerpOrderIxArgs> for FillPerpOrderIxData {
 }
 impl FillPerpOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -6749,19 +6627,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]>
     }
 }
 pub const REVERT_FILL_IX_DISCM: [u8; 8] = [236, 238, 176, 69, 239, 10, 181, 193];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RevertFillIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RevertFillIxData(pub RevertFillIxArgs);
-impl From<RevertFillIxArgs> for RevertFillIxData {
-    fn from(args: RevertFillIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RevertFillIxData;
 impl RevertFillIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -6774,11 +6643,10 @@ impl RevertFillIxData {
                 ),
             ));
         }
-        Ok(Self(RevertFillIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&REVERT_FILL_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&REVERT_FILL_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6786,34 +6654,25 @@ impl RevertFillIxData {
         Ok(data)
     }
 }
-pub fn revert_fill_ix<K: Into<RevertFillKeys>, A: Into<RevertFillIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn revert_fill_ix<K: Into<RevertFillKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: RevertFillKeys = accounts.into();
     let metas: [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RevertFillIxArgs = args.into();
-    let data: RevertFillIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RevertFillIxData.try_to_vec()?,
     })
 }
-pub fn revert_fill_invoke<'info, A: Into<RevertFillIxArgs>>(
-    accounts: &RevertFillAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = revert_fill_ix(accounts, args)?;
+pub fn revert_fill_invoke<'info>(accounts: &RevertFillAccounts<'_, 'info>) -> ProgramResult {
+    let ix = revert_fill_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn revert_fill_invoke_signed<'info, A: Into<RevertFillIxArgs>>(
+pub fn revert_fill_invoke_signed<'info>(
     accounts: &RevertFillAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revert_fill_ix(accounts, args)?;
+    let ix = revert_fill_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6972,7 +6831,6 @@ impl From<FillSpotOrderIxArgs> for FillSpotOrderIxData {
 }
 impl FillSpotOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -7166,7 +7024,6 @@ impl From<TriggerOrderIxArgs> for TriggerOrderIxData {
 }
 impl TriggerOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -7339,19 +7196,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_
     }
 }
 pub const FORCE_CANCEL_ORDERS_IX_DISCM: [u8; 8] = [64, 181, 196, 63, 222, 72, 64, 232];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ForceCancelOrdersIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ForceCancelOrdersIxData(pub ForceCancelOrdersIxArgs);
-impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
-    fn from(args: ForceCancelOrdersIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ForceCancelOrdersIxData;
 impl ForceCancelOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -7364,11 +7212,10 @@ impl ForceCancelOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(ForceCancelOrdersIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7376,34 +7223,29 @@ impl ForceCancelOrdersIxData {
         Ok(data)
     }
 }
-pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>, A: Into<ForceCancelOrdersIxArgs>>(
+pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ForceCancelOrdersKeys = accounts.into();
     let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ForceCancelOrdersIxArgs = args.into();
-    let data: ForceCancelOrdersIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ForceCancelOrdersIxData.try_to_vec()?,
     })
 }
-pub fn force_cancel_orders_invoke<'info, A: Into<ForceCancelOrdersIxArgs>>(
+pub fn force_cancel_orders_invoke<'info>(
     accounts: &ForceCancelOrdersAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = force_cancel_orders_ix(accounts, args)?;
+    let ix = force_cancel_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>>(
+pub fn force_cancel_orders_invoke_signed<'info>(
     accounts: &ForceCancelOrdersAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = force_cancel_orders_ix(accounts, args)?;
+    let ix = force_cancel_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7524,19 +7366,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN
     }
 }
 pub const UPDATE_USER_IDLE_IX_DISCM: [u8; 8] = [253, 133, 67, 22, 103, 161, 20, 100];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateUserIdleIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdateUserIdleIxData(pub UpdateUserIdleIxArgs);
-impl From<UpdateUserIdleIxArgs> for UpdateUserIdleIxData {
-    fn from(args: UpdateUserIdleIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdateUserIdleIxData;
 impl UpdateUserIdleIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -7549,11 +7382,10 @@ impl UpdateUserIdleIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserIdleIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7561,34 +7393,29 @@ impl UpdateUserIdleIxData {
         Ok(data)
     }
 }
-pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>, A: Into<UpdateUserIdleIxArgs>>(
+pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserIdleKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UpdateUserIdleIxArgs = args.into();
-    let data: UpdateUserIdleIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdateUserIdleIxData.try_to_vec()?,
     })
 }
-pub fn update_user_idle_invoke<'info, A: Into<UpdateUserIdleIxArgs>>(
+pub fn update_user_idle_invoke<'info>(
     accounts: &UpdateUserIdleAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_user_idle_ix(accounts, args)?;
+    let ix = update_user_idle_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_idle_invoke_signed<'info, A: Into<UpdateUserIdleIxArgs>>(
+pub fn update_user_idle_invoke_signed<'info>(
     accounts: &UpdateUserIdleAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_idle_ix(accounts, args)?;
+    let ix = update_user_idle_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7713,19 +7540,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX
     }
 }
 pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM: [u8; 8] = [104, 39, 65, 210, 250, 163, 100, 134];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateUserOpenOrdersCountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdateUserOpenOrdersCountIxData(pub UpdateUserOpenOrdersCountIxArgs);
-impl From<UpdateUserOpenOrdersCountIxArgs> for UpdateUserOpenOrdersCountIxData {
-    fn from(args: UpdateUserOpenOrdersCountIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdateUserOpenOrdersCountIxData;
 impl UpdateUserOpenOrdersCountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -7738,13 +7556,10 @@ impl UpdateUserOpenOrdersCountIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserOpenOrdersCountIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7752,41 +7567,30 @@ impl UpdateUserOpenOrdersCountIxData {
         Ok(data)
     }
 }
-pub fn update_user_open_orders_count_ix<
-    K: Into<UpdateUserOpenOrdersCountKeys>,
-    A: Into<UpdateUserOpenOrdersCountIxArgs>,
->(
+pub fn update_user_open_orders_count_ix<K: Into<UpdateUserOpenOrdersCountKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UpdateUserOpenOrdersCountIxArgs = args.into();
-    let data: UpdateUserOpenOrdersCountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdateUserOpenOrdersCountIxData.try_to_vec()?,
     })
 }
-pub fn update_user_open_orders_count_invoke<'info, A: Into<UpdateUserOpenOrdersCountIxArgs>>(
+pub fn update_user_open_orders_count_invoke<'info>(
     accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_user_open_orders_count_ix(accounts, args)?;
+    let ix = update_user_open_orders_count_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_open_orders_count_invoke_signed<
-    'info,
-    A: Into<UpdateUserOpenOrdersCountIxArgs>,
->(
+pub fn update_user_open_orders_count_invoke_signed<'info>(
     accounts: &UpdateUserOpenOrdersCountAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_open_orders_count_ix(accounts, args)?;
+    let ix = update_user_open_orders_count_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7922,7 +7726,6 @@ impl From<SettlePnlIxArgs> for SettlePnlIxData {
 }
 impl SettlePnlIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -8070,19 +7873,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUN
     }
 }
 pub const SETTLE_FUNDING_PAYMENT_IX_DISCM: [u8; 8] = [222, 90, 202, 94, 28, 45, 115, 183];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct SettleFundingPaymentIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct SettleFundingPaymentIxData(pub SettleFundingPaymentIxArgs);
-impl From<SettleFundingPaymentIxArgs> for SettleFundingPaymentIxData {
-    fn from(args: SettleFundingPaymentIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct SettleFundingPaymentIxData;
 impl SettleFundingPaymentIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -8095,11 +7889,10 @@ impl SettleFundingPaymentIxData {
                 ),
             ));
         }
-        Ok(Self(SettleFundingPaymentIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -8107,38 +7900,30 @@ impl SettleFundingPaymentIxData {
         Ok(data)
     }
 }
-pub fn settle_funding_payment_ix<
-    K: Into<SettleFundingPaymentKeys>,
-    A: Into<SettleFundingPaymentIxArgs>,
->(
+pub fn settle_funding_payment_ix<K: Into<SettleFundingPaymentKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettleFundingPaymentKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: SettleFundingPaymentIxArgs = args.into();
-    let data: SettleFundingPaymentIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: SettleFundingPaymentIxData.try_to_vec()?,
     })
 }
-pub fn settle_funding_payment_invoke<'info, A: Into<SettleFundingPaymentIxArgs>>(
+pub fn settle_funding_payment_invoke<'info>(
     accounts: &SettleFundingPaymentAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = settle_funding_payment_ix(accounts, args)?;
+    let ix = settle_funding_payment_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_funding_payment_invoke_signed<'info, A: Into<SettleFundingPaymentIxArgs>>(
+pub fn settle_funding_payment_invoke_signed<'info>(
     accounts: &SettleFundingPaymentAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_funding_payment_ix(accounts, args)?;
+    let ix = settle_funding_payment_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -8240,7 +8025,6 @@ impl From<SettleLpIxArgs> for SettleLpIxData {
 }
 impl SettleLpIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -8395,7 +8179,6 @@ impl From<SettleExpiredMarketIxArgs> for SettleExpiredMarketIxData {
 }
 impl SettleExpiredMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -8602,7 +8385,6 @@ impl From<LiquidatePerpIxArgs> for LiquidatePerpIxData {
 }
 impl LiquidatePerpIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -8821,7 +8603,6 @@ impl From<LiquidateSpotIxArgs> for LiquidateSpotIxData {
 }
 impl LiquidateSpotIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -9044,7 +8825,6 @@ impl From<LiquidateBorrowForPerpPnlIxArgs> for LiquidateBorrowForPerpPnlIxData {
 }
 impl LiquidateBorrowForPerpPnlIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -9279,7 +9059,6 @@ impl From<LiquidatePerpPnlForDepositIxArgs> for LiquidatePerpPnlForDepositIxData
 }
 impl LiquidatePerpPnlForDepositIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -9506,7 +9285,6 @@ impl From<ResolvePerpPnlDeficitIxArgs> for ResolvePerpPnlDeficitIxData {
 }
 impl ResolvePerpPnlDeficitIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -9770,7 +9548,6 @@ impl From<ResolvePerpBankruptcyIxArgs> for ResolvePerpBankruptcyIxData {
 }
 impl ResolvePerpBankruptcyIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10044,7 +9821,6 @@ impl From<ResolveSpotBankruptcyIxArgs> for ResolveSpotBankruptcyIxData {
 }
 impl ResolveSpotBankruptcyIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10281,7 +10057,6 @@ impl From<SettleRevenueToInsuranceFundIxArgs> for SettleRevenueToInsuranceFundIx
 }
 impl SettleRevenueToInsuranceFundIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10474,7 +10249,6 @@ impl From<UpdateFundingRateIxArgs> for UpdateFundingRateIxData {
 }
 impl UpdateFundingRateIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10640,19 +10414,10 @@ impl<'me, 'info>
 }
 pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM: [u8; 8] =
     [39, 166, 139, 243, 158, 165, 155, 225];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateSpotMarketCumulativeInterestIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdateSpotMarketCumulativeInterestIxData(pub UpdateSpotMarketCumulativeInterestIxArgs);
-impl From<UpdateSpotMarketCumulativeInterestIxArgs> for UpdateSpotMarketCumulativeInterestIxData {
-    fn from(args: UpdateSpotMarketCumulativeInterestIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdateSpotMarketCumulativeInterestIxData;
 impl UpdateSpotMarketCumulativeInterestIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10665,13 +10430,10 @@ impl UpdateSpotMarketCumulativeInterestIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketCumulativeInterestIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -10681,43 +10443,31 @@ impl UpdateSpotMarketCumulativeInterestIxData {
 }
 pub fn update_spot_market_cumulative_interest_ix<
     K: Into<UpdateSpotMarketCumulativeInterestKeys>,
-    A: Into<UpdateSpotMarketCumulativeInterestIxArgs>,
 >(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         (&keys).into();
-    let args_full: UpdateSpotMarketCumulativeInterestIxArgs = args.into();
-    let data: UpdateSpotMarketCumulativeInterestIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdateSpotMarketCumulativeInterestIxData.try_to_vec()?,
     })
 }
-pub fn update_spot_market_cumulative_interest_invoke<
-    'info,
-    A: Into<UpdateSpotMarketCumulativeInterestIxArgs>,
->(
+pub fn update_spot_market_cumulative_interest_invoke<'info>(
     accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_spot_market_cumulative_interest_ix(accounts, args)?;
+    let ix = update_spot_market_cumulative_interest_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_cumulative_interest_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketCumulativeInterestIxArgs>,
->(
+pub fn update_spot_market_cumulative_interest_invoke_signed<'info>(
     accounts: &UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_cumulative_interest_ix(accounts, args)?;
+    let ix = update_spot_market_cumulative_interest_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -10822,7 +10572,6 @@ impl From<UpdateAmmsIxArgs> for UpdateAmmsIxData {
 }
 impl UpdateAmmsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -10993,7 +10742,6 @@ impl From<UpdateSpotMarketExpiryIxArgs> for UpdateSpotMarketExpiryIxData {
 }
 impl UpdateSpotMarketExpiryIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -11204,19 +10952,10 @@ impl<'me, 'info>
 }
 pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM: [u8; 8] =
     [251, 101, 156, 7, 2, 63, 30, 23];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateUserQuoteAssetInsuranceStakeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdateUserQuoteAssetInsuranceStakeIxData(pub UpdateUserQuoteAssetInsuranceStakeIxArgs);
-impl From<UpdateUserQuoteAssetInsuranceStakeIxArgs> for UpdateUserQuoteAssetInsuranceStakeIxData {
-    fn from(args: UpdateUserQuoteAssetInsuranceStakeIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdateUserQuoteAssetInsuranceStakeIxData;
 impl UpdateUserQuoteAssetInsuranceStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -11229,13 +10968,10 @@ impl UpdateUserQuoteAssetInsuranceStakeIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -11245,43 +10981,31 @@ impl UpdateUserQuoteAssetInsuranceStakeIxData {
 }
 pub fn update_user_quote_asset_insurance_stake_ix<
     K: Into<UpdateUserQuoteAssetInsuranceStakeKeys>,
-    A: Into<UpdateUserQuoteAssetInsuranceStakeIxArgs>,
 >(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] =
         (&keys).into();
-    let args_full: UpdateUserQuoteAssetInsuranceStakeIxArgs = args.into();
-    let data: UpdateUserQuoteAssetInsuranceStakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdateUserQuoteAssetInsuranceStakeIxData.try_to_vec()?,
     })
 }
-pub fn update_user_quote_asset_insurance_stake_invoke<
-    'info,
-    A: Into<UpdateUserQuoteAssetInsuranceStakeIxArgs>,
->(
+pub fn update_user_quote_asset_insurance_stake_invoke<'info>(
     accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_user_quote_asset_insurance_stake_ix(accounts, args)?;
+    let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_quote_asset_insurance_stake_invoke_signed<
-    'info,
-    A: Into<UpdateUserQuoteAssetInsuranceStakeIxArgs>,
->(
+pub fn update_user_quote_asset_insurance_stake_invoke_signed<'info>(
     accounts: &UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_quote_asset_insurance_stake_ix(accounts, args)?;
+    let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -11479,7 +11203,6 @@ impl From<InitializeInsuranceFundStakeIxArgs> for InitializeInsuranceFundStakeIx
 }
 impl InitializeInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -11757,7 +11480,6 @@ impl From<AddInsuranceFundStakeIxArgs> for AddInsuranceFundStakeIxData {
 }
 impl AddInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -11989,7 +11711,6 @@ impl From<RequestRemoveInsuranceFundStakeIxArgs> for RequestRemoveInsuranceFundS
 }
 impl RequestRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -12225,7 +11946,6 @@ impl From<CancelRequestRemoveInsuranceFundStakeIxArgs>
 }
 impl CancelRequestRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -12494,7 +12214,6 @@ impl From<RemoveInsuranceFundStakeIxArgs> for RemoveInsuranceFundStakeIxData {
 }
 impl RemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -12723,19 +12442,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]>
     }
 }
 pub const INITIALIZE_IX_DISCM: [u8; 8] = [175, 175, 109, 31, 13, 152, 155, 237];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InitializeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct InitializeIxData(pub InitializeIxArgs);
-impl From<InitializeIxArgs> for InitializeIxData {
-    fn from(args: InitializeIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct InitializeIxData;
 impl InitializeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -12748,11 +12458,10 @@ impl InitializeIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&INITIALIZE_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -12760,34 +12469,25 @@ impl InitializeIxData {
         Ok(data)
     }
 }
-pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn initialize_ix<K: Into<InitializeKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: InitializeKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: InitializeIxArgs = args.into();
-    let data: InitializeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: InitializeIxData.try_to_vec()?,
     })
 }
-pub fn initialize_invoke<'info, A: Into<InitializeIxArgs>>(
-    accounts: &InitializeAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = initialize_ix(accounts, args)?;
+pub fn initialize_invoke<'info>(accounts: &InitializeAccounts<'_, 'info>) -> ProgramResult {
+    let ix = initialize_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
+pub fn initialize_invoke_signed<'info>(
     accounts: &InitializeAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_ix(accounts, args)?;
+    let ix = initialize_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -13013,7 +12713,6 @@ impl From<InitializeSpotMarketIxArgs> for InitializeSpotMarketIxData {
 }
 impl InitializeSpotMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -13308,7 +13007,6 @@ impl From<InitializeSerumFulfillmentConfigIxArgs> for InitializeSerumFulfillment
 }
 impl InitializeSerumFulfillmentConfigIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -13522,7 +13220,6 @@ impl From<UpdateSerumFulfillmentConfigStatusIxArgs> for UpdateSerumFulfillmentCo
 }
 impl UpdateSerumFulfillmentConfigStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -13801,7 +13498,6 @@ impl From<InitializePhoenixFulfillmentConfigIxArgs> for InitializePhoenixFulfill
 }
 impl InitializePhoenixFulfillmentConfigIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14010,7 +13706,6 @@ impl From<PhoenixFulfillmentConfigStatusIxArgs> for PhoenixFulfillmentConfigStat
 }
 impl PhoenixFulfillmentConfigStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14187,19 +13882,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_L
     }
 }
 pub const UPDATE_SERUM_VAULT_IX_DISCM: [u8; 8] = [219, 8, 246, 96, 169, 121, 91, 110];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdateSerumVaultIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdateSerumVaultIxData(pub UpdateSerumVaultIxArgs);
-impl From<UpdateSerumVaultIxArgs> for UpdateSerumVaultIxData {
-    fn from(args: UpdateSerumVaultIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdateSerumVaultIxData;
 impl UpdateSerumVaultIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14212,11 +13898,10 @@ impl UpdateSerumVaultIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSerumVaultIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -14224,34 +13909,29 @@ impl UpdateSerumVaultIxData {
         Ok(data)
     }
 }
-pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>, A: Into<UpdateSerumVaultIxArgs>>(
+pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateSerumVaultKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UpdateSerumVaultIxArgs = args.into();
-    let data: UpdateSerumVaultIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdateSerumVaultIxData.try_to_vec()?,
     })
 }
-pub fn update_serum_vault_invoke<'info, A: Into<UpdateSerumVaultIxArgs>>(
+pub fn update_serum_vault_invoke<'info>(
     accounts: &UpdateSerumVaultAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_serum_vault_ix(accounts, args)?;
+    let ix = update_serum_vault_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_serum_vault_invoke_signed<'info, A: Into<UpdateSerumVaultIxArgs>>(
+pub fn update_serum_vault_invoke_signed<'info>(
     accounts: &UpdateSerumVaultAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_serum_vault_ix(accounts, args)?;
+    let ix = update_serum_vault_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -14417,7 +14097,6 @@ impl From<InitializePerpMarketIxArgs> for InitializePerpMarketIxData {
 }
 impl InitializePerpMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14606,7 +14285,6 @@ impl From<DeleteInitializedPerpMarketIxArgs> for DeleteInitializedPerpMarketIxDa
 }
 impl DeleteInitializedPerpMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14793,7 +14471,6 @@ impl From<MoveAmmPriceIxArgs> for MoveAmmPriceIxData {
 }
 impl MoveAmmPriceIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -14970,7 +14647,6 @@ impl From<UpdatePerpMarketExpiryIxArgs> for UpdatePerpMarketExpiryIxData {
 }
 impl UpdatePerpMarketExpiryIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -15161,23 +14837,10 @@ impl<'me, 'info>
 }
 pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM: [u8; 8] =
     [55, 19, 238, 169, 227, 90, 200, 184];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct SettleExpiredMarketPoolsToRevenuePoolIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct SettleExpiredMarketPoolsToRevenuePoolIxData(
-    pub SettleExpiredMarketPoolsToRevenuePoolIxArgs,
-);
-impl From<SettleExpiredMarketPoolsToRevenuePoolIxArgs>
-    for SettleExpiredMarketPoolsToRevenuePoolIxData
-{
-    fn from(args: SettleExpiredMarketPoolsToRevenuePoolIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct SettleExpiredMarketPoolsToRevenuePoolIxData;
 impl SettleExpiredMarketPoolsToRevenuePoolIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -15190,13 +14853,10 @@ impl SettleExpiredMarketPoolsToRevenuePoolIxData {
                 ),
             ));
         }
-        Ok(Self(
-            SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(&mut reader)?,
-        ))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -15206,43 +14866,31 @@ impl SettleExpiredMarketPoolsToRevenuePoolIxData {
 }
 pub fn settle_expired_market_pools_to_revenue_pool_ix<
     K: Into<SettleExpiredMarketPoolsToRevenuePoolKeys>,
-    A: Into<SettleExpiredMarketPoolsToRevenuePoolIxArgs>,
 >(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] =
         (&keys).into();
-    let args_full: SettleExpiredMarketPoolsToRevenuePoolIxArgs = args.into();
-    let data: SettleExpiredMarketPoolsToRevenuePoolIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: SettleExpiredMarketPoolsToRevenuePoolIxData.try_to_vec()?,
     })
 }
-pub fn settle_expired_market_pools_to_revenue_pool_invoke<
-    'info,
-    A: Into<SettleExpiredMarketPoolsToRevenuePoolIxArgs>,
->(
+pub fn settle_expired_market_pools_to_revenue_pool_invoke<'info>(
     accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts, args)?;
+    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<
-    'info,
-    A: Into<SettleExpiredMarketPoolsToRevenuePoolIxArgs>,
->(
+pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<'info>(
     accounts: &SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts, args)?;
+    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -15428,7 +15076,6 @@ impl From<DepositIntoPerpMarketFeePoolIxArgs> for DepositIntoPerpMarketFeePoolIx
 }
 impl DepositIntoPerpMarketFeePoolIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -15638,7 +15285,6 @@ impl From<RepegAmmCurveIxArgs> for RepegAmmCurveIxData {
 }
 impl RepegAmmCurveIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -15818,19 +15464,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TW
 }
 pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
     [241, 74, 114, 123, 206, 153, 24, 202];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdatePerpMarketAmmOracleTwapIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdatePerpMarketAmmOracleTwapIxData(pub UpdatePerpMarketAmmOracleTwapIxArgs);
-impl From<UpdatePerpMarketAmmOracleTwapIxArgs> for UpdatePerpMarketAmmOracleTwapIxData {
-    fn from(args: UpdatePerpMarketAmmOracleTwapIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdatePerpMarketAmmOracleTwapIxData;
 impl UpdatePerpMarketAmmOracleTwapIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -15843,13 +15480,10 @@ impl UpdatePerpMarketAmmOracleTwapIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -15857,44 +15491,30 @@ impl UpdatePerpMarketAmmOracleTwapIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_amm_oracle_twap_ix<
-    K: Into<UpdatePerpMarketAmmOracleTwapKeys>,
-    A: Into<UpdatePerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn update_perp_market_amm_oracle_twap_ix<K: Into<UpdatePerpMarketAmmOracleTwapKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UpdatePerpMarketAmmOracleTwapIxArgs = args.into();
-    let data: UpdatePerpMarketAmmOracleTwapIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdatePerpMarketAmmOracleTwapIxData.try_to_vec()?,
     })
 }
-pub fn update_perp_market_amm_oracle_twap_invoke<
-    'info,
-    A: Into<UpdatePerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn update_perp_market_amm_oracle_twap_invoke<'info>(
     accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_perp_market_amm_oracle_twap_ix(accounts, args)?;
+    let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_amm_oracle_twap_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn update_perp_market_amm_oracle_twap_invoke_signed<'info>(
     accounts: &UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_amm_oracle_twap_ix(accounts, args)?;
+    let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16023,19 +15643,10 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWA
 }
 pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
     [127, 10, 55, 164, 123, 226, 47, 24];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ResetPerpMarketAmmOracleTwapIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ResetPerpMarketAmmOracleTwapIxData(pub ResetPerpMarketAmmOracleTwapIxArgs);
-impl From<ResetPerpMarketAmmOracleTwapIxArgs> for ResetPerpMarketAmmOracleTwapIxData {
-    fn from(args: ResetPerpMarketAmmOracleTwapIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ResetPerpMarketAmmOracleTwapIxData;
 impl ResetPerpMarketAmmOracleTwapIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -16048,13 +15659,10 @@ impl ResetPerpMarketAmmOracleTwapIxData {
                 ),
             ));
         }
-        Ok(Self(ResetPerpMarketAmmOracleTwapIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -16062,44 +15670,30 @@ impl ResetPerpMarketAmmOracleTwapIxData {
         Ok(data)
     }
 }
-pub fn reset_perp_market_amm_oracle_twap_ix<
-    K: Into<ResetPerpMarketAmmOracleTwapKeys>,
-    A: Into<ResetPerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn reset_perp_market_amm_oracle_twap_ix<K: Into<ResetPerpMarketAmmOracleTwapKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
     let metas: [AccountMeta; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ResetPerpMarketAmmOracleTwapIxArgs = args.into();
-    let data: ResetPerpMarketAmmOracleTwapIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ResetPerpMarketAmmOracleTwapIxData.try_to_vec()?,
     })
 }
-pub fn reset_perp_market_amm_oracle_twap_invoke<
-    'info,
-    A: Into<ResetPerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn reset_perp_market_amm_oracle_twap_invoke<'info>(
     accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = reset_perp_market_amm_oracle_twap_ix(accounts, args)?;
+    let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn reset_perp_market_amm_oracle_twap_invoke_signed<
-    'info,
-    A: Into<ResetPerpMarketAmmOracleTwapIxArgs>,
->(
+pub fn reset_perp_market_amm_oracle_twap_invoke_signed<'info>(
     accounts: &ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = reset_perp_market_amm_oracle_twap_ix(accounts, args)?;
+    let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16233,7 +15827,6 @@ impl From<UpdateKIxArgs> for UpdateKIxData {
 }
 impl UpdateKIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -16417,7 +16010,6 @@ impl From<UpdatePerpMarketMarginRatioIxArgs> for UpdatePerpMarketMarginRatioIxDa
 }
 impl UpdatePerpMarketMarginRatioIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -16610,7 +16202,6 @@ impl From<UpdatePerpMarketMaxImbalancesIxArgs> for UpdatePerpMarketMaxImbalances
 }
 impl UpdatePerpMarketMaxImbalancesIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -16805,7 +16396,6 @@ impl From<UpdatePerpMarketLiquidationFeeIxArgs> for UpdatePerpMarketLiquidationF
 }
 impl UpdatePerpMarketLiquidationFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17003,7 +16593,6 @@ impl From<UpdateInsuranceFundUnstakingPeriodIxArgs> for UpdateInsuranceFundUnsta
 }
 impl UpdateInsuranceFundUnstakingPeriodIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17200,7 +16789,6 @@ impl From<UpdateSpotMarketLiquidationFeeIxArgs> for UpdateSpotMarketLiquidationF
 }
 impl UpdateSpotMarketLiquidationFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17394,7 +16982,6 @@ impl From<UpdateWithdrawGuardThresholdIxArgs> for UpdateWithdrawGuardThresholdIx
 }
 impl UpdateWithdrawGuardThresholdIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17586,7 +17173,6 @@ impl From<UpdateSpotMarketIfFactorIxArgs> for UpdateSpotMarketIfFactorIxData {
 }
 impl UpdateSpotMarketIfFactorIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17781,7 +17367,6 @@ impl From<UpdateSpotMarketRevenueSettlePeriodIxArgs> for UpdateSpotMarketRevenue
 }
 impl UpdateSpotMarketRevenueSettlePeriodIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -17972,7 +17557,6 @@ impl From<UpdateSpotMarketStatusIxArgs> for UpdateSpotMarketStatusIxData {
 }
 impl UpdateSpotMarketStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -18158,7 +17742,6 @@ impl From<UpdateSpotMarketAssetTierIxArgs> for UpdateSpotMarketAssetTierIxData {
 }
 impl UpdateSpotMarketAssetTierIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -18353,7 +17936,6 @@ impl From<UpdateSpotMarketMarginWeightsIxArgs> for UpdateSpotMarketMarginWeights
 }
 impl UpdateSpotMarketMarginWeightsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -18549,7 +18131,6 @@ impl From<UpdateSpotMarketBorrowRateIxArgs> for UpdateSpotMarketBorrowRateIxData
 }
 impl UpdateSpotMarketBorrowRateIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -18744,7 +18325,6 @@ impl From<UpdateSpotMarketMaxTokenDepositsIxArgs> for UpdateSpotMarketMaxTokenDe
 }
 impl UpdateSpotMarketMaxTokenDepositsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -18947,7 +18527,6 @@ impl From<UpdateSpotMarketOracleIxArgs> for UpdateSpotMarketOracleIxData {
 }
 impl UpdateSpotMarketOracleIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -19141,7 +18720,6 @@ impl From<UpdateSpotMarketStepSizeAndTickSizeIxArgs> for UpdateSpotMarketStepSiz
 }
 impl UpdateSpotMarketStepSizeAndTickSizeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -19336,7 +18914,6 @@ impl From<UpdateSpotMarketMinOrderSizeIxArgs> for UpdateSpotMarketMinOrderSizeIx
 }
 impl UpdateSpotMarketMinOrderSizeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -19531,7 +19108,6 @@ impl From<UpdateSpotMarketOrdersEnabledIxArgs> for UpdateSpotMarketOrdersEnabled
 }
 impl UpdateSpotMarketOrdersEnabledIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -19719,7 +19295,6 @@ impl From<UpdateSpotMarketNameIxArgs> for UpdateSpotMarketNameIxData {
 }
 impl UpdateSpotMarketNameIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -19901,7 +19476,6 @@ impl From<UpdatePerpMarketStatusIxArgs> for UpdatePerpMarketStatusIxData {
 }
 impl UpdatePerpMarketStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -20090,7 +19664,6 @@ impl From<UpdatePerpMarketContractTierIxArgs> for UpdatePerpMarketContractTierIx
 }
 impl UpdatePerpMarketContractTierIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -20283,7 +19856,6 @@ impl From<UpdatePerpMarketImfFactorIxArgs> for UpdatePerpMarketImfFactorIxData {
 }
 impl UpdatePerpMarketImfFactorIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -20483,7 +20055,6 @@ impl From<UpdatePerpMarketUnrealizedAssetWeightIxArgs>
 }
 impl UpdatePerpMarketUnrealizedAssetWeightIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -20682,7 +20253,6 @@ impl From<UpdatePerpMarketConcentrationCoefIxArgs> for UpdatePerpMarketConcentra
 }
 impl UpdatePerpMarketConcentrationCoefIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -20885,7 +20455,6 @@ impl From<UpdatePerpMarketCurveUpdateIntensityIxArgs>
 }
 impl UpdatePerpMarketCurveUpdateIntensityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21093,7 +20662,6 @@ impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>
 }
 impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21268,7 +20836,6 @@ impl From<UpdateLpCooldownTimeIxArgs> for UpdateLpCooldownTimeIxData {
 }
 impl UpdateLpCooldownTimeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21435,7 +21002,6 @@ impl From<UpdatePerpFeeStructureIxArgs> for UpdatePerpFeeStructureIxData {
 }
 impl UpdatePerpFeeStructureIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21604,7 +21170,6 @@ impl From<UpdateSpotFeeStructureIxArgs> for UpdateSpotFeeStructureIxData {
 }
 impl UpdateSpotFeeStructureIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21778,7 +21343,6 @@ impl From<UpdateInitialPctToLiquidateIxArgs> for UpdateInitialPctToLiquidateIxDa
 }
 impl UpdateInitialPctToLiquidateIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -21950,7 +21514,6 @@ impl From<UpdateLiquidationDurationIxArgs> for UpdateLiquidationDurationIxData {
 }
 impl UpdateLiquidationDurationIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -22122,7 +21685,6 @@ impl From<UpdateOracleGuardRailsIxArgs> for UpdateOracleGuardRailsIxData {
 }
 impl UpdateOracleGuardRailsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -22295,7 +21857,6 @@ impl From<UpdateStateSettlementDurationIxArgs> for UpdateStateSettlementDuration
 }
 impl UpdateStateSettlementDurationIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -22496,7 +22057,6 @@ impl From<UpdatePerpMarketOracleIxArgs> for UpdatePerpMarketOracleIxData {
 }
 impl UpdatePerpMarketOracleIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -22685,7 +22245,6 @@ impl From<UpdatePerpMarketBaseSpreadIxArgs> for UpdatePerpMarketBaseSpreadIxData
 }
 impl UpdatePerpMarketBaseSpreadIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -22870,7 +22429,6 @@ impl From<UpdateAmmJitIntensityIxArgs> for UpdateAmmJitIntensityIxData {
 }
 impl UpdateAmmJitIntensityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -23054,7 +22612,6 @@ impl From<UpdatePerpMarketMaxSpreadIxArgs> for UpdatePerpMarketMaxSpreadIxData {
 }
 impl UpdatePerpMarketMaxSpreadIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -23250,7 +22807,6 @@ impl From<UpdatePerpMarketStepSizeAndTickSizeIxArgs> for UpdatePerpMarketStepSiz
 }
 impl UpdatePerpMarketStepSizeAndTickSizeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -23439,7 +22995,6 @@ impl From<UpdatePerpMarketNameIxArgs> for UpdatePerpMarketNameIxData {
 }
 impl UpdatePerpMarketNameIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -23625,7 +23180,6 @@ impl From<UpdatePerpMarketMinOrderSizeIxArgs> for UpdatePerpMarketMinOrderSizeIx
 }
 impl UpdatePerpMarketMinOrderSizeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -23823,7 +23377,6 @@ impl From<UpdatePerpMarketMaxSlippageRatioIxArgs> for UpdatePerpMarketMaxSlippag
 }
 impl UpdatePerpMarketMaxSlippageRatioIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24029,7 +23582,6 @@ impl From<UpdatePerpMarketMaxFillReserveFractionIxArgs>
 }
 impl UpdatePerpMarketMaxFillReserveFractionIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24228,7 +23780,6 @@ impl From<UpdatePerpMarketMaxOpenInterestIxArgs> for UpdatePerpMarketMaxOpenInte
 }
 impl UpdatePerpMarketMaxOpenInterestIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24402,7 +23953,6 @@ impl From<UpdateAdminIxArgs> for UpdateAdminIxData {
 }
 impl UpdateAdminIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24562,7 +24112,6 @@ impl From<UpdateWhitelistMintIxArgs> for UpdateWhitelistMintIxData {
 }
 impl UpdateWhitelistMintIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24725,7 +24274,6 @@ impl From<UpdateDiscountMintIxArgs> for UpdateDiscountMintIxData {
 }
 impl UpdateDiscountMintIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -24888,7 +24436,6 @@ impl From<UpdateExchangeStatusIxArgs> for UpdateExchangeStatusIxData {
 }
 impl UpdateExchangeStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -25057,7 +24604,6 @@ impl From<UpdatePerpAuctionDurationIxArgs> for UpdatePerpAuctionDurationIxData {
 }
 impl UpdatePerpAuctionDurationIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -25231,7 +24777,6 @@ impl From<UpdateSpotAuctionDurationIxArgs> for UpdateSpotAuctionDurationIxData {
 }
 impl UpdateSpotAuctionDurationIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -25467,7 +25012,6 @@ impl From<AdminRemoveInsuranceFundStakeIxArgs> for AdminRemoveInsuranceFundStake
 }
 impl AdminRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;

@@ -18,6 +18,16 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
     }
 
     fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {};
+        for ix in self.instructions {
+            if ix.has_ix_args() {
+                res.extend(quote! {
+                    use borsh::{BorshDeserialize, BorshSerialize};
+                });
+                break;
+            }
+        }
+
         let mut solana_program_imports = quote! {
             account_info::AccountInfo,
             entrypoint::ProgramResult,
@@ -33,10 +43,10 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 break;
             }
         }
-        let mut res = quote! {
-            use borsh::{BorshDeserialize, BorshSerialize};
+        res.extend(quote! {
             use solana_program::{#solana_program_imports};
-        };
+            use std::io::Read;
+        });
 
         for ix in self.instructions {
             if ix.args_has_defined_type() {
@@ -64,7 +74,6 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
             impl #program_ix_enum_ident {
                 pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-                    use std::io::Read;
                     let mut reader = buf;
                     let mut maybe_discm = [0u8; 8];
                     reader.read_exact(&mut maybe_discm)?;
@@ -80,7 +89,7 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
                 pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
                     match self {
-                        #(#serialize_variant_match_arms)*
+                        #(#serialize_variant_match_arms),*,
                     }
                 }
 
@@ -105,28 +114,51 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
 pub fn enum_variant(ix: &NamedInstruction) -> TokenStream {
     let variant_ident = format_ident!("{}", ix.name.to_pascal_case());
-    let ix_args_ident = ix.ix_args_ident();
-    quote!(
-        #variant_ident(#ix_args_ident)
-    )
+    let mut res = quote!(
+        #variant_ident
+    );
+    if ix.has_ix_args() {
+        let ix_args_ident = ix.ix_args_ident();
+        res.extend(quote! {
+            (#ix_args_ident)
+        })
+    }
+    res
 }
 
 pub fn serialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let variant_ident = format_ident!("{}", ix.name.to_pascal_case());
     let discm_ident = ix.discm_ident();
-    quote! {
-        Self::#variant_ident(args) => {
-            #discm_ident.serialize(&mut writer)?;
+    let serialize_expr = if ix.has_ix_args() {
+        quote! {{
+            writer.write_all(&#discm_ident)?;
             args.serialize(&mut writer)
-        }
+        }}
+    } else {
+        quote! { writer.write_all(&#discm_ident) }
+    };
+    let mut left_matched = quote! { Self::#variant_ident };
+    if ix.has_ix_args() {
+        left_matched.extend(quote! { (args) });
+    }
+    quote! {
+        #left_matched => #serialize_expr
     }
 }
 
 pub fn deserialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let variant_ident = format_ident!("{}", ix.name.to_pascal_case());
     let discm_ident = ix.discm_ident();
-    let ix_args_ident = ix.ix_args_ident();
+    let mut variant_expr = quote! {
+        Self::#variant_ident
+    };
+    if ix.has_ix_args() {
+        let ix_args_ident = ix.ix_args_ident();
+        variant_expr.extend(quote! {
+            (#ix_args_ident::deserialize(&mut reader)?)
+        })
+    }
     quote! {
-        #discm_ident => Ok(Self::#variant_ident(#ix_args_ident::deserialize(&mut reader)?))
+        #discm_ident => Ok(#variant_expr)
     }
 }

@@ -2,10 +2,12 @@
 resolver = "2"
 
 members = [
+    "examples/anchor/ix_no_args/*",
     "examples/anchor/ix_no_privilege/*",
     "examples/anchor/drift/*",
     "examples/anchor/marinade/*",
     "examples/anchor/unstake_it/*",
+    "examples/shank/ix_no_args/*",
     "examples/shank/ix_no_privilege/*",
     "examples/shank/phoenix_v1/*",
     "examples/shank/token_metadata/*",

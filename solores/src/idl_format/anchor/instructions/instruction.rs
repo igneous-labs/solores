@@ -15,7 +15,7 @@ use crate::{idl_format::anchor::typedefs::TypedefField, utils::unique_by_report_
 pub struct NamedInstruction {
     pub name: String,
     pub accounts: Vec<IxAccountEntry>,
-    pub args: Vec<TypedefField>,
+    pub args: Option<Vec<TypedefField>>,
 }
 
 impl NamedInstruction {
@@ -47,11 +47,21 @@ impl NamedInstruction {
         format_ident!("{}_IX_ACCOUNTS_LEN", self.name.to_shouty_snake_case())
     }
 
+    pub fn has_ix_args(&self) -> bool {
+        let args = match &self.args {
+            Some(a) => a,
+            None => return false,
+        };
+        !args.is_empty()
+    }
+
     pub fn args_has_defined_type(&self) -> bool {
-        self.args
-            .iter()
-            .map(|a| a.r#type.is_or_has_defined())
-            .any(|b| b)
+        let args = if !self.has_ix_args() {
+            return false;
+        } else {
+            self.args.as_ref().unwrap()
+        };
+        args.iter().map(|a| a.r#type.is_or_has_defined()).any(|b| b)
     }
 
     pub fn has_privileged_accounts(&self) -> bool {
@@ -221,8 +231,13 @@ impl NamedInstruction {
     }
 
     pub fn write_ix_args_struct(&self, tokens: &mut TokenStream) {
+        let args = if !self.has_ix_args() {
+            return;
+        } else {
+            self.args.as_ref().unwrap()
+        };
         let ix_args_ident = self.ix_args_ident();
-        let args_fields = self.args.iter().map(|a| quote! { pub #a });
+        let args_fields = args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
             #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -248,41 +263,79 @@ impl NamedInstruction {
         })
     }
 
-    pub fn write_ix_data(&self, tokens: &mut TokenStream) {
+    pub fn write_ix_data_struct(&self, tokens: &mut TokenStream) {
         let ix_data_ident = self.ix_data_ident();
-        let ix_args_ident = self.ix_args_ident();
-        let discm_ident = self.discm_ident();
-        // using std::io instead of borsh:: because borsh changed their paths from
-        // borsh::maybestd::io to borsh::io from 0.X to 1.X
+        let struct_decl = if self.has_ix_args() {
+            let ix_args_ident = self.ix_args_ident();
+            quote! { pub struct #ix_data_ident(pub #ix_args_ident); }
+        } else {
+            quote! { pub struct #ix_data_ident; }
+        };
+
         tokens.extend(quote! {
             #[derive(Clone, Debug, PartialEq)]
-            pub struct #ix_data_ident(pub #ix_args_ident);
+            #struct_decl
+        });
+    }
 
+    pub fn write_from_ix_args_for_ix_data(&self, tokens: &mut TokenStream) {
+        if !self.has_ix_args() {
+            return;
+        }
+        let ix_data_ident = self.ix_data_ident();
+        let ix_args_ident = self.ix_args_ident();
+        tokens.extend(quote! {
             impl From<#ix_args_ident> for #ix_data_ident {
                 fn from(args: #ix_args_ident) -> Self {
                     Self(args)
                 }
             }
+        });
+    }
 
+    pub fn write_ix_data_impl(&self, tokens: &mut TokenStream) {
+        let discm_ident = self.discm_ident();
+        let ix_data_ident = self.ix_data_ident();
+        let mut deserialize_body = quote! {
+            let mut reader = buf;
+            let mut maybe_discm = [0u8; 8];
+            reader.read_exact(&mut maybe_discm)?;
+            if maybe_discm != #discm_ident {
+                return Err(
+                    std::io::Error::new(
+                        std::io::ErrorKind::Other, format!("discm does not match. Expected: {:?}. Received: {:?}", #discm_ident, maybe_discm)
+                    )
+                );
+            }
+        };
+        if self.has_ix_args() {
+            let ix_args_ident = self.ix_args_ident();
+            deserialize_body.extend(quote! {
+                Ok(Self(#ix_args_ident::deserialize(&mut reader)?))
+            })
+        } else {
+            deserialize_body.extend(quote! {
+                Ok(Self)
+            })
+        }
+        let serialize_body = if self.has_ix_args() {
+            quote! {
+                writer.write_all(&#discm_ident)?;
+                self.0.serialize(&mut writer)
+            }
+        } else {
+            quote! {
+                writer.write_all(&#discm_ident)
+            }
+        };
+        tokens.extend(quote! {
             impl #ix_data_ident {
                 pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-                    use std::io::Read;
-                    let mut reader = buf;
-                    let mut maybe_discm = [0u8; 8];
-                    reader.read_exact(&mut maybe_discm)?;
-                    if maybe_discm != #discm_ident {
-                        return Err(
-                            std::io::Error::new(
-                                std::io::ErrorKind::Other, format!("discm does not match. Expected: {:?}. Received: {:?}", #discm_ident, maybe_discm)
-                            )
-                        );
-                    }
-                    Ok(Self(#ix_args_ident::deserialize(&mut reader)?))
+                    #deserialize_body
                 }
 
                 pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-                    writer.write_all(&#discm_ident)?;
-                    self.0.serialize(&mut writer)
+                    #serialize_body
                 }
 
                 pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -301,56 +354,99 @@ impl NamedInstruction {
         let ix_args_ident = self.ix_args_ident();
         let accounts_len_ident = self.accounts_len_ident();
         let ix_data_ident = self.ix_data_ident();
-        tokens.extend(quote! {
-            pub fn #ix_fn_ident<K: Into<#keys_ident>, A: Into<#ix_args_ident>>(
-                accounts: K,
-                args: A,
-            ) -> std::io::Result<Instruction> {
-                let keys: #keys_ident = accounts.into();
-                let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
+
+        let mut fn_generics = quote! { K: Into<#keys_ident>,};
+        if self.has_ix_args() {
+            fn_generics.extend(quote! { A: Into<#ix_args_ident> })
+        }
+
+        let mut fn_params = quote! { accounts: K, };
+        if self.has_ix_args() {
+            fn_params.extend(quote! { args: A,  });
+        }
+
+        let mut fn_body = quote! {
+            let keys: #keys_ident = accounts.into();
+            let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
+        };
+        if self.has_ix_args() {
+            fn_body.extend(quote! {
                 let args_full: #ix_args_ident = args.into();
                 let data: #ix_data_ident = args_full.into();
+            })
+        }
+        let data_expr = if self.has_ix_args() {
+            quote! { data.try_to_vec()? }
+        } else {
+            quote! { #ix_data_ident.try_to_vec()? }
+        };
+
+        tokens.extend(quote! {
+            pub fn #ix_fn_ident<#fn_generics>(#fn_params) -> std::io::Result<Instruction> {
+                #fn_body
                 Ok(Instruction {
                     program_id: crate::ID,
                     accounts: Vec::from(metas),
-                    data: data.try_to_vec()?,
+                    data: #data_expr,
                 })
             }
         });
     }
 
+    fn invoke_fn_generics(&self) -> TokenStream {
+        let mut res = quote! {'info,};
+        if self.has_ix_args() {
+            let ix_args_ident = self.ix_args_ident();
+            res.extend(quote! { A: Into<#ix_args_ident> });
+        }
+        res
+    }
+
+    fn invoke_fn_params_prefix(&self) -> TokenStream {
+        let accounts_ident = self.accounts_ident();
+        let mut fn_params = quote! {accounts: &#accounts_ident<'_, 'info>,};
+        if self.has_ix_args() {
+            fn_params.extend(quote! { args: A, })
+        }
+        fn_params
+    }
+
+    fn ix_fn_call_assign(&self) -> TokenStream {
+        let ix_fn_ident = self.ix_fn_ident();
+        if self.has_ix_args() {
+            quote! { let ix = #ix_fn_ident(accounts, args)?; }
+        } else {
+            quote! { let ix = #ix_fn_ident(accounts)?; }
+        }
+    }
+
     /// _invoke()
     pub fn write_invoke_fn(&self, tokens: &mut TokenStream) {
         let invoke_fn_ident = format_ident!("{}_invoke", self.name.to_snake_case());
-        let ix_args_ident = self.ix_args_ident();
-        let accounts_ident = self.accounts_ident();
-        let ix_fn_ident = self.ix_fn_ident();
         let accounts_len_ident = self.accounts_len_ident();
+        let fn_generics = self.invoke_fn_generics();
+        let fn_params = self.invoke_fn_params_prefix();
+        let call_assign = self.ix_fn_call_assign();
         tokens.extend(quote! {
-            pub fn #invoke_fn_ident<'info, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident<'_, 'info>,
-                args: A,
-            ) -> ProgramResult {
-                let ix = #ix_fn_ident(accounts, args)?;
+            pub fn #invoke_fn_ident<#fn_generics>(#fn_params) -> ProgramResult {
+                #call_assign
                 let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke(&ix, &account_info)
             }
         });
     }
 
+    /// _invoke_signed()
     pub fn write_invoke_signed_fn(&self, tokens: &mut TokenStream) {
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", self.name.to_snake_case());
-        let ix_args_ident = self.ix_args_ident();
-        let accounts_ident = self.accounts_ident();
-        let ix_fn_ident = self.ix_fn_ident();
         let accounts_len_ident = self.accounts_len_ident();
+        let fn_generics = self.invoke_fn_generics();
+        let mut fn_params = self.invoke_fn_params_prefix();
+        fn_params.extend(quote! { seeds: &[&[&[u8]]], });
+        let call_assign = self.ix_fn_call_assign();
         tokens.extend(quote! {
-            pub fn #invoke_signed_fn_ident<'info, A: Into<#ix_args_ident>>(
-                accounts: &#accounts_ident<'_, 'info>,
-                args: A,
-                seeds: &[&[&[u8]]],
-            ) -> ProgramResult {
-                let ix = #ix_fn_ident(accounts, args)?;
+            pub fn #invoke_signed_fn_ident<#fn_generics>(#fn_params) -> ProgramResult {
+                #call_assign
                 let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
                 invoke_signed(&ix, &account_info, seeds)
             }
@@ -497,7 +593,9 @@ impl ToTokens for NamedInstruction {
 
         self.write_discm(tokens);
         self.write_ix_args_struct(tokens);
-        self.write_ix_data(tokens);
+        self.write_ix_data_struct(tokens);
+        self.write_from_ix_args_for_ix_data(tokens);
+        self.write_ix_data_impl(tokens);
 
         self.write_ix_fn(tokens);
         self.write_invoke_fn(tokens);

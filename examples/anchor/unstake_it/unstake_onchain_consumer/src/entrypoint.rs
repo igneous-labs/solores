@@ -26,5 +26,5 @@ fn process_instruction(
         return Err(err);
     }
 
-    unstake_invoke(&accounts, UnstakeIxArgs {})
+    unstake_invoke(&accounts)
 }
