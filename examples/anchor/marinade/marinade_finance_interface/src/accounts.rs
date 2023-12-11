@@ -30,8 +30,11 @@ pub struct State {
 #[derive(Clone, Debug, PartialEq)]
 pub struct StateAccount(pub State);
 impl StateAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != STATE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -41,7 +44,7 @@ impl StateAccount {
                 ),
             ));
         }
-        Ok(Self(State::deserialize(buf)?))
+        Ok(Self(State::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&STATE_ACCOUNT_DISCM)?;
@@ -65,8 +68,11 @@ pub struct TicketAccountData {
 #[derive(Clone, Debug, PartialEq)]
 pub struct TicketAccountDataAccount(pub TicketAccountData);
 impl TicketAccountDataAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != TICKET_ACCOUNT_DATA_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -76,7 +82,7 @@ impl TicketAccountDataAccount {
                 ),
             ));
         }
-        Ok(Self(TicketAccountData::deserialize(buf)?))
+        Ok(Self(TicketAccountData::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&TICKET_ACCOUNT_DATA_ACCOUNT_DISCM)?;

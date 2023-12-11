@@ -10,8 +10,11 @@ pub struct Fee {
 #[derive(Clone, Debug, PartialEq)]
 pub struct FeeAccount(pub Fee);
 impl FeeAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != FEE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21,7 +24,7 @@ impl FeeAccount {
                 ),
             ));
         }
-        Ok(Self(Fee::deserialize(buf)?))
+        Ok(Self(Fee::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&FEE_ACCOUNT_DISCM)?;
@@ -44,8 +47,11 @@ pub struct Pool {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PoolAccount(pub Pool);
 impl PoolAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != POOL_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -55,7 +61,7 @@ impl PoolAccount {
                 ),
             ));
         }
-        Ok(Self(Pool::deserialize(buf)?))
+        Ok(Self(Pool::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&POOL_ACCOUNT_DISCM)?;
@@ -79,8 +85,11 @@ pub struct ProtocolFee {
 #[derive(Clone, Debug, PartialEq)]
 pub struct ProtocolFeeAccount(pub ProtocolFee);
 impl ProtocolFeeAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PROTOCOL_FEE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -90,7 +99,7 @@ impl ProtocolFeeAccount {
                 ),
             ));
         }
-        Ok(Self(ProtocolFee::deserialize(buf)?))
+        Ok(Self(ProtocolFee::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PROTOCOL_FEE_ACCOUNT_DISCM)?;
@@ -111,8 +120,11 @@ pub struct StakeAccountRecord {
 #[derive(Clone, Debug, PartialEq)]
 pub struct StakeAccountRecordAccount(pub StakeAccountRecord);
 impl StakeAccountRecordAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -122,7 +134,7 @@ impl StakeAccountRecordAccount {
                 ),
             ));
         }
-        Ok(Self(StakeAccountRecord::deserialize(buf)?))
+        Ok(Self(StakeAccountRecord::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&STAKE_ACCOUNT_RECORD_ACCOUNT_DISCM)?;

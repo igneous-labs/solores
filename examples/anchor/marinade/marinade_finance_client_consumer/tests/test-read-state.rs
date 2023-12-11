@@ -13,7 +13,6 @@ mod marinade_state {
 #[tokio::test]
 async fn test_read_serde_marinade_state() {
     let acc = RPC.get_account_data(&marinade_state::ID).await.unwrap();
-    let mut buf = acc.as_slice();
-    let sa = StateAccount::deserialize(&mut buf).unwrap();
+    let sa = StateAccount::deserialize(acc.as_slice()).unwrap();
     serde_json::to_string(&sa.0).unwrap();
 }

@@ -35,8 +35,11 @@ impl NamedAccount {
             pub struct #account_ident(pub #struct_ident);
 
             impl #account_ident {
-                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+                    use std::io::Read;
+                    let mut reader = buf;
+                    let mut maybe_discm = [0u8; 8];
+                    reader.read_exact(&mut maybe_discm)?;
                     if maybe_discm != #account_discm_ident {
                         return Err(
                             std::io::Error::new(
@@ -44,7 +47,7 @@ impl NamedAccount {
                             )
                         );
                     }
-                    Ok(Self(#struct_ident::deserialize(buf)?))
+                    Ok(Self(#struct_ident::deserialize(&mut reader)?))
                 }
 
                 pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {

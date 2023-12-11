@@ -60,8 +60,12 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
             }
 
             impl #program_ix_enum_ident {
-                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm = u8::deserialize(buf)?;
+                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+                    use std::io::Read;
+                    let mut reader = buf;
+                    let mut maybe_discm_buf = [0u8; 1];
+                    reader.read_exact(&mut maybe_discm_buf)?;
+                    let maybe_discm = maybe_discm_buf[0];
                     match maybe_discm {
                         #(#deserialize_variant_match_arms),*,
                         _ => Err(
@@ -121,6 +125,6 @@ pub fn deserialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let discm_ident = ix.discm_ident();
     let ix_args_ident = ix.ix_args_ident();
     quote! {
-        #discm_ident => Ok(Self::#variant_ident(#ix_args_ident::deserialize(buf)?))
+        #discm_ident => Ok(Self::#variant_ident(#ix_args_ident::deserialize(&mut reader)?))
     }
 }

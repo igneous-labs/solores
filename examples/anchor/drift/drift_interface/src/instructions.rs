@@ -134,390 +134,411 @@ pub enum DriftProgramIx {
     AdminRemoveInsuranceFundStake(AdminRemoveInsuranceFundStakeIxArgs),
 }
 impl DriftProgramIx {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         match maybe_discm {
             INITIALIZE_USER_IX_DISCM => Ok(Self::InitializeUser(
-                InitializeUserIxArgs::deserialize(buf)?,
+                InitializeUserIxArgs::deserialize(&mut reader)?,
             )),
             INITIALIZE_USER_STATS_IX_DISCM => Ok(Self::InitializeUserStats(
-                InitializeUserStatsIxArgs::deserialize(buf)?,
+                InitializeUserStatsIxArgs::deserialize(&mut reader)?,
             )),
             INITIALIZE_REFERRER_NAME_IX_DISCM => Ok(Self::InitializeReferrerName(
-                InitializeReferrerNameIxArgs::deserialize(buf)?,
+                InitializeReferrerNameIxArgs::deserialize(&mut reader)?,
             )),
-            DEPOSIT_IX_DISCM => Ok(Self::Deposit(DepositIxArgs::deserialize(buf)?)),
-            WITHDRAW_IX_DISCM => Ok(Self::Withdraw(WithdrawIxArgs::deserialize(buf)?)),
+            DEPOSIT_IX_DISCM => Ok(Self::Deposit(DepositIxArgs::deserialize(&mut reader)?)),
+            WITHDRAW_IX_DISCM => Ok(Self::Withdraw(WithdrawIxArgs::deserialize(&mut reader)?)),
             TRANSFER_DEPOSIT_IX_DISCM => Ok(Self::TransferDeposit(
-                TransferDepositIxArgs::deserialize(buf)?,
+                TransferDepositIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_PERP_ORDER_IX_DISCM => Ok(Self::PlacePerpOrder(
-                PlacePerpOrderIxArgs::deserialize(buf)?,
+                PlacePerpOrderIxArgs::deserialize(&mut reader)?,
             )),
-            CANCEL_ORDER_IX_DISCM => Ok(Self::CancelOrder(CancelOrderIxArgs::deserialize(buf)?)),
+            CANCEL_ORDER_IX_DISCM => Ok(Self::CancelOrder(CancelOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
             CANCEL_ORDER_BY_USER_ID_IX_DISCM => Ok(Self::CancelOrderByUserId(
-                CancelOrderByUserIdIxArgs::deserialize(buf)?,
+                CancelOrderByUserIdIxArgs::deserialize(&mut reader)?,
             )),
-            CANCEL_ORDERS_IX_DISCM => Ok(Self::CancelOrders(CancelOrdersIxArgs::deserialize(buf)?)),
-            MODIFY_ORDER_IX_DISCM => Ok(Self::ModifyOrder(ModifyOrderIxArgs::deserialize(buf)?)),
+            CANCEL_ORDERS_IX_DISCM => Ok(Self::CancelOrders(CancelOrdersIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            MODIFY_ORDER_IX_DISCM => Ok(Self::ModifyOrder(ModifyOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
             MODIFY_ORDER_BY_USER_ID_IX_DISCM => Ok(Self::ModifyOrderByUserId(
-                ModifyOrderByUserIdIxArgs::deserialize(buf)?,
+                ModifyOrderByUserIdIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_AND_TAKE_PERP_ORDER_IX_DISCM => Ok(Self::PlaceAndTakePerpOrder(
-                PlaceAndTakePerpOrderIxArgs::deserialize(buf)?,
+                PlaceAndTakePerpOrderIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_AND_MAKE_PERP_ORDER_IX_DISCM => Ok(Self::PlaceAndMakePerpOrder(
-                PlaceAndMakePerpOrderIxArgs::deserialize(buf)?,
+                PlaceAndMakePerpOrderIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceSpotOrder(
-                PlaceSpotOrderIxArgs::deserialize(buf)?,
+                PlaceSpotOrderIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceAndTakeSpotOrder(
-                PlaceAndTakeSpotOrderIxArgs::deserialize(buf)?,
+                PlaceAndTakeSpotOrderIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM => Ok(Self::PlaceAndMakeSpotOrder(
-                PlaceAndMakeSpotOrderIxArgs::deserialize(buf)?,
+                PlaceAndMakeSpotOrderIxArgs::deserialize(&mut reader)?,
             )),
-            BEGIN_SWAP_IX_DISCM => Ok(Self::BeginSwap(BeginSwapIxArgs::deserialize(buf)?)),
-            END_SWAP_IX_DISCM => Ok(Self::EndSwap(EndSwapIxArgs::deserialize(buf)?)),
+            BEGIN_SWAP_IX_DISCM => Ok(Self::BeginSwap(BeginSwapIxArgs::deserialize(&mut reader)?)),
+            END_SWAP_IX_DISCM => Ok(Self::EndSwap(EndSwapIxArgs::deserialize(&mut reader)?)),
             ADD_PERP_LP_SHARES_IX_DISCM => Ok(Self::AddPerpLpShares(
-                AddPerpLpSharesIxArgs::deserialize(buf)?,
+                AddPerpLpSharesIxArgs::deserialize(&mut reader)?,
             )),
             REMOVE_PERP_LP_SHARES_IX_DISCM => Ok(Self::RemovePerpLpShares(
-                RemovePerpLpSharesIxArgs::deserialize(buf)?,
+                RemovePerpLpSharesIxArgs::deserialize(&mut reader)?,
             )),
             REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM => {
                 Ok(Self::RemovePerpLpSharesInExpiringMarket(
-                    RemovePerpLpSharesInExpiringMarketIxArgs::deserialize(buf)?,
+                    RemovePerpLpSharesInExpiringMarketIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_USER_NAME_IX_DISCM => Ok(Self::UpdateUserName(
-                UpdateUserNameIxArgs::deserialize(buf)?,
+                UpdateUserNameIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM => Ok(Self::UpdateUserCustomMarginRatio(
-                UpdateUserCustomMarginRatioIxArgs::deserialize(buf)?,
+                UpdateUserCustomMarginRatioIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM => {
                 Ok(Self::UpdateUserMarginTradingEnabled(
-                    UpdateUserMarginTradingEnabledIxArgs::deserialize(buf)?,
+                    UpdateUserMarginTradingEnabledIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_USER_DELEGATE_IX_DISCM => Ok(Self::UpdateUserDelegate(
-                UpdateUserDelegateIxArgs::deserialize(buf)?,
+                UpdateUserDelegateIxArgs::deserialize(&mut reader)?,
             )),
-            DELETE_USER_IX_DISCM => Ok(Self::DeleteUser(DeleteUserIxArgs::deserialize(buf)?)),
-            FILL_PERP_ORDER_IX_DISCM => {
-                Ok(Self::FillPerpOrder(FillPerpOrderIxArgs::deserialize(buf)?))
-            }
-            REVERT_FILL_IX_DISCM => Ok(Self::RevertFill(RevertFillIxArgs::deserialize(buf)?)),
-            FILL_SPOT_ORDER_IX_DISCM => {
-                Ok(Self::FillSpotOrder(FillSpotOrderIxArgs::deserialize(buf)?))
-            }
-            TRIGGER_ORDER_IX_DISCM => Ok(Self::TriggerOrder(TriggerOrderIxArgs::deserialize(buf)?)),
+            DELETE_USER_IX_DISCM => Ok(Self::DeleteUser(DeleteUserIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            FILL_PERP_ORDER_IX_DISCM => Ok(Self::FillPerpOrder(FillPerpOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            REVERT_FILL_IX_DISCM => Ok(Self::RevertFill(RevertFillIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            FILL_SPOT_ORDER_IX_DISCM => Ok(Self::FillSpotOrder(FillSpotOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            TRIGGER_ORDER_IX_DISCM => Ok(Self::TriggerOrder(TriggerOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
             FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders(
-                ForceCancelOrdersIxArgs::deserialize(buf)?,
+                ForceCancelOrdersIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_IDLE_IX_DISCM => Ok(Self::UpdateUserIdle(
-                UpdateUserIdleIxArgs::deserialize(buf)?,
+                UpdateUserIdleIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM => Ok(Self::UpdateUserOpenOrdersCount(
-                UpdateUserOpenOrdersCountIxArgs::deserialize(buf)?,
+                UpdateUserOpenOrdersCountIxArgs::deserialize(&mut reader)?,
             )),
-            SETTLE_PNL_IX_DISCM => Ok(Self::SettlePnl(SettlePnlIxArgs::deserialize(buf)?)),
+            SETTLE_PNL_IX_DISCM => Ok(Self::SettlePnl(SettlePnlIxArgs::deserialize(&mut reader)?)),
             SETTLE_FUNDING_PAYMENT_IX_DISCM => Ok(Self::SettleFundingPayment(
-                SettleFundingPaymentIxArgs::deserialize(buf)?,
+                SettleFundingPaymentIxArgs::deserialize(&mut reader)?,
             )),
-            SETTLE_LP_IX_DISCM => Ok(Self::SettleLp(SettleLpIxArgs::deserialize(buf)?)),
+            SETTLE_LP_IX_DISCM => Ok(Self::SettleLp(SettleLpIxArgs::deserialize(&mut reader)?)),
             SETTLE_EXPIRED_MARKET_IX_DISCM => Ok(Self::SettleExpiredMarket(
-                SettleExpiredMarketIxArgs::deserialize(buf)?,
+                SettleExpiredMarketIxArgs::deserialize(&mut reader)?,
             )),
-            LIQUIDATE_PERP_IX_DISCM => {
-                Ok(Self::LiquidatePerp(LiquidatePerpIxArgs::deserialize(buf)?))
-            }
-            LIQUIDATE_SPOT_IX_DISCM => {
-                Ok(Self::LiquidateSpot(LiquidateSpotIxArgs::deserialize(buf)?))
-            }
+            LIQUIDATE_PERP_IX_DISCM => Ok(Self::LiquidatePerp(LiquidatePerpIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            LIQUIDATE_SPOT_IX_DISCM => Ok(Self::LiquidateSpot(LiquidateSpotIxArgs::deserialize(
+                &mut reader,
+            )?)),
             LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM => Ok(Self::LiquidateBorrowForPerpPnl(
-                LiquidateBorrowForPerpPnlIxArgs::deserialize(buf)?,
+                LiquidateBorrowForPerpPnlIxArgs::deserialize(&mut reader)?,
             )),
             LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM => Ok(Self::LiquidatePerpPnlForDeposit(
-                LiquidatePerpPnlForDepositIxArgs::deserialize(buf)?,
+                LiquidatePerpPnlForDepositIxArgs::deserialize(&mut reader)?,
             )),
             RESOLVE_PERP_PNL_DEFICIT_IX_DISCM => Ok(Self::ResolvePerpPnlDeficit(
-                ResolvePerpPnlDeficitIxArgs::deserialize(buf)?,
+                ResolvePerpPnlDeficitIxArgs::deserialize(&mut reader)?,
             )),
             RESOLVE_PERP_BANKRUPTCY_IX_DISCM => Ok(Self::ResolvePerpBankruptcy(
-                ResolvePerpBankruptcyIxArgs::deserialize(buf)?,
+                ResolvePerpBankruptcyIxArgs::deserialize(&mut reader)?,
             )),
             RESOLVE_SPOT_BANKRUPTCY_IX_DISCM => Ok(Self::ResolveSpotBankruptcy(
-                ResolveSpotBankruptcyIxArgs::deserialize(buf)?,
+                ResolveSpotBankruptcyIxArgs::deserialize(&mut reader)?,
             )),
             SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM => Ok(Self::SettleRevenueToInsuranceFund(
-                SettleRevenueToInsuranceFundIxArgs::deserialize(buf)?,
+                SettleRevenueToInsuranceFundIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_FUNDING_RATE_IX_DISCM => Ok(Self::UpdateFundingRate(
-                UpdateFundingRateIxArgs::deserialize(buf)?,
+                UpdateFundingRateIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM => {
                 Ok(Self::UpdateSpotMarketCumulativeInterest(
-                    UpdateSpotMarketCumulativeInterestIxArgs::deserialize(buf)?,
+                    UpdateSpotMarketCumulativeInterestIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            UPDATE_AMMS_IX_DISCM => Ok(Self::UpdateAmms(UpdateAmmsIxArgs::deserialize(buf)?)),
+            UPDATE_AMMS_IX_DISCM => Ok(Self::UpdateAmms(UpdateAmmsIxArgs::deserialize(
+                &mut reader,
+            )?)),
             UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM => Ok(Self::UpdateSpotMarketExpiry(
-                UpdateSpotMarketExpiryIxArgs::deserialize(buf)?,
+                UpdateSpotMarketExpiryIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM => {
                 Ok(Self::UpdateUserQuoteAssetInsuranceStake(
-                    UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(buf)?,
+                    UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::InitializeInsuranceFundStake(
-                InitializeInsuranceFundStakeIxArgs::deserialize(buf)?,
+                InitializeInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
             )),
             ADD_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::AddInsuranceFundStake(
-                AddInsuranceFundStakeIxArgs::deserialize(buf)?,
+                AddInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
             )),
             REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => {
                 Ok(Self::RequestRemoveInsuranceFundStake(
-                    RequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                    RequestRemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => {
                 Ok(Self::CancelRequestRemoveInsuranceFundStake(
-                    CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                    CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::RemoveInsuranceFundStake(
-                RemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                RemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
             )),
-            INITIALIZE_IX_DISCM => Ok(Self::Initialize(InitializeIxArgs::deserialize(buf)?)),
+            INITIALIZE_IX_DISCM => Ok(Self::Initialize(InitializeIxArgs::deserialize(
+                &mut reader,
+            )?)),
             INITIALIZE_SPOT_MARKET_IX_DISCM => Ok(Self::InitializeSpotMarket(
-                InitializeSpotMarketIxArgs::deserialize(buf)?,
+                InitializeSpotMarketIxArgs::deserialize(&mut reader)?,
             )),
             INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM => {
                 Ok(Self::InitializeSerumFulfillmentConfig(
-                    InitializeSerumFulfillmentConfigIxArgs::deserialize(buf)?,
+                    InitializeSerumFulfillmentConfigIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM => {
                 Ok(Self::UpdateSerumFulfillmentConfigStatus(
-                    UpdateSerumFulfillmentConfigStatusIxArgs::deserialize(buf)?,
+                    UpdateSerumFulfillmentConfigStatusIxArgs::deserialize(&mut reader)?,
                 ))
             }
             INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM => {
                 Ok(Self::InitializePhoenixFulfillmentConfig(
-                    InitializePhoenixFulfillmentConfigIxArgs::deserialize(buf)?,
+                    InitializePhoenixFulfillmentConfigIxArgs::deserialize(&mut reader)?,
                 ))
             }
             PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM => Ok(Self::PhoenixFulfillmentConfigStatus(
-                PhoenixFulfillmentConfigStatusIxArgs::deserialize(buf)?,
+                PhoenixFulfillmentConfigStatusIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SERUM_VAULT_IX_DISCM => Ok(Self::UpdateSerumVault(
-                UpdateSerumVaultIxArgs::deserialize(buf)?,
+                UpdateSerumVaultIxArgs::deserialize(&mut reader)?,
             )),
             INITIALIZE_PERP_MARKET_IX_DISCM => Ok(Self::InitializePerpMarket(
-                InitializePerpMarketIxArgs::deserialize(buf)?,
+                InitializePerpMarketIxArgs::deserialize(&mut reader)?,
             )),
             DELETE_INITIALIZED_PERP_MARKET_IX_DISCM => Ok(Self::DeleteInitializedPerpMarket(
-                DeleteInitializedPerpMarketIxArgs::deserialize(buf)?,
+                DeleteInitializedPerpMarketIxArgs::deserialize(&mut reader)?,
             )),
-            MOVE_AMM_PRICE_IX_DISCM => {
-                Ok(Self::MoveAmmPrice(MoveAmmPriceIxArgs::deserialize(buf)?))
-            }
+            MOVE_AMM_PRICE_IX_DISCM => Ok(Self::MoveAmmPrice(MoveAmmPriceIxArgs::deserialize(
+                &mut reader,
+            )?)),
             UPDATE_PERP_MARKET_EXPIRY_IX_DISCM => Ok(Self::UpdatePerpMarketExpiry(
-                UpdatePerpMarketExpiryIxArgs::deserialize(buf)?,
+                UpdatePerpMarketExpiryIxArgs::deserialize(&mut reader)?,
             )),
             SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM => {
                 Ok(Self::SettleExpiredMarketPoolsToRevenuePool(
-                    SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(buf)?,
+                    SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(&mut reader)?,
                 ))
             }
             DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM => Ok(Self::DepositIntoPerpMarketFeePool(
-                DepositIntoPerpMarketFeePoolIxArgs::deserialize(buf)?,
+                DepositIntoPerpMarketFeePoolIxArgs::deserialize(&mut reader)?,
             )),
-            REPEG_AMM_CURVE_IX_DISCM => {
-                Ok(Self::RepegAmmCurve(RepegAmmCurveIxArgs::deserialize(buf)?))
-            }
+            REPEG_AMM_CURVE_IX_DISCM => Ok(Self::RepegAmmCurve(RepegAmmCurveIxArgs::deserialize(
+                &mut reader,
+            )?)),
             UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::UpdatePerpMarketAmmOracleTwap(
-                UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(buf)?,
+                UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(&mut reader)?,
             )),
             RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM => Ok(Self::ResetPerpMarketAmmOracleTwap(
-                ResetPerpMarketAmmOracleTwapIxArgs::deserialize(buf)?,
+                ResetPerpMarketAmmOracleTwapIxArgs::deserialize(&mut reader)?,
             )),
-            UPDATE_K_IX_DISCM => Ok(Self::UpdateK(UpdateKIxArgs::deserialize(buf)?)),
+            UPDATE_K_IX_DISCM => Ok(Self::UpdateK(UpdateKIxArgs::deserialize(&mut reader)?)),
             UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM => Ok(Self::UpdatePerpMarketMarginRatio(
-                UpdatePerpMarketMarginRatioIxArgs::deserialize(buf)?,
+                UpdatePerpMarketMarginRatioIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM => Ok(Self::UpdatePerpMarketMaxImbalances(
-                UpdatePerpMarketMaxImbalancesIxArgs::deserialize(buf)?,
+                UpdatePerpMarketMaxImbalancesIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketLiquidationFee(
-                    UpdatePerpMarketLiquidationFeeIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketLiquidationFeeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM => {
                 Ok(Self::UpdateInsuranceFundUnstakingPeriod(
-                    UpdateInsuranceFundUnstakingPeriodIxArgs::deserialize(buf)?,
+                    UpdateInsuranceFundUnstakingPeriodIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM => {
                 Ok(Self::UpdateSpotMarketLiquidationFee(
-                    UpdateSpotMarketLiquidationFeeIxArgs::deserialize(buf)?,
+                    UpdateSpotMarketLiquidationFeeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM => Ok(Self::UpdateWithdrawGuardThreshold(
-                UpdateWithdrawGuardThresholdIxArgs::deserialize(buf)?,
+                UpdateWithdrawGuardThresholdIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM => Ok(Self::UpdateSpotMarketIfFactor(
-                UpdateSpotMarketIfFactorIxArgs::deserialize(buf)?,
+                UpdateSpotMarketIfFactorIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM => {
                 Ok(Self::UpdateSpotMarketRevenueSettlePeriod(
-                    UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(buf)?,
+                    UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_SPOT_MARKET_STATUS_IX_DISCM => Ok(Self::UpdateSpotMarketStatus(
-                UpdateSpotMarketStatusIxArgs::deserialize(buf)?,
+                UpdateSpotMarketStatusIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM => Ok(Self::UpdateSpotMarketAssetTier(
-                UpdateSpotMarketAssetTierIxArgs::deserialize(buf)?,
+                UpdateSpotMarketAssetTierIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM => Ok(Self::UpdateSpotMarketMarginWeights(
-                UpdateSpotMarketMarginWeightsIxArgs::deserialize(buf)?,
+                UpdateSpotMarketMarginWeightsIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM => Ok(Self::UpdateSpotMarketBorrowRate(
-                UpdateSpotMarketBorrowRateIxArgs::deserialize(buf)?,
+                UpdateSpotMarketBorrowRateIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM => {
                 Ok(Self::UpdateSpotMarketMaxTokenDeposits(
-                    UpdateSpotMarketMaxTokenDepositsIxArgs::deserialize(buf)?,
+                    UpdateSpotMarketMaxTokenDepositsIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_SPOT_MARKET_ORACLE_IX_DISCM => Ok(Self::UpdateSpotMarketOracle(
-                UpdateSpotMarketOracleIxArgs::deserialize(buf)?,
+                UpdateSpotMarketOracleIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM => {
                 Ok(Self::UpdateSpotMarketStepSizeAndTickSize(
-                    UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+                    UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM => Ok(Self::UpdateSpotMarketMinOrderSize(
-                UpdateSpotMarketMinOrderSizeIxArgs::deserialize(buf)?,
+                UpdateSpotMarketMinOrderSizeIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM => Ok(Self::UpdateSpotMarketOrdersEnabled(
-                UpdateSpotMarketOrdersEnabledIxArgs::deserialize(buf)?,
+                UpdateSpotMarketOrdersEnabledIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_MARKET_NAME_IX_DISCM => Ok(Self::UpdateSpotMarketName(
-                UpdateSpotMarketNameIxArgs::deserialize(buf)?,
+                UpdateSpotMarketNameIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_STATUS_IX_DISCM => Ok(Self::UpdatePerpMarketStatus(
-                UpdatePerpMarketStatusIxArgs::deserialize(buf)?,
+                UpdatePerpMarketStatusIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM => Ok(Self::UpdatePerpMarketContractTier(
-                UpdatePerpMarketContractTierIxArgs::deserialize(buf)?,
+                UpdatePerpMarketContractTierIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM => Ok(Self::UpdatePerpMarketImfFactor(
-                UpdatePerpMarketImfFactorIxArgs::deserialize(buf)?,
+                UpdatePerpMarketImfFactorIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketUnrealizedAssetWeight(
-                    UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketConcentrationCoef(
-                    UpdatePerpMarketConcentrationCoefIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketConcentrationCoefIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketCurveUpdateIntensity(
-                    UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(
-                    UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_LP_COOLDOWN_TIME_IX_DISCM => Ok(Self::UpdateLpCooldownTime(
-                UpdateLpCooldownTimeIxArgs::deserialize(buf)?,
+                UpdateLpCooldownTimeIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_FEE_STRUCTURE_IX_DISCM => Ok(Self::UpdatePerpFeeStructure(
-                UpdatePerpFeeStructureIxArgs::deserialize(buf)?,
+                UpdatePerpFeeStructureIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM => Ok(Self::UpdateSpotFeeStructure(
-                UpdateSpotFeeStructureIxArgs::deserialize(buf)?,
+                UpdateSpotFeeStructureIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM => Ok(Self::UpdateInitialPctToLiquidate(
-                UpdateInitialPctToLiquidateIxArgs::deserialize(buf)?,
+                UpdateInitialPctToLiquidateIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_LIQUIDATION_DURATION_IX_DISCM => Ok(Self::UpdateLiquidationDuration(
-                UpdateLiquidationDurationIxArgs::deserialize(buf)?,
+                UpdateLiquidationDurationIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_ORACLE_GUARD_RAILS_IX_DISCM => Ok(Self::UpdateOracleGuardRails(
-                UpdateOracleGuardRailsIxArgs::deserialize(buf)?,
+                UpdateOracleGuardRailsIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM => Ok(Self::UpdateStateSettlementDuration(
-                UpdateStateSettlementDurationIxArgs::deserialize(buf)?,
+                UpdateStateSettlementDurationIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_ORACLE_IX_DISCM => Ok(Self::UpdatePerpMarketOracle(
-                UpdatePerpMarketOracleIxArgs::deserialize(buf)?,
+                UpdatePerpMarketOracleIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM => Ok(Self::UpdatePerpMarketBaseSpread(
-                UpdatePerpMarketBaseSpreadIxArgs::deserialize(buf)?,
+                UpdatePerpMarketBaseSpreadIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_AMM_JIT_INTENSITY_IX_DISCM => Ok(Self::UpdateAmmJitIntensity(
-                UpdateAmmJitIntensityIxArgs::deserialize(buf)?,
+                UpdateAmmJitIntensityIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM => Ok(Self::UpdatePerpMarketMaxSpread(
-                UpdatePerpMarketMaxSpreadIxArgs::deserialize(buf)?,
+                UpdatePerpMarketMaxSpreadIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketStepSizeAndTickSize(
-                    UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_NAME_IX_DISCM => Ok(Self::UpdatePerpMarketName(
-                UpdatePerpMarketNameIxArgs::deserialize(buf)?,
+                UpdatePerpMarketNameIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM => Ok(Self::UpdatePerpMarketMinOrderSize(
-                UpdatePerpMarketMinOrderSizeIxArgs::deserialize(buf)?,
+                UpdatePerpMarketMinOrderSizeIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketMaxSlippageRatio(
-                    UpdatePerpMarketMaxSlippageRatioIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketMaxSlippageRatioIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketMaxFillReserveFraction(
-                    UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(&mut reader)?,
                 ))
             }
             UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM => {
                 Ok(Self::UpdatePerpMarketMaxOpenInterest(
-                    UpdatePerpMarketMaxOpenInterestIxArgs::deserialize(buf)?,
+                    UpdatePerpMarketMaxOpenInterestIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            UPDATE_ADMIN_IX_DISCM => Ok(Self::UpdateAdmin(UpdateAdminIxArgs::deserialize(buf)?)),
+            UPDATE_ADMIN_IX_DISCM => Ok(Self::UpdateAdmin(UpdateAdminIxArgs::deserialize(
+                &mut reader,
+            )?)),
             UPDATE_WHITELIST_MINT_IX_DISCM => Ok(Self::UpdateWhitelistMint(
-                UpdateWhitelistMintIxArgs::deserialize(buf)?,
+                UpdateWhitelistMintIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_DISCOUNT_MINT_IX_DISCM => Ok(Self::UpdateDiscountMint(
-                UpdateDiscountMintIxArgs::deserialize(buf)?,
+                UpdateDiscountMintIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_EXCHANGE_STATUS_IX_DISCM => Ok(Self::UpdateExchangeStatus(
-                UpdateExchangeStatusIxArgs::deserialize(buf)?,
+                UpdateExchangeStatusIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_PERP_AUCTION_DURATION_IX_DISCM => Ok(Self::UpdatePerpAuctionDuration(
-                UpdatePerpAuctionDurationIxArgs::deserialize(buf)?,
+                UpdatePerpAuctionDurationIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_SPOT_AUCTION_DURATION_IX_DISCM => Ok(Self::UpdateSpotAuctionDuration(
-                UpdateSpotAuctionDurationIxArgs::deserialize(buf)?,
+                UpdateSpotAuctionDurationIxArgs::deserialize(&mut reader)?,
             )),
             ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM => Ok(Self::AdminRemoveInsuranceFundStake(
-                AdminRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+                AdminRemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
             )),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1129,8 +1150,11 @@ impl From<InitializeUserIxArgs> for InitializeUserIxData {
     }
 }
 impl InitializeUserIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_USER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1140,7 +1164,7 @@ impl InitializeUserIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeUserIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeUserIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_USER_IX_DISCM)?;
@@ -1317,8 +1341,11 @@ impl From<InitializeUserStatsIxArgs> for InitializeUserStatsIxData {
     }
 }
 impl InitializeUserStatsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_USER_STATS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1328,7 +1355,7 @@ impl InitializeUserStatsIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeUserStatsIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeUserStatsIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM)?;
@@ -1511,8 +1538,11 @@ impl From<InitializeReferrerNameIxArgs> for InitializeReferrerNameIxData {
     }
 }
 impl InitializeReferrerNameIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_REFERRER_NAME_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1522,7 +1552,9 @@ impl InitializeReferrerNameIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeReferrerNameIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeReferrerNameIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_REFERRER_NAME_IX_DISCM)?;
@@ -1713,8 +1745,11 @@ impl From<DepositIxArgs> for DepositIxData {
     }
 }
 impl DepositIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != DEPOSIT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1724,7 +1759,7 @@ impl DepositIxData {
                 ),
             ));
         }
-        Ok(Self(DepositIxArgs::deserialize(buf)?))
+        Ok(Self(DepositIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&DEPOSIT_IX_DISCM)?;
@@ -1917,8 +1952,11 @@ impl From<WithdrawIxArgs> for WithdrawIxData {
     }
 }
 impl WithdrawIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != WITHDRAW_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1928,7 +1966,7 @@ impl WithdrawIxData {
                 ),
             ));
         }
-        Ok(Self(WithdrawIxArgs::deserialize(buf)?))
+        Ok(Self(WithdrawIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&WITHDRAW_IX_DISCM)?;
@@ -2109,8 +2147,11 @@ impl From<TransferDepositIxArgs> for TransferDepositIxData {
     }
 }
 impl TransferDepositIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != TRANSFER_DEPOSIT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2120,7 +2161,7 @@ impl TransferDepositIxData {
                 ),
             ));
         }
-        Ok(Self(TransferDepositIxArgs::deserialize(buf)?))
+        Ok(Self(TransferDepositIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&TRANSFER_DEPOSIT_IX_DISCM)?;
@@ -2272,8 +2313,11 @@ impl From<PlacePerpOrderIxArgs> for PlacePerpOrderIxData {
     }
 }
 impl PlacePerpOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_PERP_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2283,7 +2327,7 @@ impl PlacePerpOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlacePerpOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlacePerpOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_PERP_ORDER_IX_DISCM)?;
@@ -2432,8 +2476,11 @@ impl From<CancelOrderIxArgs> for CancelOrderIxData {
     }
 }
 impl CancelOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != CANCEL_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2443,7 +2490,7 @@ impl CancelOrderIxData {
                 ),
             ));
         }
-        Ok(Self(CancelOrderIxArgs::deserialize(buf)?))
+        Ok(Self(CancelOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&CANCEL_ORDER_IX_DISCM)?;
@@ -2592,8 +2639,11 @@ impl From<CancelOrderByUserIdIxArgs> for CancelOrderByUserIdIxData {
     }
 }
 impl CancelOrderByUserIdIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != CANCEL_ORDER_BY_USER_ID_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2603,7 +2653,7 @@ impl CancelOrderByUserIdIxData {
                 ),
             ));
         }
-        Ok(Self(CancelOrderByUserIdIxArgs::deserialize(buf)?))
+        Ok(Self(CancelOrderByUserIdIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&CANCEL_ORDER_BY_USER_ID_IX_DISCM)?;
@@ -2759,8 +2809,11 @@ impl From<CancelOrdersIxArgs> for CancelOrdersIxData {
     }
 }
 impl CancelOrdersIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != CANCEL_ORDERS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2770,7 +2823,7 @@ impl CancelOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(CancelOrdersIxArgs::deserialize(buf)?))
+        Ok(Self(CancelOrdersIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&CANCEL_ORDERS_IX_DISCM)?;
@@ -2920,8 +2973,11 @@ impl From<ModifyOrderIxArgs> for ModifyOrderIxData {
     }
 }
 impl ModifyOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != MODIFY_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2931,7 +2987,7 @@ impl ModifyOrderIxData {
                 ),
             ));
         }
-        Ok(Self(ModifyOrderIxArgs::deserialize(buf)?))
+        Ok(Self(ModifyOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&MODIFY_ORDER_IX_DISCM)?;
@@ -3081,8 +3137,11 @@ impl From<ModifyOrderByUserIdIxArgs> for ModifyOrderByUserIdIxData {
     }
 }
 impl ModifyOrderByUserIdIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != MODIFY_ORDER_BY_USER_ID_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3092,7 +3151,7 @@ impl ModifyOrderByUserIdIxData {
                 ),
             ));
         }
-        Ok(Self(ModifyOrderByUserIdIxArgs::deserialize(buf)?))
+        Ok(Self(ModifyOrderByUserIdIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&MODIFY_ORDER_BY_USER_ID_IX_DISCM)?;
@@ -3254,8 +3313,11 @@ impl From<PlaceAndTakePerpOrderIxArgs> for PlaceAndTakePerpOrderIxData {
     }
 }
 impl PlaceAndTakePerpOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_AND_TAKE_PERP_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3265,7 +3327,7 @@ impl PlaceAndTakePerpOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceAndTakePerpOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceAndTakePerpOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_AND_TAKE_PERP_ORDER_IX_DISCM)?;
@@ -3442,8 +3504,11 @@ impl From<PlaceAndMakePerpOrderIxArgs> for PlaceAndMakePerpOrderIxData {
     }
 }
 impl PlaceAndMakePerpOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_AND_MAKE_PERP_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3453,7 +3518,7 @@ impl PlaceAndMakePerpOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceAndMakePerpOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceAndMakePerpOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_AND_MAKE_PERP_ORDER_IX_DISCM)?;
@@ -3615,8 +3680,11 @@ impl From<PlaceSpotOrderIxArgs> for PlaceSpotOrderIxData {
     }
 }
 impl PlaceSpotOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_SPOT_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3626,7 +3694,7 @@ impl PlaceSpotOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceSpotOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceSpotOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_SPOT_ORDER_IX_DISCM)?;
@@ -3784,8 +3852,11 @@ impl From<PlaceAndTakeSpotOrderIxArgs> for PlaceAndTakeSpotOrderIxData {
     }
 }
 impl PlaceAndTakeSpotOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3795,7 +3866,7 @@ impl PlaceAndTakeSpotOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceAndTakeSpotOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceAndTakeSpotOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM)?;
@@ -3973,8 +4044,11 @@ impl From<PlaceAndMakeSpotOrderIxArgs> for PlaceAndMakeSpotOrderIxData {
     }
 }
 impl PlaceAndMakeSpotOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3984,7 +4058,7 @@ impl PlaceAndMakeSpotOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceAndMakeSpotOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceAndMakeSpotOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM)?;
@@ -4204,8 +4278,11 @@ impl From<BeginSwapIxArgs> for BeginSwapIxData {
     }
 }
 impl BeginSwapIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != BEGIN_SWAP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4215,7 +4292,7 @@ impl BeginSwapIxData {
                 ),
             ));
         }
-        Ok(Self(BeginSwapIxArgs::deserialize(buf)?))
+        Ok(Self(BeginSwapIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&BEGIN_SWAP_IX_DISCM)?;
@@ -4442,8 +4519,11 @@ impl From<EndSwapIxArgs> for EndSwapIxData {
     }
 }
 impl EndSwapIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != END_SWAP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4453,7 +4533,7 @@ impl EndSwapIxData {
                 ),
             ));
         }
-        Ok(Self(EndSwapIxArgs::deserialize(buf)?))
+        Ok(Self(EndSwapIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&END_SWAP_IX_DISCM)?;
@@ -4624,8 +4704,11 @@ impl From<AddPerpLpSharesIxArgs> for AddPerpLpSharesIxData {
     }
 }
 impl AddPerpLpSharesIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != ADD_PERP_LP_SHARES_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4635,7 +4718,7 @@ impl AddPerpLpSharesIxData {
                 ),
             ));
         }
-        Ok(Self(AddPerpLpSharesIxArgs::deserialize(buf)?))
+        Ok(Self(AddPerpLpSharesIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&ADD_PERP_LP_SHARES_IX_DISCM)?;
@@ -4785,8 +4868,11 @@ impl From<RemovePerpLpSharesIxArgs> for RemovePerpLpSharesIxData {
     }
 }
 impl RemovePerpLpSharesIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REMOVE_PERP_LP_SHARES_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4796,7 +4882,7 @@ impl RemovePerpLpSharesIxData {
                 ),
             ));
         }
-        Ok(Self(RemovePerpLpSharesIxArgs::deserialize(buf)?))
+        Ok(Self(RemovePerpLpSharesIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&REMOVE_PERP_LP_SHARES_IX_DISCM)?;
@@ -4949,8 +5035,11 @@ impl From<RemovePerpLpSharesInExpiringMarketIxArgs> for RemovePerpLpSharesInExpi
     }
 }
 impl RemovePerpLpSharesInExpiringMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4961,7 +5050,7 @@ impl RemovePerpLpSharesInExpiringMarketIxData {
             ));
         }
         Ok(Self(RemovePerpLpSharesInExpiringMarketIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -5108,8 +5197,11 @@ impl From<UpdateUserNameIxArgs> for UpdateUserNameIxData {
     }
 }
 impl UpdateUserNameIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_NAME_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5119,7 +5211,7 @@ impl UpdateUserNameIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserNameIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateUserNameIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_USER_NAME_IX_DISCM)?;
@@ -5264,8 +5356,11 @@ impl From<UpdateUserCustomMarginRatioIxArgs> for UpdateUserCustomMarginRatioIxDa
     }
 }
 impl UpdateUserCustomMarginRatioIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5275,7 +5370,9 @@ impl UpdateUserCustomMarginRatioIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserCustomMarginRatioIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateUserCustomMarginRatioIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM)?;
@@ -5429,8 +5526,11 @@ impl From<UpdateUserMarginTradingEnabledIxArgs> for UpdateUserMarginTradingEnabl
     }
 }
 impl UpdateUserMarginTradingEnabledIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5441,7 +5541,7 @@ impl UpdateUserMarginTradingEnabledIxData {
             ));
         }
         Ok(Self(UpdateUserMarginTradingEnabledIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -5592,8 +5692,11 @@ impl From<UpdateUserDelegateIxArgs> for UpdateUserDelegateIxData {
     }
 }
 impl UpdateUserDelegateIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_DELEGATE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5603,7 +5706,7 @@ impl UpdateUserDelegateIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserDelegateIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateUserDelegateIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_USER_DELEGATE_IX_DISCM)?;
@@ -5759,8 +5862,11 @@ impl From<DeleteUserIxArgs> for DeleteUserIxData {
     }
 }
 impl DeleteUserIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != DELETE_USER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5770,7 +5876,7 @@ impl DeleteUserIxData {
                 ),
             ));
         }
-        Ok(Self(DeleteUserIxArgs::deserialize(buf)?))
+        Ok(Self(DeleteUserIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&DELETE_USER_IX_DISCM)?;
@@ -5942,8 +6048,11 @@ impl From<FillPerpOrderIxArgs> for FillPerpOrderIxData {
     }
 }
 impl FillPerpOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != FILL_PERP_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5953,7 +6062,7 @@ impl FillPerpOrderIxData {
                 ),
             ));
         }
-        Ok(Self(FillPerpOrderIxArgs::deserialize(buf)?))
+        Ok(Self(FillPerpOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&FILL_PERP_ORDER_IX_DISCM)?;
@@ -6115,8 +6224,11 @@ impl From<RevertFillIxArgs> for RevertFillIxData {
     }
 }
 impl RevertFillIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REVERT_FILL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6126,7 +6238,7 @@ impl RevertFillIxData {
                 ),
             ));
         }
-        Ok(Self(RevertFillIxArgs::deserialize(buf)?))
+        Ok(Self(RevertFillIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&REVERT_FILL_IX_DISCM)?;
@@ -6299,8 +6411,11 @@ impl From<FillSpotOrderIxArgs> for FillSpotOrderIxData {
     }
 }
 impl FillSpotOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != FILL_SPOT_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6310,7 +6425,7 @@ impl FillSpotOrderIxData {
                 ),
             ));
         }
-        Ok(Self(FillSpotOrderIxArgs::deserialize(buf)?))
+        Ok(Self(FillSpotOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&FILL_SPOT_ORDER_IX_DISCM)?;
@@ -6474,8 +6589,11 @@ impl From<TriggerOrderIxArgs> for TriggerOrderIxData {
     }
 }
 impl TriggerOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != TRIGGER_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6485,7 +6603,7 @@ impl TriggerOrderIxData {
                 ),
             ));
         }
-        Ok(Self(TriggerOrderIxArgs::deserialize(buf)?))
+        Ok(Self(TriggerOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&TRIGGER_ORDER_IX_DISCM)?;
@@ -6640,8 +6758,11 @@ impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
     }
 }
 impl ForceCancelOrdersIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != FORCE_CANCEL_ORDERS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6651,7 +6772,7 @@ impl ForceCancelOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(ForceCancelOrdersIxArgs::deserialize(buf)?))
+        Ok(Self(ForceCancelOrdersIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM)?;
@@ -6806,8 +6927,11 @@ impl From<UpdateUserIdleIxArgs> for UpdateUserIdleIxData {
     }
 }
 impl UpdateUserIdleIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_IDLE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6817,7 +6941,7 @@ impl UpdateUserIdleIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserIdleIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateUserIdleIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)?;
@@ -6976,8 +7100,11 @@ impl From<UpdateUserOpenOrdersCountIxArgs> for UpdateUserOpenOrdersCountIxData {
     }
 }
 impl UpdateUserOpenOrdersCountIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6987,7 +7114,9 @@ impl UpdateUserOpenOrdersCountIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateUserOpenOrdersCountIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateUserOpenOrdersCountIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)?;
@@ -7152,8 +7281,11 @@ impl From<SettlePnlIxArgs> for SettlePnlIxData {
     }
 }
 impl SettlePnlIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_PNL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7163,7 +7295,7 @@ impl SettlePnlIxData {
                 ),
             ));
         }
-        Ok(Self(SettlePnlIxArgs::deserialize(buf)?))
+        Ok(Self(SettlePnlIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SETTLE_PNL_IX_DISCM)?;
@@ -7301,8 +7433,11 @@ impl From<SettleFundingPaymentIxArgs> for SettleFundingPaymentIxData {
     }
 }
 impl SettleFundingPaymentIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_FUNDING_PAYMENT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7312,7 +7447,7 @@ impl SettleFundingPaymentIxData {
                 ),
             ));
         }
-        Ok(Self(SettleFundingPaymentIxArgs::deserialize(buf)?))
+        Ok(Self(SettleFundingPaymentIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM)?;
@@ -7448,8 +7583,11 @@ impl From<SettleLpIxArgs> for SettleLpIxData {
     }
 }
 impl SettleLpIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_LP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7459,7 +7597,7 @@ impl SettleLpIxData {
                 ),
             ));
         }
-        Ok(Self(SettleLpIxArgs::deserialize(buf)?))
+        Ok(Self(SettleLpIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SETTLE_LP_IX_DISCM)?;
@@ -7592,8 +7730,11 @@ impl From<SettleExpiredMarketIxArgs> for SettleExpiredMarketIxData {
     }
 }
 impl SettleExpiredMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_EXPIRED_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7603,7 +7744,7 @@ impl SettleExpiredMarketIxData {
                 ),
             ));
         }
-        Ok(Self(SettleExpiredMarketIxArgs::deserialize(buf)?))
+        Ok(Self(SettleExpiredMarketIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SETTLE_EXPIRED_MARKET_IX_DISCM)?;
@@ -7772,8 +7913,11 @@ impl From<LiquidatePerpIxArgs> for LiquidatePerpIxData {
     }
 }
 impl LiquidatePerpIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != LIQUIDATE_PERP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7783,7 +7927,7 @@ impl LiquidatePerpIxData {
                 ),
             ));
         }
-        Ok(Self(LiquidatePerpIxArgs::deserialize(buf)?))
+        Ok(Self(LiquidatePerpIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&LIQUIDATE_PERP_IX_DISCM)?;
@@ -7964,8 +8108,11 @@ impl From<LiquidateSpotIxArgs> for LiquidateSpotIxData {
     }
 }
 impl LiquidateSpotIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != LIQUIDATE_SPOT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -7975,7 +8122,7 @@ impl LiquidateSpotIxData {
                 ),
             ));
         }
-        Ok(Self(LiquidateSpotIxArgs::deserialize(buf)?))
+        Ok(Self(LiquidateSpotIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&LIQUIDATE_SPOT_IX_DISCM)?;
@@ -8160,8 +8307,11 @@ impl From<LiquidateBorrowForPerpPnlIxArgs> for LiquidateBorrowForPerpPnlIxData {
     }
 }
 impl LiquidateBorrowForPerpPnlIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -8171,7 +8321,9 @@ impl LiquidateBorrowForPerpPnlIxData {
                 ),
             ));
         }
-        Ok(Self(LiquidateBorrowForPerpPnlIxArgs::deserialize(buf)?))
+        Ok(Self(LiquidateBorrowForPerpPnlIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM)?;
@@ -8366,8 +8518,11 @@ impl From<LiquidatePerpPnlForDepositIxArgs> for LiquidatePerpPnlForDepositIxData
     }
 }
 impl LiquidatePerpPnlForDepositIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -8377,7 +8532,9 @@ impl LiquidatePerpPnlForDepositIxData {
                 ),
             ));
         }
-        Ok(Self(LiquidatePerpPnlForDepositIxArgs::deserialize(buf)?))
+        Ok(Self(LiquidatePerpPnlForDepositIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM)?;
@@ -8564,8 +8721,11 @@ impl From<ResolvePerpPnlDeficitIxArgs> for ResolvePerpPnlDeficitIxData {
     }
 }
 impl ResolvePerpPnlDeficitIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != RESOLVE_PERP_PNL_DEFICIT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -8575,7 +8735,7 @@ impl ResolvePerpPnlDeficitIxData {
                 ),
             ));
         }
-        Ok(Self(ResolvePerpPnlDeficitIxArgs::deserialize(buf)?))
+        Ok(Self(ResolvePerpPnlDeficitIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&RESOLVE_PERP_PNL_DEFICIT_IX_DISCM)?;
@@ -8785,8 +8945,11 @@ impl From<ResolvePerpBankruptcyIxArgs> for ResolvePerpBankruptcyIxData {
     }
 }
 impl ResolvePerpBankruptcyIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != RESOLVE_PERP_BANKRUPTCY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -8796,7 +8959,7 @@ impl ResolvePerpBankruptcyIxData {
                 ),
             ));
         }
-        Ok(Self(ResolvePerpBankruptcyIxArgs::deserialize(buf)?))
+        Ok(Self(ResolvePerpBankruptcyIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&RESOLVE_PERP_BANKRUPTCY_IX_DISCM)?;
@@ -9016,8 +9179,11 @@ impl From<ResolveSpotBankruptcyIxArgs> for ResolveSpotBankruptcyIxData {
     }
 }
 impl ResolveSpotBankruptcyIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != RESOLVE_SPOT_BANKRUPTCY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9027,7 +9193,7 @@ impl ResolveSpotBankruptcyIxData {
                 ),
             ));
         }
-        Ok(Self(ResolveSpotBankruptcyIxArgs::deserialize(buf)?))
+        Ok(Self(ResolveSpotBankruptcyIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&RESOLVE_SPOT_BANKRUPTCY_IX_DISCM)?;
@@ -9226,8 +9392,11 @@ impl From<SettleRevenueToInsuranceFundIxArgs> for SettleRevenueToInsuranceFundIx
     }
 }
 impl SettleRevenueToInsuranceFundIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9237,7 +9406,9 @@ impl SettleRevenueToInsuranceFundIxData {
                 ),
             ));
         }
-        Ok(Self(SettleRevenueToInsuranceFundIxArgs::deserialize(buf)?))
+        Ok(Self(SettleRevenueToInsuranceFundIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM)?;
@@ -9402,8 +9573,11 @@ impl From<UpdateFundingRateIxArgs> for UpdateFundingRateIxData {
     }
 }
 impl UpdateFundingRateIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_FUNDING_RATE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9413,7 +9587,7 @@ impl UpdateFundingRateIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateFundingRateIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateFundingRateIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_FUNDING_RATE_IX_DISCM)?;
@@ -9565,8 +9739,11 @@ impl From<UpdateSpotMarketCumulativeInterestIxArgs> for UpdateSpotMarketCumulati
     }
 }
 impl UpdateSpotMarketCumulativeInterestIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9577,7 +9754,7 @@ impl UpdateSpotMarketCumulativeInterestIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketCumulativeInterestIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -9724,8 +9901,11 @@ impl From<UpdateAmmsIxArgs> for UpdateAmmsIxData {
     }
 }
 impl UpdateAmmsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_AMMS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9735,7 +9915,7 @@ impl UpdateAmmsIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateAmmsIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateAmmsIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_AMMS_IX_DISCM)?;
@@ -9880,8 +10060,11 @@ impl From<UpdateSpotMarketExpiryIxArgs> for UpdateSpotMarketExpiryIxData {
     }
 }
 impl UpdateSpotMarketExpiryIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -9891,7 +10074,9 @@ impl UpdateSpotMarketExpiryIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketExpiryIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketExpiryIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM)?;
@@ -10074,8 +10259,11 @@ impl From<UpdateUserQuoteAssetInsuranceStakeIxArgs> for UpdateUserQuoteAssetInsu
     }
 }
 impl UpdateUserQuoteAssetInsuranceStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -10086,7 +10274,7 @@ impl UpdateUserQuoteAssetInsuranceStakeIxData {
             ));
         }
         Ok(Self(UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -10302,8 +10490,11 @@ impl From<InitializeInsuranceFundStakeIxArgs> for InitializeInsuranceFundStakeIx
     }
 }
 impl InitializeInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -10313,7 +10504,9 @@ impl InitializeInsuranceFundStakeIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeInsuranceFundStakeIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeInsuranceFundStakeIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM)?;
@@ -10535,8 +10728,11 @@ impl From<AddInsuranceFundStakeIxArgs> for AddInsuranceFundStakeIxData {
     }
 }
 impl AddInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != ADD_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -10546,7 +10742,7 @@ impl AddInsuranceFundStakeIxData {
                 ),
             ));
         }
-        Ok(Self(AddInsuranceFundStakeIxArgs::deserialize(buf)?))
+        Ok(Self(AddInsuranceFundStakeIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&ADD_INSURANCE_FUND_STAKE_IX_DISCM)?;
@@ -10744,8 +10940,11 @@ impl From<RequestRemoveInsuranceFundStakeIxArgs> for RequestRemoveInsuranceFundS
     }
 }
 impl RequestRemoveInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -10756,7 +10955,7 @@ impl RequestRemoveInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(RequestRemoveInsuranceFundStakeIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -10957,8 +11156,11 @@ impl From<CancelRequestRemoveInsuranceFundStakeIxArgs>
     }
 }
 impl CancelRequestRemoveInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -10969,7 +11171,7 @@ impl CancelRequestRemoveInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(
-            CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
+            CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -11187,8 +11389,11 @@ impl From<RemoveInsuranceFundStakeIxArgs> for RemoveInsuranceFundStakeIxData {
     }
 }
 impl RemoveInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REMOVE_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -11198,7 +11403,9 @@ impl RemoveInsuranceFundStakeIxData {
                 ),
             ));
         }
-        Ok(Self(RemoveInsuranceFundStakeIxArgs::deserialize(buf)?))
+        Ok(Self(RemoveInsuranceFundStakeIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
@@ -11395,8 +11602,11 @@ impl From<InitializeIxArgs> for InitializeIxData {
     }
 }
 impl InitializeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -11406,7 +11616,7 @@ impl InitializeIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_IX_DISCM)?;
@@ -11626,8 +11836,11 @@ impl From<InitializeSpotMarketIxArgs> for InitializeSpotMarketIxData {
     }
 }
 impl InitializeSpotMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_SPOT_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -11637,7 +11850,7 @@ impl InitializeSpotMarketIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeSpotMarketIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeSpotMarketIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_SPOT_MARKET_IX_DISCM)?;
@@ -11874,8 +12087,11 @@ impl From<InitializeSerumFulfillmentConfigIxArgs> for InitializeSerumFulfillment
     }
 }
 impl InitializeSerumFulfillmentConfigIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -11886,7 +12102,7 @@ impl InitializeSerumFulfillmentConfigIxData {
             ));
         }
         Ok(Self(InitializeSerumFulfillmentConfigIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -12073,8 +12289,11 @@ impl From<UpdateSerumFulfillmentConfigStatusIxArgs> for UpdateSerumFulfillmentCo
     }
 }
 impl UpdateSerumFulfillmentConfigStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -12085,7 +12304,7 @@ impl UpdateSerumFulfillmentConfigStatusIxData {
             ));
         }
         Ok(Self(UpdateSerumFulfillmentConfigStatusIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -12309,8 +12528,11 @@ impl From<InitializePhoenixFulfillmentConfigIxArgs> for InitializePhoenixFulfill
     }
 }
 impl InitializePhoenixFulfillmentConfigIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -12321,7 +12543,7 @@ impl InitializePhoenixFulfillmentConfigIxData {
             ));
         }
         Ok(Self(InitializePhoenixFulfillmentConfigIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -12503,8 +12725,11 @@ impl From<PhoenixFulfillmentConfigStatusIxArgs> for PhoenixFulfillmentConfigStat
     }
 }
 impl PhoenixFulfillmentConfigStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -12515,7 +12740,7 @@ impl PhoenixFulfillmentConfigStatusIxData {
             ));
         }
         Ok(Self(PhoenixFulfillmentConfigStatusIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -12677,8 +12902,11 @@ impl From<UpdateSerumVaultIxArgs> for UpdateSerumVaultIxData {
     }
 }
 impl UpdateSerumVaultIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SERUM_VAULT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -12688,7 +12916,7 @@ impl UpdateSerumVaultIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSerumVaultIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSerumVaultIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM)?;
@@ -12868,8 +13096,11 @@ impl From<InitializePerpMarketIxArgs> for InitializePerpMarketIxData {
     }
 }
 impl InitializePerpMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INITIALIZE_PERP_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -12879,7 +13110,7 @@ impl InitializePerpMarketIxData {
                 ),
             ));
         }
-        Ok(Self(InitializePerpMarketIxArgs::deserialize(buf)?))
+        Ok(Self(InitializePerpMarketIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INITIALIZE_PERP_MARKET_IX_DISCM)?;
@@ -13042,8 +13273,11 @@ impl From<DeleteInitializedPerpMarketIxArgs> for DeleteInitializedPerpMarketIxDa
     }
 }
 impl DeleteInitializedPerpMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != DELETE_INITIALIZED_PERP_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13053,7 +13287,9 @@ impl DeleteInitializedPerpMarketIxData {
                 ),
             ));
         }
-        Ok(Self(DeleteInitializedPerpMarketIxArgs::deserialize(buf)?))
+        Ok(Self(DeleteInitializedPerpMarketIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&DELETE_INITIALIZED_PERP_MARKET_IX_DISCM)?;
@@ -13212,8 +13448,11 @@ impl From<MoveAmmPriceIxArgs> for MoveAmmPriceIxData {
     }
 }
 impl MoveAmmPriceIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != MOVE_AMM_PRICE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13223,7 +13462,7 @@ impl MoveAmmPriceIxData {
                 ),
             ));
         }
-        Ok(Self(MoveAmmPriceIxArgs::deserialize(buf)?))
+        Ok(Self(MoveAmmPriceIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&MOVE_AMM_PRICE_IX_DISCM)?;
@@ -13374,8 +13613,11 @@ impl From<UpdatePerpMarketExpiryIxArgs> for UpdatePerpMarketExpiryIxData {
     }
 }
 impl UpdatePerpMarketExpiryIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_EXPIRY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13385,7 +13627,9 @@ impl UpdatePerpMarketExpiryIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketExpiryIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketExpiryIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_EXPIRY_IX_DISCM)?;
@@ -13560,8 +13804,11 @@ impl From<SettleExpiredMarketPoolsToRevenuePoolIxArgs>
     }
 }
 impl SettleExpiredMarketPoolsToRevenuePoolIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13572,7 +13819,7 @@ impl SettleExpiredMarketPoolsToRevenuePoolIxData {
             ));
         }
         Ok(Self(
-            SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(buf)?,
+            SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -13776,8 +14023,11 @@ impl From<DepositIntoPerpMarketFeePoolIxArgs> for DepositIntoPerpMarketFeePoolIx
     }
 }
 impl DepositIntoPerpMarketFeePoolIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13787,7 +14037,9 @@ impl DepositIntoPerpMarketFeePoolIxData {
                 ),
             ));
         }
-        Ok(Self(DepositIntoPerpMarketFeePoolIxArgs::deserialize(buf)?))
+        Ok(Self(DepositIntoPerpMarketFeePoolIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM)?;
@@ -13965,8 +14217,11 @@ impl From<RepegAmmCurveIxArgs> for RepegAmmCurveIxData {
     }
 }
 impl RepegAmmCurveIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REPEG_AMM_CURVE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -13976,7 +14231,7 @@ impl RepegAmmCurveIxData {
                 ),
             ));
         }
-        Ok(Self(RepegAmmCurveIxArgs::deserialize(buf)?))
+        Ok(Self(RepegAmmCurveIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&REPEG_AMM_CURVE_IX_DISCM)?;
@@ -14138,8 +14393,11 @@ impl From<UpdatePerpMarketAmmOracleTwapIxArgs> for UpdatePerpMarketAmmOracleTwap
     }
 }
 impl UpdatePerpMarketAmmOracleTwapIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -14149,7 +14407,9 @@ impl UpdatePerpMarketAmmOracleTwapIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
@@ -14322,8 +14582,11 @@ impl From<ResetPerpMarketAmmOracleTwapIxArgs> for ResetPerpMarketAmmOracleTwapIx
     }
 }
 impl ResetPerpMarketAmmOracleTwapIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -14333,7 +14596,9 @@ impl ResetPerpMarketAmmOracleTwapIxData {
                 ),
             ));
         }
-        Ok(Self(ResetPerpMarketAmmOracleTwapIxArgs::deserialize(buf)?))
+        Ok(Self(ResetPerpMarketAmmOracleTwapIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
@@ -14499,8 +14764,11 @@ impl From<UpdateKIxArgs> for UpdateKIxData {
     }
 }
 impl UpdateKIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_K_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -14510,7 +14778,7 @@ impl UpdateKIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateKIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateKIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_K_IX_DISCM)?;
@@ -14668,8 +14936,11 @@ impl From<UpdatePerpMarketMarginRatioIxArgs> for UpdatePerpMarketMarginRatioIxDa
     }
 }
 impl UpdatePerpMarketMarginRatioIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -14679,7 +14950,9 @@ impl UpdatePerpMarketMarginRatioIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketMarginRatioIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketMarginRatioIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM)?;
@@ -14844,8 +15117,11 @@ impl From<UpdatePerpMarketMaxImbalancesIxArgs> for UpdatePerpMarketMaxImbalances
     }
 }
 impl UpdatePerpMarketMaxImbalancesIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -14855,7 +15131,9 @@ impl UpdatePerpMarketMaxImbalancesIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketMaxImbalancesIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketMaxImbalancesIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM)?;
@@ -15022,8 +15300,11 @@ impl From<UpdatePerpMarketLiquidationFeeIxArgs> for UpdatePerpMarketLiquidationF
     }
 }
 impl UpdatePerpMarketLiquidationFeeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15034,7 +15315,7 @@ impl UpdatePerpMarketLiquidationFeeIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketLiquidationFeeIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -15205,8 +15486,11 @@ impl From<UpdateInsuranceFundUnstakingPeriodIxArgs> for UpdateInsuranceFundUnsta
     }
 }
 impl UpdateInsuranceFundUnstakingPeriodIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15217,7 +15501,7 @@ impl UpdateInsuranceFundUnstakingPeriodIxData {
             ));
         }
         Ok(Self(UpdateInsuranceFundUnstakingPeriodIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -15387,8 +15671,11 @@ impl From<UpdateSpotMarketLiquidationFeeIxArgs> for UpdateSpotMarketLiquidationF
     }
 }
 impl UpdateSpotMarketLiquidationFeeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15399,7 +15686,7 @@ impl UpdateSpotMarketLiquidationFeeIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketLiquidationFeeIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -15566,8 +15853,11 @@ impl From<UpdateWithdrawGuardThresholdIxArgs> for UpdateWithdrawGuardThresholdIx
     }
 }
 impl UpdateWithdrawGuardThresholdIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15577,7 +15867,9 @@ impl UpdateWithdrawGuardThresholdIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateWithdrawGuardThresholdIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateWithdrawGuardThresholdIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM)?;
@@ -15741,8 +16033,11 @@ impl From<UpdateSpotMarketIfFactorIxArgs> for UpdateSpotMarketIfFactorIxData {
     }
 }
 impl UpdateSpotMarketIfFactorIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15752,7 +16047,9 @@ impl UpdateSpotMarketIfFactorIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketIfFactorIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketIfFactorIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM)?;
@@ -15919,8 +16216,11 @@ impl From<UpdateSpotMarketRevenueSettlePeriodIxArgs> for UpdateSpotMarketRevenue
     }
 }
 impl UpdateSpotMarketRevenueSettlePeriodIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -15931,7 +16231,7 @@ impl UpdateSpotMarketRevenueSettlePeriodIxData {
             ));
         }
         Ok(Self(
-            UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(buf)?,
+            UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -16095,8 +16395,11 @@ impl From<UpdateSpotMarketStatusIxArgs> for UpdateSpotMarketStatusIxData {
     }
 }
 impl UpdateSpotMarketStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16106,7 +16409,9 @@ impl UpdateSpotMarketStatusIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketStatusIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketStatusIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_STATUS_IX_DISCM)?;
@@ -16264,8 +16569,11 @@ impl From<UpdateSpotMarketAssetTierIxArgs> for UpdateSpotMarketAssetTierIxData {
     }
 }
 impl UpdateSpotMarketAssetTierIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16275,7 +16583,9 @@ impl UpdateSpotMarketAssetTierIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketAssetTierIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketAssetTierIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM)?;
@@ -16442,8 +16752,11 @@ impl From<UpdateSpotMarketMarginWeightsIxArgs> for UpdateSpotMarketMarginWeights
     }
 }
 impl UpdateSpotMarketMarginWeightsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16453,7 +16766,9 @@ impl UpdateSpotMarketMarginWeightsIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketMarginWeightsIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketMarginWeightsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM)?;
@@ -16621,8 +16936,11 @@ impl From<UpdateSpotMarketBorrowRateIxArgs> for UpdateSpotMarketBorrowRateIxData
     }
 }
 impl UpdateSpotMarketBorrowRateIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16632,7 +16950,9 @@ impl UpdateSpotMarketBorrowRateIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketBorrowRateIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketBorrowRateIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM)?;
@@ -16799,8 +17119,11 @@ impl From<UpdateSpotMarketMaxTokenDepositsIxArgs> for UpdateSpotMarketMaxTokenDe
     }
 }
 impl UpdateSpotMarketMaxTokenDepositsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16811,7 +17134,7 @@ impl UpdateSpotMarketMaxTokenDepositsIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketMaxTokenDepositsIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -16983,8 +17306,11 @@ impl From<UpdateSpotMarketOracleIxArgs> for UpdateSpotMarketOracleIxData {
     }
 }
 impl UpdateSpotMarketOracleIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_ORACLE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -16994,7 +17320,9 @@ impl UpdateSpotMarketOracleIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketOracleIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketOracleIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_ORACLE_IX_DISCM)?;
@@ -17160,8 +17488,11 @@ impl From<UpdateSpotMarketStepSizeAndTickSizeIxArgs> for UpdateSpotMarketStepSiz
     }
 }
 impl UpdateSpotMarketStepSizeAndTickSizeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -17172,7 +17503,7 @@ impl UpdateSpotMarketStepSizeAndTickSizeIxData {
             ));
         }
         Ok(Self(
-            UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+            UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -17340,8 +17671,11 @@ impl From<UpdateSpotMarketMinOrderSizeIxArgs> for UpdateSpotMarketMinOrderSizeIx
     }
 }
 impl UpdateSpotMarketMinOrderSizeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -17351,7 +17685,9 @@ impl UpdateSpotMarketMinOrderSizeIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketMinOrderSizeIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketMinOrderSizeIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
@@ -17518,8 +17854,11 @@ impl From<UpdateSpotMarketOrdersEnabledIxArgs> for UpdateSpotMarketOrdersEnabled
     }
 }
 impl UpdateSpotMarketOrdersEnabledIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -17529,7 +17868,9 @@ impl UpdateSpotMarketOrdersEnabledIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketOrdersEnabledIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketOrdersEnabledIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM)?;
@@ -17689,8 +18030,11 @@ impl From<UpdateSpotMarketNameIxArgs> for UpdateSpotMarketNameIxData {
     }
 }
 impl UpdateSpotMarketNameIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_MARKET_NAME_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -17700,7 +18044,7 @@ impl UpdateSpotMarketNameIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotMarketNameIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotMarketNameIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_MARKET_NAME_IX_DISCM)?;
@@ -17856,8 +18200,11 @@ impl From<UpdatePerpMarketStatusIxArgs> for UpdatePerpMarketStatusIxData {
     }
 }
 impl UpdatePerpMarketStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -17867,7 +18214,9 @@ impl UpdatePerpMarketStatusIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketStatusIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketStatusIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_STATUS_IX_DISCM)?;
@@ -18028,8 +18377,11 @@ impl From<UpdatePerpMarketContractTierIxArgs> for UpdatePerpMarketContractTierIx
     }
 }
 impl UpdatePerpMarketContractTierIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18039,7 +18391,9 @@ impl UpdatePerpMarketContractTierIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketContractTierIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketContractTierIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM)?;
@@ -18204,8 +18558,11 @@ impl From<UpdatePerpMarketImfFactorIxArgs> for UpdatePerpMarketImfFactorIxData {
     }
 }
 impl UpdatePerpMarketImfFactorIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18215,7 +18572,9 @@ impl UpdatePerpMarketImfFactorIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketImfFactorIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketImfFactorIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM)?;
@@ -18387,8 +18746,11 @@ impl From<UpdatePerpMarketUnrealizedAssetWeightIxArgs>
     }
 }
 impl UpdatePerpMarketUnrealizedAssetWeightIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18399,7 +18761,7 @@ impl UpdatePerpMarketUnrealizedAssetWeightIxData {
             ));
         }
         Ok(Self(
-            UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(buf)?,
+            UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -18571,8 +18933,11 @@ impl From<UpdatePerpMarketConcentrationCoefIxArgs> for UpdatePerpMarketConcentra
     }
 }
 impl UpdatePerpMarketConcentrationCoefIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18583,7 +18948,7 @@ impl UpdatePerpMarketConcentrationCoefIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketConcentrationCoefIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -18759,8 +19124,11 @@ impl From<UpdatePerpMarketCurveUpdateIntensityIxArgs>
     }
 }
 impl UpdatePerpMarketCurveUpdateIntensityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18771,7 +19139,7 @@ impl UpdatePerpMarketCurveUpdateIntensityIxData {
             ));
         }
         Ok(Self(
-            UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(buf)?,
+            UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -18952,8 +19320,11 @@ impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>
     }
 }
 impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -18964,7 +19335,7 @@ impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
             ));
         }
         Ok(Self(
-            UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(buf)?,
+            UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -19116,8 +19487,11 @@ impl From<UpdateLpCooldownTimeIxArgs> for UpdateLpCooldownTimeIxData {
     }
 }
 impl UpdateLpCooldownTimeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_LP_COOLDOWN_TIME_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19127,7 +19501,7 @@ impl UpdateLpCooldownTimeIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateLpCooldownTimeIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateLpCooldownTimeIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_LP_COOLDOWN_TIME_IX_DISCM)?;
@@ -19272,8 +19646,11 @@ impl From<UpdatePerpFeeStructureIxArgs> for UpdatePerpFeeStructureIxData {
     }
 }
 impl UpdatePerpFeeStructureIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_FEE_STRUCTURE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19283,7 +19660,9 @@ impl UpdatePerpFeeStructureIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpFeeStructureIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpFeeStructureIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_FEE_STRUCTURE_IX_DISCM)?;
@@ -19428,8 +19807,11 @@ impl From<UpdateSpotFeeStructureIxArgs> for UpdateSpotFeeStructureIxData {
     }
 }
 impl UpdateSpotFeeStructureIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19439,7 +19821,9 @@ impl UpdateSpotFeeStructureIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotFeeStructureIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotFeeStructureIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM)?;
@@ -19589,8 +19973,11 @@ impl From<UpdateInitialPctToLiquidateIxArgs> for UpdateInitialPctToLiquidateIxDa
     }
 }
 impl UpdateInitialPctToLiquidateIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19600,7 +19987,9 @@ impl UpdateInitialPctToLiquidateIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateInitialPctToLiquidateIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateInitialPctToLiquidateIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM)?;
@@ -19748,8 +20137,11 @@ impl From<UpdateLiquidationDurationIxArgs> for UpdateLiquidationDurationIxData {
     }
 }
 impl UpdateLiquidationDurationIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_LIQUIDATION_DURATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19759,7 +20151,9 @@ impl UpdateLiquidationDurationIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateLiquidationDurationIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateLiquidationDurationIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_LIQUIDATION_DURATION_IX_DISCM)?;
@@ -19907,8 +20301,11 @@ impl From<UpdateOracleGuardRailsIxArgs> for UpdateOracleGuardRailsIxData {
     }
 }
 impl UpdateOracleGuardRailsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_ORACLE_GUARD_RAILS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -19918,7 +20315,9 @@ impl UpdateOracleGuardRailsIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateOracleGuardRailsIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateOracleGuardRailsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_ORACLE_GUARD_RAILS_IX_DISCM)?;
@@ -20067,8 +20466,11 @@ impl From<UpdateStateSettlementDurationIxArgs> for UpdateStateSettlementDuration
     }
 }
 impl UpdateStateSettlementDurationIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20078,7 +20480,9 @@ impl UpdateStateSettlementDurationIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateStateSettlementDurationIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateStateSettlementDurationIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM)?;
@@ -20247,8 +20651,11 @@ impl From<UpdatePerpMarketOracleIxArgs> for UpdatePerpMarketOracleIxData {
     }
 }
 impl UpdatePerpMarketOracleIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_ORACLE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20258,7 +20665,9 @@ impl UpdatePerpMarketOracleIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketOracleIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketOracleIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_ORACLE_IX_DISCM)?;
@@ -20419,8 +20828,11 @@ impl From<UpdatePerpMarketBaseSpreadIxArgs> for UpdatePerpMarketBaseSpreadIxData
     }
 }
 impl UpdatePerpMarketBaseSpreadIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20430,7 +20842,9 @@ impl UpdatePerpMarketBaseSpreadIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketBaseSpreadIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketBaseSpreadIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM)?;
@@ -20587,8 +21001,11 @@ impl From<UpdateAmmJitIntensityIxArgs> for UpdateAmmJitIntensityIxData {
     }
 }
 impl UpdateAmmJitIntensityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_AMM_JIT_INTENSITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20598,7 +21015,7 @@ impl UpdateAmmJitIntensityIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateAmmJitIntensityIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateAmmJitIntensityIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_AMM_JIT_INTENSITY_IX_DISCM)?;
@@ -20756,8 +21173,11 @@ impl From<UpdatePerpMarketMaxSpreadIxArgs> for UpdatePerpMarketMaxSpreadIxData {
     }
 }
 impl UpdatePerpMarketMaxSpreadIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20767,7 +21187,9 @@ impl UpdatePerpMarketMaxSpreadIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketMaxSpreadIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketMaxSpreadIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM)?;
@@ -20935,8 +21357,11 @@ impl From<UpdatePerpMarketStepSizeAndTickSizeIxArgs> for UpdatePerpMarketStepSiz
     }
 }
 impl UpdatePerpMarketStepSizeAndTickSizeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -20947,7 +21372,7 @@ impl UpdatePerpMarketStepSizeAndTickSizeIxData {
             ));
         }
         Ok(Self(
-            UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
+            UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -21109,8 +21534,11 @@ impl From<UpdatePerpMarketNameIxArgs> for UpdatePerpMarketNameIxData {
     }
 }
 impl UpdatePerpMarketNameIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_NAME_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21120,7 +21548,7 @@ impl UpdatePerpMarketNameIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketNameIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketNameIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_NAME_IX_DISCM)?;
@@ -21280,8 +21708,11 @@ impl From<UpdatePerpMarketMinOrderSizeIxArgs> for UpdatePerpMarketMinOrderSizeIx
     }
 }
 impl UpdatePerpMarketMinOrderSizeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21291,7 +21722,9 @@ impl UpdatePerpMarketMinOrderSizeIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpMarketMinOrderSizeIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpMarketMinOrderSizeIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
@@ -21461,8 +21894,11 @@ impl From<UpdatePerpMarketMaxSlippageRatioIxArgs> for UpdatePerpMarketMaxSlippag
     }
 }
 impl UpdatePerpMarketMaxSlippageRatioIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21473,7 +21909,7 @@ impl UpdatePerpMarketMaxSlippageRatioIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMaxSlippageRatioIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -21652,8 +22088,11 @@ impl From<UpdatePerpMarketMaxFillReserveFractionIxArgs>
     }
 }
 impl UpdatePerpMarketMaxFillReserveFractionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21664,7 +22103,7 @@ impl UpdatePerpMarketMaxFillReserveFractionIxData {
             ));
         }
         Ok(Self(
-            UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(buf)?,
+            UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -21836,8 +22275,11 @@ impl From<UpdatePerpMarketMaxOpenInterestIxArgs> for UpdatePerpMarketMaxOpenInte
     }
 }
 impl UpdatePerpMarketMaxOpenInterestIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -21848,7 +22290,7 @@ impl UpdatePerpMarketMaxOpenInterestIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMaxOpenInterestIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -21999,8 +22441,11 @@ impl From<UpdateAdminIxArgs> for UpdateAdminIxData {
     }
 }
 impl UpdateAdminIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_ADMIN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22010,7 +22455,7 @@ impl UpdateAdminIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateAdminIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateAdminIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_ADMIN_IX_DISCM)?;
@@ -22148,8 +22593,11 @@ impl From<UpdateWhitelistMintIxArgs> for UpdateWhitelistMintIxData {
     }
 }
 impl UpdateWhitelistMintIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_WHITELIST_MINT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22159,7 +22607,7 @@ impl UpdateWhitelistMintIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateWhitelistMintIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateWhitelistMintIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_WHITELIST_MINT_IX_DISCM)?;
@@ -22300,8 +22748,11 @@ impl From<UpdateDiscountMintIxArgs> for UpdateDiscountMintIxData {
     }
 }
 impl UpdateDiscountMintIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_DISCOUNT_MINT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22311,7 +22762,7 @@ impl UpdateDiscountMintIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateDiscountMintIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateDiscountMintIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_DISCOUNT_MINT_IX_DISCM)?;
@@ -22452,8 +22903,11 @@ impl From<UpdateExchangeStatusIxArgs> for UpdateExchangeStatusIxData {
     }
 }
 impl UpdateExchangeStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_EXCHANGE_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22463,7 +22917,7 @@ impl UpdateExchangeStatusIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateExchangeStatusIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateExchangeStatusIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_EXCHANGE_STATUS_IX_DISCM)?;
@@ -22610,8 +23064,11 @@ impl From<UpdatePerpAuctionDurationIxArgs> for UpdatePerpAuctionDurationIxData {
     }
 }
 impl UpdatePerpAuctionDurationIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_PERP_AUCTION_DURATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22621,7 +23078,9 @@ impl UpdatePerpAuctionDurationIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePerpAuctionDurationIxArgs::deserialize(buf)?))
+        Ok(Self(UpdatePerpAuctionDurationIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_PERP_AUCTION_DURATION_IX_DISCM)?;
@@ -22771,8 +23230,11 @@ impl From<UpdateSpotAuctionDurationIxArgs> for UpdateSpotAuctionDurationIxData {
     }
 }
 impl UpdateSpotAuctionDurationIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != UPDATE_SPOT_AUCTION_DURATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22782,7 +23244,9 @@ impl UpdateSpotAuctionDurationIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateSpotAuctionDurationIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateSpotAuctionDurationIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&UPDATE_SPOT_AUCTION_DURATION_IX_DISCM)?;
@@ -22974,8 +23438,11 @@ impl From<AdminRemoveInsuranceFundStakeIxArgs> for AdminRemoveInsuranceFundStake
     }
 }
 impl AdminRemoveInsuranceFundStakeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -22985,7 +23452,9 @@ impl AdminRemoveInsuranceFundStakeIxData {
                 ),
             ));
         }
-        Ok(Self(AdminRemoveInsuranceFundStakeIxArgs::deserialize(buf)?))
+        Ok(Self(AdminRemoveInsuranceFundStakeIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;

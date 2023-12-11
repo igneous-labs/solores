@@ -45,103 +45,111 @@ pub enum MplTokenMetadataProgramIx {
     RemoveCreatorVerification(RemoveCreatorVerificationIxArgs),
 }
 impl MplTokenMetadataProgramIx {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         match maybe_discm {
             CREATE_METADATA_ACCOUNT_IX_DISCM => Ok(Self::CreateMetadataAccount(
-                CreateMetadataAccountIxArgs::deserialize(buf)?,
+                CreateMetadataAccountIxArgs::deserialize(&mut reader)?,
             )),
             UPDATE_METADATA_ACCOUNT_IX_DISCM => Ok(Self::UpdateMetadataAccount(
-                UpdateMetadataAccountIxArgs::deserialize(buf)?,
+                UpdateMetadataAccountIxArgs::deserialize(&mut reader)?,
             )),
             DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM => Ok(Self::DeprecatedCreateMasterEdition(
-                DeprecatedCreateMasterEditionIxArgs::deserialize(buf)?,
+                DeprecatedCreateMasterEditionIxArgs::deserialize(&mut reader)?,
             )),
             DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM => Ok(
                 Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(
                     DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(
-                        buf,
+                        &mut reader,
                     )?,
                 ),
             ),
             UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM => {
                 Ok(Self::UpdatePrimarySaleHappenedViaToken(
-                    UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(buf)?,
+                    UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(&mut reader)?,
                 ))
             }
             DEPRECATED_SET_RESERVATION_LIST_IX_DISCM => Ok(Self::DeprecatedSetReservationList(
-                DeprecatedSetReservationListIxArgs::deserialize(buf)?,
+                DeprecatedSetReservationListIxArgs::deserialize(&mut reader)?,
             )),
             DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM => {
                 Ok(Self::DeprecatedCreateReservationList(
-                    DeprecatedCreateReservationListIxArgs::deserialize(buf)?,
+                    DeprecatedCreateReservationListIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            SIGN_METADATA_IX_DISCM => Ok(Self::SignMetadata(SignMetadataIxArgs::deserialize(buf)?)),
+            SIGN_METADATA_IX_DISCM => Ok(Self::SignMetadata(SignMetadataIxArgs::deserialize(
+                &mut reader,
+            )?)),
             DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM => {
                 Ok(Self::DeprecatedMintPrintingTokensViaToken(
-                    DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(buf)?,
+                    DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(&mut reader)?,
                 ))
             }
             DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM => Ok(Self::DeprecatedMintPrintingTokens(
-                DeprecatedMintPrintingTokensIxArgs::deserialize(buf)?,
+                DeprecatedMintPrintingTokensIxArgs::deserialize(&mut reader)?,
             )),
             CREATE_MASTER_EDITION_IX_DISCM => Ok(Self::CreateMasterEdition(
-                CreateMasterEditionIxArgs::deserialize(buf)?,
+                CreateMasterEditionIxArgs::deserialize(&mut reader)?,
             )),
             MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM => {
                 Ok(Self::MintNewEditionFromMasterEditionViaToken(
-                    MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(buf)?,
+                    MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(&mut reader)?,
                 ))
             }
             CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM => Ok(Self::ConvertMasterEditionV1ToV2(
-                ConvertMasterEditionV1ToV2IxArgs::deserialize(buf)?,
+                ConvertMasterEditionV1ToV2IxArgs::deserialize(&mut reader)?,
             )),
             MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM => {
                 Ok(Self::MintNewEditionFromMasterEditionViaVaultProxy(
-                    MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(buf)?,
+                    MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            PUFF_METADATA_IX_DISCM => Ok(Self::PuffMetadata(PuffMetadataIxArgs::deserialize(buf)?)),
+            PUFF_METADATA_IX_DISCM => Ok(Self::PuffMetadata(PuffMetadataIxArgs::deserialize(
+                &mut reader,
+            )?)),
             UPDATE_METADATA_ACCOUNT_V2_IX_DISCM => Ok(Self::UpdateMetadataAccountV2(
-                UpdateMetadataAccountV2IxArgs::deserialize(buf)?,
+                UpdateMetadataAccountV2IxArgs::deserialize(&mut reader)?,
             )),
             CREATE_METADATA_ACCOUNT_V2_IX_DISCM => Ok(Self::CreateMetadataAccountV2(
-                CreateMetadataAccountV2IxArgs::deserialize(buf)?,
+                CreateMetadataAccountV2IxArgs::deserialize(&mut reader)?,
             )),
             CREATE_MASTER_EDITION_V3_IX_DISCM => Ok(Self::CreateMasterEditionV3(
-                CreateMasterEditionV3IxArgs::deserialize(buf)?,
+                CreateMasterEditionV3IxArgs::deserialize(&mut reader)?,
             )),
             VERIFY_COLLECTION_IX_DISCM => Ok(Self::VerifyCollection(
-                VerifyCollectionIxArgs::deserialize(buf)?,
+                VerifyCollectionIxArgs::deserialize(&mut reader)?,
             )),
-            UTILIZE_IX_DISCM => Ok(Self::Utilize(UtilizeIxArgs::deserialize(buf)?)),
+            UTILIZE_IX_DISCM => Ok(Self::Utilize(UtilizeIxArgs::deserialize(&mut reader)?)),
             APPROVE_USE_AUTHORITY_IX_DISCM => Ok(Self::ApproveUseAuthority(
-                ApproveUseAuthorityIxArgs::deserialize(buf)?,
+                ApproveUseAuthorityIxArgs::deserialize(&mut reader)?,
             )),
             REVOKE_USE_AUTHORITY_IX_DISCM => Ok(Self::RevokeUseAuthority(
-                RevokeUseAuthorityIxArgs::deserialize(buf)?,
+                RevokeUseAuthorityIxArgs::deserialize(&mut reader)?,
             )),
             UNVERIFY_COLLECTION_IX_DISCM => Ok(Self::UnverifyCollection(
-                UnverifyCollectionIxArgs::deserialize(buf)?,
+                UnverifyCollectionIxArgs::deserialize(&mut reader)?,
             )),
             APPROVE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::ApproveCollectionAuthority(
-                ApproveCollectionAuthorityIxArgs::deserialize(buf)?,
+                ApproveCollectionAuthorityIxArgs::deserialize(&mut reader)?,
             )),
             REVOKE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::RevokeCollectionAuthority(
-                RevokeCollectionAuthorityIxArgs::deserialize(buf)?,
+                RevokeCollectionAuthorityIxArgs::deserialize(&mut reader)?,
             )),
             SET_AND_VERIFY_COLLECTION_IX_DISCM => Ok(Self::SetAndVerifyCollection(
-                SetAndVerifyCollectionIxArgs::deserialize(buf)?,
+                SetAndVerifyCollectionIxArgs::deserialize(&mut reader)?,
             )),
             FREEZE_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::FreezeDelegatedAccount(
-                FreezeDelegatedAccountIxArgs::deserialize(buf)?,
+                FreezeDelegatedAccountIxArgs::deserialize(&mut reader)?,
             )),
             THAW_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::ThawDelegatedAccount(
-                ThawDelegatedAccountIxArgs::deserialize(buf)?,
+                ThawDelegatedAccountIxArgs::deserialize(&mut reader)?,
             )),
             REMOVE_CREATOR_VERIFICATION_IX_DISCM => Ok(Self::RemoveCreatorVerification(
-                RemoveCreatorVerificationIxArgs::deserialize(buf)?,
+                RemoveCreatorVerificationIxArgs::deserialize(&mut reader)?,
             )),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -395,8 +403,12 @@ impl From<CreateMetadataAccountIxArgs> for CreateMetadataAccountIxData {
     }
 }
 impl CreateMetadataAccountIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CREATE_METADATA_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -406,7 +418,7 @@ impl CreateMetadataAccountIxData {
                 ),
             ));
         }
-        Ok(Self(CreateMetadataAccountIxArgs::deserialize(buf)?))
+        Ok(Self(CreateMetadataAccountIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CREATE_METADATA_ACCOUNT_IX_DISCM])?;
@@ -558,8 +570,12 @@ impl From<UpdateMetadataAccountIxArgs> for UpdateMetadataAccountIxData {
     }
 }
 impl UpdateMetadataAccountIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != UPDATE_METADATA_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -569,7 +585,7 @@ impl UpdateMetadataAccountIxData {
                 ),
             ));
         }
-        Ok(Self(UpdateMetadataAccountIxArgs::deserialize(buf)?))
+        Ok(Self(UpdateMetadataAccountIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[UPDATE_METADATA_ACCOUNT_IX_DISCM])?;
@@ -830,8 +846,12 @@ impl From<DeprecatedCreateMasterEditionIxArgs> for DeprecatedCreateMasterEdition
     }
 }
 impl DeprecatedCreateMasterEditionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -841,7 +861,9 @@ impl DeprecatedCreateMasterEditionIxData {
                 ),
             ));
         }
-        Ok(Self(DeprecatedCreateMasterEditionIxArgs::deserialize(buf)?))
+        Ok(Self(DeprecatedCreateMasterEditionIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM])?;
@@ -1179,8 +1201,12 @@ impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>
     }
 }
 impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm
             != DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
         {
@@ -1194,7 +1220,9 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
             ));
         }
         Ok(Self(
-            DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(buf)?,
+            DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(
+                &mut reader,
+            )?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -1409,8 +1437,12 @@ impl From<UpdatePrimarySaleHappenedViaTokenIxArgs> for UpdatePrimarySaleHappened
     }
 }
 impl UpdatePrimarySaleHappenedViaTokenIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1421,7 +1453,7 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
             ));
         }
         Ok(Self(UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -1595,8 +1627,12 @@ impl From<DeprecatedSetReservationListIxArgs> for DeprecatedSetReservationListIx
     }
 }
 impl DeprecatedSetReservationListIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPRECATED_SET_RESERVATION_LIST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1606,7 +1642,9 @@ impl DeprecatedSetReservationListIxData {
                 ),
             ));
         }
-        Ok(Self(DeprecatedSetReservationListIxArgs::deserialize(buf)?))
+        Ok(Self(DeprecatedSetReservationListIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[DEPRECATED_SET_RESERVATION_LIST_IX_DISCM])?;
@@ -1823,8 +1861,12 @@ impl From<DeprecatedCreateReservationListIxArgs> for DeprecatedCreateReservation
     }
 }
 impl DeprecatedCreateReservationListIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1835,7 +1877,7 @@ impl DeprecatedCreateReservationListIxData {
             ));
         }
         Ok(Self(DeprecatedCreateReservationListIxArgs::deserialize(
-            buf,
+            &mut reader,
         )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -1993,8 +2035,12 @@ impl From<SignMetadataIxArgs> for SignMetadataIxData {
     }
 }
 impl SignMetadataIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != SIGN_METADATA_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2004,7 +2050,7 @@ impl SignMetadataIxData {
                 ),
             ));
         }
-        Ok(Self(SignMetadataIxArgs::deserialize(buf)?))
+        Ok(Self(SignMetadataIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[SIGN_METADATA_IX_DISCM])?;
@@ -2227,8 +2273,12 @@ impl From<DeprecatedMintPrintingTokensViaTokenIxArgs>
     }
 }
 impl DeprecatedMintPrintingTokensViaTokenIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2239,7 +2289,7 @@ impl DeprecatedMintPrintingTokensViaTokenIxData {
             ));
         }
         Ok(Self(
-            DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(buf)?,
+            DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -2463,8 +2513,12 @@ impl From<DeprecatedMintPrintingTokensIxArgs> for DeprecatedMintPrintingTokensIx
     }
 }
 impl DeprecatedMintPrintingTokensIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2474,7 +2528,9 @@ impl DeprecatedMintPrintingTokensIxData {
                 ),
             ));
         }
-        Ok(Self(DeprecatedMintPrintingTokensIxArgs::deserialize(buf)?))
+        Ok(Self(DeprecatedMintPrintingTokensIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM])?;
@@ -2698,8 +2754,12 @@ impl From<CreateMasterEditionIxArgs> for CreateMasterEditionIxData {
     }
 }
 impl CreateMasterEditionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CREATE_MASTER_EDITION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2709,7 +2769,7 @@ impl CreateMasterEditionIxData {
                 ),
             ));
         }
-        Ok(Self(CreateMasterEditionIxArgs::deserialize(buf)?))
+        Ok(Self(CreateMasterEditionIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CREATE_MASTER_EDITION_IX_DISCM])?;
@@ -2993,8 +3053,12 @@ impl From<MintNewEditionFromMasterEditionViaTokenIxArgs>
     }
 }
 impl MintNewEditionFromMasterEditionViaTokenIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3005,7 +3069,7 @@ impl MintNewEditionFromMasterEditionViaTokenIxData {
             ));
         }
         Ok(Self(
-            MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(buf)?,
+            MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -3201,8 +3265,12 @@ impl From<ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1ToV2IxData
     }
 }
 impl ConvertMasterEditionV1ToV2IxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3212,7 +3280,9 @@ impl ConvertMasterEditionV1ToV2IxData {
                 ),
             ));
         }
-        Ok(Self(ConvertMasterEditionV1ToV2IxArgs::deserialize(buf)?))
+        Ok(Self(ConvertMasterEditionV1ToV2IxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])?;
@@ -3519,8 +3589,12 @@ impl From<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>
     }
 }
 impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3531,7 +3605,7 @@ impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
             ));
         }
         Ok(Self(
-            MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(buf)?,
+            MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -3706,8 +3780,12 @@ impl From<PuffMetadataIxArgs> for PuffMetadataIxData {
     }
 }
 impl PuffMetadataIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != PUFF_METADATA_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3717,7 +3795,7 @@ impl PuffMetadataIxData {
                 ),
             ));
         }
-        Ok(Self(PuffMetadataIxArgs::deserialize(buf)?))
+        Ok(Self(PuffMetadataIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[PUFF_METADATA_IX_DISCM])?;
@@ -3853,8 +3931,12 @@ impl From<UpdateMetadataAccountV2IxArgs> for UpdateMetadataAccountV2IxData {
     }
 }
 impl UpdateMetadataAccountV2IxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != UPDATE_METADATA_ACCOUNT_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3864,7 +3946,9 @@ impl UpdateMetadataAccountV2IxData {
                 ),
             ));
         }
-        Ok(Self(UpdateMetadataAccountV2IxArgs::deserialize(buf)?))
+        Ok(Self(UpdateMetadataAccountV2IxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[UPDATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
@@ -4061,8 +4145,12 @@ impl From<CreateMetadataAccountV2IxArgs> for CreateMetadataAccountV2IxData {
     }
 }
 impl CreateMetadataAccountV2IxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CREATE_METADATA_ACCOUNT_V2_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4072,7 +4160,9 @@ impl CreateMetadataAccountV2IxData {
                 ),
             ));
         }
-        Ok(Self(CreateMetadataAccountV2IxArgs::deserialize(buf)?))
+        Ok(Self(CreateMetadataAccountV2IxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CREATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
@@ -4290,8 +4380,12 @@ impl From<CreateMasterEditionV3IxArgs> for CreateMasterEditionV3IxData {
     }
 }
 impl CreateMasterEditionV3IxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CREATE_MASTER_EDITION_V3_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4301,7 +4395,7 @@ impl CreateMasterEditionV3IxData {
                 ),
             ));
         }
-        Ok(Self(CreateMasterEditionV3IxArgs::deserialize(buf)?))
+        Ok(Self(CreateMasterEditionV3IxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CREATE_MASTER_EDITION_V3_IX_DISCM])?;
@@ -4496,8 +4590,12 @@ impl From<VerifyCollectionIxArgs> for VerifyCollectionIxData {
     }
 }
 impl VerifyCollectionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != VERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4507,7 +4605,7 @@ impl VerifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(VerifyCollectionIxArgs::deserialize(buf)?))
+        Ok(Self(VerifyCollectionIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[VERIFY_COLLECTION_IX_DISCM])?;
@@ -4741,8 +4839,12 @@ impl From<UtilizeIxArgs> for UtilizeIxData {
     }
 }
 impl UtilizeIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != UTILIZE_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4752,7 +4854,7 @@ impl UtilizeIxData {
                 ),
             ));
         }
-        Ok(Self(UtilizeIxArgs::deserialize(buf)?))
+        Ok(Self(UtilizeIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[UTILIZE_IX_DISCM])?;
@@ -4995,8 +5097,12 @@ impl From<ApproveUseAuthorityIxArgs> for ApproveUseAuthorityIxData {
     }
 }
 impl ApproveUseAuthorityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != APPROVE_USE_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5006,7 +5112,7 @@ impl ApproveUseAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(ApproveUseAuthorityIxArgs::deserialize(buf)?))
+        Ok(Self(ApproveUseAuthorityIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[APPROVE_USE_AUTHORITY_IX_DISCM])?;
@@ -5227,8 +5333,12 @@ impl From<RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData {
     }
 }
 impl RevokeUseAuthorityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REVOKE_USE_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5238,7 +5348,7 @@ impl RevokeUseAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(RevokeUseAuthorityIxArgs::deserialize(buf)?))
+        Ok(Self(RevokeUseAuthorityIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REVOKE_USE_AUTHORITY_IX_DISCM])?;
@@ -5430,8 +5540,12 @@ impl From<UnverifyCollectionIxArgs> for UnverifyCollectionIxData {
     }
 }
 impl UnverifyCollectionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != UNVERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5441,7 +5555,7 @@ impl UnverifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(UnverifyCollectionIxArgs::deserialize(buf)?))
+        Ok(Self(UnverifyCollectionIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[UNVERIFY_COLLECTION_IX_DISCM])?;
@@ -5658,8 +5772,12 @@ impl From<ApproveCollectionAuthorityIxArgs> for ApproveCollectionAuthorityIxData
     }
 }
 impl ApproveCollectionAuthorityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != APPROVE_COLLECTION_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5669,7 +5787,9 @@ impl ApproveCollectionAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(ApproveCollectionAuthorityIxArgs::deserialize(buf)?))
+        Ok(Self(ApproveCollectionAuthorityIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])?;
@@ -5852,8 +5972,12 @@ impl From<RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthorityIxData {
     }
 }
 impl RevokeCollectionAuthorityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REVOKE_COLLECTION_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5863,7 +5987,9 @@ impl RevokeCollectionAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(RevokeCollectionAuthorityIxArgs::deserialize(buf)?))
+        Ok(Self(RevokeCollectionAuthorityIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])?;
@@ -6075,8 +6201,12 @@ impl From<SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxData {
     }
 }
 impl SetAndVerifyCollectionIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != SET_AND_VERIFY_COLLECTION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6086,7 +6216,9 @@ impl SetAndVerifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(SetAndVerifyCollectionIxArgs::deserialize(buf)?))
+        Ok(Self(SetAndVerifyCollectionIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])?;
@@ -6276,8 +6408,12 @@ impl From<FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxData {
     }
 }
 impl FreezeDelegatedAccountIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != FREEZE_DELEGATED_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6287,7 +6423,9 @@ impl FreezeDelegatedAccountIxData {
                 ),
             ));
         }
-        Ok(Self(FreezeDelegatedAccountIxArgs::deserialize(buf)?))
+        Ok(Self(FreezeDelegatedAccountIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])?;
@@ -6465,8 +6603,12 @@ impl From<ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData {
     }
 }
 impl ThawDelegatedAccountIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != THAW_DELEGATED_ACCOUNT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6476,7 +6618,7 @@ impl ThawDelegatedAccountIxData {
                 ),
             ));
         }
-        Ok(Self(ThawDelegatedAccountIxArgs::deserialize(buf)?))
+        Ok(Self(ThawDelegatedAccountIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])?;
@@ -6626,8 +6768,12 @@ impl From<RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificationIxData {
     }
 }
 impl RemoveCreatorVerificationIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REMOVE_CREATOR_VERIFICATION_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6637,7 +6783,9 @@ impl RemoveCreatorVerificationIxData {
                 ),
             ));
         }
-        Ok(Self(RemoveCreatorVerificationIxArgs::deserialize(buf)?))
+        Ok(Self(RemoveCreatorVerificationIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])?;

@@ -1,6 +1,7 @@
 use mpl_token_metadata_interface::{
     CreateMasterEditionArgs, CreateMasterEditionV3IxArgs, CreateMasterEditionV3IxData,
-    MplTokenMetadataProgramIx, RevokeUseAuthorityIxArgs,
+    MplTokenMetadataProgramIx, RevokeUseAuthorityIxArgs, CREATE_MASTER_EDITION_V3_IX_DISCM,
+    REVOKE_USE_AUTHORITY_IX_DISCM,
 };
 
 #[test]
@@ -11,7 +12,8 @@ fn test_ix_data_borsh_roundtrip() {
         },
     });
     let serialized = sample.try_to_vec().unwrap();
-    let deserialized = CreateMasterEditionV3IxData::deserialize(&mut serialized.as_ref()).unwrap();
+    assert_eq!(serialized[0], CREATE_MASTER_EDITION_V3_IX_DISCM);
+    let deserialized = CreateMasterEditionV3IxData::deserialize(&serialized).unwrap();
     assert_eq!(sample, deserialized);
 }
 
@@ -19,6 +21,7 @@ fn test_ix_data_borsh_roundtrip() {
 fn test_program_ix_borsh_roundtrip() {
     let program_ix = MplTokenMetadataProgramIx::RevokeUseAuthority(RevokeUseAuthorityIxArgs {});
     let serialized = program_ix.try_to_vec().unwrap();
-    let deserialized = MplTokenMetadataProgramIx::deserialize(&mut serialized.as_ref()).unwrap();
+    assert_eq!(serialized[0], REVOKE_USE_AUTHORITY_IX_DISCM);
+    let deserialized = MplTokenMetadataProgramIx::deserialize(&serialized).unwrap();
     assert_eq!(program_ix, deserialized);
 }

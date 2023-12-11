@@ -40,80 +40,94 @@ pub enum PhoenixV1ProgramIx {
     ChangeFeeRecipient(ChangeFeeRecipientIxArgs),
 }
 impl PhoenixV1ProgramIx {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         match maybe_discm {
-            SWAP_IX_DISCM => Ok(Self::Swap(SwapIxArgs::deserialize(buf)?)),
+            SWAP_IX_DISCM => Ok(Self::Swap(SwapIxArgs::deserialize(&mut reader)?)),
             SWAP_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::SwapWithFreeFunds(
-                SwapWithFreeFundsIxArgs::deserialize(buf)?,
+                SwapWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_LIMIT_ORDER_IX_DISCM => Ok(Self::PlaceLimitOrder(
-                PlaceLimitOrderIxArgs::deserialize(buf)?,
+                PlaceLimitOrderIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::PlaceLimitOrderWithFreeFunds(
-                PlaceLimitOrderWithFreeFundsIxArgs::deserialize(buf)?,
+                PlaceLimitOrderWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
-            REDUCE_ORDER_IX_DISCM => Ok(Self::ReduceOrder(ReduceOrderIxArgs::deserialize(buf)?)),
+            REDUCE_ORDER_IX_DISCM => Ok(Self::ReduceOrder(ReduceOrderIxArgs::deserialize(
+                &mut reader,
+            )?)),
             REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::ReduceOrderWithFreeFunds(
-                ReduceOrderWithFreeFundsIxArgs::deserialize(buf)?,
+                ReduceOrderWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
             CANCEL_ALL_ORDERS_IX_DISCM => Ok(Self::CancelAllOrders(
-                CancelAllOrdersIxArgs::deserialize(buf)?,
+                CancelAllOrdersIxArgs::deserialize(&mut reader)?,
             )),
             CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::CancelAllOrdersWithFreeFunds(
-                CancelAllOrdersWithFreeFundsIxArgs::deserialize(buf)?,
+                CancelAllOrdersWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
-            CANCEL_UP_TO_IX_DISCM => Ok(Self::CancelUpTo(CancelUpToIxArgs::deserialize(buf)?)),
+            CANCEL_UP_TO_IX_DISCM => Ok(Self::CancelUpTo(CancelUpToIxArgs::deserialize(
+                &mut reader,
+            )?)),
             CANCEL_UP_TO_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::CancelUpToWithFreeFunds(
-                CancelUpToWithFreeFundsIxArgs::deserialize(buf)?,
+                CancelUpToWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
             CANCEL_MULTIPLE_ORDERS_BY_ID_IX_DISCM => Ok(Self::CancelMultipleOrdersById(
-                CancelMultipleOrdersByIdIxArgs::deserialize(buf)?,
+                CancelMultipleOrdersByIdIxArgs::deserialize(&mut reader)?,
             )),
             CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_DISCM => {
                 Ok(Self::CancelMultipleOrdersByIdWithFreeFunds(
-                    CancelMultipleOrdersByIdWithFreeFundsIxArgs::deserialize(buf)?,
+                    CancelMultipleOrdersByIdWithFreeFundsIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            WITHDRAW_FUNDS_IX_DISCM => {
-                Ok(Self::WithdrawFunds(WithdrawFundsIxArgs::deserialize(buf)?))
-            }
-            DEPOSIT_FUNDS_IX_DISCM => Ok(Self::DepositFunds(DepositFundsIxArgs::deserialize(buf)?)),
-            REQUEST_SEAT_IX_DISCM => Ok(Self::RequestSeat(RequestSeatIxArgs::deserialize(buf)?)),
-            LOG_IX_DISCM => Ok(Self::Log(LogIxArgs::deserialize(buf)?)),
+            WITHDRAW_FUNDS_IX_DISCM => Ok(Self::WithdrawFunds(WithdrawFundsIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            DEPOSIT_FUNDS_IX_DISCM => Ok(Self::DepositFunds(DepositFundsIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            REQUEST_SEAT_IX_DISCM => Ok(Self::RequestSeat(RequestSeatIxArgs::deserialize(
+                &mut reader,
+            )?)),
+            LOG_IX_DISCM => Ok(Self::Log(LogIxArgs::deserialize(&mut reader)?)),
             PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM => Ok(Self::PlaceMultiplePostOnlyOrders(
-                PlaceMultiplePostOnlyOrdersIxArgs::deserialize(buf)?,
+                PlaceMultiplePostOnlyOrdersIxArgs::deserialize(&mut reader)?,
             )),
             PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_DISCM => {
                 Ok(Self::PlaceMultiplePostOnlyOrdersWithFreeFunds(
-                    PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs::deserialize(buf)?,
+                    PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs::deserialize(&mut reader)?,
                 ))
             }
             INITIALIZE_MARKET_IX_DISCM => Ok(Self::InitializeMarket(
-                InitializeMarketIxArgs::deserialize(buf)?,
+                InitializeMarketIxArgs::deserialize(&mut reader)?,
             )),
             CLAIM_AUTHORITY_IX_DISCM => Ok(Self::ClaimAuthority(
-                ClaimAuthorityIxArgs::deserialize(buf)?,
+                ClaimAuthorityIxArgs::deserialize(&mut reader)?,
             )),
-            NAME_SUCCESSOR_IX_DISCM => {
-                Ok(Self::NameSuccessor(NameSuccessorIxArgs::deserialize(buf)?))
-            }
+            NAME_SUCCESSOR_IX_DISCM => Ok(Self::NameSuccessor(NameSuccessorIxArgs::deserialize(
+                &mut reader,
+            )?)),
             CHANGE_MARKET_STATUS_IX_DISCM => Ok(Self::ChangeMarketStatus(
-                ChangeMarketStatusIxArgs::deserialize(buf)?,
+                ChangeMarketStatusIxArgs::deserialize(&mut reader)?,
             )),
             CHANGE_SEAT_STATUS_IX_DISCM => Ok(Self::ChangeSeatStatus(
-                ChangeSeatStatusIxArgs::deserialize(buf)?,
+                ChangeSeatStatusIxArgs::deserialize(&mut reader)?,
             )),
             REQUEST_SEAT_AUTHORIZED_IX_DISCM => Ok(Self::RequestSeatAuthorized(
-                RequestSeatAuthorizedIxArgs::deserialize(buf)?,
+                RequestSeatAuthorizedIxArgs::deserialize(&mut reader)?,
             )),
-            EVICT_SEAT_IX_DISCM => Ok(Self::EvictSeat(EvictSeatIxArgs::deserialize(buf)?)),
+            EVICT_SEAT_IX_DISCM => Ok(Self::EvictSeat(EvictSeatIxArgs::deserialize(&mut reader)?)),
             FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders(
-                ForceCancelOrdersIxArgs::deserialize(buf)?,
+                ForceCancelOrdersIxArgs::deserialize(&mut reader)?,
             )),
-            COLLECT_FEES_IX_DISCM => Ok(Self::CollectFees(CollectFeesIxArgs::deserialize(buf)?)),
+            COLLECT_FEES_IX_DISCM => Ok(Self::CollectFees(CollectFeesIxArgs::deserialize(
+                &mut reader,
+            )?)),
             CHANGE_FEE_RECIPIENT_IX_DISCM => Ok(Self::ChangeFeeRecipient(
-                ChangeFeeRecipientIxArgs::deserialize(buf)?,
+                ChangeFeeRecipientIxArgs::deserialize(&mut reader)?,
             )),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -375,8 +389,12 @@ impl From<SwapIxArgs> for SwapIxData {
     }
 }
 impl SwapIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != SWAP_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -386,7 +404,7 @@ impl SwapIxData {
                 ),
             ));
         }
-        Ok(Self(SwapIxArgs::deserialize(buf)?))
+        Ok(Self(SwapIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[SWAP_IX_DISCM])?;
@@ -567,8 +585,12 @@ impl From<SwapWithFreeFundsIxArgs> for SwapWithFreeFundsIxData {
     }
 }
 impl SwapWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != SWAP_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -578,7 +600,7 @@ impl SwapWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(SwapWithFreeFundsIxArgs::deserialize(buf)?))
+        Ok(Self(SwapWithFreeFundsIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[SWAP_WITH_FREE_FUNDS_IX_DISCM])?;
@@ -794,8 +816,12 @@ impl From<PlaceLimitOrderIxArgs> for PlaceLimitOrderIxData {
     }
 }
 impl PlaceLimitOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != PLACE_LIMIT_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -805,7 +831,7 @@ impl PlaceLimitOrderIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceLimitOrderIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceLimitOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[PLACE_LIMIT_ORDER_IX_DISCM])?;
@@ -993,8 +1019,12 @@ impl From<PlaceLimitOrderWithFreeFundsIxArgs> for PlaceLimitOrderWithFreeFundsIx
     }
 }
 impl PlaceLimitOrderWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1004,7 +1034,9 @@ impl PlaceLimitOrderWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceLimitOrderWithFreeFundsIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceLimitOrderWithFreeFundsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_DISCM])?;
@@ -1224,8 +1256,12 @@ impl From<ReduceOrderIxArgs> for ReduceOrderIxData {
     }
 }
 impl ReduceOrderIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REDUCE_ORDER_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1235,7 +1271,7 @@ impl ReduceOrderIxData {
                 ),
             ));
         }
-        Ok(Self(ReduceOrderIxArgs::deserialize(buf)?))
+        Ok(Self(ReduceOrderIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REDUCE_ORDER_IX_DISCM])?;
@@ -1411,8 +1447,12 @@ impl From<ReduceOrderWithFreeFundsIxArgs> for ReduceOrderWithFreeFundsIxData {
     }
 }
 impl ReduceOrderWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1422,7 +1462,9 @@ impl ReduceOrderWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(ReduceOrderWithFreeFundsIxArgs::deserialize(buf)?))
+        Ok(Self(ReduceOrderWithFreeFundsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM])?;
@@ -1636,8 +1678,12 @@ impl From<CancelAllOrdersIxArgs> for CancelAllOrdersIxData {
     }
 }
 impl CancelAllOrdersIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_ALL_ORDERS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1647,7 +1693,7 @@ impl CancelAllOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(CancelAllOrdersIxArgs::deserialize(buf)?))
+        Ok(Self(CancelAllOrdersIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CANCEL_ALL_ORDERS_IX_DISCM])?;
@@ -1825,8 +1871,12 @@ impl From<CancelAllOrdersWithFreeFundsIxArgs> for CancelAllOrdersWithFreeFundsIx
     }
 }
 impl CancelAllOrdersWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -1836,7 +1886,9 @@ impl CancelAllOrdersWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(CancelAllOrdersWithFreeFundsIxArgs::deserialize(buf)?))
+        Ok(Self(CancelAllOrdersWithFreeFundsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM])?;
@@ -2055,8 +2107,12 @@ impl From<CancelUpToIxArgs> for CancelUpToIxData {
     }
 }
 impl CancelUpToIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_UP_TO_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2066,7 +2122,7 @@ impl CancelUpToIxData {
                 ),
             ));
         }
-        Ok(Self(CancelUpToIxArgs::deserialize(buf)?))
+        Ok(Self(CancelUpToIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CANCEL_UP_TO_IX_DISCM])?;
@@ -2242,8 +2298,12 @@ impl From<CancelUpToWithFreeFundsIxArgs> for CancelUpToWithFreeFundsIxData {
     }
 }
 impl CancelUpToWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_UP_TO_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2253,7 +2313,9 @@ impl CancelUpToWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(CancelUpToWithFreeFundsIxArgs::deserialize(buf)?))
+        Ok(Self(CancelUpToWithFreeFundsIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CANCEL_UP_TO_WITH_FREE_FUNDS_IX_DISCM])?;
@@ -2468,8 +2530,12 @@ impl From<CancelMultipleOrdersByIdIxArgs> for CancelMultipleOrdersByIdIxData {
     }
 }
 impl CancelMultipleOrdersByIdIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_MULTIPLE_ORDERS_BY_ID_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2479,7 +2545,9 @@ impl CancelMultipleOrdersByIdIxData {
                 ),
             ));
         }
-        Ok(Self(CancelMultipleOrdersByIdIxArgs::deserialize(buf)?))
+        Ok(Self(CancelMultipleOrdersByIdIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CANCEL_MULTIPLE_ORDERS_BY_ID_IX_DISCM])?;
@@ -2677,8 +2745,12 @@ impl From<CancelMultipleOrdersByIdWithFreeFundsIxArgs>
     }
 }
 impl CancelMultipleOrdersByIdWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2689,7 +2761,7 @@ impl CancelMultipleOrdersByIdWithFreeFundsIxData {
             ));
         }
         Ok(Self(
-            CancelMultipleOrdersByIdWithFreeFundsIxArgs::deserialize(buf)?,
+            CancelMultipleOrdersByIdWithFreeFundsIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -2910,8 +2982,12 @@ impl From<WithdrawFundsIxArgs> for WithdrawFundsIxData {
     }
 }
 impl WithdrawFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != WITHDRAW_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -2921,7 +2997,7 @@ impl WithdrawFundsIxData {
                 ),
             ));
         }
-        Ok(Self(WithdrawFundsIxArgs::deserialize(buf)?))
+        Ok(Self(WithdrawFundsIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[WITHDRAW_FUNDS_IX_DISCM])?;
@@ -3147,8 +3223,12 @@ impl From<DepositFundsIxArgs> for DepositFundsIxData {
     }
 }
 impl DepositFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != DEPOSIT_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3158,7 +3238,7 @@ impl DepositFundsIxData {
                 ),
             ));
         }
-        Ok(Self(DepositFundsIxArgs::deserialize(buf)?))
+        Ok(Self(DepositFundsIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[DEPOSIT_FUNDS_IX_DISCM])?;
@@ -3347,8 +3427,12 @@ impl From<RequestSeatIxArgs> for RequestSeatIxData {
     }
 }
 impl RequestSeatIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REQUEST_SEAT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3358,7 +3442,7 @@ impl RequestSeatIxData {
                 ),
             ));
         }
-        Ok(Self(RequestSeatIxArgs::deserialize(buf)?))
+        Ok(Self(RequestSeatIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REQUEST_SEAT_IX_DISCM])?;
@@ -3488,8 +3572,12 @@ impl From<LogIxArgs> for LogIxData {
     }
 }
 impl LogIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != LOG_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3499,7 +3587,7 @@ impl LogIxData {
                 ),
             ));
         }
-        Ok(Self(LogIxArgs::deserialize(buf)?))
+        Ok(Self(LogIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[LOG_IX_DISCM])?;
@@ -3710,8 +3798,12 @@ impl From<PlaceMultiplePostOnlyOrdersIxArgs> for PlaceMultiplePostOnlyOrdersIxDa
     }
 }
 impl PlaceMultiplePostOnlyOrdersIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3721,7 +3813,9 @@ impl PlaceMultiplePostOnlyOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(PlaceMultiplePostOnlyOrdersIxArgs::deserialize(buf)?))
+        Ok(Self(PlaceMultiplePostOnlyOrdersIxArgs::deserialize(
+            &mut reader,
+        )?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM])?;
@@ -3927,8 +4021,12 @@ impl From<PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs>
     }
 }
 impl PlaceMultiplePostOnlyOrdersWithFreeFundsIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -3939,7 +4037,7 @@ impl PlaceMultiplePostOnlyOrdersWithFreeFundsIxData {
             ));
         }
         Ok(Self(
-            PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs::deserialize(buf)?,
+            PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs::deserialize(&mut reader)?,
         ))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
@@ -4172,8 +4270,12 @@ impl From<InitializeMarketIxArgs> for InitializeMarketIxData {
     }
 }
 impl InitializeMarketIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != INITIALIZE_MARKET_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4183,7 +4285,7 @@ impl InitializeMarketIxData {
                 ),
             ));
         }
-        Ok(Self(InitializeMarketIxArgs::deserialize(buf)?))
+        Ok(Self(InitializeMarketIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[INITIALIZE_MARKET_IX_DISCM])?;
@@ -4357,8 +4459,12 @@ impl From<ClaimAuthorityIxArgs> for ClaimAuthorityIxData {
     }
 }
 impl ClaimAuthorityIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CLAIM_AUTHORITY_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4368,7 +4474,7 @@ impl ClaimAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(ClaimAuthorityIxArgs::deserialize(buf)?))
+        Ok(Self(ClaimAuthorityIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CLAIM_AUTHORITY_IX_DISCM])?;
@@ -4533,8 +4639,12 @@ impl From<NameSuccessorIxArgs> for NameSuccessorIxData {
     }
 }
 impl NameSuccessorIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != NAME_SUCCESSOR_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4544,7 +4654,7 @@ impl NameSuccessorIxData {
                 ),
             ));
         }
-        Ok(Self(NameSuccessorIxArgs::deserialize(buf)?))
+        Ok(Self(NameSuccessorIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[NAME_SUCCESSOR_IX_DISCM])?;
@@ -4709,8 +4819,12 @@ impl From<ChangeMarketStatusIxArgs> for ChangeMarketStatusIxData {
     }
 }
 impl ChangeMarketStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CHANGE_MARKET_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4720,7 +4834,7 @@ impl ChangeMarketStatusIxData {
                 ),
             ));
         }
-        Ok(Self(ChangeMarketStatusIxArgs::deserialize(buf)?))
+        Ok(Self(ChangeMarketStatusIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CHANGE_MARKET_STATUS_IX_DISCM])?;
@@ -4895,8 +5009,12 @@ impl From<ChangeSeatStatusIxArgs> for ChangeSeatStatusIxData {
     }
 }
 impl ChangeSeatStatusIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CHANGE_SEAT_STATUS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -4906,7 +5024,7 @@ impl ChangeSeatStatusIxData {
                 ),
             ));
         }
-        Ok(Self(ChangeSeatStatusIxArgs::deserialize(buf)?))
+        Ok(Self(ChangeSeatStatusIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CHANGE_SEAT_STATUS_IX_DISCM])?;
@@ -5100,8 +5218,12 @@ impl From<RequestSeatAuthorizedIxArgs> for RequestSeatAuthorizedIxData {
     }
 }
 impl RequestSeatAuthorizedIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != REQUEST_SEAT_AUTHORIZED_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5111,7 +5233,7 @@ impl RequestSeatAuthorizedIxData {
                 ),
             ));
         }
-        Ok(Self(RequestSeatAuthorizedIxArgs::deserialize(buf)?))
+        Ok(Self(RequestSeatAuthorizedIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[REQUEST_SEAT_AUTHORIZED_IX_DISCM])?;
@@ -5336,8 +5458,12 @@ impl From<EvictSeatIxArgs> for EvictSeatIxData {
     }
 }
 impl EvictSeatIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != EVICT_SEAT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5347,7 +5473,7 @@ impl EvictSeatIxData {
                 ),
             ));
         }
-        Ok(Self(EvictSeatIxArgs::deserialize(buf)?))
+        Ok(Self(EvictSeatIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[EVICT_SEAT_IX_DISCM])?;
@@ -5586,8 +5712,12 @@ impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
     }
 }
 impl ForceCancelOrdersIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != FORCE_CANCEL_ORDERS_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5597,7 +5727,7 @@ impl ForceCancelOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(ForceCancelOrdersIxArgs::deserialize(buf)?))
+        Ok(Self(ForceCancelOrdersIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[FORCE_CANCEL_ORDERS_IX_DISCM])?;
@@ -5800,8 +5930,12 @@ impl From<CollectFeesIxArgs> for CollectFeesIxData {
     }
 }
 impl CollectFeesIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != COLLECT_FEES_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -5811,7 +5945,7 @@ impl CollectFeesIxData {
                 ),
             ));
         }
-        Ok(Self(CollectFeesIxArgs::deserialize(buf)?))
+        Ok(Self(CollectFeesIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[COLLECT_FEES_IX_DISCM])?;
@@ -5990,8 +6124,12 @@ impl From<ChangeFeeRecipientIxArgs> for ChangeFeeRecipientIxData {
     }
 }
 impl ChangeFeeRecipientIxData {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = u8::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm_buf = [0u8; 1];
+        reader.read_exact(&mut maybe_discm_buf)?;
+        let maybe_discm = maybe_discm_buf[0];
         if maybe_discm != CHANGE_FEE_RECIPIENT_IX_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -6001,7 +6139,7 @@ impl ChangeFeeRecipientIxData {
                 ),
             ));
         }
-        Ok(Self(ChangeFeeRecipientIxArgs::deserialize(buf)?))
+        Ok(Self(ChangeFeeRecipientIxArgs::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[CHANGE_FEE_RECIPIENT_IX_DISCM])?;

@@ -247,8 +247,11 @@ impl ToTokens for NamedInstruction {
             }
 
             impl #ix_data_ident {
-                pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-                    let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+                    use std::io::Read;
+                    let mut reader = buf;
+                    let mut maybe_discm = [0u8; 8];
+                    reader.read_exact(&mut maybe_discm)?;
                     if maybe_discm != #discm_ident {
                         return Err(
                             std::io::Error::new(
@@ -256,7 +259,7 @@ impl ToTokens for NamedInstruction {
                             )
                         );
                     }
-                    Ok(Self(#ix_args_ident::deserialize(buf)?))
+                    Ok(Self(#ix_args_ident::deserialize(&mut reader)?))
                 }
 
                 pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {

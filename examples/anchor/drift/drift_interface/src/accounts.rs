@@ -19,8 +19,11 @@ pub struct PhoenixV1FulfillmentConfig {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PhoenixV1FulfillmentConfigAccount(pub PhoenixV1FulfillmentConfig);
 impl PhoenixV1FulfillmentConfigAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -30,7 +33,7 @@ impl PhoenixV1FulfillmentConfigAccount {
                 ),
             ));
         }
-        Ok(Self(PhoenixV1FulfillmentConfig::deserialize(buf)?))
+        Ok(Self(PhoenixV1FulfillmentConfig::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM)?;
@@ -66,8 +69,11 @@ pub struct SerumV3FulfillmentConfig {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SerumV3FulfillmentConfigAccount(pub SerumV3FulfillmentConfig);
 impl SerumV3FulfillmentConfigAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -77,7 +83,7 @@ impl SerumV3FulfillmentConfigAccount {
                 ),
             ));
         }
-        Ok(Self(SerumV3FulfillmentConfig::deserialize(buf)?))
+        Ok(Self(SerumV3FulfillmentConfig::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM)?;
@@ -107,8 +113,11 @@ pub struct InsuranceFundStake {
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsuranceFundStakeAccount(pub InsuranceFundStake);
 impl InsuranceFundStakeAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != INSURANCE_FUND_STAKE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -118,7 +127,7 @@ impl InsuranceFundStakeAccount {
                 ),
             ));
         }
-        Ok(Self(InsuranceFundStake::deserialize(buf)?))
+        Ok(Self(InsuranceFundStake::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&INSURANCE_FUND_STAKE_ACCOUNT_DISCM)?;
@@ -166,8 +175,11 @@ pub struct PerpMarket {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PerpMarketAccount(pub PerpMarket);
 impl PerpMarketAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != PERP_MARKET_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -177,7 +189,7 @@ impl PerpMarketAccount {
                 ),
             ));
         }
-        Ok(Self(PerpMarket::deserialize(buf)?))
+        Ok(Self(PerpMarket::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&PERP_MARKET_ACCOUNT_DISCM)?;
@@ -249,8 +261,11 @@ pub struct SpotMarket {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpotMarketAccount(pub SpotMarket);
 impl SpotMarketAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != SPOT_MARKET_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -260,7 +275,7 @@ impl SpotMarketAccount {
                 ),
             ));
         }
-        Ok(Self(SpotMarket::deserialize(buf)?))
+        Ok(Self(SpotMarket::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&SPOT_MARKET_ACCOUNT_DISCM)?;
@@ -303,8 +318,11 @@ pub struct State {
 #[derive(Clone, Debug, PartialEq)]
 pub struct StateAccount(pub State);
 impl StateAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != STATE_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -314,7 +332,7 @@ impl StateAccount {
                 ),
             ));
         }
-        Ok(Self(State::deserialize(buf)?))
+        Ok(Self(State::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&STATE_ACCOUNT_DISCM)?;
@@ -361,8 +379,11 @@ pub struct User {
 #[derive(Clone, Debug, PartialEq)]
 pub struct UserAccount(pub User);
 impl UserAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != USER_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -372,7 +393,7 @@ impl UserAccount {
                 ),
             ));
         }
-        Ok(Self(User::deserialize(buf)?))
+        Ok(Self(User::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&USER_ACCOUNT_DISCM)?;
@@ -407,8 +428,11 @@ pub struct UserStats {
 #[derive(Clone, Debug, PartialEq)]
 pub struct UserStatsAccount(pub UserStats);
 impl UserStatsAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != USER_STATS_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -418,7 +442,7 @@ impl UserStatsAccount {
                 ),
             ));
         }
-        Ok(Self(UserStats::deserialize(buf)?))
+        Ok(Self(UserStats::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&USER_STATS_ACCOUNT_DISCM)?;
@@ -442,8 +466,11 @@ pub struct ReferrerName {
 #[derive(Clone, Debug, PartialEq)]
 pub struct ReferrerNameAccount(pub ReferrerName);
 impl ReferrerNameAccount {
-    pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
-        let maybe_discm = <[u8; 8]>::deserialize(buf)?;
+    pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
+        use std::io::Read;
+        let mut reader = buf;
+        let mut maybe_discm = [0u8; 8];
+        reader.read_exact(&mut maybe_discm)?;
         if maybe_discm != REFERRER_NAME_ACCOUNT_DISCM {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
@@ -453,7 +480,7 @@ impl ReferrerNameAccount {
                 ),
             ));
         }
-        Ok(Self(ReferrerName::deserialize(buf)?))
+        Ok(Self(ReferrerName::deserialize(&mut reader)?))
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&REFERRER_NAME_ACCOUNT_DISCM)?;
