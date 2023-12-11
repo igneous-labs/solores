@@ -24,7 +24,7 @@ pub enum MarinadeFinanceProgramIx {
     SetLpParams(SetLpParamsIxArgs),
     ConfigMarinade(ConfigMarinadeIxArgs),
     OrderUnstake(OrderUnstakeIxArgs),
-    Claim(ClaimIxArgs),
+    Claim,
     StakeReserve(StakeReserveIxArgs),
     UpdateActive(UpdateActiveIxArgs),
     UpdateDeactivated(UpdateDeactivatedIxArgs),
@@ -79,7 +79,7 @@ impl MarinadeFinanceProgramIx {
             ORDER_UNSTAKE_IX_DISCM => Ok(Self::OrderUnstake(OrderUnstakeIxArgs::deserialize(
                 &mut reader,
             )?)),
-            CLAIM_IX_DISCM => Ok(Self::Claim(ClaimIxArgs::deserialize(&mut reader)?)),
+            CLAIM_IX_DISCM => Ok(Self::Claim),
             STAKE_RESERVE_IX_DISCM => Ok(Self::StakeReserve(StakeReserveIxArgs::deserialize(
                 &mut reader,
             )?)),
@@ -162,10 +162,7 @@ impl MarinadeFinanceProgramIx {
                 ORDER_UNSTAKE_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::Claim(args) => {
-                CLAIM_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::Claim => CLAIM_IX_DISCM.serialize(&mut writer),
             Self::StakeReserve(args) => {
                 STAKE_RESERVE_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -3563,16 +3560,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN]>
     }
 }
 pub const CLAIM_IX_DISCM: [u8; 8] = [62, 198, 214, 193, 213, 159, 108, 210];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ClaimIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ClaimIxData(pub ClaimIxArgs);
-impl From<ClaimIxArgs> for ClaimIxData {
-    fn from(args: ClaimIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ClaimIxData;
 impl ClaimIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -3588,11 +3577,10 @@ impl ClaimIxData {
                 ),
             ));
         }
-        Ok(Self(ClaimIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&CLAIM_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&CLAIM_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -3600,34 +3588,25 @@ impl ClaimIxData {
         Ok(data)
     }
 }
-pub fn claim_ix<K: Into<ClaimKeys>, A: Into<ClaimIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn claim_ix<K: Into<ClaimKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: ClaimKeys = accounts.into();
     let metas: [AccountMeta; CLAIM_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ClaimIxArgs = args.into();
-    let data: ClaimIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ClaimIxData.try_to_vec()?,
     })
 }
-pub fn claim_invoke<'info, A: Into<ClaimIxArgs>>(
-    accounts: &ClaimAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = claim_ix(accounts, args)?;
+pub fn claim_invoke<'info>(accounts: &ClaimAccounts<'_, 'info>) -> ProgramResult {
+    let ix = claim_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn claim_invoke_signed<'info, A: Into<ClaimIxArgs>>(
+pub fn claim_invoke_signed<'info>(
     accounts: &ClaimAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = claim_ix(accounts, args)?;
+    let ix = claim_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }

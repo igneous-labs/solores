@@ -10,17 +10,17 @@ use solana_program::{
 };
 #[derive(Clone, Debug, PartialEq)]
 pub enum UnstakeProgramIx {
-    InitProtocolFee(InitProtocolFeeIxArgs),
+    InitProtocolFee,
     SetProtocolFee(SetProtocolFeeIxArgs),
     CreatePool(CreatePoolIxArgs),
     AddLiquidity(AddLiquidityIxArgs),
     RemoveLiquidity(RemoveLiquidityIxArgs),
     SetFee(SetFeeIxArgs),
-    SetFeeAuthority(SetFeeAuthorityIxArgs),
-    DeactivateStakeAccount(DeactivateStakeAccountIxArgs),
-    ReclaimStakeAccount(ReclaimStakeAccountIxArgs),
-    Unstake(UnstakeIxArgs),
-    UnstakeWsol(UnstakeWsolIxArgs),
+    SetFeeAuthority,
+    DeactivateStakeAccount,
+    ReclaimStakeAccount,
+    Unstake,
+    UnstakeWsol,
 }
 impl UnstakeProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
@@ -29,9 +29,7 @@ impl UnstakeProgramIx {
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
         match maybe_discm {
-            INIT_PROTOCOL_FEE_IX_DISCM => Ok(Self::InitProtocolFee(
-                InitProtocolFeeIxArgs::deserialize(&mut reader)?,
-            )),
+            INIT_PROTOCOL_FEE_IX_DISCM => Ok(Self::InitProtocolFee),
             SET_PROTOCOL_FEE_IX_DISCM => Ok(Self::SetProtocolFee(
                 SetProtocolFeeIxArgs::deserialize(&mut reader)?,
             )),
@@ -45,19 +43,11 @@ impl UnstakeProgramIx {
                 RemoveLiquidityIxArgs::deserialize(&mut reader)?,
             )),
             SET_FEE_IX_DISCM => Ok(Self::SetFee(SetFeeIxArgs::deserialize(&mut reader)?)),
-            SET_FEE_AUTHORITY_IX_DISCM => Ok(Self::SetFeeAuthority(
-                SetFeeAuthorityIxArgs::deserialize(&mut reader)?,
-            )),
-            DEACTIVATE_STAKE_ACCOUNT_IX_DISCM => Ok(Self::DeactivateStakeAccount(
-                DeactivateStakeAccountIxArgs::deserialize(&mut reader)?,
-            )),
-            RECLAIM_STAKE_ACCOUNT_IX_DISCM => Ok(Self::ReclaimStakeAccount(
-                ReclaimStakeAccountIxArgs::deserialize(&mut reader)?,
-            )),
-            UNSTAKE_IX_DISCM => Ok(Self::Unstake(UnstakeIxArgs::deserialize(&mut reader)?)),
-            UNSTAKE_WSOL_IX_DISCM => Ok(Self::UnstakeWsol(UnstakeWsolIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            SET_FEE_AUTHORITY_IX_DISCM => Ok(Self::SetFeeAuthority),
+            DEACTIVATE_STAKE_ACCOUNT_IX_DISCM => Ok(Self::DeactivateStakeAccount),
+            RECLAIM_STAKE_ACCOUNT_IX_DISCM => Ok(Self::ReclaimStakeAccount),
+            UNSTAKE_IX_DISCM => Ok(Self::Unstake),
+            UNSTAKE_WSOL_IX_DISCM => Ok(Self::UnstakeWsol),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!("discm {:?} not found", maybe_discm),
@@ -66,10 +56,7 @@ impl UnstakeProgramIx {
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
-            Self::InitProtocolFee(args) => {
-                INIT_PROTOCOL_FEE_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::InitProtocolFee => INIT_PROTOCOL_FEE_IX_DISCM.serialize(&mut writer),
             Self::SetProtocolFee(args) => {
                 SET_PROTOCOL_FEE_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -90,26 +77,13 @@ impl UnstakeProgramIx {
                 SET_FEE_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::SetFeeAuthority(args) => {
-                SET_FEE_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::SetFeeAuthority => SET_FEE_AUTHORITY_IX_DISCM.serialize(&mut writer),
+            Self::DeactivateStakeAccount => {
+                DEACTIVATE_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer)
             }
-            Self::DeactivateStakeAccount(args) => {
-                DEACTIVATE_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::ReclaimStakeAccount(args) => {
-                RECLAIM_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::Unstake(args) => {
-                UNSTAKE_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::UnstakeWsol(args) => {
-                UNSTAKE_WSOL_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::ReclaimStakeAccount => RECLAIM_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer),
+            Self::Unstake => UNSTAKE_IX_DISCM.serialize(&mut writer),
+            Self::UnstakeWsol => UNSTAKE_WSOL_IX_DISCM.serialize(&mut writer),
         }
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -193,16 +167,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LE
     }
 }
 pub const INIT_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [225, 155, 167, 170, 29, 145, 165, 90];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InitProtocolFeeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct InitProtocolFeeIxData(pub InitProtocolFeeIxArgs);
-impl From<InitProtocolFeeIxArgs> for InitProtocolFeeIxData {
-    fn from(args: InitProtocolFeeIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct InitProtocolFeeIxData;
 impl InitProtocolFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -218,11 +184,10 @@ impl InitProtocolFeeIxData {
                 ),
             ));
         }
-        Ok(Self(InitProtocolFeeIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&INIT_PROTOCOL_FEE_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&INIT_PROTOCOL_FEE_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -230,34 +195,29 @@ impl InitProtocolFeeIxData {
         Ok(data)
     }
 }
-pub fn init_protocol_fee_ix<K: Into<InitProtocolFeeKeys>, A: Into<InitProtocolFeeIxArgs>>(
+pub fn init_protocol_fee_ix<K: Into<InitProtocolFeeKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitProtocolFeeKeys = accounts.into();
     let metas: [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: InitProtocolFeeIxArgs = args.into();
-    let data: InitProtocolFeeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: InitProtocolFeeIxData.try_to_vec()?,
     })
 }
-pub fn init_protocol_fee_invoke<'info, A: Into<InitProtocolFeeIxArgs>>(
+pub fn init_protocol_fee_invoke<'info>(
     accounts: &InitProtocolFeeAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = init_protocol_fee_ix(accounts, args)?;
+    let ix = init_protocol_fee_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn init_protocol_fee_invoke_signed<'info, A: Into<InitProtocolFeeIxArgs>>(
+pub fn init_protocol_fee_invoke_signed<'info>(
     accounts: &InitProtocolFeeAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = init_protocol_fee_ix(accounts, args)?;
+    let ix = init_protocol_fee_ix(accounts)?;
     let account_info: [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1462,16 +1422,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LE
     }
 }
 pub const SET_FEE_AUTHORITY_IX_DISCM: [u8; 8] = [31, 1, 50, 87, 237, 101, 97, 132];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct SetFeeAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct SetFeeAuthorityIxData(pub SetFeeAuthorityIxArgs);
-impl From<SetFeeAuthorityIxArgs> for SetFeeAuthorityIxData {
-    fn from(args: SetFeeAuthorityIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct SetFeeAuthorityIxData;
 impl SetFeeAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1487,11 +1439,10 @@ impl SetFeeAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(SetFeeAuthorityIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&SET_FEE_AUTHORITY_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&SET_FEE_AUTHORITY_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1499,34 +1450,29 @@ impl SetFeeAuthorityIxData {
         Ok(data)
     }
 }
-pub fn set_fee_authority_ix<K: Into<SetFeeAuthorityKeys>, A: Into<SetFeeAuthorityIxArgs>>(
+pub fn set_fee_authority_ix<K: Into<SetFeeAuthorityKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SetFeeAuthorityKeys = accounts.into();
     let metas: [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: SetFeeAuthorityIxArgs = args.into();
-    let data: SetFeeAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: SetFeeAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn set_fee_authority_invoke<'info, A: Into<SetFeeAuthorityIxArgs>>(
+pub fn set_fee_authority_invoke<'info>(
     accounts: &SetFeeAuthorityAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = set_fee_authority_ix(accounts, args)?;
+    let ix = set_fee_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn set_fee_authority_invoke_signed<'info, A: Into<SetFeeAuthorityIxArgs>>(
+pub fn set_fee_authority_invoke_signed<'info>(
     accounts: &SetFeeAuthorityAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = set_fee_authority_ix(accounts, args)?;
+    let ix = set_fee_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1657,16 +1603,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCO
     }
 }
 pub const DEACTIVATE_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [217, 64, 76, 16, 216, 77, 123, 226];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DeactivateStakeAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct DeactivateStakeAccountIxData(pub DeactivateStakeAccountIxArgs);
-impl From<DeactivateStakeAccountIxArgs> for DeactivateStakeAccountIxData {
-    fn from(args: DeactivateStakeAccountIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct DeactivateStakeAccountIxData;
 impl DeactivateStakeAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1682,13 +1620,10 @@ impl DeactivateStakeAccountIxData {
                 ),
             ));
         }
-        Ok(Self(DeactivateStakeAccountIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&DEACTIVATE_STAKE_ACCOUNT_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&DEACTIVATE_STAKE_ACCOUNT_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1696,38 +1631,30 @@ impl DeactivateStakeAccountIxData {
         Ok(data)
     }
 }
-pub fn deactivate_stake_account_ix<
-    K: Into<DeactivateStakeAccountKeys>,
-    A: Into<DeactivateStakeAccountIxArgs>,
->(
+pub fn deactivate_stake_account_ix<K: Into<DeactivateStakeAccountKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeactivateStakeAccountKeys = accounts.into();
     let metas: [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: DeactivateStakeAccountIxArgs = args.into();
-    let data: DeactivateStakeAccountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: DeactivateStakeAccountIxData.try_to_vec()?,
     })
 }
-pub fn deactivate_stake_account_invoke<'info, A: Into<DeactivateStakeAccountIxArgs>>(
+pub fn deactivate_stake_account_invoke<'info>(
     accounts: &DeactivateStakeAccountAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = deactivate_stake_account_ix(accounts, args)?;
+    let ix = deactivate_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deactivate_stake_account_invoke_signed<'info, A: Into<DeactivateStakeAccountIxArgs>>(
+pub fn deactivate_stake_account_invoke_signed<'info>(
     accounts: &DeactivateStakeAccountAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deactivate_stake_account_ix(accounts, args)?;
+    let ix = deactivate_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -1878,16 +1805,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNT
     }
 }
 pub const RECLAIM_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [47, 127, 90, 221, 10, 160, 183, 117];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ReclaimStakeAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ReclaimStakeAccountIxData(pub ReclaimStakeAccountIxArgs);
-impl From<ReclaimStakeAccountIxArgs> for ReclaimStakeAccountIxData {
-    fn from(args: ReclaimStakeAccountIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ReclaimStakeAccountIxData;
 impl ReclaimStakeAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1903,11 +1822,10 @@ impl ReclaimStakeAccountIxData {
                 ),
             ));
         }
-        Ok(Self(ReclaimStakeAccountIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&RECLAIM_STAKE_ACCOUNT_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&RECLAIM_STAKE_ACCOUNT_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1915,37 +1833,29 @@ impl ReclaimStakeAccountIxData {
         Ok(data)
     }
 }
-pub fn reclaim_stake_account_ix<
-    K: Into<ReclaimStakeAccountKeys>,
-    A: Into<ReclaimStakeAccountIxArgs>,
->(
+pub fn reclaim_stake_account_ix<K: Into<ReclaimStakeAccountKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ReclaimStakeAccountKeys = accounts.into();
     let metas: [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ReclaimStakeAccountIxArgs = args.into();
-    let data: ReclaimStakeAccountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ReclaimStakeAccountIxData.try_to_vec()?,
     })
 }
-pub fn reclaim_stake_account_invoke<'info, A: Into<ReclaimStakeAccountIxArgs>>(
+pub fn reclaim_stake_account_invoke<'info>(
     accounts: &ReclaimStakeAccountAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = reclaim_stake_account_ix(accounts, args)?;
+    let ix = reclaim_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn reclaim_stake_account_invoke_signed<'info, A: Into<ReclaimStakeAccountIxArgs>>(
+pub fn reclaim_stake_account_invoke_signed<'info>(
     accounts: &ReclaimStakeAccountAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = reclaim_stake_account_ix(accounts, args)?;
+    let ix = reclaim_stake_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2169,16 +2079,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN]>
     }
 }
 pub const UNSTAKE_IX_DISCM: [u8; 8] = [90, 95, 107, 42, 205, 124, 50, 225];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UnstakeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnstakeIxData(pub UnstakeIxArgs);
-impl From<UnstakeIxArgs> for UnstakeIxData {
-    fn from(args: UnstakeIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UnstakeIxData;
 impl UnstakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -2194,11 +2096,10 @@ impl UnstakeIxData {
                 ),
             ));
         }
-        Ok(Self(UnstakeIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UNSTAKE_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UNSTAKE_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -2206,34 +2107,25 @@ impl UnstakeIxData {
         Ok(data)
     }
 }
-pub fn unstake_ix<K: Into<UnstakeKeys>, A: Into<UnstakeIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn unstake_ix<K: Into<UnstakeKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: UnstakeKeys = accounts.into();
     let metas: [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UnstakeIxArgs = args.into();
-    let data: UnstakeIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UnstakeIxData.try_to_vec()?,
     })
 }
-pub fn unstake_invoke<'info, A: Into<UnstakeIxArgs>>(
-    accounts: &UnstakeAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = unstake_ix(accounts, args)?;
+pub fn unstake_invoke<'info>(accounts: &UnstakeAccounts<'_, 'info>) -> ProgramResult {
+    let ix = unstake_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn unstake_invoke_signed<'info, A: Into<UnstakeIxArgs>>(
+pub fn unstake_invoke_signed<'info>(
     accounts: &UnstakeAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = unstake_ix(accounts, args)?;
+    let ix = unstake_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2490,16 +2382,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN]>
     }
 }
 pub const UNSTAKE_WSOL_IX_DISCM: [u8; 8] = [125, 93, 190, 135, 89, 174, 142, 149];
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UnstakeWsolIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnstakeWsolIxData(pub UnstakeWsolIxArgs);
-impl From<UnstakeWsolIxArgs> for UnstakeWsolIxData {
-    fn from(args: UnstakeWsolIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UnstakeWsolIxData;
 impl UnstakeWsolIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -2515,11 +2399,10 @@ impl UnstakeWsolIxData {
                 ),
             ));
         }
-        Ok(Self(UnstakeWsolIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&UNSTAKE_WSOL_IX_DISCM)?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&UNSTAKE_WSOL_IX_DISCM)
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -2527,34 +2410,25 @@ impl UnstakeWsolIxData {
         Ok(data)
     }
 }
-pub fn unstake_wsol_ix<K: Into<UnstakeWsolKeys>, A: Into<UnstakeWsolIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn unstake_wsol_ix<K: Into<UnstakeWsolKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: UnstakeWsolKeys = accounts.into();
     let metas: [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UnstakeWsolIxArgs = args.into();
-    let data: UnstakeWsolIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UnstakeWsolIxData.try_to_vec()?,
     })
 }
-pub fn unstake_wsol_invoke<'info, A: Into<UnstakeWsolIxArgs>>(
-    accounts: &UnstakeWsolAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = unstake_wsol_ix(accounts, args)?;
+pub fn unstake_wsol_invoke<'info>(accounts: &UnstakeWsolAccounts<'_, 'info>) -> ProgramResult {
+    let ix = unstake_wsol_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn unstake_wsol_invoke_signed<'info, A: Into<UnstakeWsolIxArgs>>(
+pub fn unstake_wsol_invoke_signed<'info>(
     accounts: &UnstakeWsolAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = unstake_wsol_ix(accounts, args)?;
+    let ix = unstake_wsol_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
