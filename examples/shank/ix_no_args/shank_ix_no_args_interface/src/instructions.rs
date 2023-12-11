@@ -1,4 +1,3 @@
-use borsh::BorshSerialize;
 use solana_program::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
@@ -7,13 +6,13 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
 pub enum ShankIxNoArgsProgramIx {
     NoArgsIx,
 }
 impl ShankIxNoArgsProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -28,7 +27,7 @@ impl ShankIxNoArgsProgramIx {
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
-            Self::NoArgsIx => NO_ARGS_IX_IX_DISCM.serialize(&mut writer),
+            Self::NoArgsIx => writer.write_all(&[NO_ARGS_IX_IX_DISCM]),
         }
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -84,7 +83,6 @@ pub const NO_ARGS_IX_IX_DISCM: u8 = 69u8;
 pub struct NoArgsIxIxData;
 impl NoArgsIxIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;

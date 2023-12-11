@@ -293,7 +293,6 @@ impl NamedInstruction {
         let discm_ident = self.discm_ident();
         let ix_data_ident = self.ix_data_ident();
         let mut deserialize_body = quote! {
-            use std::io::Read;
             let mut reader = buf;
             let mut maybe_discm_buf = [0u8; 1];
             reader.read_exact(&mut maybe_discm_buf)?;

@@ -18,6 +18,15 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
     }
 
     fn gen_head(&self) -> TokenStream {
+        let mut res = quote! {};
+        for ix in self.instructions {
+            if ix.has_ix_args() {
+                res.extend(quote! {
+                    use borsh::{BorshDeserialize, BorshSerialize};
+                });
+                break;
+            }
+        }
         let mut solana_program_imports = quote! {
             account_info::AccountInfo,
             entrypoint::ProgramResult,
@@ -33,10 +42,10 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 break;
             }
         }
-        let mut res = quote! {
-            use borsh::{BorshDeserialize, BorshSerialize};
+        res.extend(quote! {
             use solana_program::{#solana_program_imports};
-        };
+            use std::io::Read;
+        });
 
         for ix in self.instructions {
             if ix.args_has_defined_type() {
@@ -64,7 +73,6 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
             impl #program_ix_enum_ident {
                 pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-                    use std::io::Read;
                     let mut reader = buf;
                     let mut maybe_discm_buf = [0u8; 1];
                     reader.read_exact(&mut maybe_discm_buf)?;
@@ -123,11 +131,11 @@ pub fn serialize_variant_match_arm(ix: &NamedInstruction) -> TokenStream {
     let discm_ident = ix.discm_ident();
     let serialize_expr = if ix.has_ix_args() {
         quote! {{
-            #discm_ident.serialize(&mut writer)?;
+            writer.write_all(&[#discm_ident])?;
             args.serialize(&mut writer)
         }}
     } else {
-        quote! { #discm_ident.serialize(&mut writer) }
+        quote! { writer.write_all(&[#discm_ident]) }
     };
     let mut left_matched = quote! { Self::#variant_ident };
     if ix.has_ix_args() {

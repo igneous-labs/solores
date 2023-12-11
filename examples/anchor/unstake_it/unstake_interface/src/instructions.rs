@@ -8,6 +8,7 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
 pub enum UnstakeProgramIx {
     InitProtocolFee,
@@ -24,7 +25,6 @@ pub enum UnstakeProgramIx {
 }
 impl UnstakeProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -56,34 +56,32 @@ impl UnstakeProgramIx {
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
-            Self::InitProtocolFee => INIT_PROTOCOL_FEE_IX_DISCM.serialize(&mut writer),
+            Self::InitProtocolFee => writer.write_all(&INIT_PROTOCOL_FEE_IX_DISCM),
             Self::SetProtocolFee(args) => {
-                SET_PROTOCOL_FEE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SET_PROTOCOL_FEE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::CreatePool(args) => {
-                CREATE_POOL_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&CREATE_POOL_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::AddLiquidity(args) => {
-                ADD_LIQUIDITY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&ADD_LIQUIDITY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::RemoveLiquidity(args) => {
-                REMOVE_LIQUIDITY_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&REMOVE_LIQUIDITY_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
             Self::SetFee(args) => {
-                SET_FEE_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&SET_FEE_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
-            Self::SetFeeAuthority => SET_FEE_AUTHORITY_IX_DISCM.serialize(&mut writer),
-            Self::DeactivateStakeAccount => {
-                DEACTIVATE_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer)
-            }
-            Self::ReclaimStakeAccount => RECLAIM_STAKE_ACCOUNT_IX_DISCM.serialize(&mut writer),
-            Self::Unstake => UNSTAKE_IX_DISCM.serialize(&mut writer),
-            Self::UnstakeWsol => UNSTAKE_WSOL_IX_DISCM.serialize(&mut writer),
+            Self::SetFeeAuthority => writer.write_all(&SET_FEE_AUTHORITY_IX_DISCM),
+            Self::DeactivateStakeAccount => writer.write_all(&DEACTIVATE_STAKE_ACCOUNT_IX_DISCM),
+            Self::ReclaimStakeAccount => writer.write_all(&RECLAIM_STAKE_ACCOUNT_IX_DISCM),
+            Self::Unstake => writer.write_all(&UNSTAKE_IX_DISCM),
+            Self::UnstakeWsol => writer.write_all(&UNSTAKE_WSOL_IX_DISCM),
         }
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -171,7 +169,6 @@ pub const INIT_PROTOCOL_FEE_IX_DISCM: [u8; 8] = [225, 155, 167, 170, 29, 145, 16
 pub struct InitProtocolFeeIxData;
 impl InitProtocolFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -332,7 +329,6 @@ impl From<SetProtocolFeeIxArgs> for SetProtocolFeeIxData {
 }
 impl SetProtocolFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -575,7 +571,6 @@ impl From<CreatePoolIxArgs> for CreatePoolIxData {
 }
 impl CreatePoolIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -810,7 +805,6 @@ impl From<AddLiquidityIxArgs> for AddLiquidityIxData {
 }
 impl AddLiquidityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1050,7 +1044,6 @@ impl From<RemoveLiquidityIxArgs> for RemoveLiquidityIxData {
 }
 impl RemoveLiquidityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1259,7 +1252,6 @@ impl From<SetFeeIxArgs> for SetFeeIxData {
 }
 impl SetFeeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1426,7 +1418,6 @@ pub const SET_FEE_AUTHORITY_IX_DISCM: [u8; 8] = [31, 1, 50, 87, 237, 101, 97, 13
 pub struct SetFeeAuthorityIxData;
 impl SetFeeAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1607,7 +1598,6 @@ pub const DEACTIVATE_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [217, 64, 76, 16, 216, 77
 pub struct DeactivateStakeAccountIxData;
 impl DeactivateStakeAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -1809,7 +1799,6 @@ pub const RECLAIM_STAKE_ACCOUNT_IX_DISCM: [u8; 8] = [47, 127, 90, 221, 10, 160, 
 pub struct ReclaimStakeAccountIxData;
 impl ReclaimStakeAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2083,7 +2072,6 @@ pub const UNSTAKE_IX_DISCM: [u8; 8] = [90, 95, 107, 42, 205, 124, 50, 225];
 pub struct UnstakeIxData;
 impl UnstakeIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -2386,7 +2374,6 @@ pub const UNSTAKE_WSOL_IX_DISCM: [u8; 8] = [125, 93, 190, 135, 89, 174, 142, 149
 pub struct UnstakeWsolIxData;
 impl UnstakeWsolIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;

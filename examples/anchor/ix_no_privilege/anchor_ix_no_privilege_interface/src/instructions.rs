@@ -6,13 +6,13 @@ use solana_program::{
     program::{invoke, invoke_signed},
     pubkey::Pubkey,
 };
+use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
 pub enum AnchorIxNoPrivilegeProgramIx {
     NoPrivilegedAccountIx(NoPrivilegedAccountIxIxArgs),
 }
 impl AnchorIxNoPrivilegeProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;
@@ -29,7 +29,7 @@ impl AnchorIxNoPrivilegeProgramIx {
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
             Self::NoPrivilegedAccountIx(args) => {
-                NO_PRIVILEGED_ACCOUNT_IX_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&NO_PRIVILEGED_ACCOUNT_IX_IX_DISCM)?;
                 args.serialize(&mut writer)
             }
         }
@@ -97,7 +97,6 @@ impl From<NoPrivilegedAccountIxIxArgs> for NoPrivilegedAccountIxIxData {
 }
 impl NoPrivilegedAccountIxIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm = [0u8; 8];
         reader.read_exact(&mut maybe_discm)?;

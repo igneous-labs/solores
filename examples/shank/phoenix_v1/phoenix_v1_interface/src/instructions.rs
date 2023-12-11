@@ -8,6 +8,7 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
 pub enum PhoenixV1ProgramIx {
     Swap(SwapIxArgs),
@@ -41,7 +42,6 @@ pub enum PhoenixV1ProgramIx {
 }
 impl PhoenixV1ProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -124,92 +124,92 @@ impl PhoenixV1ProgramIx {
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         match self {
             Self::Swap(args) => {
-                SWAP_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[SWAP_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::SwapWithFreeFunds(args) => {
-                SWAP_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[SWAP_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::PlaceLimitOrder(args) => {
-                PLACE_LIMIT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[PLACE_LIMIT_ORDER_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::PlaceLimitOrderWithFreeFunds(args) => {
-                PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::ReduceOrder(args) => {
-                REDUCE_ORDER_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[REDUCE_ORDER_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::ReduceOrderWithFreeFunds(args) => {
-                REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
-            Self::CancelAllOrders => CANCEL_ALL_ORDERS_IX_DISCM.serialize(&mut writer),
+            Self::CancelAllOrders => writer.write_all(&[CANCEL_ALL_ORDERS_IX_DISCM]),
             Self::CancelAllOrdersWithFreeFunds => {
-                CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)
+                writer.write_all(&[CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM])
             }
             Self::CancelUpTo(args) => {
-                CANCEL_UP_TO_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CANCEL_UP_TO_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::CancelUpToWithFreeFunds(args) => {
-                CANCEL_UP_TO_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CANCEL_UP_TO_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::CancelMultipleOrdersById(args) => {
-                CANCEL_MULTIPLE_ORDERS_BY_ID_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CANCEL_MULTIPLE_ORDERS_BY_ID_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::CancelMultipleOrdersByIdWithFreeFunds(args) => {
-                CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::WithdrawFunds(args) => {
-                WITHDRAW_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[WITHDRAW_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::DepositFunds(args) => {
-                DEPOSIT_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[DEPOSIT_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
-            Self::RequestSeat => REQUEST_SEAT_IX_DISCM.serialize(&mut writer),
-            Self::Log => LOG_IX_DISCM.serialize(&mut writer),
+            Self::RequestSeat => writer.write_all(&[REQUEST_SEAT_IX_DISCM]),
+            Self::Log => writer.write_all(&[LOG_IX_DISCM]),
             Self::PlaceMultiplePostOnlyOrders(args) => {
-                PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::PlaceMultiplePostOnlyOrdersWithFreeFunds(args) => {
-                PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::InitializeMarket(args) => {
-                INITIALIZE_MARKET_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[INITIALIZE_MARKET_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
-            Self::ClaimAuthority => CLAIM_AUTHORITY_IX_DISCM.serialize(&mut writer),
+            Self::ClaimAuthority => writer.write_all(&[CLAIM_AUTHORITY_IX_DISCM]),
             Self::NameSuccessor(args) => {
-                NAME_SUCCESSOR_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[NAME_SUCCESSOR_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::ChangeMarketStatus(args) => {
-                CHANGE_MARKET_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CHANGE_MARKET_STATUS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
             Self::ChangeSeatStatus(args) => {
-                CHANGE_SEAT_STATUS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[CHANGE_SEAT_STATUS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
-            Self::RequestSeatAuthorized => REQUEST_SEAT_AUTHORIZED_IX_DISCM.serialize(&mut writer),
-            Self::EvictSeat => EVICT_SEAT_IX_DISCM.serialize(&mut writer),
+            Self::RequestSeatAuthorized => writer.write_all(&[REQUEST_SEAT_AUTHORIZED_IX_DISCM]),
+            Self::EvictSeat => writer.write_all(&[EVICT_SEAT_IX_DISCM]),
             Self::ForceCancelOrders(args) => {
-                FORCE_CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
+                writer.write_all(&[FORCE_CANCEL_ORDERS_IX_DISCM])?;
                 args.serialize(&mut writer)
             }
-            Self::CollectFees => COLLECT_FEES_IX_DISCM.serialize(&mut writer),
-            Self::ChangeFeeRecipient => CHANGE_FEE_RECIPIENT_IX_DISCM.serialize(&mut writer),
+            Self::CollectFees => writer.write_all(&[COLLECT_FEES_IX_DISCM]),
+            Self::ChangeFeeRecipient => writer.write_all(&[CHANGE_FEE_RECIPIENT_IX_DISCM]),
         }
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -387,7 +387,6 @@ impl From<SwapIxArgs> for SwapIxData {
 }
 impl SwapIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -603,7 +602,6 @@ impl From<SwapWithFreeFundsIxArgs> for SwapWithFreeFundsIxData {
 }
 impl SwapWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -874,7 +872,6 @@ impl From<PlaceLimitOrderIxArgs> for PlaceLimitOrderIxData {
 }
 impl PlaceLimitOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -1097,7 +1094,6 @@ impl From<PlaceLimitOrderWithFreeFundsIxArgs> for PlaceLimitOrderWithFreeFundsIx
 }
 impl PlaceLimitOrderWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -1370,7 +1366,6 @@ impl From<ReduceOrderIxArgs> for ReduceOrderIxData {
 }
 impl ReduceOrderIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -1577,7 +1572,6 @@ impl From<ReduceOrderWithFreeFundsIxArgs> for ReduceOrderWithFreeFundsIxData {
 }
 impl ReduceOrderWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -1836,7 +1830,6 @@ pub const CANCEL_ALL_ORDERS_IX_DISCM: u8 = 6u8;
 pub struct CancelAllOrdersIxData;
 impl CancelAllOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -2031,7 +2024,6 @@ pub const CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM: u8 = 7u8;
 pub struct CancelAllOrdersWithFreeFundsIxData;
 impl CancelAllOrdersWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -2286,7 +2278,6 @@ impl From<CancelUpToIxArgs> for CancelUpToIxData {
 }
 impl CancelUpToIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -2493,7 +2484,6 @@ impl From<CancelUpToWithFreeFundsIxArgs> for CancelUpToWithFreeFundsIxData {
 }
 impl CancelUpToWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -2761,7 +2751,6 @@ impl From<CancelMultipleOrdersByIdIxArgs> for CancelMultipleOrdersByIdIxData {
 }
 impl CancelMultipleOrdersByIdIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -2992,7 +2981,6 @@ impl From<CancelMultipleOrdersByIdWithFreeFundsIxArgs>
 }
 impl CancelMultipleOrdersByIdWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -3265,7 +3253,6 @@ impl From<WithdrawFundsIxArgs> for WithdrawFundsIxData {
 }
 impl WithdrawFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -3546,7 +3533,6 @@ impl From<DepositFundsIxArgs> for DepositFundsIxData {
 }
 impl DepositFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -3766,7 +3752,6 @@ pub const REQUEST_SEAT_IX_DISCM: u8 = 14u8;
 pub struct RequestSeatIxData;
 impl RequestSeatIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -3897,7 +3882,6 @@ pub const LOG_IX_DISCM: u8 = 15u8;
 pub struct LogIxData;
 impl LogIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -4153,7 +4137,6 @@ impl From<PlaceMultiplePostOnlyOrdersIxArgs> for PlaceMultiplePostOnlyOrdersIxDa
 }
 impl PlaceMultiplePostOnlyOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -4396,7 +4379,6 @@ impl From<PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs>
 }
 impl PlaceMultiplePostOnlyOrdersWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -4685,7 +4667,6 @@ impl From<InitializeMarketIxArgs> for InitializeMarketIxData {
 }
 impl InitializeMarketIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -4882,7 +4863,6 @@ pub const CLAIM_AUTHORITY_IX_DISCM: u8 = 101u8;
 pub struct ClaimAuthorityIxData;
 impl ClaimAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -5072,7 +5052,6 @@ impl From<NameSuccessorIxArgs> for NameSuccessorIxData {
 }
 impl NameSuccessorIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -5268,7 +5247,6 @@ impl From<ChangeMarketStatusIxArgs> for ChangeMarketStatusIxData {
 }
 impl ChangeMarketStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -5478,7 +5456,6 @@ impl From<ChangeSeatStatusIxArgs> for ChangeSeatStatusIxData {
 }
 impl ChangeSeatStatusIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -5711,7 +5688,6 @@ pub const REQUEST_SEAT_AUTHORIZED_IX_DISCM: u8 = 105u8;
 pub struct RequestSeatAuthorizedIxData;
 impl RequestSeatAuthorizedIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -5978,7 +5954,6 @@ pub const EVICT_SEAT_IX_DISCM: u8 = 106u8;
 pub struct EvictSeatIxData;
 impl EvictSeatIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -6266,7 +6241,6 @@ impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
 }
 impl ForceCancelOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -6504,7 +6478,6 @@ pub const COLLECT_FEES_IX_DISCM: u8 = 108u8;
 pub struct CollectFeesIxData;
 impl CollectFeesIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
@@ -6700,7 +6673,6 @@ pub const CHANGE_FEE_RECIPIENT_IX_DISCM: u8 = 109u8;
 pub struct ChangeFeeRecipientIxData;
 impl ChangeFeeRecipientIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-        use std::io::Read;
         let mut reader = buf;
         let mut maybe_discm_buf = [0u8; 1];
         reader.read_exact(&mut maybe_discm_buf)?;
