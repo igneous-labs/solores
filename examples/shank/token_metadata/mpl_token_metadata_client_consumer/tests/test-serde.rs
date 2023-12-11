@@ -1,7 +1,6 @@
 use mpl_token_metadata_interface::{
     CreateMasterEditionArgs, CreateMasterEditionV3IxArgs, CreateMasterEditionV3IxData,
-    MplTokenMetadataProgramIx, RevokeUseAuthorityIxArgs, CREATE_MASTER_EDITION_V3_IX_DISCM,
-    REVOKE_USE_AUTHORITY_IX_DISCM,
+    MplTokenMetadataProgramIx, CREATE_MASTER_EDITION_V3_IX_DISCM, REVOKE_USE_AUTHORITY_IX_DISCM,
 };
 
 #[test]
@@ -19,7 +18,7 @@ fn test_ix_data_borsh_roundtrip() {
 
 #[test]
 fn test_program_ix_borsh_roundtrip() {
-    let program_ix = MplTokenMetadataProgramIx::RevokeUseAuthority(RevokeUseAuthorityIxArgs {});
+    let program_ix = MplTokenMetadataProgramIx::RevokeUseAuthority;
     let serialized = program_ix.try_to_vec().unwrap();
     assert_eq!(serialized[0], REVOKE_USE_AUTHORITY_IX_DISCM);
     let deserialized = MplTokenMetadataProgramIx::deserialize(&serialized).unwrap();

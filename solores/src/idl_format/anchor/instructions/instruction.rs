@@ -265,8 +265,8 @@ impl NamedInstruction {
 
     pub fn write_ix_data_struct(&self, tokens: &mut TokenStream) {
         let ix_data_ident = self.ix_data_ident();
-        let ix_args_ident = self.ix_args_ident();
         let struct_decl = if self.has_ix_args() {
+            let ix_args_ident = self.ix_args_ident();
             quote! { pub struct #ix_data_ident(pub #ix_args_ident); }
         } else {
             quote! { pub struct #ix_data_ident; }
@@ -437,6 +437,7 @@ impl NamedInstruction {
         });
     }
 
+    /// _invoke_signed()
     pub fn write_invoke_signed_fn(&self, tokens: &mut TokenStream) {
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", self.name.to_snake_case());
         let accounts_len_ident = self.accounts_len_ident();

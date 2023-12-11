@@ -13,36 +13,34 @@ pub enum MplTokenMetadataProgramIx {
     CreateMetadataAccount(CreateMetadataAccountIxArgs),
     UpdateMetadataAccount(UpdateMetadataAccountIxArgs),
     DeprecatedCreateMasterEdition(DeprecatedCreateMasterEditionIxArgs),
-    DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(
-        DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs,
-    ),
-    UpdatePrimarySaleHappenedViaToken(UpdatePrimarySaleHappenedViaTokenIxArgs),
+    DeprecatedMintNewEditionFromMasterEditionViaPrintingToken,
+    UpdatePrimarySaleHappenedViaToken,
     DeprecatedSetReservationList(DeprecatedSetReservationListIxArgs),
-    DeprecatedCreateReservationList(DeprecatedCreateReservationListIxArgs),
-    SignMetadata(SignMetadataIxArgs),
+    DeprecatedCreateReservationList,
+    SignMetadata,
     DeprecatedMintPrintingTokensViaToken(DeprecatedMintPrintingTokensViaTokenIxArgs),
     DeprecatedMintPrintingTokens(DeprecatedMintPrintingTokensIxArgs),
     CreateMasterEdition(CreateMasterEditionIxArgs),
     MintNewEditionFromMasterEditionViaToken(MintNewEditionFromMasterEditionViaTokenIxArgs),
-    ConvertMasterEditionV1ToV2(ConvertMasterEditionV1ToV2IxArgs),
+    ConvertMasterEditionV1ToV2,
     MintNewEditionFromMasterEditionViaVaultProxy(
         MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
     ),
-    PuffMetadata(PuffMetadataIxArgs),
+    PuffMetadata,
     UpdateMetadataAccountV2(UpdateMetadataAccountV2IxArgs),
     CreateMetadataAccountV2(CreateMetadataAccountV2IxArgs),
     CreateMasterEditionV3(CreateMasterEditionV3IxArgs),
-    VerifyCollection(VerifyCollectionIxArgs),
+    VerifyCollection,
     Utilize(UtilizeIxArgs),
     ApproveUseAuthority(ApproveUseAuthorityIxArgs),
-    RevokeUseAuthority(RevokeUseAuthorityIxArgs),
-    UnverifyCollection(UnverifyCollectionIxArgs),
-    ApproveCollectionAuthority(ApproveCollectionAuthorityIxArgs),
-    RevokeCollectionAuthority(RevokeCollectionAuthorityIxArgs),
-    SetAndVerifyCollection(SetAndVerifyCollectionIxArgs),
-    FreezeDelegatedAccount(FreezeDelegatedAccountIxArgs),
-    ThawDelegatedAccount(ThawDelegatedAccountIxArgs),
-    RemoveCreatorVerification(RemoveCreatorVerificationIxArgs),
+    RevokeUseAuthority,
+    UnverifyCollection,
+    ApproveCollectionAuthority,
+    RevokeCollectionAuthority,
+    SetAndVerifyCollection,
+    FreezeDelegatedAccount,
+    ThawDelegatedAccount,
+    RemoveCreatorVerification,
 }
 impl MplTokenMetadataProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
@@ -61,29 +59,19 @@ impl MplTokenMetadataProgramIx {
             DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM => Ok(Self::DeprecatedCreateMasterEdition(
                 DeprecatedCreateMasterEditionIxArgs::deserialize(&mut reader)?,
             )),
-            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM => Ok(
-                Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(
-                    DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(
-                        &mut reader,
-                    )?,
-                ),
-            ),
+            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM => {
+                Ok(Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken)
+            }
             UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM => {
-                Ok(Self::UpdatePrimarySaleHappenedViaToken(
-                    UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(&mut reader)?,
-                ))
+                Ok(Self::UpdatePrimarySaleHappenedViaToken)
             }
             DEPRECATED_SET_RESERVATION_LIST_IX_DISCM => Ok(Self::DeprecatedSetReservationList(
                 DeprecatedSetReservationListIxArgs::deserialize(&mut reader)?,
             )),
             DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM => {
-                Ok(Self::DeprecatedCreateReservationList(
-                    DeprecatedCreateReservationListIxArgs::deserialize(&mut reader)?,
-                ))
+                Ok(Self::DeprecatedCreateReservationList)
             }
-            SIGN_METADATA_IX_DISCM => Ok(Self::SignMetadata(SignMetadataIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            SIGN_METADATA_IX_DISCM => Ok(Self::SignMetadata),
             DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM => {
                 Ok(Self::DeprecatedMintPrintingTokensViaToken(
                     DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(&mut reader)?,
@@ -100,17 +88,13 @@ impl MplTokenMetadataProgramIx {
                     MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM => Ok(Self::ConvertMasterEditionV1ToV2(
-                ConvertMasterEditionV1ToV2IxArgs::deserialize(&mut reader)?,
-            )),
+            CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM => Ok(Self::ConvertMasterEditionV1ToV2),
             MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM => {
                 Ok(Self::MintNewEditionFromMasterEditionViaVaultProxy(
                     MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(&mut reader)?,
                 ))
             }
-            PUFF_METADATA_IX_DISCM => Ok(Self::PuffMetadata(PuffMetadataIxArgs::deserialize(
-                &mut reader,
-            )?)),
+            PUFF_METADATA_IX_DISCM => Ok(Self::PuffMetadata),
             UPDATE_METADATA_ACCOUNT_V2_IX_DISCM => Ok(Self::UpdateMetadataAccountV2(
                 UpdateMetadataAccountV2IxArgs::deserialize(&mut reader)?,
             )),
@@ -120,37 +104,19 @@ impl MplTokenMetadataProgramIx {
             CREATE_MASTER_EDITION_V3_IX_DISCM => Ok(Self::CreateMasterEditionV3(
                 CreateMasterEditionV3IxArgs::deserialize(&mut reader)?,
             )),
-            VERIFY_COLLECTION_IX_DISCM => Ok(Self::VerifyCollection(
-                VerifyCollectionIxArgs::deserialize(&mut reader)?,
-            )),
+            VERIFY_COLLECTION_IX_DISCM => Ok(Self::VerifyCollection),
             UTILIZE_IX_DISCM => Ok(Self::Utilize(UtilizeIxArgs::deserialize(&mut reader)?)),
             APPROVE_USE_AUTHORITY_IX_DISCM => Ok(Self::ApproveUseAuthority(
                 ApproveUseAuthorityIxArgs::deserialize(&mut reader)?,
             )),
-            REVOKE_USE_AUTHORITY_IX_DISCM => Ok(Self::RevokeUseAuthority(
-                RevokeUseAuthorityIxArgs::deserialize(&mut reader)?,
-            )),
-            UNVERIFY_COLLECTION_IX_DISCM => Ok(Self::UnverifyCollection(
-                UnverifyCollectionIxArgs::deserialize(&mut reader)?,
-            )),
-            APPROVE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::ApproveCollectionAuthority(
-                ApproveCollectionAuthorityIxArgs::deserialize(&mut reader)?,
-            )),
-            REVOKE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::RevokeCollectionAuthority(
-                RevokeCollectionAuthorityIxArgs::deserialize(&mut reader)?,
-            )),
-            SET_AND_VERIFY_COLLECTION_IX_DISCM => Ok(Self::SetAndVerifyCollection(
-                SetAndVerifyCollectionIxArgs::deserialize(&mut reader)?,
-            )),
-            FREEZE_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::FreezeDelegatedAccount(
-                FreezeDelegatedAccountIxArgs::deserialize(&mut reader)?,
-            )),
-            THAW_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::ThawDelegatedAccount(
-                ThawDelegatedAccountIxArgs::deserialize(&mut reader)?,
-            )),
-            REMOVE_CREATOR_VERIFICATION_IX_DISCM => Ok(Self::RemoveCreatorVerification(
-                RemoveCreatorVerificationIxArgs::deserialize(&mut reader)?,
-            )),
+            REVOKE_USE_AUTHORITY_IX_DISCM => Ok(Self::RevokeUseAuthority),
+            UNVERIFY_COLLECTION_IX_DISCM => Ok(Self::UnverifyCollection),
+            APPROVE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::ApproveCollectionAuthority),
+            REVOKE_COLLECTION_AUTHORITY_IX_DISCM => Ok(Self::RevokeCollectionAuthority),
+            SET_AND_VERIFY_COLLECTION_IX_DISCM => Ok(Self::SetAndVerifyCollection),
+            FREEZE_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::FreezeDelegatedAccount),
+            THAW_DELEGATED_ACCOUNT_IX_DISCM => Ok(Self::ThawDelegatedAccount),
+            REMOVE_CREATOR_VERIFICATION_IX_DISCM => Ok(Self::RemoveCreatorVerification),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!("discm {:?} not found", maybe_discm),
@@ -171,27 +137,21 @@ impl MplTokenMetadataProgramIx {
                 DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(args) => {
+            Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken => {
                 DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
-                    .serialize(&mut writer)?;
-                args.serialize(&mut writer)
+                    .serialize(&mut writer)
             }
-            Self::UpdatePrimarySaleHappenedViaToken(args) => {
-                UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::UpdatePrimarySaleHappenedViaToken => {
+                UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM.serialize(&mut writer)
             }
             Self::DeprecatedSetReservationList(args) => {
                 DEPRECATED_SET_RESERVATION_LIST_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::DeprecatedCreateReservationList(args) => {
-                DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::DeprecatedCreateReservationList => {
+                DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM.serialize(&mut writer)
             }
-            Self::SignMetadata(args) => {
-                SIGN_METADATA_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::SignMetadata => SIGN_METADATA_IX_DISCM.serialize(&mut writer),
             Self::DeprecatedMintPrintingTokensViaToken(args) => {
                 DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -208,19 +168,15 @@ impl MplTokenMetadataProgramIx {
                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::ConvertMasterEditionV1ToV2(args) => {
-                CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::ConvertMasterEditionV1ToV2 => {
+                CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM.serialize(&mut writer)
             }
             Self::MintNewEditionFromMasterEditionViaVaultProxy(args) => {
                 MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM
                     .serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::PuffMetadata(args) => {
-                PUFF_METADATA_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::PuffMetadata => PUFF_METADATA_IX_DISCM.serialize(&mut writer),
             Self::UpdateMetadataAccountV2(args) => {
                 UPDATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -233,10 +189,7 @@ impl MplTokenMetadataProgramIx {
                 CREATE_MASTER_EDITION_V3_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::VerifyCollection(args) => {
-                VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::VerifyCollection => VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer),
             Self::Utilize(args) => {
                 UTILIZE_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -245,37 +198,23 @@ impl MplTokenMetadataProgramIx {
                 APPROVE_USE_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::RevokeUseAuthority(args) => {
-                REVOKE_USE_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::RevokeUseAuthority => REVOKE_USE_AUTHORITY_IX_DISCM.serialize(&mut writer),
+            Self::UnverifyCollection => UNVERIFY_COLLECTION_IX_DISCM.serialize(&mut writer),
+            Self::ApproveCollectionAuthority => {
+                APPROVE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)
             }
-            Self::UnverifyCollection(args) => {
-                UNVERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::RevokeCollectionAuthority => {
+                REVOKE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)
             }
-            Self::ApproveCollectionAuthority(args) => {
-                APPROVE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::SetAndVerifyCollection => {
+                SET_AND_VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)
             }
-            Self::RevokeCollectionAuthority(args) => {
-                REVOKE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::FreezeDelegatedAccount => {
+                FREEZE_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer)
             }
-            Self::SetAndVerifyCollection(args) => {
-                SET_AND_VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::FreezeDelegatedAccount(args) => {
-                FREEZE_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::ThawDelegatedAccount(args) => {
-                THAW_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::RemoveCreatorVerification(args) => {
-                REMOVE_CREATOR_VERIFICATION_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::ThawDelegatedAccount => THAW_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer),
+            Self::RemoveCreatorVerification => {
+                REMOVE_CREATOR_VERIFICATION_IX_DISCM.serialize(&mut writer)
             }
         }
     }
@@ -1338,20 +1277,8 @@ impl<'me, 'info>
     }
 }
 pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM: u8 = 3u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData(
-    pub DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs,
-);
-impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>
-    for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData
-{
-    fn from(args: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData;
 impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1371,17 +1298,12 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
                 ),
             ));
         }
-        Ok(Self(
-            DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(
-                &mut reader,
-            )?,
-        ))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
         writer.write_all(&[
             DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM,
-        ])?;
-        self.0.serialize(&mut writer)
+        ])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1391,45 +1313,33 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
     K: Into<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>,
-    A: Into<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>,
 >(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
     let metas: [AccountMeta;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         (&keys).into();
-    let args_full: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs = args.into();
-    let data: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke<
-    'info,
-    A: Into<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>,
->(
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke<'info>(
     accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts, args)?;
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed<
-    'info,
-    A: Into<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>,
->(
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed<'info>(
     accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts, args)?;
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
@@ -1590,16 +1500,8 @@ impl<'me, 'info>
     }
 }
 pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM: u8 = 4u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UpdatePrimarySaleHappenedViaTokenIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UpdatePrimarySaleHappenedViaTokenIxData(pub UpdatePrimarySaleHappenedViaTokenIxArgs);
-impl From<UpdatePrimarySaleHappenedViaTokenIxArgs> for UpdatePrimarySaleHappenedViaTokenIxData {
-    fn from(args: UpdatePrimarySaleHappenedViaTokenIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UpdatePrimarySaleHappenedViaTokenIxData;
 impl UpdatePrimarySaleHappenedViaTokenIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1616,13 +1518,10 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
                 ),
             ));
         }
-        Ok(Self(UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1630,45 +1529,31 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
         Ok(data)
     }
 }
-pub fn update_primary_sale_happened_via_token_ix<
-    K: Into<UpdatePrimarySaleHappenedViaTokenKeys>,
-    A: Into<UpdatePrimarySaleHappenedViaTokenIxArgs>,
->(
+pub fn update_primary_sale_happened_via_token_ix<K: Into<UpdatePrimarySaleHappenedViaTokenKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         (&keys).into();
-    let args_full: UpdatePrimarySaleHappenedViaTokenIxArgs = args.into();
-    let data: UpdatePrimarySaleHappenedViaTokenIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UpdatePrimarySaleHappenedViaTokenIxData.try_to_vec()?,
     })
 }
-pub fn update_primary_sale_happened_via_token_invoke<
-    'info,
-    A: Into<UpdatePrimarySaleHappenedViaTokenIxArgs>,
->(
+pub fn update_primary_sale_happened_via_token_invoke<'info>(
     accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = update_primary_sale_happened_via_token_ix(accounts, args)?;
+    let ix = update_primary_sale_happened_via_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_primary_sale_happened_via_token_invoke_signed<
-    'info,
-    A: Into<UpdatePrimarySaleHappenedViaTokenIxArgs>,
->(
+pub fn update_primary_sale_happened_via_token_invoke_signed<'info>(
     accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_primary_sale_happened_via_token_ix(accounts, args)?;
+    let ix = update_primary_sale_happened_via_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2058,16 +1943,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LI
     }
 }
 pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM: u8 = 6u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct DeprecatedCreateReservationListIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct DeprecatedCreateReservationListIxData(pub DeprecatedCreateReservationListIxArgs);
-impl From<DeprecatedCreateReservationListIxArgs> for DeprecatedCreateReservationListIxData {
-    fn from(args: DeprecatedCreateReservationListIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct DeprecatedCreateReservationListIxData;
 impl DeprecatedCreateReservationListIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -2084,13 +1961,10 @@ impl DeprecatedCreateReservationListIxData {
                 ),
             ));
         }
-        Ok(Self(DeprecatedCreateReservationListIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -2098,44 +1972,30 @@ impl DeprecatedCreateReservationListIxData {
         Ok(data)
     }
 }
-pub fn deprecated_create_reservation_list_ix<
-    K: Into<DeprecatedCreateReservationListKeys>,
-    A: Into<DeprecatedCreateReservationListIxArgs>,
->(
+pub fn deprecated_create_reservation_list_ix<K: Into<DeprecatedCreateReservationListKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedCreateReservationListKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: DeprecatedCreateReservationListIxArgs = args.into();
-    let data: DeprecatedCreateReservationListIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: DeprecatedCreateReservationListIxData.try_to_vec()?,
     })
 }
-pub fn deprecated_create_reservation_list_invoke<
-    'info,
-    A: Into<DeprecatedCreateReservationListIxArgs>,
->(
+pub fn deprecated_create_reservation_list_invoke<'info>(
     accounts: &DeprecatedCreateReservationListAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = deprecated_create_reservation_list_ix(accounts, args)?;
+    let ix = deprecated_create_reservation_list_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_create_reservation_list_invoke_signed<
-    'info,
-    A: Into<DeprecatedCreateReservationListIxArgs>,
->(
+pub fn deprecated_create_reservation_list_invoke_signed<'info>(
     accounts: &DeprecatedCreateReservationListAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_create_reservation_list_ix(accounts, args)?;
+    let ix = deprecated_create_reservation_list_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2240,16 +2100,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]>
     }
 }
 pub const SIGN_METADATA_IX_DISCM: u8 = 7u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct SignMetadataIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct SignMetadataIxData(pub SignMetadataIxArgs);
-impl From<SignMetadataIxArgs> for SignMetadataIxData {
-    fn from(args: SignMetadataIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct SignMetadataIxData;
 impl SignMetadataIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -2266,11 +2118,10 @@ impl SignMetadataIxData {
                 ),
             ));
         }
-        Ok(Self(SignMetadataIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[SIGN_METADATA_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[SIGN_METADATA_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -2278,34 +2129,25 @@ impl SignMetadataIxData {
         Ok(data)
     }
 }
-pub fn sign_metadata_ix<K: Into<SignMetadataKeys>, A: Into<SignMetadataIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn sign_metadata_ix<K: Into<SignMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: SignMetadataKeys = accounts.into();
     let metas: [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: SignMetadataIxArgs = args.into();
-    let data: SignMetadataIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: SignMetadataIxData.try_to_vec()?,
     })
 }
-pub fn sign_metadata_invoke<'info, A: Into<SignMetadataIxArgs>>(
-    accounts: &SignMetadataAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = sign_metadata_ix(accounts, args)?;
+pub fn sign_metadata_invoke<'info>(accounts: &SignMetadataAccounts<'_, 'info>) -> ProgramResult {
+    let ix = sign_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn sign_metadata_invoke_signed<'info, A: Into<SignMetadataIxArgs>>(
+pub fn sign_metadata_invoke_signed<'info>(
     accounts: &SignMetadataAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = sign_metadata_ix(accounts, args)?;
+    let ix = sign_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3638,16 +3480,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_
     }
 }
 pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM: u8 = 12u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ConvertMasterEditionV1ToV2IxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ConvertMasterEditionV1ToV2IxData(pub ConvertMasterEditionV1ToV2IxArgs);
-impl From<ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1ToV2IxData {
-    fn from(args: ConvertMasterEditionV1ToV2IxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ConvertMasterEditionV1ToV2IxData;
 impl ConvertMasterEditionV1ToV2IxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -3664,13 +3498,10 @@ impl ConvertMasterEditionV1ToV2IxData {
                 ),
             ));
         }
-        Ok(Self(ConvertMasterEditionV1ToV2IxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -3678,41 +3509,30 @@ impl ConvertMasterEditionV1ToV2IxData {
         Ok(data)
     }
 }
-pub fn convert_master_edition_v1_to_v2_ix<
-    K: Into<ConvertMasterEditionV1ToV2Keys>,
-    A: Into<ConvertMasterEditionV1ToV2IxArgs>,
->(
+pub fn convert_master_edition_v1_to_v2_ix<K: Into<ConvertMasterEditionV1ToV2Keys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
     let metas: [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ConvertMasterEditionV1ToV2IxArgs = args.into();
-    let data: ConvertMasterEditionV1ToV2IxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ConvertMasterEditionV1ToV2IxData.try_to_vec()?,
     })
 }
-pub fn convert_master_edition_v1_to_v2_invoke<'info, A: Into<ConvertMasterEditionV1ToV2IxArgs>>(
+pub fn convert_master_edition_v1_to_v2_invoke<'info>(
     accounts: &ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = convert_master_edition_v1_to_v2_ix(accounts, args)?;
+    let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn convert_master_edition_v1_to_v2_invoke_signed<
-    'info,
-    A: Into<ConvertMasterEditionV1ToV2IxArgs>,
->(
+pub fn convert_master_edition_v1_to_v2_invoke_signed<'info>(
     accounts: &ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = convert_master_edition_v1_to_v2_ix(accounts, args)?;
+    let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4225,16 +4045,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]>
     }
 }
 pub const PUFF_METADATA_IX_DISCM: u8 = 14u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct PuffMetadataIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct PuffMetadataIxData(pub PuffMetadataIxArgs);
-impl From<PuffMetadataIxArgs> for PuffMetadataIxData {
-    fn from(args: PuffMetadataIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct PuffMetadataIxData;
 impl PuffMetadataIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -4251,11 +4063,10 @@ impl PuffMetadataIxData {
                 ),
             ));
         }
-        Ok(Self(PuffMetadataIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[PUFF_METADATA_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[PUFF_METADATA_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -4263,34 +4074,25 @@ impl PuffMetadataIxData {
         Ok(data)
     }
 }
-pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>, A: Into<PuffMetadataIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: PuffMetadataKeys = accounts.into();
     let metas: [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: PuffMetadataIxArgs = args.into();
-    let data: PuffMetadataIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: PuffMetadataIxData.try_to_vec()?,
     })
 }
-pub fn puff_metadata_invoke<'info, A: Into<PuffMetadataIxArgs>>(
-    accounts: &PuffMetadataAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = puff_metadata_ix(accounts, args)?;
+pub fn puff_metadata_invoke<'info>(accounts: &PuffMetadataAccounts<'_, 'info>) -> ProgramResult {
+    let ix = puff_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn puff_metadata_invoke_signed<'info, A: Into<PuffMetadataIxArgs>>(
+pub fn puff_metadata_invoke_signed<'info>(
     accounts: &PuffMetadataAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = puff_metadata_ix(accounts, args)?;
+    let ix = puff_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5131,16 +4933,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LE
     }
 }
 pub const VERIFY_COLLECTION_IX_DISCM: u8 = 18u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct VerifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct VerifyCollectionIxData(pub VerifyCollectionIxArgs);
-impl From<VerifyCollectionIxArgs> for VerifyCollectionIxData {
-    fn from(args: VerifyCollectionIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct VerifyCollectionIxData;
 impl VerifyCollectionIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -5157,11 +4951,10 @@ impl VerifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(VerifyCollectionIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[VERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[VERIFY_COLLECTION_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -5169,34 +4962,29 @@ impl VerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>, A: Into<VerifyCollectionIxArgs>>(
+pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: VerifyCollectionKeys = accounts.into();
     let metas: [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: VerifyCollectionIxArgs = args.into();
-    let data: VerifyCollectionIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: VerifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn verify_collection_invoke<'info, A: Into<VerifyCollectionIxArgs>>(
+pub fn verify_collection_invoke<'info>(
     accounts: &VerifyCollectionAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = verify_collection_ix(accounts, args)?;
+    let ix = verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn verify_collection_invoke_signed<'info, A: Into<VerifyCollectionIxArgs>>(
+pub fn verify_collection_invoke_signed<'info>(
     accounts: &VerifyCollectionAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = verify_collection_ix(accounts, args)?;
+    let ix = verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5998,16 +5786,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS
     }
 }
 pub const REVOKE_USE_AUTHORITY_IX_DISCM: u8 = 21u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RevokeUseAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RevokeUseAuthorityIxData(pub RevokeUseAuthorityIxArgs);
-impl From<RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData {
-    fn from(args: RevokeUseAuthorityIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RevokeUseAuthorityIxData;
 impl RevokeUseAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6024,11 +5804,10 @@ impl RevokeUseAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(RevokeUseAuthorityIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[REVOKE_USE_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[REVOKE_USE_AUTHORITY_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6036,37 +5815,29 @@ impl RevokeUseAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_use_authority_ix<
-    K: Into<RevokeUseAuthorityKeys>,
-    A: Into<RevokeUseAuthorityIxArgs>,
->(
+pub fn revoke_use_authority_ix<K: Into<RevokeUseAuthorityKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RevokeUseAuthorityKeys = accounts.into();
     let metas: [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RevokeUseAuthorityIxArgs = args.into();
-    let data: RevokeUseAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RevokeUseAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn revoke_use_authority_invoke<'info, A: Into<RevokeUseAuthorityIxArgs>>(
+pub fn revoke_use_authority_invoke<'info>(
     accounts: &RevokeUseAuthorityAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = revoke_use_authority_ix(accounts, args)?;
+    let ix = revoke_use_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn revoke_use_authority_invoke_signed<'info, A: Into<RevokeUseAuthorityIxArgs>>(
+pub fn revoke_use_authority_invoke_signed<'info>(
     accounts: &RevokeUseAuthorityAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revoke_use_authority_ix(accounts, args)?;
+    let ix = revoke_use_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6229,16 +6000,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_
     }
 }
 pub const UNVERIFY_COLLECTION_IX_DISCM: u8 = 22u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct UnverifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnverifyCollectionIxData(pub UnverifyCollectionIxArgs);
-impl From<UnverifyCollectionIxArgs> for UnverifyCollectionIxData {
-    fn from(args: UnverifyCollectionIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct UnverifyCollectionIxData;
 impl UnverifyCollectionIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6255,11 +6018,10 @@ impl UnverifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(UnverifyCollectionIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[UNVERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[UNVERIFY_COLLECTION_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6267,37 +6029,29 @@ impl UnverifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn unverify_collection_ix<
-    K: Into<UnverifyCollectionKeys>,
-    A: Into<UnverifyCollectionIxArgs>,
->(
+pub fn unverify_collection_ix<K: Into<UnverifyCollectionKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UnverifyCollectionKeys = accounts.into();
     let metas: [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: UnverifyCollectionIxArgs = args.into();
-    let data: UnverifyCollectionIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: UnverifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn unverify_collection_invoke<'info, A: Into<UnverifyCollectionIxArgs>>(
+pub fn unverify_collection_invoke<'info>(
     accounts: &UnverifyCollectionAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = unverify_collection_ix(accounts, args)?;
+    let ix = unverify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn unverify_collection_invoke_signed<'info, A: Into<UnverifyCollectionIxArgs>>(
+pub fn unverify_collection_invoke_signed<'info>(
     accounts: &UnverifyCollectionAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = unverify_collection_ix(accounts, args)?;
+    let ix = unverify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6493,16 +6247,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_
     }
 }
 pub const APPROVE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 23u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ApproveCollectionAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ApproveCollectionAuthorityIxData(pub ApproveCollectionAuthorityIxArgs);
-impl From<ApproveCollectionAuthorityIxArgs> for ApproveCollectionAuthorityIxData {
-    fn from(args: ApproveCollectionAuthorityIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ApproveCollectionAuthorityIxData;
 impl ApproveCollectionAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6519,13 +6265,10 @@ impl ApproveCollectionAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(ApproveCollectionAuthorityIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6533,41 +6276,30 @@ impl ApproveCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn approve_collection_authority_ix<
-    K: Into<ApproveCollectionAuthorityKeys>,
-    A: Into<ApproveCollectionAuthorityIxArgs>,
->(
+pub fn approve_collection_authority_ix<K: Into<ApproveCollectionAuthorityKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ApproveCollectionAuthorityKeys = accounts.into();
     let metas: [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ApproveCollectionAuthorityIxArgs = args.into();
-    let data: ApproveCollectionAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ApproveCollectionAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn approve_collection_authority_invoke<'info, A: Into<ApproveCollectionAuthorityIxArgs>>(
+pub fn approve_collection_authority_invoke<'info>(
     accounts: &ApproveCollectionAuthorityAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = approve_collection_authority_ix(accounts, args)?;
+    let ix = approve_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn approve_collection_authority_invoke_signed<
-    'info,
-    A: Into<ApproveCollectionAuthorityIxArgs>,
->(
+pub fn approve_collection_authority_invoke_signed<'info>(
     accounts: &ApproveCollectionAuthorityAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = approve_collection_authority_ix(accounts, args)?;
+    let ix = approve_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6709,16 +6441,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_A
     }
 }
 pub const REVOKE_COLLECTION_AUTHORITY_IX_DISCM: u8 = 24u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RevokeCollectionAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RevokeCollectionAuthorityIxData(pub RevokeCollectionAuthorityIxArgs);
-impl From<RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthorityIxData {
-    fn from(args: RevokeCollectionAuthorityIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RevokeCollectionAuthorityIxData;
 impl RevokeCollectionAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6735,13 +6459,10 @@ impl RevokeCollectionAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(RevokeCollectionAuthorityIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6749,41 +6470,30 @@ impl RevokeCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_collection_authority_ix<
-    K: Into<RevokeCollectionAuthorityKeys>,
-    A: Into<RevokeCollectionAuthorityIxArgs>,
->(
+pub fn revoke_collection_authority_ix<K: Into<RevokeCollectionAuthorityKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RevokeCollectionAuthorityKeys = accounts.into();
     let metas: [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RevokeCollectionAuthorityIxArgs = args.into();
-    let data: RevokeCollectionAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RevokeCollectionAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn revoke_collection_authority_invoke<'info, A: Into<RevokeCollectionAuthorityIxArgs>>(
+pub fn revoke_collection_authority_invoke<'info>(
     accounts: &RevokeCollectionAuthorityAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = revoke_collection_authority_ix(accounts, args)?;
+    let ix = revoke_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn revoke_collection_authority_invoke_signed<
-    'info,
-    A: Into<RevokeCollectionAuthorityIxArgs>,
->(
+pub fn revoke_collection_authority_invoke_signed<'info>(
     accounts: &RevokeCollectionAuthorityAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revoke_collection_authority_ix(accounts, args)?;
+    let ix = revoke_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6970,16 +6680,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACC
     }
 }
 pub const SET_AND_VERIFY_COLLECTION_IX_DISCM: u8 = 25u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct SetAndVerifyCollectionIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct SetAndVerifyCollectionIxData(pub SetAndVerifyCollectionIxArgs);
-impl From<SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxData {
-    fn from(args: SetAndVerifyCollectionIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct SetAndVerifyCollectionIxData;
 impl SetAndVerifyCollectionIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6996,13 +6698,10 @@ impl SetAndVerifyCollectionIxData {
                 ),
             ));
         }
-        Ok(Self(SetAndVerifyCollectionIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7010,38 +6709,30 @@ impl SetAndVerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn set_and_verify_collection_ix<
-    K: Into<SetAndVerifyCollectionKeys>,
-    A: Into<SetAndVerifyCollectionIxArgs>,
->(
+pub fn set_and_verify_collection_ix<K: Into<SetAndVerifyCollectionKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SetAndVerifyCollectionKeys = accounts.into();
     let metas: [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: SetAndVerifyCollectionIxArgs = args.into();
-    let data: SetAndVerifyCollectionIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: SetAndVerifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn set_and_verify_collection_invoke<'info, A: Into<SetAndVerifyCollectionIxArgs>>(
+pub fn set_and_verify_collection_invoke<'info>(
     accounts: &SetAndVerifyCollectionAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = set_and_verify_collection_ix(accounts, args)?;
+    let ix = set_and_verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn set_and_verify_collection_invoke_signed<'info, A: Into<SetAndVerifyCollectionIxArgs>>(
+pub fn set_and_verify_collection_invoke_signed<'info>(
     accounts: &SetAndVerifyCollectionAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = set_and_verify_collection_ix(accounts, args)?;
+    let ix = set_and_verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7197,16 +6888,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCO
     }
 }
 pub const FREEZE_DELEGATED_ACCOUNT_IX_DISCM: u8 = 26u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct FreezeDelegatedAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct FreezeDelegatedAccountIxData(pub FreezeDelegatedAccountIxArgs);
-impl From<FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxData {
-    fn from(args: FreezeDelegatedAccountIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct FreezeDelegatedAccountIxData;
 impl FreezeDelegatedAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -7223,13 +6906,10 @@ impl FreezeDelegatedAccountIxData {
                 ),
             ));
         }
-        Ok(Self(FreezeDelegatedAccountIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7237,38 +6917,30 @@ impl FreezeDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn freeze_delegated_account_ix<
-    K: Into<FreezeDelegatedAccountKeys>,
-    A: Into<FreezeDelegatedAccountIxArgs>,
->(
+pub fn freeze_delegated_account_ix<K: Into<FreezeDelegatedAccountKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: FreezeDelegatedAccountKeys = accounts.into();
     let metas: [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: FreezeDelegatedAccountIxArgs = args.into();
-    let data: FreezeDelegatedAccountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: FreezeDelegatedAccountIxData.try_to_vec()?,
     })
 }
-pub fn freeze_delegated_account_invoke<'info, A: Into<FreezeDelegatedAccountIxArgs>>(
+pub fn freeze_delegated_account_invoke<'info>(
     accounts: &FreezeDelegatedAccountAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = freeze_delegated_account_ix(accounts, args)?;
+    let ix = freeze_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn freeze_delegated_account_invoke_signed<'info, A: Into<FreezeDelegatedAccountIxArgs>>(
+pub fn freeze_delegated_account_invoke_signed<'info>(
     accounts: &FreezeDelegatedAccountAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = freeze_delegated_account_ix(accounts, args)?;
+    let ix = freeze_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7412,16 +7084,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUN
     }
 }
 pub const THAW_DELEGATED_ACCOUNT_IX_DISCM: u8 = 27u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ThawDelegatedAccountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ThawDelegatedAccountIxData(pub ThawDelegatedAccountIxArgs);
-impl From<ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData {
-    fn from(args: ThawDelegatedAccountIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ThawDelegatedAccountIxData;
 impl ThawDelegatedAccountIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -7438,11 +7102,10 @@ impl ThawDelegatedAccountIxData {
                 ),
             ));
         }
-        Ok(Self(ThawDelegatedAccountIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7450,38 +7113,30 @@ impl ThawDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn thaw_delegated_account_ix<
-    K: Into<ThawDelegatedAccountKeys>,
-    A: Into<ThawDelegatedAccountIxArgs>,
->(
+pub fn thaw_delegated_account_ix<K: Into<ThawDelegatedAccountKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ThawDelegatedAccountKeys = accounts.into();
     let metas: [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ThawDelegatedAccountIxArgs = args.into();
-    let data: ThawDelegatedAccountIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ThawDelegatedAccountIxData.try_to_vec()?,
     })
 }
-pub fn thaw_delegated_account_invoke<'info, A: Into<ThawDelegatedAccountIxArgs>>(
+pub fn thaw_delegated_account_invoke<'info>(
     accounts: &ThawDelegatedAccountAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = thaw_delegated_account_ix(accounts, args)?;
+    let ix = thaw_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn thaw_delegated_account_invoke_signed<'info, A: Into<ThawDelegatedAccountIxArgs>>(
+pub fn thaw_delegated_account_invoke_signed<'info>(
     accounts: &ThawDelegatedAccountAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = thaw_delegated_account_ix(accounts, args)?;
+    let ix = thaw_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7585,16 +7240,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_A
     }
 }
 pub const REMOVE_CREATOR_VERIFICATION_IX_DISCM: u8 = 28u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RemoveCreatorVerificationIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RemoveCreatorVerificationIxData(pub RemoveCreatorVerificationIxArgs);
-impl From<RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificationIxData {
-    fn from(args: RemoveCreatorVerificationIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RemoveCreatorVerificationIxData;
 impl RemoveCreatorVerificationIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -7611,13 +7258,10 @@ impl RemoveCreatorVerificationIxData {
                 ),
             ));
         }
-        Ok(Self(RemoveCreatorVerificationIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -7625,41 +7269,30 @@ impl RemoveCreatorVerificationIxData {
         Ok(data)
     }
 }
-pub fn remove_creator_verification_ix<
-    K: Into<RemoveCreatorVerificationKeys>,
-    A: Into<RemoveCreatorVerificationIxArgs>,
->(
+pub fn remove_creator_verification_ix<K: Into<RemoveCreatorVerificationKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RemoveCreatorVerificationKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RemoveCreatorVerificationIxArgs = args.into();
-    let data: RemoveCreatorVerificationIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RemoveCreatorVerificationIxData.try_to_vec()?,
     })
 }
-pub fn remove_creator_verification_invoke<'info, A: Into<RemoveCreatorVerificationIxArgs>>(
+pub fn remove_creator_verification_invoke<'info>(
     accounts: &RemoveCreatorVerificationAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = remove_creator_verification_ix(accounts, args)?;
+    let ix = remove_creator_verification_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_creator_verification_invoke_signed<
-    'info,
-    A: Into<RemoveCreatorVerificationIxArgs>,
->(
+pub fn remove_creator_verification_invoke_signed<'info>(
     accounts: &RemoveCreatorVerificationAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_creator_verification_ix(accounts, args)?;
+    let ix = remove_creator_verification_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)

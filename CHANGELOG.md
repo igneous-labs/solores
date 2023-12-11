@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `*IxData`, `*ProgramIx` and anchor accounts no longer implement `BorshSerialize` since it does not follow the borsh spec. The methods have been moved to their intrinsic impl.
 - Change `*IxData` and `*ProgramIx`s' `deserialize()` fn signature to accept `&[u8]` instead of `&mut &[u8]`. `&mut &[u8]` was previously used for borsh compatibility.
 - No longer generates `*_verify_account_privileges()` function if instruction has no privileged accounts (only non-signer and non-writable accounts).
+- No longer generates `*IxArgs` struct if no instruction args.
 
 ## [0.4.0] - 2023-08-07
 

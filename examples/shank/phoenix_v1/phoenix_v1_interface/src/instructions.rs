@@ -16,28 +16,28 @@ pub enum PhoenixV1ProgramIx {
     PlaceLimitOrderWithFreeFunds(PlaceLimitOrderWithFreeFundsIxArgs),
     ReduceOrder(ReduceOrderIxArgs),
     ReduceOrderWithFreeFunds(ReduceOrderWithFreeFundsIxArgs),
-    CancelAllOrders(CancelAllOrdersIxArgs),
-    CancelAllOrdersWithFreeFunds(CancelAllOrdersWithFreeFundsIxArgs),
+    CancelAllOrders,
+    CancelAllOrdersWithFreeFunds,
     CancelUpTo(CancelUpToIxArgs),
     CancelUpToWithFreeFunds(CancelUpToWithFreeFundsIxArgs),
     CancelMultipleOrdersById(CancelMultipleOrdersByIdIxArgs),
     CancelMultipleOrdersByIdWithFreeFunds(CancelMultipleOrdersByIdWithFreeFundsIxArgs),
     WithdrawFunds(WithdrawFundsIxArgs),
     DepositFunds(DepositFundsIxArgs),
-    RequestSeat(RequestSeatIxArgs),
-    Log(LogIxArgs),
+    RequestSeat,
+    Log,
     PlaceMultiplePostOnlyOrders(PlaceMultiplePostOnlyOrdersIxArgs),
     PlaceMultiplePostOnlyOrdersWithFreeFunds(PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs),
     InitializeMarket(InitializeMarketIxArgs),
-    ClaimAuthority(ClaimAuthorityIxArgs),
+    ClaimAuthority,
     NameSuccessor(NameSuccessorIxArgs),
     ChangeMarketStatus(ChangeMarketStatusIxArgs),
     ChangeSeatStatus(ChangeSeatStatusIxArgs),
-    RequestSeatAuthorized(RequestSeatAuthorizedIxArgs),
-    EvictSeat(EvictSeatIxArgs),
+    RequestSeatAuthorized,
+    EvictSeat,
     ForceCancelOrders(ForceCancelOrdersIxArgs),
-    CollectFees(CollectFeesIxArgs),
-    ChangeFeeRecipient(ChangeFeeRecipientIxArgs),
+    CollectFees,
+    ChangeFeeRecipient,
 }
 impl PhoenixV1ProgramIx {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
@@ -63,12 +63,8 @@ impl PhoenixV1ProgramIx {
             REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::ReduceOrderWithFreeFunds(
                 ReduceOrderWithFreeFundsIxArgs::deserialize(&mut reader)?,
             )),
-            CANCEL_ALL_ORDERS_IX_DISCM => Ok(Self::CancelAllOrders(
-                CancelAllOrdersIxArgs::deserialize(&mut reader)?,
-            )),
-            CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::CancelAllOrdersWithFreeFunds(
-                CancelAllOrdersWithFreeFundsIxArgs::deserialize(&mut reader)?,
-            )),
+            CANCEL_ALL_ORDERS_IX_DISCM => Ok(Self::CancelAllOrders),
+            CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM => Ok(Self::CancelAllOrdersWithFreeFunds),
             CANCEL_UP_TO_IX_DISCM => Ok(Self::CancelUpTo(CancelUpToIxArgs::deserialize(
                 &mut reader,
             )?)),
@@ -89,10 +85,8 @@ impl PhoenixV1ProgramIx {
             DEPOSIT_FUNDS_IX_DISCM => Ok(Self::DepositFunds(DepositFundsIxArgs::deserialize(
                 &mut reader,
             )?)),
-            REQUEST_SEAT_IX_DISCM => Ok(Self::RequestSeat(RequestSeatIxArgs::deserialize(
-                &mut reader,
-            )?)),
-            LOG_IX_DISCM => Ok(Self::Log(LogIxArgs::deserialize(&mut reader)?)),
+            REQUEST_SEAT_IX_DISCM => Ok(Self::RequestSeat),
+            LOG_IX_DISCM => Ok(Self::Log),
             PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM => Ok(Self::PlaceMultiplePostOnlyOrders(
                 PlaceMultiplePostOnlyOrdersIxArgs::deserialize(&mut reader)?,
             )),
@@ -104,9 +98,7 @@ impl PhoenixV1ProgramIx {
             INITIALIZE_MARKET_IX_DISCM => Ok(Self::InitializeMarket(
                 InitializeMarketIxArgs::deserialize(&mut reader)?,
             )),
-            CLAIM_AUTHORITY_IX_DISCM => Ok(Self::ClaimAuthority(
-                ClaimAuthorityIxArgs::deserialize(&mut reader)?,
-            )),
+            CLAIM_AUTHORITY_IX_DISCM => Ok(Self::ClaimAuthority),
             NAME_SUCCESSOR_IX_DISCM => Ok(Self::NameSuccessor(NameSuccessorIxArgs::deserialize(
                 &mut reader,
             )?)),
@@ -116,19 +108,13 @@ impl PhoenixV1ProgramIx {
             CHANGE_SEAT_STATUS_IX_DISCM => Ok(Self::ChangeSeatStatus(
                 ChangeSeatStatusIxArgs::deserialize(&mut reader)?,
             )),
-            REQUEST_SEAT_AUTHORIZED_IX_DISCM => Ok(Self::RequestSeatAuthorized(
-                RequestSeatAuthorizedIxArgs::deserialize(&mut reader)?,
-            )),
-            EVICT_SEAT_IX_DISCM => Ok(Self::EvictSeat(EvictSeatIxArgs::deserialize(&mut reader)?)),
+            REQUEST_SEAT_AUTHORIZED_IX_DISCM => Ok(Self::RequestSeatAuthorized),
+            EVICT_SEAT_IX_DISCM => Ok(Self::EvictSeat),
             FORCE_CANCEL_ORDERS_IX_DISCM => Ok(Self::ForceCancelOrders(
                 ForceCancelOrdersIxArgs::deserialize(&mut reader)?,
             )),
-            COLLECT_FEES_IX_DISCM => Ok(Self::CollectFees(CollectFeesIxArgs::deserialize(
-                &mut reader,
-            )?)),
-            CHANGE_FEE_RECIPIENT_IX_DISCM => Ok(Self::ChangeFeeRecipient(
-                ChangeFeeRecipientIxArgs::deserialize(&mut reader)?,
-            )),
+            COLLECT_FEES_IX_DISCM => Ok(Self::CollectFees),
+            CHANGE_FEE_RECIPIENT_IX_DISCM => Ok(Self::ChangeFeeRecipient),
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 format!("discm {:?} not found", maybe_discm),
@@ -161,13 +147,9 @@ impl PhoenixV1ProgramIx {
                 REDUCE_ORDER_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::CancelAllOrders(args) => {
-                CANCEL_ALL_ORDERS_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::CancelAllOrdersWithFreeFunds(args) => {
-                CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
+            Self::CancelAllOrders => CANCEL_ALL_ORDERS_IX_DISCM.serialize(&mut writer),
+            Self::CancelAllOrdersWithFreeFunds => {
+                CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM.serialize(&mut writer)
             }
             Self::CancelUpTo(args) => {
                 CANCEL_UP_TO_IX_DISCM.serialize(&mut writer)?;
@@ -193,14 +175,8 @@ impl PhoenixV1ProgramIx {
                 DEPOSIT_FUNDS_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::RequestSeat(args) => {
-                REQUEST_SEAT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::Log(args) => {
-                LOG_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::RequestSeat => REQUEST_SEAT_IX_DISCM.serialize(&mut writer),
+            Self::Log => LOG_IX_DISCM.serialize(&mut writer),
             Self::PlaceMultiplePostOnlyOrders(args) => {
                 PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -213,10 +189,7 @@ impl PhoenixV1ProgramIx {
                 INITIALIZE_MARKET_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::ClaimAuthority(args) => {
-                CLAIM_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::ClaimAuthority => CLAIM_AUTHORITY_IX_DISCM.serialize(&mut writer),
             Self::NameSuccessor(args) => {
                 NAME_SUCCESSOR_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
@@ -229,26 +202,14 @@ impl PhoenixV1ProgramIx {
                 CHANGE_SEAT_STATUS_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::RequestSeatAuthorized(args) => {
-                REQUEST_SEAT_AUTHORIZED_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::EvictSeat(args) => {
-                EVICT_SEAT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::RequestSeatAuthorized => REQUEST_SEAT_AUTHORIZED_IX_DISCM.serialize(&mut writer),
+            Self::EvictSeat => EVICT_SEAT_IX_DISCM.serialize(&mut writer),
             Self::ForceCancelOrders(args) => {
                 FORCE_CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
                 args.serialize(&mut writer)
             }
-            Self::CollectFees(args) => {
-                COLLECT_FEES_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
-            Self::ChangeFeeRecipient(args) => {
-                CHANGE_FEE_RECIPIENT_IX_DISCM.serialize(&mut writer)?;
-                args.serialize(&mut writer)
-            }
+            Self::CollectFees => COLLECT_FEES_IX_DISCM.serialize(&mut writer),
+            Self::ChangeFeeRecipient => CHANGE_FEE_RECIPIENT_IX_DISCM.serialize(&mut writer),
         }
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
@@ -1871,16 +1832,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LE
     }
 }
 pub const CANCEL_ALL_ORDERS_IX_DISCM: u8 = 6u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CancelAllOrdersIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct CancelAllOrdersIxData(pub CancelAllOrdersIxArgs);
-impl From<CancelAllOrdersIxArgs> for CancelAllOrdersIxData {
-    fn from(args: CancelAllOrdersIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct CancelAllOrdersIxData;
 impl CancelAllOrdersIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -1897,11 +1850,10 @@ impl CancelAllOrdersIxData {
                 ),
             ));
         }
-        Ok(Self(CancelAllOrdersIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[CANCEL_ALL_ORDERS_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[CANCEL_ALL_ORDERS_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -1909,34 +1861,29 @@ impl CancelAllOrdersIxData {
         Ok(data)
     }
 }
-pub fn cancel_all_orders_ix<K: Into<CancelAllOrdersKeys>, A: Into<CancelAllOrdersIxArgs>>(
+pub fn cancel_all_orders_ix<K: Into<CancelAllOrdersKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelAllOrdersKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: CancelAllOrdersIxArgs = args.into();
-    let data: CancelAllOrdersIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: CancelAllOrdersIxData.try_to_vec()?,
     })
 }
-pub fn cancel_all_orders_invoke<'info, A: Into<CancelAllOrdersIxArgs>>(
+pub fn cancel_all_orders_invoke<'info>(
     accounts: &CancelAllOrdersAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = cancel_all_orders_ix(accounts, args)?;
+    let ix = cancel_all_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_all_orders_invoke_signed<'info, A: Into<CancelAllOrdersIxArgs>>(
+pub fn cancel_all_orders_invoke_signed<'info>(
     accounts: &CancelAllOrdersAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_all_orders_ix(accounts, args)?;
+    let ix = cancel_all_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2080,16 +2027,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUND
     }
 }
 pub const CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM: u8 = 7u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CancelAllOrdersWithFreeFundsIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct CancelAllOrdersWithFreeFundsIxData(pub CancelAllOrdersWithFreeFundsIxArgs);
-impl From<CancelAllOrdersWithFreeFundsIxArgs> for CancelAllOrdersWithFreeFundsIxData {
-    fn from(args: CancelAllOrdersWithFreeFundsIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct CancelAllOrdersWithFreeFundsIxData;
 impl CancelAllOrdersWithFreeFundsIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -2106,13 +2045,10 @@ impl CancelAllOrdersWithFreeFundsIxData {
                 ),
             ));
         }
-        Ok(Self(CancelAllOrdersWithFreeFundsIxArgs::deserialize(
-            &mut reader,
-        )?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -2120,44 +2056,30 @@ impl CancelAllOrdersWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn cancel_all_orders_with_free_funds_ix<
-    K: Into<CancelAllOrdersWithFreeFundsKeys>,
-    A: Into<CancelAllOrdersWithFreeFundsIxArgs>,
->(
+pub fn cancel_all_orders_with_free_funds_ix<K: Into<CancelAllOrdersWithFreeFundsKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelAllOrdersWithFreeFundsKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: CancelAllOrdersWithFreeFundsIxArgs = args.into();
-    let data: CancelAllOrdersWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: CancelAllOrdersWithFreeFundsIxData.try_to_vec()?,
     })
 }
-pub fn cancel_all_orders_with_free_funds_invoke<
-    'info,
-    A: Into<CancelAllOrdersWithFreeFundsIxArgs>,
->(
+pub fn cancel_all_orders_with_free_funds_invoke<'info>(
     accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = cancel_all_orders_with_free_funds_ix(accounts, args)?;
+    let ix = cancel_all_orders_with_free_funds_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_all_orders_with_free_funds_invoke_signed<
-    'info,
-    A: Into<CancelAllOrdersWithFreeFundsIxArgs>,
->(
+pub fn cancel_all_orders_with_free_funds_invoke_signed<'info>(
     accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_all_orders_with_free_funds_ix(accounts, args)?;
+    let ix = cancel_all_orders_with_free_funds_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3840,16 +3762,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN]>
     }
 }
 pub const REQUEST_SEAT_IX_DISCM: u8 = 14u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RequestSeatIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RequestSeatIxData(pub RequestSeatIxArgs);
-impl From<RequestSeatIxArgs> for RequestSeatIxData {
-    fn from(args: RequestSeatIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RequestSeatIxData;
 impl RequestSeatIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -3866,11 +3780,10 @@ impl RequestSeatIxData {
                 ),
             ));
         }
-        Ok(Self(RequestSeatIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[REQUEST_SEAT_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[REQUEST_SEAT_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -3878,34 +3791,25 @@ impl RequestSeatIxData {
         Ok(data)
     }
 }
-pub fn request_seat_ix<K: Into<RequestSeatKeys>, A: Into<RequestSeatIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn request_seat_ix<K: Into<RequestSeatKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: RequestSeatKeys = accounts.into();
     let metas: [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RequestSeatIxArgs = args.into();
-    let data: RequestSeatIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RequestSeatIxData.try_to_vec()?,
     })
 }
-pub fn request_seat_invoke<'info, A: Into<RequestSeatIxArgs>>(
-    accounts: &RequestSeatAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = request_seat_ix(accounts, args)?;
+pub fn request_seat_invoke<'info>(accounts: &RequestSeatAccounts<'_, 'info>) -> ProgramResult {
+    let ix = request_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn request_seat_invoke_signed<'info, A: Into<RequestSeatIxArgs>>(
+pub fn request_seat_invoke_signed<'info>(
     accounts: &RequestSeatAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = request_seat_ix(accounts, args)?;
+    let ix = request_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3989,16 +3893,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN]> for LogAcc
     }
 }
 pub const LOG_IX_DISCM: u8 = 15u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct LogIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct LogIxData(pub LogIxArgs);
-impl From<LogIxArgs> for LogIxData {
-    fn from(args: LogIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct LogIxData;
 impl LogIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -4015,11 +3911,10 @@ impl LogIxData {
                 ),
             ));
         }
-        Ok(Self(LogIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[LOG_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[LOG_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -4027,34 +3922,25 @@ impl LogIxData {
         Ok(data)
     }
 }
-pub fn log_ix<K: Into<LogKeys>, A: Into<LogIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn log_ix<K: Into<LogKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: LogKeys = accounts.into();
     let metas: [AccountMeta; LOG_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: LogIxArgs = args.into();
-    let data: LogIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: LogIxData.try_to_vec()?,
     })
 }
-pub fn log_invoke<'info, A: Into<LogIxArgs>>(
-    accounts: &LogAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = log_ix(accounts, args)?;
+pub fn log_invoke<'info>(accounts: &LogAccounts<'_, 'info>) -> ProgramResult {
+    let ix = log_ix(accounts)?;
     let account_info: [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn log_invoke_signed<'info, A: Into<LogIxArgs>>(
+pub fn log_invoke_signed<'info>(
     accounts: &LogAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = log_ix(accounts, args)?;
+    let ix = log_ix(accounts)?;
     let account_info: [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4992,16 +4878,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN]
     }
 }
 pub const CLAIM_AUTHORITY_IX_DISCM: u8 = 101u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ClaimAuthorityIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ClaimAuthorityIxData(pub ClaimAuthorityIxArgs);
-impl From<ClaimAuthorityIxArgs> for ClaimAuthorityIxData {
-    fn from(args: ClaimAuthorityIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ClaimAuthorityIxData;
 impl ClaimAuthorityIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -5018,11 +4896,10 @@ impl ClaimAuthorityIxData {
                 ),
             ));
         }
-        Ok(Self(ClaimAuthorityIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[CLAIM_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[CLAIM_AUTHORITY_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -5030,34 +4907,29 @@ impl ClaimAuthorityIxData {
         Ok(data)
     }
 }
-pub fn claim_authority_ix<K: Into<ClaimAuthorityKeys>, A: Into<ClaimAuthorityIxArgs>>(
+pub fn claim_authority_ix<K: Into<ClaimAuthorityKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ClaimAuthorityKeys = accounts.into();
     let metas: [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ClaimAuthorityIxArgs = args.into();
-    let data: ClaimAuthorityIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ClaimAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn claim_authority_invoke<'info, A: Into<ClaimAuthorityIxArgs>>(
+pub fn claim_authority_invoke<'info>(
     accounts: &ClaimAuthorityAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = claim_authority_ix(accounts, args)?;
+    let ix = claim_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn claim_authority_invoke_signed<'info, A: Into<ClaimAuthorityIxArgs>>(
+pub fn claim_authority_invoke_signed<'info>(
     accounts: &ClaimAuthorityAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = claim_authority_ix(accounts, args)?;
+    let ix = claim_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5835,16 +5707,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOU
     }
 }
 pub const REQUEST_SEAT_AUTHORIZED_IX_DISCM: u8 = 105u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct RequestSeatAuthorizedIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct RequestSeatAuthorizedIxData(pub RequestSeatAuthorizedIxArgs);
-impl From<RequestSeatAuthorizedIxArgs> for RequestSeatAuthorizedIxData {
-    fn from(args: RequestSeatAuthorizedIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct RequestSeatAuthorizedIxData;
 impl RequestSeatAuthorizedIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -5861,11 +5725,10 @@ impl RequestSeatAuthorizedIxData {
                 ),
             ));
         }
-        Ok(Self(RequestSeatAuthorizedIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[REQUEST_SEAT_AUTHORIZED_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[REQUEST_SEAT_AUTHORIZED_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -5873,38 +5736,30 @@ impl RequestSeatAuthorizedIxData {
         Ok(data)
     }
 }
-pub fn request_seat_authorized_ix<
-    K: Into<RequestSeatAuthorizedKeys>,
-    A: Into<RequestSeatAuthorizedIxArgs>,
->(
+pub fn request_seat_authorized_ix<K: Into<RequestSeatAuthorizedKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: RequestSeatAuthorizedKeys = accounts.into();
     let metas: [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: RequestSeatAuthorizedIxArgs = args.into();
-    let data: RequestSeatAuthorizedIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: RequestSeatAuthorizedIxData.try_to_vec()?,
     })
 }
-pub fn request_seat_authorized_invoke<'info, A: Into<RequestSeatAuthorizedIxArgs>>(
+pub fn request_seat_authorized_invoke<'info>(
     accounts: &RequestSeatAuthorizedAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = request_seat_authorized_ix(accounts, args)?;
+    let ix = request_seat_authorized_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn request_seat_authorized_invoke_signed<'info, A: Into<RequestSeatAuthorizedIxArgs>>(
+pub fn request_seat_authorized_invoke_signed<'info>(
     accounts: &RequestSeatAuthorizedAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = request_seat_authorized_ix(accounts, args)?;
+    let ix = request_seat_authorized_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6119,16 +5974,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN]>
     }
 }
 pub const EVICT_SEAT_IX_DISCM: u8 = 106u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct EvictSeatIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct EvictSeatIxData(pub EvictSeatIxArgs);
-impl From<EvictSeatIxArgs> for EvictSeatIxData {
-    fn from(args: EvictSeatIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct EvictSeatIxData;
 impl EvictSeatIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6145,11 +5992,10 @@ impl EvictSeatIxData {
                 ),
             ));
         }
-        Ok(Self(EvictSeatIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[EVICT_SEAT_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[EVICT_SEAT_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6157,34 +6003,25 @@ impl EvictSeatIxData {
         Ok(data)
     }
 }
-pub fn evict_seat_ix<K: Into<EvictSeatKeys>, A: Into<EvictSeatIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn evict_seat_ix<K: Into<EvictSeatKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: EvictSeatKeys = accounts.into();
     let metas: [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: EvictSeatIxArgs = args.into();
-    let data: EvictSeatIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: EvictSeatIxData.try_to_vec()?,
     })
 }
-pub fn evict_seat_invoke<'info, A: Into<EvictSeatIxArgs>>(
-    accounts: &EvictSeatAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = evict_seat_ix(accounts, args)?;
+pub fn evict_seat_invoke<'info>(accounts: &EvictSeatAccounts<'_, 'info>) -> ProgramResult {
+    let ix = evict_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn evict_seat_invoke_signed<'info, A: Into<EvictSeatIxArgs>>(
+pub fn evict_seat_invoke_signed<'info>(
     accounts: &EvictSeatAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = evict_seat_ix(accounts, args)?;
+    let ix = evict_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6663,16 +6500,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN]>
     }
 }
 pub const COLLECT_FEES_IX_DISCM: u8 = 108u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CollectFeesIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct CollectFeesIxData(pub CollectFeesIxArgs);
-impl From<CollectFeesIxArgs> for CollectFeesIxData {
-    fn from(args: CollectFeesIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct CollectFeesIxData;
 impl CollectFeesIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6689,11 +6518,10 @@ impl CollectFeesIxData {
                 ),
             ));
         }
-        Ok(Self(CollectFeesIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[COLLECT_FEES_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[COLLECT_FEES_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6701,34 +6529,25 @@ impl CollectFeesIxData {
         Ok(data)
     }
 }
-pub fn collect_fees_ix<K: Into<CollectFeesKeys>, A: Into<CollectFeesIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
+pub fn collect_fees_ix<K: Into<CollectFeesKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: CollectFeesKeys = accounts.into();
     let metas: [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: CollectFeesIxArgs = args.into();
-    let data: CollectFeesIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: CollectFeesIxData.try_to_vec()?,
     })
 }
-pub fn collect_fees_invoke<'info, A: Into<CollectFeesIxArgs>>(
-    accounts: &CollectFeesAccounts<'_, 'info>,
-    args: A,
-) -> ProgramResult {
-    let ix = collect_fees_ix(accounts, args)?;
+pub fn collect_fees_invoke<'info>(accounts: &CollectFeesAccounts<'_, 'info>) -> ProgramResult {
+    let ix = collect_fees_ix(accounts)?;
     let account_info: [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn collect_fees_invoke_signed<'info, A: Into<CollectFeesIxArgs>>(
+pub fn collect_fees_invoke_signed<'info>(
     accounts: &CollectFeesAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = collect_fees_ix(accounts, args)?;
+    let ix = collect_fees_ix(accounts)?;
     let account_info: [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6877,16 +6696,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS
     }
 }
 pub const CHANGE_FEE_RECIPIENT_IX_DISCM: u8 = 109u8;
-#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ChangeFeeRecipientIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
-pub struct ChangeFeeRecipientIxData(pub ChangeFeeRecipientIxArgs);
-impl From<ChangeFeeRecipientIxArgs> for ChangeFeeRecipientIxData {
-    fn from(args: ChangeFeeRecipientIxArgs) -> Self {
-        Self(args)
-    }
-}
+pub struct ChangeFeeRecipientIxData;
 impl ChangeFeeRecipientIxData {
     pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
         use std::io::Read;
@@ -6903,11 +6714,10 @@ impl ChangeFeeRecipientIxData {
                 ),
             ));
         }
-        Ok(Self(ChangeFeeRecipientIxArgs::deserialize(&mut reader)?))
+        Ok(Self)
     }
     pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-        writer.write_all(&[CHANGE_FEE_RECIPIENT_IX_DISCM])?;
-        self.0.serialize(&mut writer)
+        writer.write_all(&[CHANGE_FEE_RECIPIENT_IX_DISCM])
     }
     pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
         let mut data = Vec::new();
@@ -6915,37 +6725,29 @@ impl ChangeFeeRecipientIxData {
         Ok(data)
     }
 }
-pub fn change_fee_recipient_ix<
-    K: Into<ChangeFeeRecipientKeys>,
-    A: Into<ChangeFeeRecipientIxArgs>,
->(
+pub fn change_fee_recipient_ix<K: Into<ChangeFeeRecipientKeys>>(
     accounts: K,
-    args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ChangeFeeRecipientKeys = accounts.into();
     let metas: [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = (&keys).into();
-    let args_full: ChangeFeeRecipientIxArgs = args.into();
-    let data: ChangeFeeRecipientIxData = args_full.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
-        data: data.try_to_vec()?,
+        data: ChangeFeeRecipientIxData.try_to_vec()?,
     })
 }
-pub fn change_fee_recipient_invoke<'info, A: Into<ChangeFeeRecipientIxArgs>>(
+pub fn change_fee_recipient_invoke<'info>(
     accounts: &ChangeFeeRecipientAccounts<'_, 'info>,
-    args: A,
 ) -> ProgramResult {
-    let ix = change_fee_recipient_ix(accounts, args)?;
+    let ix = change_fee_recipient_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn change_fee_recipient_invoke_signed<'info, A: Into<ChangeFeeRecipientIxArgs>>(
+pub fn change_fee_recipient_invoke_signed<'info>(
     accounts: &ChangeFeeRecipientAccounts<'_, 'info>,
-    args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = change_fee_recipient_ix(accounts, args)?;
+    let ix = change_fee_recipient_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
