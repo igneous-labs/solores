@@ -34,13 +34,6 @@ impl NamedAccount {
             #[derive(Clone, Debug, PartialEq)]
             pub struct #account_ident(pub #struct_ident);
 
-            impl BorshSerialize for #account_ident {
-                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    #account_discm_ident.serialize(writer)?;
-                    self.0.serialize(writer)
-                }
-            }
-
             impl #account_ident {
                 pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
                     let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -52,6 +45,17 @@ impl NamedAccount {
                         );
                     }
                     Ok(Self(#struct_ident::deserialize(buf)?))
+                }
+
+                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+                    writer.write_all(&#account_discm_ident)?;
+                    self.0.serialize(&mut writer)
+                }
+
+                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+                    let mut data = Vec::new();
+                    self.serialize(&mut data)?;
+                    Ok(data)
                 }
             }
         }

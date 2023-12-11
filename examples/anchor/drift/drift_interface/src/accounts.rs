@@ -18,12 +18,6 @@ pub struct PhoenixV1FulfillmentConfig {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PhoenixV1FulfillmentConfigAccount(pub PhoenixV1FulfillmentConfig);
-impl BorshSerialize for PhoenixV1FulfillmentConfigAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl PhoenixV1FulfillmentConfigAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -37,6 +31,15 @@ impl PhoenixV1FulfillmentConfigAccount {
             ));
         }
         Ok(Self(PhoenixV1FulfillmentConfig::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PHOENIX_V1_FULFILLMENT_CONFIG_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM: [u8; 8] =
@@ -62,12 +65,6 @@ pub struct SerumV3FulfillmentConfig {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SerumV3FulfillmentConfigAccount(pub SerumV3FulfillmentConfig);
-impl BorshSerialize for SerumV3FulfillmentConfigAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl SerumV3FulfillmentConfigAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -81,6 +78,15 @@ impl SerumV3FulfillmentConfigAccount {
             ));
         }
         Ok(Self(SerumV3FulfillmentConfig::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SERUM_V3_FULFILLMENT_CONFIG_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const INSURANCE_FUND_STAKE_ACCOUNT_DISCM: [u8; 8] = [110, 202, 14, 42, 95, 73, 90, 95];
@@ -100,12 +106,6 @@ pub struct InsuranceFundStake {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InsuranceFundStakeAccount(pub InsuranceFundStake);
-impl BorshSerialize for InsuranceFundStakeAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        INSURANCE_FUND_STAKE_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl InsuranceFundStakeAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -119,6 +119,15 @@ impl InsuranceFundStakeAccount {
             ));
         }
         Ok(Self(InsuranceFundStake::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INSURANCE_FUND_STAKE_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const PERP_MARKET_ACCOUNT_DISCM: [u8; 8] = [10, 223, 12, 44, 107, 245, 55, 247];
@@ -156,12 +165,6 @@ pub struct PerpMarket {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PerpMarketAccount(pub PerpMarket);
-impl BorshSerialize for PerpMarketAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        PERP_MARKET_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl PerpMarketAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -175,6 +178,15 @@ impl PerpMarketAccount {
             ));
         }
         Ok(Self(PerpMarket::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PERP_MARKET_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const SPOT_MARKET_ACCOUNT_DISCM: [u8; 8] = [100, 177, 8, 107, 168, 65, 65, 39];
@@ -236,12 +248,6 @@ pub struct SpotMarket {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpotMarketAccount(pub SpotMarket);
-impl BorshSerialize for SpotMarketAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        SPOT_MARKET_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl SpotMarketAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -255,6 +261,15 @@ impl SpotMarketAccount {
             ));
         }
         Ok(Self(SpotMarket::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SPOT_MARKET_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const STATE_ACCOUNT_DISCM: [u8; 8] = [216, 146, 107, 94, 104, 75, 182, 177];
@@ -287,12 +302,6 @@ pub struct State {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct StateAccount(pub State);
-impl BorshSerialize for StateAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        STATE_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl StateAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -306,6 +315,15 @@ impl StateAccount {
             ));
         }
         Ok(Self(State::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&STATE_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const USER_ACCOUNT_DISCM: [u8; 8] = [159, 117, 95, 227, 239, 151, 58, 236];
@@ -342,12 +360,6 @@ pub struct User {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UserAccount(pub User);
-impl BorshSerialize for UserAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        USER_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl UserAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -361,6 +373,15 @@ impl UserAccount {
             ));
         }
         Ok(Self(User::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&USER_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const USER_STATS_ACCOUNT_DISCM: [u8; 8] = [176, 223, 136, 27, 122, 79, 32, 227];
@@ -385,12 +406,6 @@ pub struct UserStats {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UserStatsAccount(pub UserStats);
-impl BorshSerialize for UserStatsAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        USER_STATS_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl UserStatsAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -405,6 +420,15 @@ impl UserStatsAccount {
         }
         Ok(Self(UserStats::deserialize(buf)?))
     }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&USER_STATS_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
+    }
 }
 pub const REFERRER_NAME_ACCOUNT_DISCM: [u8; 8] = [105, 133, 170, 110, 52, 42, 28, 182];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -417,12 +441,6 @@ pub struct ReferrerName {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ReferrerNameAccount(pub ReferrerName);
-impl BorshSerialize for ReferrerNameAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        REFERRER_NAME_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl ReferrerNameAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -436,5 +454,14 @@ impl ReferrerNameAccount {
             ));
         }
         Ok(Self(ReferrerName::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REFERRER_NAME_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }

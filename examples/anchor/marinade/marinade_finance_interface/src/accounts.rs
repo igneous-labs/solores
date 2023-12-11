@@ -29,12 +29,6 @@ pub struct State {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct StateAccount(pub State);
-impl BorshSerialize for StateAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        STATE_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl StateAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -49,6 +43,15 @@ impl StateAccount {
         }
         Ok(Self(State::deserialize(buf)?))
     }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&STATE_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
+    }
 }
 pub const TICKET_ACCOUNT_DATA_ACCOUNT_DISCM: [u8; 8] = [133, 77, 18, 98, 211, 1, 231, 3];
 #[derive(Clone, Debug, BorshDeserialize, BorshSerialize, PartialEq)]
@@ -61,12 +64,6 @@ pub struct TicketAccountData {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct TicketAccountDataAccount(pub TicketAccountData);
-impl BorshSerialize for TicketAccountDataAccount {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        TICKET_ACCOUNT_DATA_ACCOUNT_DISCM.serialize(writer)?;
-        self.0.serialize(writer)
-    }
-}
 impl TicketAccountDataAccount {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -80,5 +77,14 @@ impl TicketAccountDataAccount {
             ));
         }
         Ok(Self(TicketAccountData::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&TICKET_ACCOUNT_DATA_ACCOUNT_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
