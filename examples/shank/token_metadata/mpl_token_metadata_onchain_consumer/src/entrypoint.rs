@@ -18,7 +18,7 @@ fn process_instruction(
         .unwrap();
     let cpi_accounts: CreateMasterEditionAccounts = cpi_slice.into();
 
-    if let Err((acc, err)) = create_master_edition_verify_account_privileges(&cpi_accounts) {
+    if let Err((acc, err)) = create_master_edition_verify_account_privileges(cpi_accounts) {
         solana_program::msg!(
             "Writable/signer privilege escalation for {}: {}",
             acc.key,
@@ -31,5 +31,5 @@ fn process_instruction(
     let create_master_edition_ix_args_without_discm =
         CreateMasterEditionIxArgs::deserialize(&mut ix_data_reader)?;
 
-    create_master_edition_invoke(&cpi_accounts, create_master_edition_ix_args_without_discm)
+    create_master_edition_invoke(cpi_accounts, create_master_edition_ix_args_without_discm)
 }

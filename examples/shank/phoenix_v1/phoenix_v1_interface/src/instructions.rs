@@ -259,8 +259,8 @@ pub struct SwapKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&SwapAccounts<'_, '_>> for SwapKeys {
-    fn from(accounts: &SwapAccounts) -> Self {
+impl From<SwapAccounts<'_, '_>> for SwapKeys {
+    fn from(accounts: SwapAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -274,8 +274,8 @@ impl From<&SwapAccounts<'_, '_>> for SwapKeys {
         }
     }
 }
-impl From<&SwapKeys> for [AccountMeta; SWAP_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SwapKeys) -> Self {
+impl From<SwapKeys> for [AccountMeta; SWAP_IX_ACCOUNTS_LEN] {
+    fn from(keys: SwapKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -340,8 +340,8 @@ impl From<[Pubkey; SWAP_IX_ACCOUNTS_LEN]> for SwapKeys {
         }
     }
 }
-impl<'info> From<&SwapAccounts<'_, 'info>> for [AccountInfo<'info>; SWAP_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &SwapAccounts<'_, 'info>) -> Self {
+impl<'info> From<SwapAccounts<'_, 'info>> for [AccountInfo<'info>; SWAP_IX_ACCOUNTS_LEN] {
+    fn from(accounts: SwapAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -417,7 +417,7 @@ pub fn swap_ix<K: Into<SwapKeys>, A: Into<SwapIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SwapKeys = accounts.into();
-    let metas: [AccountMeta; SWAP_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SWAP_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SwapIxArgs = args.into();
     let data: SwapIxData = args_full.into();
     Ok(Instruction {
@@ -427,7 +427,7 @@ pub fn swap_ix<K: Into<SwapKeys>, A: Into<SwapIxArgs>>(
     })
 }
 pub fn swap_invoke<'info, A: Into<SwapIxArgs>>(
-    accounts: &SwapAccounts<'_, 'info>,
+    accounts: SwapAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = swap_ix(accounts, args)?;
@@ -435,7 +435,7 @@ pub fn swap_invoke<'info, A: Into<SwapIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn swap_invoke_signed<'info, A: Into<SwapIxArgs>>(
-    accounts: &SwapAccounts<'_, 'info>,
+    accounts: SwapAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -444,8 +444,8 @@ pub fn swap_invoke_signed<'info, A: Into<SwapIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn swap_verify_account_keys(
-    accounts: &SwapAccounts<'_, '_>,
-    keys: &SwapKeys,
+    accounts: SwapAccounts<'_, '_>,
+    keys: SwapKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -465,7 +465,7 @@ pub fn swap_verify_account_keys(
     Ok(())
 }
 pub fn swap_verify_account_privileges<'me, 'info>(
-    accounts: &SwapAccounts<'me, 'info>,
+    accounts: SwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -508,8 +508,8 @@ pub struct SwapWithFreeFundsKeys {
     pub trader: Pubkey,
     pub seat: Pubkey,
 }
-impl From<&SwapWithFreeFundsAccounts<'_, '_>> for SwapWithFreeFundsKeys {
-    fn from(accounts: &SwapWithFreeFundsAccounts) -> Self {
+impl From<SwapWithFreeFundsAccounts<'_, '_>> for SwapWithFreeFundsKeys {
+    fn from(accounts: SwapWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -519,8 +519,8 @@ impl From<&SwapWithFreeFundsAccounts<'_, '_>> for SwapWithFreeFundsKeys {
         }
     }
 }
-impl From<&SwapWithFreeFundsKeys> for [AccountMeta; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SwapWithFreeFundsKeys) -> Self {
+impl From<SwapWithFreeFundsKeys> for [AccountMeta; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] {
+    fn from(keys: SwapWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -561,10 +561,10 @@ impl From<[Pubkey; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]> for SwapWithFreeFundsK
         }
     }
 }
-impl<'info> From<&SwapWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<SwapWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SwapWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SwapWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -632,7 +632,7 @@ pub fn swap_with_free_funds_ix<K: Into<SwapWithFreeFundsKeys>, A: Into<SwapWithF
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: SwapWithFreeFundsKeys = accounts.into();
-    let metas: [AccountMeta; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: SwapWithFreeFundsIxArgs = args.into();
     let data: SwapWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -642,7 +642,7 @@ pub fn swap_with_free_funds_ix<K: Into<SwapWithFreeFundsKeys>, A: Into<SwapWithF
     })
 }
 pub fn swap_with_free_funds_invoke<'info, A: Into<SwapWithFreeFundsIxArgs>>(
-    accounts: &SwapWithFreeFundsAccounts<'_, 'info>,
+    accounts: SwapWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = swap_with_free_funds_ix(accounts, args)?;
@@ -650,7 +650,7 @@ pub fn swap_with_free_funds_invoke<'info, A: Into<SwapWithFreeFundsIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn swap_with_free_funds_invoke_signed<'info, A: Into<SwapWithFreeFundsIxArgs>>(
-    accounts: &SwapWithFreeFundsAccounts<'_, 'info>,
+    accounts: SwapWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -659,8 +659,8 @@ pub fn swap_with_free_funds_invoke_signed<'info, A: Into<SwapWithFreeFundsIxArgs
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn swap_with_free_funds_verify_account_keys(
-    accounts: &SwapWithFreeFundsAccounts<'_, '_>,
-    keys: &SwapWithFreeFundsKeys,
+    accounts: SwapWithFreeFundsAccounts<'_, '_>,
+    keys: SwapWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -676,7 +676,7 @@ pub fn swap_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn swap_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &SwapWithFreeFundsAccounts<'me, 'info>,
+    accounts: SwapWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -733,8 +733,8 @@ pub struct PlaceLimitOrderKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&PlaceLimitOrderAccounts<'_, '_>> for PlaceLimitOrderKeys {
-    fn from(accounts: &PlaceLimitOrderAccounts) -> Self {
+impl From<PlaceLimitOrderAccounts<'_, '_>> for PlaceLimitOrderKeys {
+    fn from(accounts: PlaceLimitOrderAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -749,8 +749,8 @@ impl From<&PlaceLimitOrderAccounts<'_, '_>> for PlaceLimitOrderKeys {
         }
     }
 }
-impl From<&PlaceLimitOrderKeys> for [AccountMeta; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PlaceLimitOrderKeys) -> Self {
+impl From<PlaceLimitOrderKeys> for [AccountMeta; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: PlaceLimitOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -821,10 +821,10 @@ impl From<[Pubkey; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN]> for PlaceLimitOrderKeys {
         }
     }
 }
-impl<'info> From<&PlaceLimitOrderAccounts<'_, 'info>>
+impl<'info> From<PlaceLimitOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceLimitOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceLimitOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -902,7 +902,7 @@ pub fn place_limit_order_ix<K: Into<PlaceLimitOrderKeys>, A: Into<PlaceLimitOrde
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceLimitOrderKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceLimitOrderIxArgs = args.into();
     let data: PlaceLimitOrderIxData = args_full.into();
     Ok(Instruction {
@@ -912,7 +912,7 @@ pub fn place_limit_order_ix<K: Into<PlaceLimitOrderKeys>, A: Into<PlaceLimitOrde
     })
 }
 pub fn place_limit_order_invoke<'info, A: Into<PlaceLimitOrderIxArgs>>(
-    accounts: &PlaceLimitOrderAccounts<'_, 'info>,
+    accounts: PlaceLimitOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_limit_order_ix(accounts, args)?;
@@ -920,7 +920,7 @@ pub fn place_limit_order_invoke<'info, A: Into<PlaceLimitOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn place_limit_order_invoke_signed<'info, A: Into<PlaceLimitOrderIxArgs>>(
-    accounts: &PlaceLimitOrderAccounts<'_, 'info>,
+    accounts: PlaceLimitOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -929,8 +929,8 @@ pub fn place_limit_order_invoke_signed<'info, A: Into<PlaceLimitOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_limit_order_verify_account_keys(
-    accounts: &PlaceLimitOrderAccounts<'_, '_>,
-    keys: &PlaceLimitOrderKeys,
+    accounts: PlaceLimitOrderAccounts<'_, '_>,
+    keys: PlaceLimitOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -951,7 +951,7 @@ pub fn place_limit_order_verify_account_keys(
     Ok(())
 }
 pub fn place_limit_order_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceLimitOrderAccounts<'me, 'info>,
+    accounts: PlaceLimitOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -994,8 +994,8 @@ pub struct PlaceLimitOrderWithFreeFundsKeys {
     pub trader: Pubkey,
     pub seat: Pubkey,
 }
-impl From<&PlaceLimitOrderWithFreeFundsAccounts<'_, '_>> for PlaceLimitOrderWithFreeFundsKeys {
-    fn from(accounts: &PlaceLimitOrderWithFreeFundsAccounts) -> Self {
+impl From<PlaceLimitOrderWithFreeFundsAccounts<'_, '_>> for PlaceLimitOrderWithFreeFundsKeys {
+    fn from(accounts: PlaceLimitOrderWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -1005,10 +1005,10 @@ impl From<&PlaceLimitOrderWithFreeFundsAccounts<'_, '_>> for PlaceLimitOrderWith
         }
     }
 }
-impl From<&PlaceLimitOrderWithFreeFundsKeys>
+impl From<PlaceLimitOrderWithFreeFundsKeys>
     for [AccountMeta; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &PlaceLimitOrderWithFreeFundsKeys) -> Self {
+    fn from(keys: PlaceLimitOrderWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -1051,10 +1051,10 @@ impl From<[Pubkey; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -1129,7 +1129,7 @@ pub fn place_limit_order_with_free_funds_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceLimitOrderWithFreeFundsKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceLimitOrderWithFreeFundsIxArgs = args.into();
     let data: PlaceLimitOrderWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -1142,7 +1142,7 @@ pub fn place_limit_order_with_free_funds_invoke<
     'info,
     A: Into<PlaceLimitOrderWithFreeFundsIxArgs>,
 >(
-    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_limit_order_with_free_funds_ix(accounts, args)?;
@@ -1154,7 +1154,7 @@ pub fn place_limit_order_with_free_funds_invoke_signed<
     'info,
     A: Into<PlaceLimitOrderWithFreeFundsIxArgs>,
 >(
-    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1164,8 +1164,8 @@ pub fn place_limit_order_with_free_funds_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_limit_order_with_free_funds_verify_account_keys(
-    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
-    keys: &PlaceLimitOrderWithFreeFundsKeys,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
+    keys: PlaceLimitOrderWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -1181,7 +1181,7 @@ pub fn place_limit_order_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn place_limit_order_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceLimitOrderWithFreeFundsAccounts<'me, 'info>,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -1236,8 +1236,8 @@ pub struct ReduceOrderKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&ReduceOrderAccounts<'_, '_>> for ReduceOrderKeys {
-    fn from(accounts: &ReduceOrderAccounts) -> Self {
+impl From<ReduceOrderAccounts<'_, '_>> for ReduceOrderKeys {
+    fn from(accounts: ReduceOrderAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -1251,8 +1251,8 @@ impl From<&ReduceOrderAccounts<'_, '_>> for ReduceOrderKeys {
         }
     }
 }
-impl From<&ReduceOrderKeys> for [AccountMeta; REDUCE_ORDER_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ReduceOrderKeys) -> Self {
+impl From<ReduceOrderKeys> for [AccountMeta; REDUCE_ORDER_IX_ACCOUNTS_LEN] {
+    fn from(keys: ReduceOrderKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -1317,10 +1317,10 @@ impl From<[Pubkey; REDUCE_ORDER_IX_ACCOUNTS_LEN]> for ReduceOrderKeys {
         }
     }
 }
-impl<'info> From<&ReduceOrderAccounts<'_, 'info>>
+impl<'info> From<ReduceOrderAccounts<'_, 'info>>
     for [AccountInfo<'info>; REDUCE_ORDER_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ReduceOrderAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ReduceOrderAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -1396,7 +1396,7 @@ pub fn reduce_order_ix<K: Into<ReduceOrderKeys>, A: Into<ReduceOrderIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ReduceOrderKeys = accounts.into();
-    let metas: [AccountMeta; REDUCE_ORDER_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REDUCE_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ReduceOrderIxArgs = args.into();
     let data: ReduceOrderIxData = args_full.into();
     Ok(Instruction {
@@ -1406,7 +1406,7 @@ pub fn reduce_order_ix<K: Into<ReduceOrderKeys>, A: Into<ReduceOrderIxArgs>>(
     })
 }
 pub fn reduce_order_invoke<'info, A: Into<ReduceOrderIxArgs>>(
-    accounts: &ReduceOrderAccounts<'_, 'info>,
+    accounts: ReduceOrderAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = reduce_order_ix(accounts, args)?;
@@ -1414,7 +1414,7 @@ pub fn reduce_order_invoke<'info, A: Into<ReduceOrderIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn reduce_order_invoke_signed<'info, A: Into<ReduceOrderIxArgs>>(
-    accounts: &ReduceOrderAccounts<'_, 'info>,
+    accounts: ReduceOrderAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1423,8 +1423,8 @@ pub fn reduce_order_invoke_signed<'info, A: Into<ReduceOrderIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn reduce_order_verify_account_keys(
-    accounts: &ReduceOrderAccounts<'_, '_>,
-    keys: &ReduceOrderKeys,
+    accounts: ReduceOrderAccounts<'_, '_>,
+    keys: ReduceOrderKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -1444,7 +1444,7 @@ pub fn reduce_order_verify_account_keys(
     Ok(())
 }
 pub fn reduce_order_verify_account_privileges<'me, 'info>(
-    accounts: &ReduceOrderAccounts<'me, 'info>,
+    accounts: ReduceOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -1485,8 +1485,8 @@ pub struct ReduceOrderWithFreeFundsKeys {
     pub market: Pubkey,
     pub trader: Pubkey,
 }
-impl From<&ReduceOrderWithFreeFundsAccounts<'_, '_>> for ReduceOrderWithFreeFundsKeys {
-    fn from(accounts: &ReduceOrderWithFreeFundsAccounts) -> Self {
+impl From<ReduceOrderWithFreeFundsAccounts<'_, '_>> for ReduceOrderWithFreeFundsKeys {
+    fn from(accounts: ReduceOrderWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -1495,10 +1495,10 @@ impl From<&ReduceOrderWithFreeFundsAccounts<'_, '_>> for ReduceOrderWithFreeFund
         }
     }
 }
-impl From<&ReduceOrderWithFreeFundsKeys>
+impl From<ReduceOrderWithFreeFundsKeys>
     for [AccountMeta; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &ReduceOrderWithFreeFundsKeys) -> Self {
+    fn from(keys: ReduceOrderWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -1533,10 +1533,10 @@ impl From<[Pubkey; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]> for ReduceOrde
         }
     }
 }
-impl<'info> From<&ReduceOrderWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<ReduceOrderWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ReduceOrderWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ReduceOrderWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -1607,7 +1607,7 @@ pub fn reduce_order_with_free_funds_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ReduceOrderWithFreeFundsKeys = accounts.into();
-    let metas: [AccountMeta; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ReduceOrderWithFreeFundsIxArgs = args.into();
     let data: ReduceOrderWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -1617,7 +1617,7 @@ pub fn reduce_order_with_free_funds_ix<
     })
 }
 pub fn reduce_order_with_free_funds_invoke<'info, A: Into<ReduceOrderWithFreeFundsIxArgs>>(
-    accounts: &ReduceOrderWithFreeFundsAccounts<'_, 'info>,
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = reduce_order_with_free_funds_ix(accounts, args)?;
@@ -1629,7 +1629,7 @@ pub fn reduce_order_with_free_funds_invoke_signed<
     'info,
     A: Into<ReduceOrderWithFreeFundsIxArgs>,
 >(
-    accounts: &ReduceOrderWithFreeFundsAccounts<'_, 'info>,
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1639,8 +1639,8 @@ pub fn reduce_order_with_free_funds_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn reduce_order_with_free_funds_verify_account_keys(
-    accounts: &ReduceOrderWithFreeFundsAccounts<'_, '_>,
-    keys: &ReduceOrderWithFreeFundsKeys,
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
+    keys: ReduceOrderWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -1655,7 +1655,7 @@ pub fn reduce_order_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn reduce_order_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &ReduceOrderWithFreeFundsAccounts<'me, 'info>,
+    accounts: ReduceOrderWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.trader] {
         if !should_be_writable.is_writable {
@@ -1710,8 +1710,8 @@ pub struct CancelAllOrdersKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&CancelAllOrdersAccounts<'_, '_>> for CancelAllOrdersKeys {
-    fn from(accounts: &CancelAllOrdersAccounts) -> Self {
+impl From<CancelAllOrdersAccounts<'_, '_>> for CancelAllOrdersKeys {
+    fn from(accounts: CancelAllOrdersAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -1725,8 +1725,8 @@ impl From<&CancelAllOrdersAccounts<'_, '_>> for CancelAllOrdersKeys {
         }
     }
 }
-impl From<&CancelAllOrdersKeys> for [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CancelAllOrdersKeys) -> Self {
+impl From<CancelAllOrdersKeys> for [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] {
+    fn from(keys: CancelAllOrdersKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -1791,10 +1791,10 @@ impl From<[Pubkey; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN]> for CancelAllOrdersKeys {
         }
     }
 }
-impl<'info> From<&CancelAllOrdersAccounts<'_, 'info>>
+impl<'info> From<CancelAllOrdersAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelAllOrdersAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelAllOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -1858,7 +1858,7 @@ pub fn cancel_all_orders_ix<K: Into<CancelAllOrdersKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: CancelAllOrdersKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1866,14 +1866,14 @@ pub fn cancel_all_orders_ix<K: Into<CancelAllOrdersKeys>>(
     })
 }
 pub fn cancel_all_orders_invoke<'info>(
-    accounts: &CancelAllOrdersAccounts<'_, 'info>,
+    accounts: CancelAllOrdersAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = cancel_all_orders_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn cancel_all_orders_invoke_signed<'info>(
-    accounts: &CancelAllOrdersAccounts<'_, 'info>,
+    accounts: CancelAllOrdersAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_all_orders_ix(accounts)?;
@@ -1881,8 +1881,8 @@ pub fn cancel_all_orders_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_all_orders_verify_account_keys(
-    accounts: &CancelAllOrdersAccounts<'_, '_>,
-    keys: &CancelAllOrdersKeys,
+    accounts: CancelAllOrdersAccounts<'_, '_>,
+    keys: CancelAllOrdersKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -1902,7 +1902,7 @@ pub fn cancel_all_orders_verify_account_keys(
     Ok(())
 }
 pub fn cancel_all_orders_verify_account_privileges<'me, 'info>(
-    accounts: &CancelAllOrdersAccounts<'me, 'info>,
+    accounts: CancelAllOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -1943,8 +1943,8 @@ pub struct CancelAllOrdersWithFreeFundsKeys {
     pub market: Pubkey,
     pub trader: Pubkey,
 }
-impl From<&CancelAllOrdersWithFreeFundsAccounts<'_, '_>> for CancelAllOrdersWithFreeFundsKeys {
-    fn from(accounts: &CancelAllOrdersWithFreeFundsAccounts) -> Self {
+impl From<CancelAllOrdersWithFreeFundsAccounts<'_, '_>> for CancelAllOrdersWithFreeFundsKeys {
+    fn from(accounts: CancelAllOrdersWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -1953,10 +1953,10 @@ impl From<&CancelAllOrdersWithFreeFundsAccounts<'_, '_>> for CancelAllOrdersWith
         }
     }
 }
-impl From<&CancelAllOrdersWithFreeFundsKeys>
+impl From<CancelAllOrdersWithFreeFundsKeys>
     for [AccountMeta; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CancelAllOrdersWithFreeFundsKeys) -> Self {
+    fn from(keys: CancelAllOrdersWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -1993,10 +1993,10 @@ impl From<[Pubkey; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&CancelAllOrdersWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<CancelAllOrdersWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelAllOrdersWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -2052,7 +2052,7 @@ pub fn cancel_all_orders_with_free_funds_ix<K: Into<CancelAllOrdersWithFreeFunds
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: CancelAllOrdersWithFreeFundsKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -2060,7 +2060,7 @@ pub fn cancel_all_orders_with_free_funds_ix<K: Into<CancelAllOrdersWithFreeFunds
     })
 }
 pub fn cancel_all_orders_with_free_funds_invoke<'info>(
-    accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = cancel_all_orders_with_free_funds_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
@@ -2068,7 +2068,7 @@ pub fn cancel_all_orders_with_free_funds_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn cancel_all_orders_with_free_funds_invoke_signed<'info>(
-    accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = cancel_all_orders_with_free_funds_ix(accounts)?;
@@ -2077,8 +2077,8 @@ pub fn cancel_all_orders_with_free_funds_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_all_orders_with_free_funds_verify_account_keys(
-    accounts: &CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
-    keys: &CancelAllOrdersWithFreeFundsKeys,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
+    keys: CancelAllOrdersWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -2093,7 +2093,7 @@ pub fn cancel_all_orders_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn cancel_all_orders_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &CancelAllOrdersWithFreeFundsAccounts<'me, 'info>,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -2148,8 +2148,8 @@ pub struct CancelUpToKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&CancelUpToAccounts<'_, '_>> for CancelUpToKeys {
-    fn from(accounts: &CancelUpToAccounts) -> Self {
+impl From<CancelUpToAccounts<'_, '_>> for CancelUpToKeys {
+    fn from(accounts: CancelUpToAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -2163,8 +2163,8 @@ impl From<&CancelUpToAccounts<'_, '_>> for CancelUpToKeys {
         }
     }
 }
-impl From<&CancelUpToKeys> for [AccountMeta; CANCEL_UP_TO_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CancelUpToKeys) -> Self {
+impl From<CancelUpToKeys> for [AccountMeta; CANCEL_UP_TO_IX_ACCOUNTS_LEN] {
+    fn from(keys: CancelUpToKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -2229,10 +2229,10 @@ impl From<[Pubkey; CANCEL_UP_TO_IX_ACCOUNTS_LEN]> for CancelUpToKeys {
         }
     }
 }
-impl<'info> From<&CancelUpToAccounts<'_, 'info>>
+impl<'info> From<CancelUpToAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_UP_TO_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelUpToAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelUpToAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -2308,7 +2308,7 @@ pub fn cancel_up_to_ix<K: Into<CancelUpToKeys>, A: Into<CancelUpToIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelUpToKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_UP_TO_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_UP_TO_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelUpToIxArgs = args.into();
     let data: CancelUpToIxData = args_full.into();
     Ok(Instruction {
@@ -2318,7 +2318,7 @@ pub fn cancel_up_to_ix<K: Into<CancelUpToKeys>, A: Into<CancelUpToIxArgs>>(
     })
 }
 pub fn cancel_up_to_invoke<'info, A: Into<CancelUpToIxArgs>>(
-    accounts: &CancelUpToAccounts<'_, 'info>,
+    accounts: CancelUpToAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_up_to_ix(accounts, args)?;
@@ -2326,7 +2326,7 @@ pub fn cancel_up_to_invoke<'info, A: Into<CancelUpToIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn cancel_up_to_invoke_signed<'info, A: Into<CancelUpToIxArgs>>(
-    accounts: &CancelUpToAccounts<'_, 'info>,
+    accounts: CancelUpToAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2335,8 +2335,8 @@ pub fn cancel_up_to_invoke_signed<'info, A: Into<CancelUpToIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_up_to_verify_account_keys(
-    accounts: &CancelUpToAccounts<'_, '_>,
-    keys: &CancelUpToKeys,
+    accounts: CancelUpToAccounts<'_, '_>,
+    keys: CancelUpToKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -2356,7 +2356,7 @@ pub fn cancel_up_to_verify_account_keys(
     Ok(())
 }
 pub fn cancel_up_to_verify_account_privileges<'me, 'info>(
-    accounts: &CancelUpToAccounts<'me, 'info>,
+    accounts: CancelUpToAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -2397,8 +2397,8 @@ pub struct CancelUpToWithFreeFundsKeys {
     pub market: Pubkey,
     pub trader: Pubkey,
 }
-impl From<&CancelUpToWithFreeFundsAccounts<'_, '_>> for CancelUpToWithFreeFundsKeys {
-    fn from(accounts: &CancelUpToWithFreeFundsAccounts) -> Self {
+impl From<CancelUpToWithFreeFundsAccounts<'_, '_>> for CancelUpToWithFreeFundsKeys {
+    fn from(accounts: CancelUpToWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -2407,10 +2407,10 @@ impl From<&CancelUpToWithFreeFundsAccounts<'_, '_>> for CancelUpToWithFreeFundsK
         }
     }
 }
-impl From<&CancelUpToWithFreeFundsKeys>
+impl From<CancelUpToWithFreeFundsKeys>
     for [AccountMeta; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CancelUpToWithFreeFundsKeys) -> Self {
+    fn from(keys: CancelUpToWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -2445,10 +2445,10 @@ impl From<[Pubkey; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]> for CancelUpTo
         }
     }
 }
-impl<'info> From<&CancelUpToWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<CancelUpToWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelUpToWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelUpToWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -2519,7 +2519,7 @@ pub fn cancel_up_to_with_free_funds_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelUpToWithFreeFundsKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelUpToWithFreeFundsIxArgs = args.into();
     let data: CancelUpToWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -2529,7 +2529,7 @@ pub fn cancel_up_to_with_free_funds_ix<
     })
 }
 pub fn cancel_up_to_with_free_funds_invoke<'info, A: Into<CancelUpToWithFreeFundsIxArgs>>(
-    accounts: &CancelUpToWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelUpToWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_up_to_with_free_funds_ix(accounts, args)?;
@@ -2538,7 +2538,7 @@ pub fn cancel_up_to_with_free_funds_invoke<'info, A: Into<CancelUpToWithFreeFund
     invoke(&ix, &account_info)
 }
 pub fn cancel_up_to_with_free_funds_invoke_signed<'info, A: Into<CancelUpToWithFreeFundsIxArgs>>(
-    accounts: &CancelUpToWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelUpToWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2548,8 +2548,8 @@ pub fn cancel_up_to_with_free_funds_invoke_signed<'info, A: Into<CancelUpToWithF
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_up_to_with_free_funds_verify_account_keys(
-    accounts: &CancelUpToWithFreeFundsAccounts<'_, '_>,
-    keys: &CancelUpToWithFreeFundsKeys,
+    accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
+    keys: CancelUpToWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -2564,7 +2564,7 @@ pub fn cancel_up_to_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn cancel_up_to_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &CancelUpToWithFreeFundsAccounts<'me, 'info>,
+    accounts: CancelUpToWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -2619,8 +2619,8 @@ pub struct CancelMultipleOrdersByIdKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&CancelMultipleOrdersByIdAccounts<'_, '_>> for CancelMultipleOrdersByIdKeys {
-    fn from(accounts: &CancelMultipleOrdersByIdAccounts) -> Self {
+impl From<CancelMultipleOrdersByIdAccounts<'_, '_>> for CancelMultipleOrdersByIdKeys {
+    fn from(accounts: CancelMultipleOrdersByIdAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -2634,10 +2634,10 @@ impl From<&CancelMultipleOrdersByIdAccounts<'_, '_>> for CancelMultipleOrdersByI
         }
     }
 }
-impl From<&CancelMultipleOrdersByIdKeys>
+impl From<CancelMultipleOrdersByIdKeys>
     for [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CancelMultipleOrdersByIdKeys) -> Self {
+    fn from(keys: CancelMultipleOrdersByIdKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -2702,10 +2702,10 @@ impl From<[Pubkey; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN]> for CancelMult
         }
     }
 }
-impl<'info> From<&CancelMultipleOrdersByIdAccounts<'_, 'info>>
+impl<'info> From<CancelMultipleOrdersByIdAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelMultipleOrdersByIdAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelMultipleOrdersByIdAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -2786,7 +2786,7 @@ pub fn cancel_multiple_orders_by_id_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CancelMultipleOrdersByIdKeys = accounts.into();
-    let metas: [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CancelMultipleOrdersByIdIxArgs = args.into();
     let data: CancelMultipleOrdersByIdIxData = args_full.into();
     Ok(Instruction {
@@ -2796,7 +2796,7 @@ pub fn cancel_multiple_orders_by_id_ix<
     })
 }
 pub fn cancel_multiple_orders_by_id_invoke<'info, A: Into<CancelMultipleOrdersByIdIxArgs>>(
-    accounts: &CancelMultipleOrdersByIdAccounts<'_, 'info>,
+    accounts: CancelMultipleOrdersByIdAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_multiple_orders_by_id_ix(accounts, args)?;
@@ -2808,7 +2808,7 @@ pub fn cancel_multiple_orders_by_id_invoke_signed<
     'info,
     A: Into<CancelMultipleOrdersByIdIxArgs>,
 >(
-    accounts: &CancelMultipleOrdersByIdAccounts<'_, 'info>,
+    accounts: CancelMultipleOrdersByIdAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2818,8 +2818,8 @@ pub fn cancel_multiple_orders_by_id_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_multiple_orders_by_id_verify_account_keys(
-    accounts: &CancelMultipleOrdersByIdAccounts<'_, '_>,
-    keys: &CancelMultipleOrdersByIdKeys,
+    accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
+    keys: CancelMultipleOrdersByIdKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -2839,7 +2839,7 @@ pub fn cancel_multiple_orders_by_id_verify_account_keys(
     Ok(())
 }
 pub fn cancel_multiple_orders_by_id_verify_account_privileges<'me, 'info>(
-    accounts: &CancelMultipleOrdersByIdAccounts<'me, 'info>,
+    accounts: CancelMultipleOrdersByIdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -2880,10 +2880,10 @@ pub struct CancelMultipleOrdersByIdWithFreeFundsKeys {
     pub market: Pubkey,
     pub trader: Pubkey,
 }
-impl From<&CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>>
+impl From<CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>>
     for CancelMultipleOrdersByIdWithFreeFundsKeys
 {
-    fn from(accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts) -> Self {
+    fn from(accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -2892,10 +2892,10 @@ impl From<&CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>>
         }
     }
 }
-impl From<&CancelMultipleOrdersByIdWithFreeFundsKeys>
+impl From<CancelMultipleOrdersByIdWithFreeFundsKeys>
     for [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CancelMultipleOrdersByIdWithFreeFundsKeys) -> Self {
+    fn from(keys: CancelMultipleOrdersByIdWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -2934,10 +2934,10 @@ impl From<[Pubkey; CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
         }
     }
 }
-impl<'info> From<&CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -3017,7 +3017,7 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_ix<
 ) -> std::io::Result<Instruction> {
     let keys: CancelMultipleOrdersByIdWithFreeFundsKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: CancelMultipleOrdersByIdWithFreeFundsIxArgs = args.into();
     let data: CancelMultipleOrdersByIdWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -3030,7 +3030,7 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_invoke<
     'info,
     A: Into<CancelMultipleOrdersByIdWithFreeFundsIxArgs>,
 >(
-    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = cancel_multiple_orders_by_id_with_free_funds_ix(accounts, args)?;
@@ -3042,7 +3042,7 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_signed<
     'info,
     A: Into<CancelMultipleOrdersByIdWithFreeFundsIxArgs>,
 >(
-    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3052,8 +3052,8 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_keys(
-    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
-    keys: &CancelMultipleOrdersByIdWithFreeFundsKeys,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
+    keys: CancelMultipleOrdersByIdWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -3068,7 +3068,7 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &CancelMultipleOrdersByIdWithFreeFundsAccounts<'me, 'info>,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -3123,8 +3123,8 @@ pub struct WithdrawFundsKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&WithdrawFundsAccounts<'_, '_>> for WithdrawFundsKeys {
-    fn from(accounts: &WithdrawFundsAccounts) -> Self {
+impl From<WithdrawFundsAccounts<'_, '_>> for WithdrawFundsKeys {
+    fn from(accounts: WithdrawFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -3138,8 +3138,8 @@ impl From<&WithdrawFundsAccounts<'_, '_>> for WithdrawFundsKeys {
         }
     }
 }
-impl From<&WithdrawFundsKeys> for [AccountMeta; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &WithdrawFundsKeys) -> Self {
+impl From<WithdrawFundsKeys> for [AccountMeta; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] {
+    fn from(keys: WithdrawFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -3204,10 +3204,10 @@ impl From<[Pubkey; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN]> for WithdrawFundsKeys {
         }
     }
 }
-impl<'info> From<&WithdrawFundsAccounts<'_, 'info>>
+impl<'info> From<WithdrawFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &WithdrawFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: WithdrawFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -3283,7 +3283,7 @@ pub fn withdraw_funds_ix<K: Into<WithdrawFundsKeys>, A: Into<WithdrawFundsIxArgs
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: WithdrawFundsKeys = accounts.into();
-    let metas: [AccountMeta; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: WithdrawFundsIxArgs = args.into();
     let data: WithdrawFundsIxData = args_full.into();
     Ok(Instruction {
@@ -3293,7 +3293,7 @@ pub fn withdraw_funds_ix<K: Into<WithdrawFundsKeys>, A: Into<WithdrawFundsIxArgs
     })
 }
 pub fn withdraw_funds_invoke<'info, A: Into<WithdrawFundsIxArgs>>(
-    accounts: &WithdrawFundsAccounts<'_, 'info>,
+    accounts: WithdrawFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = withdraw_funds_ix(accounts, args)?;
@@ -3301,7 +3301,7 @@ pub fn withdraw_funds_invoke<'info, A: Into<WithdrawFundsIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn withdraw_funds_invoke_signed<'info, A: Into<WithdrawFundsIxArgs>>(
-    accounts: &WithdrawFundsAccounts<'_, 'info>,
+    accounts: WithdrawFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3310,8 +3310,8 @@ pub fn withdraw_funds_invoke_signed<'info, A: Into<WithdrawFundsIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn withdraw_funds_verify_account_keys(
-    accounts: &WithdrawFundsAccounts<'_, '_>,
-    keys: &WithdrawFundsKeys,
+    accounts: WithdrawFundsAccounts<'_, '_>,
+    keys: WithdrawFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -3331,7 +3331,7 @@ pub fn withdraw_funds_verify_account_keys(
     Ok(())
 }
 pub fn withdraw_funds_verify_account_privileges<'me, 'info>(
-    accounts: &WithdrawFundsAccounts<'me, 'info>,
+    accounts: WithdrawFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -3394,8 +3394,8 @@ pub struct DepositFundsKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&DepositFundsAccounts<'_, '_>> for DepositFundsKeys {
-    fn from(accounts: &DepositFundsAccounts) -> Self {
+impl From<DepositFundsAccounts<'_, '_>> for DepositFundsKeys {
+    fn from(accounts: DepositFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -3410,8 +3410,8 @@ impl From<&DepositFundsAccounts<'_, '_>> for DepositFundsKeys {
         }
     }
 }
-impl From<&DepositFundsKeys> for [AccountMeta; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &DepositFundsKeys) -> Self {
+impl From<DepositFundsKeys> for [AccountMeta; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] {
+    fn from(keys: DepositFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -3482,10 +3482,10 @@ impl From<[Pubkey; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN]> for DepositFundsKeys {
         }
     }
 }
-impl<'info> From<&DepositFundsAccounts<'_, 'info>>
+impl<'info> From<DepositFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DepositFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DepositFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -3563,7 +3563,7 @@ pub fn deposit_funds_ix<K: Into<DepositFundsKeys>, A: Into<DepositFundsIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DepositFundsKeys = accounts.into();
-    let metas: [AccountMeta; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DepositFundsIxArgs = args.into();
     let data: DepositFundsIxData = args_full.into();
     Ok(Instruction {
@@ -3573,7 +3573,7 @@ pub fn deposit_funds_ix<K: Into<DepositFundsKeys>, A: Into<DepositFundsIxArgs>>(
     })
 }
 pub fn deposit_funds_invoke<'info, A: Into<DepositFundsIxArgs>>(
-    accounts: &DepositFundsAccounts<'_, 'info>,
+    accounts: DepositFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deposit_funds_ix(accounts, args)?;
@@ -3581,7 +3581,7 @@ pub fn deposit_funds_invoke<'info, A: Into<DepositFundsIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn deposit_funds_invoke_signed<'info, A: Into<DepositFundsIxArgs>>(
-    accounts: &DepositFundsAccounts<'_, 'info>,
+    accounts: DepositFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3590,8 +3590,8 @@ pub fn deposit_funds_invoke_signed<'info, A: Into<DepositFundsIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deposit_funds_verify_account_keys(
-    accounts: &DepositFundsAccounts<'_, '_>,
-    keys: &DepositFundsKeys,
+    accounts: DepositFundsAccounts<'_, '_>,
+    keys: DepositFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -3612,7 +3612,7 @@ pub fn deposit_funds_verify_account_keys(
     Ok(())
 }
 pub fn deposit_funds_verify_account_privileges<'me, 'info>(
-    accounts: &DepositFundsAccounts<'me, 'info>,
+    accounts: DepositFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -3659,8 +3659,8 @@ pub struct RequestSeatKeys {
     ///System program
     pub system_program: Pubkey,
 }
-impl From<&RequestSeatAccounts<'_, '_>> for RequestSeatKeys {
-    fn from(accounts: &RequestSeatAccounts) -> Self {
+impl From<RequestSeatAccounts<'_, '_>> for RequestSeatKeys {
+    fn from(accounts: RequestSeatAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -3671,8 +3671,8 @@ impl From<&RequestSeatAccounts<'_, '_>> for RequestSeatKeys {
         }
     }
 }
-impl From<&RequestSeatKeys> for [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RequestSeatKeys) -> Self {
+impl From<RequestSeatKeys> for [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] {
+    fn from(keys: RequestSeatKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -3719,10 +3719,10 @@ impl From<[Pubkey; REQUEST_SEAT_IX_ACCOUNTS_LEN]> for RequestSeatKeys {
         }
     }
 }
-impl<'info> From<&RequestSeatAccounts<'_, 'info>>
+impl<'info> From<RequestSeatAccounts<'_, 'info>>
     for [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RequestSeatAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RequestSeatAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -3778,20 +3778,20 @@ impl RequestSeatIxData {
 }
 pub fn request_seat_ix<K: Into<RequestSeatKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: RequestSeatKeys = accounts.into();
-    let metas: [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: RequestSeatIxData.try_to_vec()?,
     })
 }
-pub fn request_seat_invoke<'info>(accounts: &RequestSeatAccounts<'_, 'info>) -> ProgramResult {
+pub fn request_seat_invoke<'info>(accounts: RequestSeatAccounts<'_, 'info>) -> ProgramResult {
     let ix = request_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn request_seat_invoke_signed<'info>(
-    accounts: &RequestSeatAccounts<'_, 'info>,
+    accounts: RequestSeatAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = request_seat_ix(accounts)?;
@@ -3799,8 +3799,8 @@ pub fn request_seat_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn request_seat_verify_account_keys(
-    accounts: &RequestSeatAccounts<'_, '_>,
-    keys: &RequestSeatKeys,
+    accounts: RequestSeatAccounts<'_, '_>,
+    keys: RequestSeatKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -3817,7 +3817,7 @@ pub fn request_seat_verify_account_keys(
     Ok(())
 }
 pub fn request_seat_verify_account_privileges<'me, 'info>(
-    accounts: &RequestSeatAccounts<'me, 'info>,
+    accounts: RequestSeatAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.payer, accounts.seat] {
         if !should_be_writable.is_writable {
@@ -3842,15 +3842,15 @@ pub struct LogKeys {
     ///Log authority
     pub log_authority: Pubkey,
 }
-impl From<&LogAccounts<'_, '_>> for LogKeys {
-    fn from(accounts: &LogAccounts) -> Self {
+impl From<LogAccounts<'_, '_>> for LogKeys {
+    fn from(accounts: LogAccounts) -> Self {
         Self {
             log_authority: *accounts.log_authority.key,
         }
     }
 }
-impl From<&LogKeys> for [AccountMeta; LOG_IX_ACCOUNTS_LEN] {
-    fn from(keys: &LogKeys) -> Self {
+impl From<LogKeys> for [AccountMeta; LOG_IX_ACCOUNTS_LEN] {
+    fn from(keys: LogKeys) -> Self {
         [AccountMeta {
             pubkey: keys.log_authority,
             is_signer: true,
@@ -3865,8 +3865,8 @@ impl From<[Pubkey; LOG_IX_ACCOUNTS_LEN]> for LogKeys {
         }
     }
 }
-impl<'info> From<&LogAccounts<'_, 'info>> for [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &LogAccounts<'_, 'info>) -> Self {
+impl<'info> From<LogAccounts<'_, 'info>> for [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] {
+    fn from(accounts: LogAccounts<'_, 'info>) -> Self {
         [accounts.log_authority.clone()]
     }
 }
@@ -3908,20 +3908,20 @@ impl LogIxData {
 }
 pub fn log_ix<K: Into<LogKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: LogKeys = accounts.into();
-    let metas: [AccountMeta; LOG_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; LOG_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: LogIxData.try_to_vec()?,
     })
 }
-pub fn log_invoke<'info>(accounts: &LogAccounts<'_, 'info>) -> ProgramResult {
+pub fn log_invoke<'info>(accounts: LogAccounts<'_, 'info>) -> ProgramResult {
     let ix = log_ix(accounts)?;
     let account_info: [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn log_invoke_signed<'info>(
-    accounts: &LogAccounts<'_, 'info>,
+    accounts: LogAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = log_ix(accounts)?;
@@ -3929,8 +3929,8 @@ pub fn log_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn log_verify_account_keys(
-    accounts: &LogAccounts<'_, '_>,
-    keys: &LogKeys,
+    accounts: LogAccounts<'_, '_>,
+    keys: LogKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [(accounts.log_authority.key, &keys.log_authority)] {
         if actual != expected {
@@ -3940,7 +3940,7 @@ pub fn log_verify_account_keys(
     Ok(())
 }
 pub fn log_verify_account_privileges<'me, 'info>(
-    accounts: &LogAccounts<'me, 'info>,
+    accounts: LogAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.log_authority] {
         if !should_be_signer.is_signer {
@@ -3992,8 +3992,8 @@ pub struct PlaceMultiplePostOnlyOrdersKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&PlaceMultiplePostOnlyOrdersAccounts<'_, '_>> for PlaceMultiplePostOnlyOrdersKeys {
-    fn from(accounts: &PlaceMultiplePostOnlyOrdersAccounts) -> Self {
+impl From<PlaceMultiplePostOnlyOrdersAccounts<'_, '_>> for PlaceMultiplePostOnlyOrdersKeys {
+    fn from(accounts: PlaceMultiplePostOnlyOrdersAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -4008,10 +4008,10 @@ impl From<&PlaceMultiplePostOnlyOrdersAccounts<'_, '_>> for PlaceMultiplePostOnl
         }
     }
 }
-impl From<&PlaceMultiplePostOnlyOrdersKeys>
+impl From<PlaceMultiplePostOnlyOrdersKeys>
     for [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &PlaceMultiplePostOnlyOrdersKeys) -> Self {
+    fn from(keys: PlaceMultiplePostOnlyOrdersKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -4084,10 +4084,10 @@ impl From<[Pubkey; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>>
+impl<'info> From<PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -4172,7 +4172,7 @@ pub fn place_multiple_post_only_orders_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: PlaceMultiplePostOnlyOrdersKeys = accounts.into();
-    let metas: [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: PlaceMultiplePostOnlyOrdersIxArgs = args.into();
     let data: PlaceMultiplePostOnlyOrdersIxData = args_full.into();
     Ok(Instruction {
@@ -4182,7 +4182,7 @@ pub fn place_multiple_post_only_orders_ix<
     })
 }
 pub fn place_multiple_post_only_orders_invoke<'info, A: Into<PlaceMultiplePostOnlyOrdersIxArgs>>(
-    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_multiple_post_only_orders_ix(accounts, args)?;
@@ -4194,7 +4194,7 @@ pub fn place_multiple_post_only_orders_invoke_signed<
     'info,
     A: Into<PlaceMultiplePostOnlyOrdersIxArgs>,
 >(
-    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4204,8 +4204,8 @@ pub fn place_multiple_post_only_orders_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_multiple_post_only_orders_verify_account_keys(
-    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
-    keys: &PlaceMultiplePostOnlyOrdersKeys,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
+    keys: PlaceMultiplePostOnlyOrdersKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -4226,7 +4226,7 @@ pub fn place_multiple_post_only_orders_verify_account_keys(
     Ok(())
 }
 pub fn place_multiple_post_only_orders_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceMultiplePostOnlyOrdersAccounts<'me, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -4269,10 +4269,10 @@ pub struct PlaceMultiplePostOnlyOrdersWithFreeFundsKeys {
     pub trader: Pubkey,
     pub seat: Pubkey,
 }
-impl From<&PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>>
+impl From<PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>>
     for PlaceMultiplePostOnlyOrdersWithFreeFundsKeys
 {
-    fn from(accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts) -> Self {
+    fn from(accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -4282,10 +4282,10 @@ impl From<&PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>>
         }
     }
 }
-impl From<&PlaceMultiplePostOnlyOrdersWithFreeFundsKeys>
+impl From<PlaceMultiplePostOnlyOrdersWithFreeFundsKeys>
     for [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &PlaceMultiplePostOnlyOrdersWithFreeFundsKeys) -> Self {
+    fn from(keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -4330,10 +4330,10 @@ impl From<[Pubkey; PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_L
         }
     }
 }
-impl<'info> From<&PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>>
+impl<'info> From<PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>>
     for [AccountInfo<'info>; PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -4415,7 +4415,7 @@ pub fn place_multiple_post_only_orders_with_free_funds_ix<
 ) -> std::io::Result<Instruction> {
     let keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys = accounts.into();
     let metas: [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs = args.into();
     let data: PlaceMultiplePostOnlyOrdersWithFreeFundsIxData = args_full.into();
     Ok(Instruction {
@@ -4428,7 +4428,7 @@ pub fn place_multiple_post_only_orders_with_free_funds_invoke<
     'info,
     A: Into<PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs>,
 >(
-    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = place_multiple_post_only_orders_with_free_funds_ix(accounts, args)?;
@@ -4440,7 +4440,7 @@ pub fn place_multiple_post_only_orders_with_free_funds_invoke_signed<
     'info,
     A: Into<PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs>,
 >(
-    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4450,8 +4450,8 @@ pub fn place_multiple_post_only_orders_with_free_funds_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn place_multiple_post_only_orders_with_free_funds_verify_account_keys(
-    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
-    keys: &PlaceMultiplePostOnlyOrdersWithFreeFundsKeys,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
+    keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -4467,7 +4467,7 @@ pub fn place_multiple_post_only_orders_with_free_funds_verify_account_keys(
     Ok(())
 }
 pub fn place_multiple_post_only_orders_with_free_funds_verify_account_privileges<'me, 'info>(
-    accounts: &PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'me, 'info>,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -4528,8 +4528,8 @@ pub struct InitializeMarketKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&InitializeMarketAccounts<'_, '_>> for InitializeMarketKeys {
-    fn from(accounts: &InitializeMarketAccounts) -> Self {
+impl From<InitializeMarketAccounts<'_, '_>> for InitializeMarketKeys {
+    fn from(accounts: InitializeMarketAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -4544,8 +4544,8 @@ impl From<&InitializeMarketAccounts<'_, '_>> for InitializeMarketKeys {
         }
     }
 }
-impl From<&InitializeMarketKeys> for [AccountMeta; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] {
-    fn from(keys: &InitializeMarketKeys) -> Self {
+impl From<InitializeMarketKeys> for [AccountMeta; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] {
+    fn from(keys: InitializeMarketKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -4616,10 +4616,10 @@ impl From<[Pubkey; INITIALIZE_MARKET_IX_ACCOUNTS_LEN]> for InitializeMarketKeys 
         }
     }
 }
-impl<'info> From<&InitializeMarketAccounts<'_, 'info>>
+impl<'info> From<InitializeMarketAccounts<'_, 'info>>
     for [AccountInfo<'info>; INITIALIZE_MARKET_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &InitializeMarketAccounts<'_, 'info>) -> Self {
+    fn from(accounts: InitializeMarketAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -4697,7 +4697,7 @@ pub fn initialize_market_ix<K: Into<InitializeMarketKeys>, A: Into<InitializeMar
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: InitializeMarketKeys = accounts.into();
-    let metas: [AccountMeta; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: InitializeMarketIxArgs = args.into();
     let data: InitializeMarketIxData = args_full.into();
     Ok(Instruction {
@@ -4707,7 +4707,7 @@ pub fn initialize_market_ix<K: Into<InitializeMarketKeys>, A: Into<InitializeMar
     })
 }
 pub fn initialize_market_invoke<'info, A: Into<InitializeMarketIxArgs>>(
-    accounts: &InitializeMarketAccounts<'_, 'info>,
+    accounts: InitializeMarketAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = initialize_market_ix(accounts, args)?;
@@ -4715,7 +4715,7 @@ pub fn initialize_market_invoke<'info, A: Into<InitializeMarketIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn initialize_market_invoke_signed<'info, A: Into<InitializeMarketIxArgs>>(
-    accounts: &InitializeMarketAccounts<'_, 'info>,
+    accounts: InitializeMarketAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4724,8 +4724,8 @@ pub fn initialize_market_invoke_signed<'info, A: Into<InitializeMarketIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn initialize_market_verify_account_keys(
-    accounts: &InitializeMarketAccounts<'_, '_>,
-    keys: &InitializeMarketKeys,
+    accounts: InitializeMarketAccounts<'_, '_>,
+    keys: InitializeMarketKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -4746,7 +4746,7 @@ pub fn initialize_market_verify_account_keys(
     Ok(())
 }
 pub fn initialize_market_verify_account_privileges<'me, 'info>(
-    accounts: &InitializeMarketAccounts<'me, 'info>,
+    accounts: InitializeMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -4788,8 +4788,8 @@ pub struct ClaimAuthorityKeys {
     ///The successor account must sign to claim authority
     pub successor: Pubkey,
 }
-impl From<&ClaimAuthorityAccounts<'_, '_>> for ClaimAuthorityKeys {
-    fn from(accounts: &ClaimAuthorityAccounts) -> Self {
+impl From<ClaimAuthorityAccounts<'_, '_>> for ClaimAuthorityKeys {
+    fn from(accounts: ClaimAuthorityAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -4798,8 +4798,8 @@ impl From<&ClaimAuthorityAccounts<'_, '_>> for ClaimAuthorityKeys {
         }
     }
 }
-impl From<&ClaimAuthorityKeys> for [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ClaimAuthorityKeys) -> Self {
+impl From<ClaimAuthorityKeys> for [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: ClaimAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -4834,10 +4834,10 @@ impl From<[Pubkey; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN]> for ClaimAuthorityKeys {
         }
     }
 }
-impl<'info> From<&ClaimAuthorityAccounts<'_, 'info>>
+impl<'info> From<ClaimAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ClaimAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ClaimAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -4891,22 +4891,20 @@ pub fn claim_authority_ix<K: Into<ClaimAuthorityKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ClaimAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: ClaimAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn claim_authority_invoke<'info>(
-    accounts: &ClaimAuthorityAccounts<'_, 'info>,
-) -> ProgramResult {
+pub fn claim_authority_invoke<'info>(accounts: ClaimAuthorityAccounts<'_, 'info>) -> ProgramResult {
     let ix = claim_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn claim_authority_invoke_signed<'info>(
-    accounts: &ClaimAuthorityAccounts<'_, 'info>,
+    accounts: ClaimAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = claim_authority_ix(accounts)?;
@@ -4914,8 +4912,8 @@ pub fn claim_authority_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn claim_authority_verify_account_keys(
-    accounts: &ClaimAuthorityAccounts<'_, '_>,
-    keys: &ClaimAuthorityKeys,
+    accounts: ClaimAuthorityAccounts<'_, '_>,
+    keys: ClaimAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -4930,7 +4928,7 @@ pub fn claim_authority_verify_account_keys(
     Ok(())
 }
 pub fn claim_authority_verify_account_privileges<'me, 'info>(
-    accounts: &ClaimAuthorityAccounts<'me, 'info>,
+    accounts: ClaimAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -4967,8 +4965,8 @@ pub struct NameSuccessorKeys {
     ///The market_authority account must sign to name successor
     pub market_authority: Pubkey,
 }
-impl From<&NameSuccessorAccounts<'_, '_>> for NameSuccessorKeys {
-    fn from(accounts: &NameSuccessorAccounts) -> Self {
+impl From<NameSuccessorAccounts<'_, '_>> for NameSuccessorKeys {
+    fn from(accounts: NameSuccessorAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -4977,8 +4975,8 @@ impl From<&NameSuccessorAccounts<'_, '_>> for NameSuccessorKeys {
         }
     }
 }
-impl From<&NameSuccessorKeys> for [AccountMeta; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] {
-    fn from(keys: &NameSuccessorKeys) -> Self {
+impl From<NameSuccessorKeys> for [AccountMeta; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] {
+    fn from(keys: NameSuccessorKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -5013,10 +5011,10 @@ impl From<[Pubkey; NAME_SUCCESSOR_IX_ACCOUNTS_LEN]> for NameSuccessorKeys {
         }
     }
 }
-impl<'info> From<&NameSuccessorAccounts<'_, 'info>>
+impl<'info> From<NameSuccessorAccounts<'_, 'info>>
     for [AccountInfo<'info>; NAME_SUCCESSOR_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &NameSuccessorAccounts<'_, 'info>) -> Self {
+    fn from(accounts: NameSuccessorAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -5082,7 +5080,7 @@ pub fn name_successor_ix<K: Into<NameSuccessorKeys>, A: Into<NameSuccessorIxArgs
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: NameSuccessorKeys = accounts.into();
-    let metas: [AccountMeta; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: NameSuccessorIxArgs = args.into();
     let data: NameSuccessorIxData = args_full.into();
     Ok(Instruction {
@@ -5092,7 +5090,7 @@ pub fn name_successor_ix<K: Into<NameSuccessorKeys>, A: Into<NameSuccessorIxArgs
     })
 }
 pub fn name_successor_invoke<'info, A: Into<NameSuccessorIxArgs>>(
-    accounts: &NameSuccessorAccounts<'_, 'info>,
+    accounts: NameSuccessorAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = name_successor_ix(accounts, args)?;
@@ -5100,7 +5098,7 @@ pub fn name_successor_invoke<'info, A: Into<NameSuccessorIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn name_successor_invoke_signed<'info, A: Into<NameSuccessorIxArgs>>(
-    accounts: &NameSuccessorAccounts<'_, 'info>,
+    accounts: NameSuccessorAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5109,8 +5107,8 @@ pub fn name_successor_invoke_signed<'info, A: Into<NameSuccessorIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn name_successor_verify_account_keys(
-    accounts: &NameSuccessorAccounts<'_, '_>,
-    keys: &NameSuccessorKeys,
+    accounts: NameSuccessorAccounts<'_, '_>,
+    keys: NameSuccessorKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -5125,7 +5123,7 @@ pub fn name_successor_verify_account_keys(
     Ok(())
 }
 pub fn name_successor_verify_account_privileges<'me, 'info>(
-    accounts: &NameSuccessorAccounts<'me, 'info>,
+    accounts: NameSuccessorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -5162,8 +5160,8 @@ pub struct ChangeMarketStatusKeys {
     ///The market_authority account must sign to change market status
     pub market_authority: Pubkey,
 }
-impl From<&ChangeMarketStatusAccounts<'_, '_>> for ChangeMarketStatusKeys {
-    fn from(accounts: &ChangeMarketStatusAccounts) -> Self {
+impl From<ChangeMarketStatusAccounts<'_, '_>> for ChangeMarketStatusKeys {
+    fn from(accounts: ChangeMarketStatusAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -5172,8 +5170,8 @@ impl From<&ChangeMarketStatusAccounts<'_, '_>> for ChangeMarketStatusKeys {
         }
     }
 }
-impl From<&ChangeMarketStatusKeys> for [AccountMeta; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ChangeMarketStatusKeys) -> Self {
+impl From<ChangeMarketStatusKeys> for [AccountMeta; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] {
+    fn from(keys: ChangeMarketStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -5208,10 +5206,10 @@ impl From<[Pubkey; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN]> for ChangeMarketStatus
         }
     }
 }
-impl<'info> From<&ChangeMarketStatusAccounts<'_, 'info>>
+impl<'info> From<ChangeMarketStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ChangeMarketStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ChangeMarketStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -5280,7 +5278,7 @@ pub fn change_market_status_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ChangeMarketStatusKeys = accounts.into();
-    let metas: [AccountMeta; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ChangeMarketStatusIxArgs = args.into();
     let data: ChangeMarketStatusIxData = args_full.into();
     Ok(Instruction {
@@ -5290,7 +5288,7 @@ pub fn change_market_status_ix<
     })
 }
 pub fn change_market_status_invoke<'info, A: Into<ChangeMarketStatusIxArgs>>(
-    accounts: &ChangeMarketStatusAccounts<'_, 'info>,
+    accounts: ChangeMarketStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = change_market_status_ix(accounts, args)?;
@@ -5298,7 +5296,7 @@ pub fn change_market_status_invoke<'info, A: Into<ChangeMarketStatusIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn change_market_status_invoke_signed<'info, A: Into<ChangeMarketStatusIxArgs>>(
-    accounts: &ChangeMarketStatusAccounts<'_, 'info>,
+    accounts: ChangeMarketStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5307,8 +5305,8 @@ pub fn change_market_status_invoke_signed<'info, A: Into<ChangeMarketStatusIxArg
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn change_market_status_verify_account_keys(
-    accounts: &ChangeMarketStatusAccounts<'_, '_>,
-    keys: &ChangeMarketStatusKeys,
+    accounts: ChangeMarketStatusAccounts<'_, '_>,
+    keys: ChangeMarketStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -5323,7 +5321,7 @@ pub fn change_market_status_verify_account_keys(
     Ok(())
 }
 pub fn change_market_status_verify_account_privileges<'me, 'info>(
-    accounts: &ChangeMarketStatusAccounts<'me, 'info>,
+    accounts: ChangeMarketStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
@@ -5362,8 +5360,8 @@ pub struct ChangeSeatStatusKeys {
     pub market_authority: Pubkey,
     pub seat: Pubkey,
 }
-impl From<&ChangeSeatStatusAccounts<'_, '_>> for ChangeSeatStatusKeys {
-    fn from(accounts: &ChangeSeatStatusAccounts) -> Self {
+impl From<ChangeSeatStatusAccounts<'_, '_>> for ChangeSeatStatusKeys {
+    fn from(accounts: ChangeSeatStatusAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -5373,8 +5371,8 @@ impl From<&ChangeSeatStatusAccounts<'_, '_>> for ChangeSeatStatusKeys {
         }
     }
 }
-impl From<&ChangeSeatStatusKeys> for [AccountMeta; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ChangeSeatStatusKeys) -> Self {
+impl From<ChangeSeatStatusKeys> for [AccountMeta; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] {
+    fn from(keys: ChangeSeatStatusKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -5415,10 +5413,10 @@ impl From<[Pubkey; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN]> for ChangeSeatStatusKeys
         }
     }
 }
-impl<'info> From<&ChangeSeatStatusAccounts<'_, 'info>>
+impl<'info> From<ChangeSeatStatusAccounts<'_, 'info>>
     for [AccountInfo<'info>; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ChangeSeatStatusAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ChangeSeatStatusAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -5486,7 +5484,7 @@ pub fn change_seat_status_ix<K: Into<ChangeSeatStatusKeys>, A: Into<ChangeSeatSt
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ChangeSeatStatusKeys = accounts.into();
-    let metas: [AccountMeta; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ChangeSeatStatusIxArgs = args.into();
     let data: ChangeSeatStatusIxData = args_full.into();
     Ok(Instruction {
@@ -5496,7 +5494,7 @@ pub fn change_seat_status_ix<K: Into<ChangeSeatStatusKeys>, A: Into<ChangeSeatSt
     })
 }
 pub fn change_seat_status_invoke<'info, A: Into<ChangeSeatStatusIxArgs>>(
-    accounts: &ChangeSeatStatusAccounts<'_, 'info>,
+    accounts: ChangeSeatStatusAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = change_seat_status_ix(accounts, args)?;
@@ -5504,7 +5502,7 @@ pub fn change_seat_status_invoke<'info, A: Into<ChangeSeatStatusIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn change_seat_status_invoke_signed<'info, A: Into<ChangeSeatStatusIxArgs>>(
-    accounts: &ChangeSeatStatusAccounts<'_, 'info>,
+    accounts: ChangeSeatStatusAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5513,8 +5511,8 @@ pub fn change_seat_status_invoke_signed<'info, A: Into<ChangeSeatStatusIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn change_seat_status_verify_account_keys(
-    accounts: &ChangeSeatStatusAccounts<'_, '_>,
-    keys: &ChangeSeatStatusKeys,
+    accounts: ChangeSeatStatusAccounts<'_, '_>,
+    keys: ChangeSeatStatusKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -5530,7 +5528,7 @@ pub fn change_seat_status_verify_account_keys(
     Ok(())
 }
 pub fn change_seat_status_verify_account_privileges<'me, 'info>(
-    accounts: &ChangeSeatStatusAccounts<'me, 'info>,
+    accounts: ChangeSeatStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.seat] {
         if !should_be_writable.is_writable {
@@ -5577,8 +5575,8 @@ pub struct RequestSeatAuthorizedKeys {
     ///System program
     pub system_program: Pubkey,
 }
-impl From<&RequestSeatAuthorizedAccounts<'_, '_>> for RequestSeatAuthorizedKeys {
-    fn from(accounts: &RequestSeatAuthorizedAccounts) -> Self {
+impl From<RequestSeatAuthorizedAccounts<'_, '_>> for RequestSeatAuthorizedKeys {
+    fn from(accounts: RequestSeatAuthorizedAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -5591,8 +5589,8 @@ impl From<&RequestSeatAuthorizedAccounts<'_, '_>> for RequestSeatAuthorizedKeys 
         }
     }
 }
-impl From<&RequestSeatAuthorizedKeys> for [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RequestSeatAuthorizedKeys) -> Self {
+impl From<RequestSeatAuthorizedKeys> for [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] {
+    fn from(keys: RequestSeatAuthorizedKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -5651,10 +5649,10 @@ impl From<[Pubkey; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN]> for RequestSeatAuth
         }
     }
 }
-impl<'info> From<&RequestSeatAuthorizedAccounts<'_, 'info>>
+impl<'info> From<RequestSeatAuthorizedAccounts<'_, 'info>>
     for [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RequestSeatAuthorizedAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RequestSeatAuthorizedAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -5716,7 +5714,7 @@ pub fn request_seat_authorized_ix<K: Into<RequestSeatAuthorizedKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: RequestSeatAuthorizedKeys = accounts.into();
-    let metas: [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -5724,7 +5722,7 @@ pub fn request_seat_authorized_ix<K: Into<RequestSeatAuthorizedKeys>>(
     })
 }
 pub fn request_seat_authorized_invoke<'info>(
-    accounts: &RequestSeatAuthorizedAccounts<'_, 'info>,
+    accounts: RequestSeatAuthorizedAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = request_seat_authorized_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] =
@@ -5732,7 +5730,7 @@ pub fn request_seat_authorized_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn request_seat_authorized_invoke_signed<'info>(
-    accounts: &RequestSeatAuthorizedAccounts<'_, 'info>,
+    accounts: RequestSeatAuthorizedAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = request_seat_authorized_ix(accounts)?;
@@ -5741,8 +5739,8 @@ pub fn request_seat_authorized_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn request_seat_authorized_verify_account_keys(
-    accounts: &RequestSeatAuthorizedAccounts<'_, '_>,
-    keys: &RequestSeatAuthorizedKeys,
+    accounts: RequestSeatAuthorizedAccounts<'_, '_>,
+    keys: RequestSeatAuthorizedKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -5761,7 +5759,7 @@ pub fn request_seat_authorized_verify_account_keys(
     Ok(())
 }
 pub fn request_seat_authorized_verify_account_privileges<'me, 'info>(
-    accounts: &RequestSeatAuthorizedAccounts<'me, 'info>,
+    accounts: RequestSeatAuthorizedAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market, accounts.payer, accounts.seat] {
         if !should_be_writable.is_writable {
@@ -5816,8 +5814,8 @@ pub struct EvictSeatKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&EvictSeatAccounts<'_, '_>> for EvictSeatKeys {
-    fn from(accounts: &EvictSeatAccounts) -> Self {
+impl From<EvictSeatAccounts<'_, '_>> for EvictSeatKeys {
+    fn from(accounts: EvictSeatAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -5833,8 +5831,8 @@ impl From<&EvictSeatAccounts<'_, '_>> for EvictSeatKeys {
         }
     }
 }
-impl From<&EvictSeatKeys> for [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &EvictSeatKeys) -> Self {
+impl From<EvictSeatKeys> for [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] {
+    fn from(keys: EvictSeatKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -5911,10 +5909,10 @@ impl From<[Pubkey; EVICT_SEAT_IX_ACCOUNTS_LEN]> for EvictSeatKeys {
         }
     }
 }
-impl<'info> From<&EvictSeatAccounts<'_, 'info>>
+impl<'info> From<EvictSeatAccounts<'_, 'info>>
     for [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &EvictSeatAccounts<'_, 'info>) -> Self {
+    fn from(accounts: EvictSeatAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -5980,20 +5978,20 @@ impl EvictSeatIxData {
 }
 pub fn evict_seat_ix<K: Into<EvictSeatKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: EvictSeatKeys = accounts.into();
-    let metas: [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: EvictSeatIxData.try_to_vec()?,
     })
 }
-pub fn evict_seat_invoke<'info>(accounts: &EvictSeatAccounts<'_, 'info>) -> ProgramResult {
+pub fn evict_seat_invoke<'info>(accounts: EvictSeatAccounts<'_, 'info>) -> ProgramResult {
     let ix = evict_seat_ix(accounts)?;
     let account_info: [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn evict_seat_invoke_signed<'info>(
-    accounts: &EvictSeatAccounts<'_, 'info>,
+    accounts: EvictSeatAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = evict_seat_ix(accounts)?;
@@ -6001,8 +5999,8 @@ pub fn evict_seat_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn evict_seat_verify_account_keys(
-    accounts: &EvictSeatAccounts<'_, '_>,
-    keys: &EvictSeatKeys,
+    accounts: EvictSeatAccounts<'_, '_>,
+    keys: EvictSeatKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -6024,7 +6022,7 @@ pub fn evict_seat_verify_account_keys(
     Ok(())
 }
 pub fn evict_seat_verify_account_privileges<'me, 'info>(
-    accounts: &EvictSeatAccounts<'me, 'info>,
+    accounts: EvictSeatAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -6093,8 +6091,8 @@ pub struct ForceCancelOrdersKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
-    fn from(accounts: &ForceCancelOrdersAccounts) -> Self {
+impl From<ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
+    fn from(accounts: ForceCancelOrdersAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -6110,8 +6108,8 @@ impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
         }
     }
 }
-impl From<&ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ForceCancelOrdersKeys) -> Self {
+impl From<ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
+    fn from(keys: ForceCancelOrdersKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -6188,10 +6186,10 @@ impl From<[Pubkey; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]> for ForceCancelOrdersKe
         }
     }
 }
-impl<'info> From<&ForceCancelOrdersAccounts<'_, 'info>>
+impl<'info> From<ForceCancelOrdersAccounts<'_, 'info>>
     for [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ForceCancelOrdersAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ForceCancelOrdersAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -6271,7 +6269,7 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>, A: Into<ForceCance
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ForceCancelOrdersKeys = accounts.into();
-    let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ForceCancelOrdersIxArgs = args.into();
     let data: ForceCancelOrdersIxData = args_full.into();
     Ok(Instruction {
@@ -6281,7 +6279,7 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>, A: Into<ForceCance
     })
 }
 pub fn force_cancel_orders_invoke<'info, A: Into<ForceCancelOrdersIxArgs>>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
+    accounts: ForceCancelOrdersAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = force_cancel_orders_ix(accounts, args)?;
@@ -6289,7 +6287,7 @@ pub fn force_cancel_orders_invoke<'info, A: Into<ForceCancelOrdersIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>>(
-    accounts: &ForceCancelOrdersAccounts<'_, 'info>,
+    accounts: ForceCancelOrdersAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -6298,8 +6296,8 @@ pub fn force_cancel_orders_invoke_signed<'info, A: Into<ForceCancelOrdersIxArgs>
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn force_cancel_orders_verify_account_keys(
-    accounts: &ForceCancelOrdersAccounts<'_, '_>,
-    keys: &ForceCancelOrdersKeys,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+    keys: ForceCancelOrdersKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -6321,7 +6319,7 @@ pub fn force_cancel_orders_verify_account_keys(
     Ok(())
 }
 pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
-    accounts: &ForceCancelOrdersAccounts<'me, 'info>,
+    accounts: ForceCancelOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -6376,8 +6374,8 @@ pub struct CollectFeesKeys {
     ///Token program
     pub token_program: Pubkey,
 }
-impl From<&CollectFeesAccounts<'_, '_>> for CollectFeesKeys {
-    fn from(accounts: &CollectFeesAccounts) -> Self {
+impl From<CollectFeesAccounts<'_, '_>> for CollectFeesKeys {
+    fn from(accounts: CollectFeesAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -6389,8 +6387,8 @@ impl From<&CollectFeesAccounts<'_, '_>> for CollectFeesKeys {
         }
     }
 }
-impl From<&CollectFeesKeys> for [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CollectFeesKeys) -> Self {
+impl From<CollectFeesKeys> for [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] {
+    fn from(keys: CollectFeesKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -6443,10 +6441,10 @@ impl From<[Pubkey; COLLECT_FEES_IX_ACCOUNTS_LEN]> for CollectFeesKeys {
         }
     }
 }
-impl<'info> From<&CollectFeesAccounts<'_, 'info>>
+impl<'info> From<CollectFeesAccounts<'_, 'info>>
     for [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CollectFeesAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CollectFeesAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -6504,20 +6502,20 @@ impl CollectFeesIxData {
 }
 pub fn collect_fees_ix<K: Into<CollectFeesKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: CollectFeesKeys = accounts.into();
-    let metas: [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: CollectFeesIxData.try_to_vec()?,
     })
 }
-pub fn collect_fees_invoke<'info>(accounts: &CollectFeesAccounts<'_, 'info>) -> ProgramResult {
+pub fn collect_fees_invoke<'info>(accounts: CollectFeesAccounts<'_, 'info>) -> ProgramResult {
     let ix = collect_fees_ix(accounts)?;
     let account_info: [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn collect_fees_invoke_signed<'info>(
-    accounts: &CollectFeesAccounts<'_, 'info>,
+    accounts: CollectFeesAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = collect_fees_ix(accounts)?;
@@ -6525,8 +6523,8 @@ pub fn collect_fees_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn collect_fees_verify_account_keys(
-    accounts: &CollectFeesAccounts<'_, '_>,
-    keys: &CollectFeesKeys,
+    accounts: CollectFeesAccounts<'_, '_>,
+    keys: CollectFeesKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -6544,7 +6542,7 @@ pub fn collect_fees_verify_account_keys(
     Ok(())
 }
 pub fn collect_fees_verify_account_privileges<'me, 'info>(
-    accounts: &CollectFeesAccounts<'me, 'info>,
+    accounts: CollectFeesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.market,
@@ -6589,8 +6587,8 @@ pub struct ChangeFeeRecipientKeys {
     ///New fee recipient
     pub new_fee_recipient: Pubkey,
 }
-impl From<&ChangeFeeRecipientAccounts<'_, '_>> for ChangeFeeRecipientKeys {
-    fn from(accounts: &ChangeFeeRecipientAccounts) -> Self {
+impl From<ChangeFeeRecipientAccounts<'_, '_>> for ChangeFeeRecipientKeys {
+    fn from(accounts: ChangeFeeRecipientAccounts) -> Self {
         Self {
             phoenix_program: *accounts.phoenix_program.key,
             log_authority: *accounts.log_authority.key,
@@ -6600,8 +6598,8 @@ impl From<&ChangeFeeRecipientAccounts<'_, '_>> for ChangeFeeRecipientKeys {
         }
     }
 }
-impl From<&ChangeFeeRecipientKeys> for [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ChangeFeeRecipientKeys) -> Self {
+impl From<ChangeFeeRecipientKeys> for [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] {
+    fn from(keys: ChangeFeeRecipientKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.phoenix_program,
@@ -6642,10 +6640,10 @@ impl From<[Pubkey; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN]> for ChangeFeeRecipient
         }
     }
 }
-impl<'info> From<&ChangeFeeRecipientAccounts<'_, 'info>>
+impl<'info> From<ChangeFeeRecipientAccounts<'_, 'info>>
     for [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ChangeFeeRecipientAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ChangeFeeRecipientAccounts<'_, 'info>) -> Self {
         [
             accounts.phoenix_program.clone(),
             accounts.log_authority.clone(),
@@ -6701,7 +6699,7 @@ pub fn change_fee_recipient_ix<K: Into<ChangeFeeRecipientKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ChangeFeeRecipientKeys = accounts.into();
-    let metas: [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6709,14 +6707,14 @@ pub fn change_fee_recipient_ix<K: Into<ChangeFeeRecipientKeys>>(
     })
 }
 pub fn change_fee_recipient_invoke<'info>(
-    accounts: &ChangeFeeRecipientAccounts<'_, 'info>,
+    accounts: ChangeFeeRecipientAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = change_fee_recipient_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn change_fee_recipient_invoke_signed<'info>(
-    accounts: &ChangeFeeRecipientAccounts<'_, 'info>,
+    accounts: ChangeFeeRecipientAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = change_fee_recipient_ix(accounts)?;
@@ -6724,8 +6722,8 @@ pub fn change_fee_recipient_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn change_fee_recipient_verify_account_keys(
-    accounts: &ChangeFeeRecipientAccounts<'_, '_>,
-    keys: &ChangeFeeRecipientKeys,
+    accounts: ChangeFeeRecipientAccounts<'_, '_>,
+    keys: ChangeFeeRecipientKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.phoenix_program.key, &keys.phoenix_program),
@@ -6741,7 +6739,7 @@ pub fn change_fee_recipient_verify_account_keys(
     Ok(())
 }
 pub fn change_fee_recipient_verify_account_privileges<'me, 'info>(
-    accounts: &ChangeFeeRecipientAccounts<'me, 'info>,
+    accounts: ChangeFeeRecipientAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.market] {
         if !should_be_writable.is_writable {
