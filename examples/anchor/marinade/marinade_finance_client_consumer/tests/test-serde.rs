@@ -1,4 +1,3 @@
-use borsh::BorshSerialize;
 use marinade_finance_interface::{
     ChangeAuthorityData, ChangeAuthorityIxArgs, ChangeAuthorityIxData, DepositIxArgs,
     MarinadeFinanceProgramIx,

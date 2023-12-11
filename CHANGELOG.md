@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking
 
 - Program ID now defaults to `TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111` instead of system program ID if ID not provided in IDL
+- `*IxData` and `*ProgramIx` no longer implement `BorshSerialize` since it does not follow the borsh spec. The methods have been moved to their intrinsic impl.
 
 ## [0.4.0] - 2023-08-07
 

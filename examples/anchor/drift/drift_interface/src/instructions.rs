@@ -133,500 +133,6 @@ pub enum DriftProgramIx {
     UpdateSpotAuctionDuration(UpdateSpotAuctionDurationIxArgs),
     AdminRemoveInsuranceFundStake(AdminRemoveInsuranceFundStakeIxArgs),
 }
-impl BorshSerialize for DriftProgramIx {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        match self {
-            Self::InitializeUser(args) => {
-                INITIALIZE_USER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializeUserStats(args) => {
-                INITIALIZE_USER_STATS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializeReferrerName(args) => {
-                INITIALIZE_REFERRER_NAME_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::Deposit(args) => {
-                DEPOSIT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::Withdraw(args) => {
-                WITHDRAW_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::TransferDeposit(args) => {
-                TRANSFER_DEPOSIT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlacePerpOrder(args) => {
-                PLACE_PERP_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CancelOrder(args) => {
-                CANCEL_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CancelOrderByUserId(args) => {
-                CANCEL_ORDER_BY_USER_ID_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CancelOrders(args) => {
-                CANCEL_ORDERS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ModifyOrder(args) => {
-                MODIFY_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ModifyOrderByUserId(args) => {
-                MODIFY_ORDER_BY_USER_ID_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlaceAndTakePerpOrder(args) => {
-                PLACE_AND_TAKE_PERP_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlaceAndMakePerpOrder(args) => {
-                PLACE_AND_MAKE_PERP_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlaceSpotOrder(args) => {
-                PLACE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlaceAndTakeSpotOrder(args) => {
-                PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PlaceAndMakeSpotOrder(args) => {
-                PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::BeginSwap(args) => {
-                BEGIN_SWAP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::EndSwap(args) => {
-                END_SWAP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::AddPerpLpShares(args) => {
-                ADD_PERP_LP_SHARES_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RemovePerpLpShares(args) => {
-                REMOVE_PERP_LP_SHARES_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RemovePerpLpSharesInExpiringMarket(args) => {
-                REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserName(args) => {
-                UPDATE_USER_NAME_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserCustomMarginRatio(args) => {
-                UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserMarginTradingEnabled(args) => {
-                UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserDelegate(args) => {
-                UPDATE_USER_DELEGATE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeleteUser(args) => {
-                DELETE_USER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::FillPerpOrder(args) => {
-                FILL_PERP_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RevertFill(args) => {
-                REVERT_FILL_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::FillSpotOrder(args) => {
-                FILL_SPOT_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::TriggerOrder(args) => {
-                TRIGGER_ORDER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ForceCancelOrders(args) => {
-                FORCE_CANCEL_ORDERS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserIdle(args) => {
-                UPDATE_USER_IDLE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserOpenOrdersCount(args) => {
-                UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettlePnl(args) => {
-                SETTLE_PNL_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettleFundingPayment(args) => {
-                SETTLE_FUNDING_PAYMENT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettleLp(args) => {
-                SETTLE_LP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettleExpiredMarket(args) => {
-                SETTLE_EXPIRED_MARKET_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::LiquidatePerp(args) => {
-                LIQUIDATE_PERP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::LiquidateSpot(args) => {
-                LIQUIDATE_SPOT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::LiquidateBorrowForPerpPnl(args) => {
-                LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::LiquidatePerpPnlForDeposit(args) => {
-                LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ResolvePerpPnlDeficit(args) => {
-                RESOLVE_PERP_PNL_DEFICIT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ResolvePerpBankruptcy(args) => {
-                RESOLVE_PERP_BANKRUPTCY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ResolveSpotBankruptcy(args) => {
-                RESOLVE_SPOT_BANKRUPTCY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettleRevenueToInsuranceFund(args) => {
-                SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateFundingRate(args) => {
-                UPDATE_FUNDING_RATE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketCumulativeInterest(args) => {
-                UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateAmms(args) => {
-                UPDATE_AMMS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketExpiry(args) => {
-                UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateUserQuoteAssetInsuranceStake(args) => {
-                UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializeInsuranceFundStake(args) => {
-                INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::AddInsuranceFundStake(args) => {
-                ADD_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RequestRemoveInsuranceFundStake(args) => {
-                REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CancelRequestRemoveInsuranceFundStake(args) => {
-                CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RemoveInsuranceFundStake(args) => {
-                REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::Initialize(args) => {
-                INITIALIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializeSpotMarket(args) => {
-                INITIALIZE_SPOT_MARKET_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializeSerumFulfillmentConfig(args) => {
-                INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSerumFulfillmentConfigStatus(args) => {
-                UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializePhoenixFulfillmentConfig(args) => {
-                INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PhoenixFulfillmentConfigStatus(args) => {
-                PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSerumVault(args) => {
-                UPDATE_SERUM_VAULT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::InitializePerpMarket(args) => {
-                INITIALIZE_PERP_MARKET_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeleteInitializedPerpMarket(args) => {
-                DELETE_INITIALIZED_PERP_MARKET_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::MoveAmmPrice(args) => {
-                MOVE_AMM_PRICE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketExpiry(args) => {
-                UPDATE_PERP_MARKET_EXPIRY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SettleExpiredMarketPoolsToRevenuePool(args) => {
-                SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DepositIntoPerpMarketFeePool(args) => {
-                DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RepegAmmCurve(args) => {
-                REPEG_AMM_CURVE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketAmmOracleTwap(args) => {
-                UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ResetPerpMarketAmmOracleTwap(args) => {
-                RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateK(args) => {
-                UPDATE_K_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMarginRatio(args) => {
-                UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMaxImbalances(args) => {
-                UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketLiquidationFee(args) => {
-                UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateInsuranceFundUnstakingPeriod(args) => {
-                UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketLiquidationFee(args) => {
-                UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateWithdrawGuardThreshold(args) => {
-                UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketIfFactor(args) => {
-                UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketRevenueSettlePeriod(args) => {
-                UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketStatus(args) => {
-                UPDATE_SPOT_MARKET_STATUS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketAssetTier(args) => {
-                UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketMarginWeights(args) => {
-                UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketBorrowRate(args) => {
-                UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketMaxTokenDeposits(args) => {
-                UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketOracle(args) => {
-                UPDATE_SPOT_MARKET_ORACLE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketStepSizeAndTickSize(args) => {
-                UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketMinOrderSize(args) => {
-                UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketOrdersEnabled(args) => {
-                UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotMarketName(args) => {
-                UPDATE_SPOT_MARKET_NAME_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketStatus(args) => {
-                UPDATE_PERP_MARKET_STATUS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketContractTier(args) => {
-                UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketImfFactor(args) => {
-                UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketUnrealizedAssetWeight(args) => {
-                UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketConcentrationCoef(args) => {
-                UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketCurveUpdateIntensity(args) => {
-                UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(args) => {
-                UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateLpCooldownTime(args) => {
-                UPDATE_LP_COOLDOWN_TIME_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpFeeStructure(args) => {
-                UPDATE_PERP_FEE_STRUCTURE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotFeeStructure(args) => {
-                UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateInitialPctToLiquidate(args) => {
-                UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateLiquidationDuration(args) => {
-                UPDATE_LIQUIDATION_DURATION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateOracleGuardRails(args) => {
-                UPDATE_ORACLE_GUARD_RAILS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateStateSettlementDuration(args) => {
-                UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketOracle(args) => {
-                UPDATE_PERP_MARKET_ORACLE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketBaseSpread(args) => {
-                UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateAmmJitIntensity(args) => {
-                UPDATE_AMM_JIT_INTENSITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMaxSpread(args) => {
-                UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketStepSizeAndTickSize(args) => {
-                UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketName(args) => {
-                UPDATE_PERP_MARKET_NAME_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMinOrderSize(args) => {
-                UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMaxSlippageRatio(args) => {
-                UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMaxFillReserveFraction(args) => {
-                UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpMarketMaxOpenInterest(args) => {
-                UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateAdmin(args) => {
-                UPDATE_ADMIN_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateWhitelistMint(args) => {
-                UPDATE_WHITELIST_MINT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateDiscountMint(args) => {
-                UPDATE_DISCOUNT_MINT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateExchangeStatus(args) => {
-                UPDATE_EXCHANGE_STATUS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePerpAuctionDuration(args) => {
-                UPDATE_PERP_AUCTION_DURATION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateSpotAuctionDuration(args) => {
-                UPDATE_SPOT_AUCTION_DURATION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::AdminRemoveInsuranceFundStake(args) => {
-                ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-        }
-    }
-}
 impl DriftProgramIx {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1019,6 +525,504 @@ impl DriftProgramIx {
             )),
         }
     }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        match self {
+            Self::InitializeUser(args) => {
+                INITIALIZE_USER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializeUserStats(args) => {
+                INITIALIZE_USER_STATS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializeReferrerName(args) => {
+                INITIALIZE_REFERRER_NAME_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::Deposit(args) => {
+                DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::Withdraw(args) => {
+                WITHDRAW_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::TransferDeposit(args) => {
+                TRANSFER_DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlacePerpOrder(args) => {
+                PLACE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CancelOrder(args) => {
+                CANCEL_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CancelOrderByUserId(args) => {
+                CANCEL_ORDER_BY_USER_ID_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CancelOrders(args) => {
+                CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ModifyOrder(args) => {
+                MODIFY_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ModifyOrderByUserId(args) => {
+                MODIFY_ORDER_BY_USER_ID_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlaceAndTakePerpOrder(args) => {
+                PLACE_AND_TAKE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlaceAndMakePerpOrder(args) => {
+                PLACE_AND_MAKE_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlaceSpotOrder(args) => {
+                PLACE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlaceAndTakeSpotOrder(args) => {
+                PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PlaceAndMakeSpotOrder(args) => {
+                PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::BeginSwap(args) => {
+                BEGIN_SWAP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::EndSwap(args) => {
+                END_SWAP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::AddPerpLpShares(args) => {
+                ADD_PERP_LP_SHARES_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RemovePerpLpShares(args) => {
+                REMOVE_PERP_LP_SHARES_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RemovePerpLpSharesInExpiringMarket(args) => {
+                REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserName(args) => {
+                UPDATE_USER_NAME_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserCustomMarginRatio(args) => {
+                UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserMarginTradingEnabled(args) => {
+                UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserDelegate(args) => {
+                UPDATE_USER_DELEGATE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeleteUser(args) => {
+                DELETE_USER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::FillPerpOrder(args) => {
+                FILL_PERP_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RevertFill(args) => {
+                REVERT_FILL_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::FillSpotOrder(args) => {
+                FILL_SPOT_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::TriggerOrder(args) => {
+                TRIGGER_ORDER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ForceCancelOrders(args) => {
+                FORCE_CANCEL_ORDERS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserIdle(args) => {
+                UPDATE_USER_IDLE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserOpenOrdersCount(args) => {
+                UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettlePnl(args) => {
+                SETTLE_PNL_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettleFundingPayment(args) => {
+                SETTLE_FUNDING_PAYMENT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettleLp(args) => {
+                SETTLE_LP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettleExpiredMarket(args) => {
+                SETTLE_EXPIRED_MARKET_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::LiquidatePerp(args) => {
+                LIQUIDATE_PERP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::LiquidateSpot(args) => {
+                LIQUIDATE_SPOT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::LiquidateBorrowForPerpPnl(args) => {
+                LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::LiquidatePerpPnlForDeposit(args) => {
+                LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ResolvePerpPnlDeficit(args) => {
+                RESOLVE_PERP_PNL_DEFICIT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ResolvePerpBankruptcy(args) => {
+                RESOLVE_PERP_BANKRUPTCY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ResolveSpotBankruptcy(args) => {
+                RESOLVE_SPOT_BANKRUPTCY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettleRevenueToInsuranceFund(args) => {
+                SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateFundingRate(args) => {
+                UPDATE_FUNDING_RATE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketCumulativeInterest(args) => {
+                UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateAmms(args) => {
+                UPDATE_AMMS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketExpiry(args) => {
+                UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateUserQuoteAssetInsuranceStake(args) => {
+                UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializeInsuranceFundStake(args) => {
+                INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::AddInsuranceFundStake(args) => {
+                ADD_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RequestRemoveInsuranceFundStake(args) => {
+                REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CancelRequestRemoveInsuranceFundStake(args) => {
+                CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RemoveInsuranceFundStake(args) => {
+                REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::Initialize(args) => {
+                INITIALIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializeSpotMarket(args) => {
+                INITIALIZE_SPOT_MARKET_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializeSerumFulfillmentConfig(args) => {
+                INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSerumFulfillmentConfigStatus(args) => {
+                UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializePhoenixFulfillmentConfig(args) => {
+                INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PhoenixFulfillmentConfigStatus(args) => {
+                PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSerumVault(args) => {
+                UPDATE_SERUM_VAULT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::InitializePerpMarket(args) => {
+                INITIALIZE_PERP_MARKET_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeleteInitializedPerpMarket(args) => {
+                DELETE_INITIALIZED_PERP_MARKET_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::MoveAmmPrice(args) => {
+                MOVE_AMM_PRICE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketExpiry(args) => {
+                UPDATE_PERP_MARKET_EXPIRY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SettleExpiredMarketPoolsToRevenuePool(args) => {
+                SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DepositIntoPerpMarketFeePool(args) => {
+                DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RepegAmmCurve(args) => {
+                REPEG_AMM_CURVE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketAmmOracleTwap(args) => {
+                UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ResetPerpMarketAmmOracleTwap(args) => {
+                RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateK(args) => {
+                UPDATE_K_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMarginRatio(args) => {
+                UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMaxImbalances(args) => {
+                UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketLiquidationFee(args) => {
+                UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateInsuranceFundUnstakingPeriod(args) => {
+                UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketLiquidationFee(args) => {
+                UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateWithdrawGuardThreshold(args) => {
+                UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketIfFactor(args) => {
+                UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketRevenueSettlePeriod(args) => {
+                UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketStatus(args) => {
+                UPDATE_SPOT_MARKET_STATUS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketAssetTier(args) => {
+                UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketMarginWeights(args) => {
+                UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketBorrowRate(args) => {
+                UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketMaxTokenDeposits(args) => {
+                UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketOracle(args) => {
+                UPDATE_SPOT_MARKET_ORACLE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketStepSizeAndTickSize(args) => {
+                UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketMinOrderSize(args) => {
+                UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketOrdersEnabled(args) => {
+                UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotMarketName(args) => {
+                UPDATE_SPOT_MARKET_NAME_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketStatus(args) => {
+                UPDATE_PERP_MARKET_STATUS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketContractTier(args) => {
+                UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketImfFactor(args) => {
+                UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketUnrealizedAssetWeight(args) => {
+                UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketConcentrationCoef(args) => {
+                UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketCurveUpdateIntensity(args) => {
+                UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketTargetBaseAssetAmountPerLp(args) => {
+                UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM
+                    .serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateLpCooldownTime(args) => {
+                UPDATE_LP_COOLDOWN_TIME_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpFeeStructure(args) => {
+                UPDATE_PERP_FEE_STRUCTURE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotFeeStructure(args) => {
+                UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateInitialPctToLiquidate(args) => {
+                UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateLiquidationDuration(args) => {
+                UPDATE_LIQUIDATION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateOracleGuardRails(args) => {
+                UPDATE_ORACLE_GUARD_RAILS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateStateSettlementDuration(args) => {
+                UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketOracle(args) => {
+                UPDATE_PERP_MARKET_ORACLE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketBaseSpread(args) => {
+                UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateAmmJitIntensity(args) => {
+                UPDATE_AMM_JIT_INTENSITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMaxSpread(args) => {
+                UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketStepSizeAndTickSize(args) => {
+                UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketName(args) => {
+                UPDATE_PERP_MARKET_NAME_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMinOrderSize(args) => {
+                UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMaxSlippageRatio(args) => {
+                UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMaxFillReserveFraction(args) => {
+                UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpMarketMaxOpenInterest(args) => {
+                UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateAdmin(args) => {
+                UPDATE_ADMIN_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateWhitelistMint(args) => {
+                UPDATE_WHITELIST_MINT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateDiscountMint(args) => {
+                UPDATE_DISCOUNT_MINT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateExchangeStatus(args) => {
+                UPDATE_EXCHANGE_STATUS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePerpAuctionDuration(args) => {
+                UPDATE_PERP_AUCTION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateSpotAuctionDuration(args) => {
+                UPDATE_SPOT_AUCTION_DURATION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::AdminRemoveInsuranceFundStake(args) => {
+                ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+        }
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
+    }
 }
 pub const INITIALIZE_USER_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
@@ -1124,12 +1128,6 @@ impl From<InitializeUserIxArgs> for InitializeUserIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeUserIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_USER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeUserIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1143,6 +1141,15 @@ impl InitializeUserIxData {
             ));
         }
         Ok(Self(InitializeUserIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_USER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_user_ix<K: Into<InitializeUserKeys>, A: Into<InitializeUserIxArgs>>(
@@ -1309,12 +1316,6 @@ impl From<InitializeUserStatsIxArgs> for InitializeUserStatsIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeUserStatsIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeUserStatsIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1328,6 +1329,15 @@ impl InitializeUserStatsIxData {
             ));
         }
         Ok(Self(InitializeUserStatsIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_USER_STATS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_user_stats_ix<
@@ -1500,12 +1510,6 @@ impl From<InitializeReferrerNameIxArgs> for InitializeReferrerNameIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeReferrerNameIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_REFERRER_NAME_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeReferrerNameIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1519,6 +1523,15 @@ impl InitializeReferrerNameIxData {
             ));
         }
         Ok(Self(InitializeReferrerNameIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_REFERRER_NAME_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_referrer_name_ix<
@@ -1699,12 +1712,6 @@ impl From<DepositIxArgs> for DepositIxData {
         Self(args)
     }
 }
-impl BorshSerialize for DepositIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&DEPOSIT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl DepositIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1718,6 +1725,15 @@ impl DepositIxData {
             ));
         }
         Ok(Self(DepositIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&DEPOSIT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
@@ -1900,12 +1916,6 @@ impl From<WithdrawIxArgs> for WithdrawIxData {
         Self(args)
     }
 }
-impl BorshSerialize for WithdrawIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&WITHDRAW_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl WithdrawIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -1919,6 +1929,15 @@ impl WithdrawIxData {
             ));
         }
         Ok(Self(WithdrawIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&WITHDRAW_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn withdraw_ix<K: Into<WithdrawKeys>, A: Into<WithdrawIxArgs>>(
@@ -2089,12 +2108,6 @@ impl From<TransferDepositIxArgs> for TransferDepositIxData {
         Self(args)
     }
 }
-impl BorshSerialize for TransferDepositIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&TRANSFER_DEPOSIT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl TransferDepositIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2108,6 +2121,15 @@ impl TransferDepositIxData {
             ));
         }
         Ok(Self(TransferDepositIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&TRANSFER_DEPOSIT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn transfer_deposit_ix<K: Into<TransferDepositKeys>, A: Into<TransferDepositIxArgs>>(
@@ -2249,12 +2271,6 @@ impl From<PlacePerpOrderIxArgs> for PlacePerpOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlacePerpOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_PERP_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlacePerpOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2268,6 +2284,15 @@ impl PlacePerpOrderIxData {
             ));
         }
         Ok(Self(PlacePerpOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_PERP_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_perp_order_ix<K: Into<PlacePerpOrderKeys>, A: Into<PlacePerpOrderIxArgs>>(
@@ -2406,12 +2431,6 @@ impl From<CancelOrderIxArgs> for CancelOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for CancelOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&CANCEL_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl CancelOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2425,6 +2444,15 @@ impl CancelOrderIxData {
             ));
         }
         Ok(Self(CancelOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&CANCEL_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn cancel_order_ix<K: Into<CancelOrderKeys>, A: Into<CancelOrderIxArgs>>(
@@ -2563,12 +2591,6 @@ impl From<CancelOrderByUserIdIxArgs> for CancelOrderByUserIdIxData {
         Self(args)
     }
 }
-impl BorshSerialize for CancelOrderByUserIdIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&CANCEL_ORDER_BY_USER_ID_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl CancelOrderByUserIdIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2582,6 +2604,15 @@ impl CancelOrderByUserIdIxData {
             ));
         }
         Ok(Self(CancelOrderByUserIdIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&CANCEL_ORDER_BY_USER_ID_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn cancel_order_by_user_id_ix<
@@ -2727,12 +2758,6 @@ impl From<CancelOrdersIxArgs> for CancelOrdersIxData {
         Self(args)
     }
 }
-impl BorshSerialize for CancelOrdersIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&CANCEL_ORDERS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl CancelOrdersIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2746,6 +2771,15 @@ impl CancelOrdersIxData {
             ));
         }
         Ok(Self(CancelOrdersIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&CANCEL_ORDERS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn cancel_orders_ix<K: Into<CancelOrdersKeys>, A: Into<CancelOrdersIxArgs>>(
@@ -2885,12 +2919,6 @@ impl From<ModifyOrderIxArgs> for ModifyOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ModifyOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&MODIFY_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ModifyOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -2904,6 +2932,15 @@ impl ModifyOrderIxData {
             ));
         }
         Ok(Self(ModifyOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&MODIFY_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
@@ -3043,12 +3080,6 @@ impl From<ModifyOrderByUserIdIxArgs> for ModifyOrderByUserIdIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ModifyOrderByUserIdIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&MODIFY_ORDER_BY_USER_ID_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ModifyOrderByUserIdIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3062,6 +3093,15 @@ impl ModifyOrderByUserIdIxData {
             ));
         }
         Ok(Self(ModifyOrderByUserIdIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&MODIFY_ORDER_BY_USER_ID_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn modify_order_by_user_id_ix<
@@ -3213,12 +3253,6 @@ impl From<PlaceAndTakePerpOrderIxArgs> for PlaceAndTakePerpOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlaceAndTakePerpOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_AND_TAKE_PERP_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlaceAndTakePerpOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3232,6 +3266,15 @@ impl PlaceAndTakePerpOrderIxData {
             ));
         }
         Ok(Self(PlaceAndTakePerpOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_AND_TAKE_PERP_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_and_take_perp_order_ix<
@@ -3398,12 +3441,6 @@ impl From<PlaceAndMakePerpOrderIxArgs> for PlaceAndMakePerpOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlaceAndMakePerpOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_AND_MAKE_PERP_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlaceAndMakePerpOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3417,6 +3454,15 @@ impl PlaceAndMakePerpOrderIxData {
             ));
         }
         Ok(Self(PlaceAndMakePerpOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_AND_MAKE_PERP_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_and_make_perp_order_ix<
@@ -3568,12 +3614,6 @@ impl From<PlaceSpotOrderIxArgs> for PlaceSpotOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlaceSpotOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_SPOT_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlaceSpotOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3587,6 +3627,15 @@ impl PlaceSpotOrderIxData {
             ));
         }
         Ok(Self(PlaceSpotOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_SPOT_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_spot_order_ix<K: Into<PlaceSpotOrderKeys>, A: Into<PlaceSpotOrderIxArgs>>(
@@ -3734,12 +3783,6 @@ impl From<PlaceAndTakeSpotOrderIxArgs> for PlaceAndTakeSpotOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlaceAndTakeSpotOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlaceAndTakeSpotOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3753,6 +3796,15 @@ impl PlaceAndTakeSpotOrderIxData {
             ));
         }
         Ok(Self(PlaceAndTakeSpotOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_and_take_spot_order_ix<
@@ -3920,12 +3972,6 @@ impl From<PlaceAndMakeSpotOrderIxArgs> for PlaceAndMakeSpotOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PlaceAndMakeSpotOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PlaceAndMakeSpotOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -3939,6 +3985,15 @@ impl PlaceAndMakeSpotOrderIxData {
             ));
         }
         Ok(Self(PlaceAndMakeSpotOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn place_and_make_spot_order_ix<
@@ -4148,12 +4203,6 @@ impl From<BeginSwapIxArgs> for BeginSwapIxData {
         Self(args)
     }
 }
-impl BorshSerialize for BeginSwapIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&BEGIN_SWAP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl BeginSwapIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -4167,6 +4216,15 @@ impl BeginSwapIxData {
             ));
         }
         Ok(Self(BeginSwapIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&BEGIN_SWAP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
@@ -4383,12 +4441,6 @@ impl From<EndSwapIxArgs> for EndSwapIxData {
         Self(args)
     }
 }
-impl BorshSerialize for EndSwapIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&END_SWAP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl EndSwapIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -4402,6 +4454,15 @@ impl EndSwapIxData {
             ));
         }
         Ok(Self(EndSwapIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&END_SWAP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
@@ -4562,12 +4623,6 @@ impl From<AddPerpLpSharesIxArgs> for AddPerpLpSharesIxData {
         Self(args)
     }
 }
-impl BorshSerialize for AddPerpLpSharesIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&ADD_PERP_LP_SHARES_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl AddPerpLpSharesIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -4581,6 +4636,15 @@ impl AddPerpLpSharesIxData {
             ));
         }
         Ok(Self(AddPerpLpSharesIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&ADD_PERP_LP_SHARES_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn add_perp_lp_shares_ix<K: Into<AddPerpLpSharesKeys>, A: Into<AddPerpLpSharesIxArgs>>(
@@ -4720,12 +4784,6 @@ impl From<RemovePerpLpSharesIxArgs> for RemovePerpLpSharesIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RemovePerpLpSharesIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REMOVE_PERP_LP_SHARES_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RemovePerpLpSharesIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -4739,6 +4797,15 @@ impl RemovePerpLpSharesIxData {
             ));
         }
         Ok(Self(RemovePerpLpSharesIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REMOVE_PERP_LP_SHARES_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn remove_perp_lp_shares_ix<
@@ -4881,12 +4948,6 @@ impl From<RemovePerpLpSharesInExpiringMarketIxArgs> for RemovePerpLpSharesInExpi
         Self(args)
     }
 }
-impl BorshSerialize for RemovePerpLpSharesInExpiringMarketIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RemovePerpLpSharesInExpiringMarketIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -4902,6 +4963,15 @@ impl RemovePerpLpSharesInExpiringMarketIxData {
         Ok(Self(RemovePerpLpSharesInExpiringMarketIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn remove_perp_lp_shares_in_expiring_market_ix<
@@ -5037,12 +5107,6 @@ impl From<UpdateUserNameIxArgs> for UpdateUserNameIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserNameIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_NAME_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserNameIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5056,6 +5120,15 @@ impl UpdateUserNameIxData {
             ));
         }
         Ok(Self(UpdateUserNameIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_NAME_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_name_ix<K: Into<UpdateUserNameKeys>, A: Into<UpdateUserNameIxArgs>>(
@@ -5190,12 +5263,6 @@ impl From<UpdateUserCustomMarginRatioIxArgs> for UpdateUserCustomMarginRatioIxDa
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserCustomMarginRatioIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserCustomMarginRatioIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5209,6 +5276,15 @@ impl UpdateUserCustomMarginRatioIxData {
             ));
         }
         Ok(Self(UpdateUserCustomMarginRatioIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_custom_margin_ratio_ix<
@@ -5352,12 +5428,6 @@ impl From<UpdateUserMarginTradingEnabledIxArgs> for UpdateUserMarginTradingEnabl
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserMarginTradingEnabledIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserMarginTradingEnabledIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5373,6 +5443,15 @@ impl UpdateUserMarginTradingEnabledIxData {
         Ok(Self(UpdateUserMarginTradingEnabledIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_margin_trading_enabled_ix<
@@ -5512,12 +5591,6 @@ impl From<UpdateUserDelegateIxArgs> for UpdateUserDelegateIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserDelegateIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_DELEGATE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserDelegateIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5531,6 +5604,15 @@ impl UpdateUserDelegateIxData {
             ));
         }
         Ok(Self(UpdateUserDelegateIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_DELEGATE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_delegate_ix<
@@ -5676,12 +5758,6 @@ impl From<DeleteUserIxArgs> for DeleteUserIxData {
         Self(args)
     }
 }
-impl BorshSerialize for DeleteUserIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&DELETE_USER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl DeleteUserIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5695,6 +5771,15 @@ impl DeleteUserIxData {
             ));
         }
         Ok(Self(DeleteUserIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&DELETE_USER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn delete_user_ix<K: Into<DeleteUserKeys>, A: Into<DeleteUserIxArgs>>(
@@ -5856,12 +5941,6 @@ impl From<FillPerpOrderIxArgs> for FillPerpOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for FillPerpOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&FILL_PERP_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl FillPerpOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -5875,6 +5954,15 @@ impl FillPerpOrderIxData {
             ));
         }
         Ok(Self(FillPerpOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&FILL_PERP_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn fill_perp_order_ix<K: Into<FillPerpOrderKeys>, A: Into<FillPerpOrderIxArgs>>(
@@ -6026,12 +6114,6 @@ impl From<RevertFillIxArgs> for RevertFillIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RevertFillIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REVERT_FILL_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RevertFillIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6045,6 +6127,15 @@ impl RevertFillIxData {
             ));
         }
         Ok(Self(RevertFillIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REVERT_FILL_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn revert_fill_ix<K: Into<RevertFillKeys>, A: Into<RevertFillIxArgs>>(
@@ -6207,12 +6298,6 @@ impl From<FillSpotOrderIxArgs> for FillSpotOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for FillSpotOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&FILL_SPOT_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl FillSpotOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6226,6 +6311,15 @@ impl FillSpotOrderIxData {
             ));
         }
         Ok(Self(FillSpotOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&FILL_SPOT_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn fill_spot_order_ix<K: Into<FillSpotOrderKeys>, A: Into<FillSpotOrderIxArgs>>(
@@ -6379,12 +6473,6 @@ impl From<TriggerOrderIxArgs> for TriggerOrderIxData {
         Self(args)
     }
 }
-impl BorshSerialize for TriggerOrderIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&TRIGGER_ORDER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl TriggerOrderIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6398,6 +6486,15 @@ impl TriggerOrderIxData {
             ));
         }
         Ok(Self(TriggerOrderIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&TRIGGER_ORDER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn trigger_order_ix<K: Into<TriggerOrderKeys>, A: Into<TriggerOrderIxArgs>>(
@@ -6542,12 +6639,6 @@ impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ForceCancelOrdersIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ForceCancelOrdersIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6561,6 +6652,15 @@ impl ForceCancelOrdersIxData {
             ));
         }
         Ok(Self(ForceCancelOrdersIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&FORCE_CANCEL_ORDERS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>, A: Into<ForceCancelOrdersIxArgs>>(
@@ -6705,12 +6805,6 @@ impl From<UpdateUserIdleIxArgs> for UpdateUserIdleIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserIdleIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserIdleIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6724,6 +6818,15 @@ impl UpdateUserIdleIxData {
             ));
         }
         Ok(Self(UpdateUserIdleIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_IDLE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>, A: Into<UpdateUserIdleIxArgs>>(
@@ -6872,12 +6975,6 @@ impl From<UpdateUserOpenOrdersCountIxArgs> for UpdateUserOpenOrdersCountIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserOpenOrdersCountIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserOpenOrdersCountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -6891,6 +6988,15 @@ impl UpdateUserOpenOrdersCountIxData {
             ));
         }
         Ok(Self(UpdateUserOpenOrdersCountIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_open_orders_count_ix<
@@ -7045,12 +7151,6 @@ impl From<SettlePnlIxArgs> for SettlePnlIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SettlePnlIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_PNL_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettlePnlIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7064,6 +7164,15 @@ impl SettlePnlIxData {
             ));
         }
         Ok(Self(SettlePnlIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_PNL_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_pnl_ix<K: Into<SettlePnlKeys>, A: Into<SettlePnlIxArgs>>(
@@ -7191,12 +7300,6 @@ impl From<SettleFundingPaymentIxArgs> for SettleFundingPaymentIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SettleFundingPaymentIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettleFundingPaymentIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7210,6 +7313,15 @@ impl SettleFundingPaymentIxData {
             ));
         }
         Ok(Self(SettleFundingPaymentIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_FUNDING_PAYMENT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_funding_payment_ix<
@@ -7335,12 +7447,6 @@ impl From<SettleLpIxArgs> for SettleLpIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SettleLpIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_LP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettleLpIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7354,6 +7460,15 @@ impl SettleLpIxData {
             ));
         }
         Ok(Self(SettleLpIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_LP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_lp_ix<K: Into<SettleLpKeys>, A: Into<SettleLpIxArgs>>(
@@ -7476,12 +7591,6 @@ impl From<SettleExpiredMarketIxArgs> for SettleExpiredMarketIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SettleExpiredMarketIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_EXPIRED_MARKET_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettleExpiredMarketIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7495,6 +7604,15 @@ impl SettleExpiredMarketIxData {
             ));
         }
         Ok(Self(SettleExpiredMarketIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_EXPIRED_MARKET_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_expired_market_ix<
@@ -7653,12 +7771,6 @@ impl From<LiquidatePerpIxArgs> for LiquidatePerpIxData {
         Self(args)
     }
 }
-impl BorshSerialize for LiquidatePerpIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&LIQUIDATE_PERP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl LiquidatePerpIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7672,6 +7784,15 @@ impl LiquidatePerpIxData {
             ));
         }
         Ok(Self(LiquidatePerpIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&LIQUIDATE_PERP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn liquidate_perp_ix<K: Into<LiquidatePerpKeys>, A: Into<LiquidatePerpIxArgs>>(
@@ -7842,12 +7963,6 @@ impl From<LiquidateSpotIxArgs> for LiquidateSpotIxData {
         Self(args)
     }
 }
-impl BorshSerialize for LiquidateSpotIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&LIQUIDATE_SPOT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl LiquidateSpotIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -7861,6 +7976,15 @@ impl LiquidateSpotIxData {
             ));
         }
         Ok(Self(LiquidateSpotIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&LIQUIDATE_SPOT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn liquidate_spot_ix<K: Into<LiquidateSpotKeys>, A: Into<LiquidateSpotIxArgs>>(
@@ -8035,12 +8159,6 @@ impl From<LiquidateBorrowForPerpPnlIxArgs> for LiquidateBorrowForPerpPnlIxData {
         Self(args)
     }
 }
-impl BorshSerialize for LiquidateBorrowForPerpPnlIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl LiquidateBorrowForPerpPnlIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -8054,6 +8172,15 @@ impl LiquidateBorrowForPerpPnlIxData {
             ));
         }
         Ok(Self(LiquidateBorrowForPerpPnlIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn liquidate_borrow_for_perp_pnl_ix<
@@ -8238,12 +8365,6 @@ impl From<LiquidatePerpPnlForDepositIxArgs> for LiquidatePerpPnlForDepositIxData
         Self(args)
     }
 }
-impl BorshSerialize for LiquidatePerpPnlForDepositIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl LiquidatePerpPnlForDepositIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -8257,6 +8378,15 @@ impl LiquidatePerpPnlForDepositIxData {
             ));
         }
         Ok(Self(LiquidatePerpPnlForDepositIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn liquidate_perp_pnl_for_deposit_ix<
@@ -8433,12 +8563,6 @@ impl From<ResolvePerpPnlDeficitIxArgs> for ResolvePerpPnlDeficitIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ResolvePerpPnlDeficitIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&RESOLVE_PERP_PNL_DEFICIT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ResolvePerpPnlDeficitIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -8452,6 +8576,15 @@ impl ResolvePerpPnlDeficitIxData {
             ));
         }
         Ok(Self(ResolvePerpPnlDeficitIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&RESOLVE_PERP_PNL_DEFICIT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn resolve_perp_pnl_deficit_ix<
@@ -8651,12 +8784,6 @@ impl From<ResolvePerpBankruptcyIxArgs> for ResolvePerpBankruptcyIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ResolvePerpBankruptcyIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&RESOLVE_PERP_BANKRUPTCY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ResolvePerpBankruptcyIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -8670,6 +8797,15 @@ impl ResolvePerpBankruptcyIxData {
             ));
         }
         Ok(Self(ResolvePerpBankruptcyIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&RESOLVE_PERP_BANKRUPTCY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn resolve_perp_bankruptcy_ix<
@@ -8879,12 +9015,6 @@ impl From<ResolveSpotBankruptcyIxArgs> for ResolveSpotBankruptcyIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ResolveSpotBankruptcyIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&RESOLVE_SPOT_BANKRUPTCY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ResolveSpotBankruptcyIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -8898,6 +9028,15 @@ impl ResolveSpotBankruptcyIxData {
             ));
         }
         Ok(Self(ResolveSpotBankruptcyIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&RESOLVE_SPOT_BANKRUPTCY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn resolve_spot_bankruptcy_ix<
@@ -9086,12 +9225,6 @@ impl From<SettleRevenueToInsuranceFundIxArgs> for SettleRevenueToInsuranceFundIx
         Self(args)
     }
 }
-impl BorshSerialize for SettleRevenueToInsuranceFundIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettleRevenueToInsuranceFundIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9105,6 +9238,15 @@ impl SettleRevenueToInsuranceFundIxData {
             ));
         }
         Ok(Self(SettleRevenueToInsuranceFundIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_revenue_to_insurance_fund_ix<
@@ -9259,12 +9401,6 @@ impl From<UpdateFundingRateIxArgs> for UpdateFundingRateIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateFundingRateIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_FUNDING_RATE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateFundingRateIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9278,6 +9414,15 @@ impl UpdateFundingRateIxData {
             ));
         }
         Ok(Self(UpdateFundingRateIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_FUNDING_RATE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_funding_rate_ix<K: Into<UpdateFundingRateKeys>, A: Into<UpdateFundingRateIxArgs>>(
@@ -9419,12 +9564,6 @@ impl From<UpdateSpotMarketCumulativeInterestIxArgs> for UpdateSpotMarketCumulati
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketCumulativeInterestIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketCumulativeInterestIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9440,6 +9579,15 @@ impl UpdateSpotMarketCumulativeInterestIxData {
         Ok(Self(UpdateSpotMarketCumulativeInterestIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_cumulative_interest_ix<
@@ -9575,12 +9723,6 @@ impl From<UpdateAmmsIxArgs> for UpdateAmmsIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateAmmsIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_AMMS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateAmmsIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9594,6 +9736,15 @@ impl UpdateAmmsIxData {
             ));
         }
         Ok(Self(UpdateAmmsIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_AMMS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_amms_ix<K: Into<UpdateAmmsKeys>, A: Into<UpdateAmmsIxArgs>>(
@@ -9728,12 +9879,6 @@ impl From<UpdateSpotMarketExpiryIxArgs> for UpdateSpotMarketExpiryIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketExpiryIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketExpiryIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9747,6 +9892,15 @@ impl UpdateSpotMarketExpiryIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketExpiryIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_expiry_ix<
@@ -9919,12 +10073,6 @@ impl From<UpdateUserQuoteAssetInsuranceStakeIxArgs> for UpdateUserQuoteAssetInsu
         Self(args)
     }
 }
-impl BorshSerialize for UpdateUserQuoteAssetInsuranceStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateUserQuoteAssetInsuranceStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -9940,6 +10088,15 @@ impl UpdateUserQuoteAssetInsuranceStakeIxData {
         Ok(Self(UpdateUserQuoteAssetInsuranceStakeIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_user_quote_asset_insurance_stake_ix<
@@ -10144,12 +10301,6 @@ impl From<InitializeInsuranceFundStakeIxArgs> for InitializeInsuranceFundStakeIx
         Self(args)
     }
 }
-impl BorshSerialize for InitializeInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -10163,6 +10314,15 @@ impl InitializeInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(InitializeInsuranceFundStakeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_insurance_fund_stake_ix<
@@ -10374,12 +10534,6 @@ impl From<AddInsuranceFundStakeIxArgs> for AddInsuranceFundStakeIxData {
         Self(args)
     }
 }
-impl BorshSerialize for AddInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&ADD_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl AddInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -10393,6 +10547,15 @@ impl AddInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(AddInsuranceFundStakeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&ADD_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn add_insurance_fund_stake_ix<
@@ -10580,12 +10743,6 @@ impl From<RequestRemoveInsuranceFundStakeIxArgs> for RequestRemoveInsuranceFundS
         Self(args)
     }
 }
-impl BorshSerialize for RequestRemoveInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RequestRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -10601,6 +10758,15 @@ impl RequestRemoveInsuranceFundStakeIxData {
         Ok(Self(RequestRemoveInsuranceFundStakeIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn request_remove_insurance_fund_stake_ix<
@@ -10790,12 +10956,6 @@ impl From<CancelRequestRemoveInsuranceFundStakeIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for CancelRequestRemoveInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl CancelRequestRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -10811,6 +10971,15 @@ impl CancelRequestRemoveInsuranceFundStakeIxData {
         Ok(Self(
             CancelRequestRemoveInsuranceFundStakeIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn cancel_request_remove_insurance_fund_stake_ix<
@@ -11017,12 +11186,6 @@ impl From<RemoveInsuranceFundStakeIxArgs> for RemoveInsuranceFundStakeIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RemoveInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -11036,6 +11199,15 @@ impl RemoveInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(RemoveInsuranceFundStakeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn remove_insurance_fund_stake_ix<
@@ -11222,12 +11394,6 @@ impl From<InitializeIxArgs> for InitializeIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -11241,6 +11407,15 @@ impl InitializeIxData {
             ));
         }
         Ok(Self(InitializeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
@@ -11450,12 +11625,6 @@ impl From<InitializeSpotMarketIxArgs> for InitializeSpotMarketIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializeSpotMarketIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_SPOT_MARKET_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeSpotMarketIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -11469,6 +11638,15 @@ impl InitializeSpotMarketIxData {
             ));
         }
         Ok(Self(InitializeSpotMarketIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_SPOT_MARKET_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_spot_market_ix<
@@ -11695,12 +11873,6 @@ impl From<InitializeSerumFulfillmentConfigIxArgs> for InitializeSerumFulfillment
         Self(args)
     }
 }
-impl BorshSerialize for InitializeSerumFulfillmentConfigIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializeSerumFulfillmentConfigIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -11716,6 +11888,15 @@ impl InitializeSerumFulfillmentConfigIxData {
         Ok(Self(InitializeSerumFulfillmentConfigIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_serum_fulfillment_config_ix<
@@ -11891,12 +12072,6 @@ impl From<UpdateSerumFulfillmentConfigStatusIxArgs> for UpdateSerumFulfillmentCo
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSerumFulfillmentConfigStatusIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSerumFulfillmentConfigStatusIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -11912,6 +12087,15 @@ impl UpdateSerumFulfillmentConfigStatusIxData {
         Ok(Self(UpdateSerumFulfillmentConfigStatusIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_serum_fulfillment_config_status_ix<
@@ -12124,12 +12308,6 @@ impl From<InitializePhoenixFulfillmentConfigIxArgs> for InitializePhoenixFulfill
         Self(args)
     }
 }
-impl BorshSerialize for InitializePhoenixFulfillmentConfigIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializePhoenixFulfillmentConfigIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -12145,6 +12323,15 @@ impl InitializePhoenixFulfillmentConfigIxData {
         Ok(Self(InitializePhoenixFulfillmentConfigIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_phoenix_fulfillment_config_ix<
@@ -12315,12 +12502,6 @@ impl From<PhoenixFulfillmentConfigStatusIxArgs> for PhoenixFulfillmentConfigStat
         Self(args)
     }
 }
-impl BorshSerialize for PhoenixFulfillmentConfigStatusIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl PhoenixFulfillmentConfigStatusIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -12336,6 +12517,15 @@ impl PhoenixFulfillmentConfigStatusIxData {
         Ok(Self(PhoenixFulfillmentConfigStatusIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn phoenix_fulfillment_config_status_ix<
@@ -12486,12 +12676,6 @@ impl From<UpdateSerumVaultIxArgs> for UpdateSerumVaultIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSerumVaultIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSerumVaultIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -12505,6 +12689,15 @@ impl UpdateSerumVaultIxData {
             ));
         }
         Ok(Self(UpdateSerumVaultIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SERUM_VAULT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>, A: Into<UpdateSerumVaultIxArgs>>(
@@ -12674,12 +12867,6 @@ impl From<InitializePerpMarketIxArgs> for InitializePerpMarketIxData {
         Self(args)
     }
 }
-impl BorshSerialize for InitializePerpMarketIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&INITIALIZE_PERP_MARKET_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl InitializePerpMarketIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -12693,6 +12880,15 @@ impl InitializePerpMarketIxData {
             ));
         }
         Ok(Self(InitializePerpMarketIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&INITIALIZE_PERP_MARKET_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn initialize_perp_market_ix<
@@ -12845,12 +13041,6 @@ impl From<DeleteInitializedPerpMarketIxArgs> for DeleteInitializedPerpMarketIxDa
         Self(args)
     }
 }
-impl BorshSerialize for DeleteInitializedPerpMarketIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&DELETE_INITIALIZED_PERP_MARKET_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl DeleteInitializedPerpMarketIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -12864,6 +13054,15 @@ impl DeleteInitializedPerpMarketIxData {
             ));
         }
         Ok(Self(DeleteInitializedPerpMarketIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&DELETE_INITIALIZED_PERP_MARKET_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn delete_initialized_perp_market_ix<
@@ -13012,12 +13211,6 @@ impl From<MoveAmmPriceIxArgs> for MoveAmmPriceIxData {
         Self(args)
     }
 }
-impl BorshSerialize for MoveAmmPriceIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&MOVE_AMM_PRICE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl MoveAmmPriceIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13031,6 +13224,15 @@ impl MoveAmmPriceIxData {
             ));
         }
         Ok(Self(MoveAmmPriceIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&MOVE_AMM_PRICE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn move_amm_price_ix<K: Into<MoveAmmPriceKeys>, A: Into<MoveAmmPriceIxArgs>>(
@@ -13171,12 +13373,6 @@ impl From<UpdatePerpMarketExpiryIxArgs> for UpdatePerpMarketExpiryIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketExpiryIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_EXPIRY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketExpiryIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13190,6 +13386,15 @@ impl UpdatePerpMarketExpiryIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketExpiryIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_EXPIRY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_expiry_ix<
@@ -13354,12 +13559,6 @@ impl From<SettleExpiredMarketPoolsToRevenuePoolIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for SettleExpiredMarketPoolsToRevenuePoolIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl SettleExpiredMarketPoolsToRevenuePoolIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13375,6 +13574,15 @@ impl SettleExpiredMarketPoolsToRevenuePoolIxData {
         Ok(Self(
             SettleExpiredMarketPoolsToRevenuePoolIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn settle_expired_market_pools_to_revenue_pool_ix<
@@ -13567,12 +13775,6 @@ impl From<DepositIntoPerpMarketFeePoolIxArgs> for DepositIntoPerpMarketFeePoolIx
         Self(args)
     }
 }
-impl BorshSerialize for DepositIntoPerpMarketFeePoolIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl DepositIntoPerpMarketFeePoolIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13586,6 +13788,15 @@ impl DepositIntoPerpMarketFeePoolIxData {
             ));
         }
         Ok(Self(DepositIntoPerpMarketFeePoolIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deposit_into_perp_market_fee_pool_ix<
@@ -13753,12 +13964,6 @@ impl From<RepegAmmCurveIxArgs> for RepegAmmCurveIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RepegAmmCurveIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&REPEG_AMM_CURVE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl RepegAmmCurveIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13772,6 +13977,15 @@ impl RepegAmmCurveIxData {
             ));
         }
         Ok(Self(RepegAmmCurveIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&REPEG_AMM_CURVE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn repeg_amm_curve_ix<K: Into<RepegAmmCurveKeys>, A: Into<RepegAmmCurveIxArgs>>(
@@ -13923,12 +14137,6 @@ impl From<UpdatePerpMarketAmmOracleTwapIxArgs> for UpdatePerpMarketAmmOracleTwap
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketAmmOracleTwapIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketAmmOracleTwapIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -13942,6 +14150,15 @@ impl UpdatePerpMarketAmmOracleTwapIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketAmmOracleTwapIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_amm_oracle_twap_ix<
@@ -14104,12 +14321,6 @@ impl From<ResetPerpMarketAmmOracleTwapIxArgs> for ResetPerpMarketAmmOracleTwapIx
         Self(args)
     }
 }
-impl BorshSerialize for ResetPerpMarketAmmOracleTwapIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl ResetPerpMarketAmmOracleTwapIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14123,6 +14334,15 @@ impl ResetPerpMarketAmmOracleTwapIxData {
             ));
         }
         Ok(Self(ResetPerpMarketAmmOracleTwapIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn reset_perp_market_amm_oracle_twap_ix<
@@ -14278,12 +14498,6 @@ impl From<UpdateKIxArgs> for UpdateKIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateKIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_K_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateKIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14297,6 +14511,15 @@ impl UpdateKIxData {
             ));
         }
         Ok(Self(UpdateKIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_K_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_k_ix<K: Into<UpdateKKeys>, A: Into<UpdateKIxArgs>>(
@@ -14444,12 +14667,6 @@ impl From<UpdatePerpMarketMarginRatioIxArgs> for UpdatePerpMarketMarginRatioIxDa
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMarginRatioIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMarginRatioIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14463,6 +14680,15 @@ impl UpdatePerpMarketMarginRatioIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMarginRatioIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_margin_ratio_ix<
@@ -14617,12 +14843,6 @@ impl From<UpdatePerpMarketMaxImbalancesIxArgs> for UpdatePerpMarketMaxImbalances
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMaxImbalancesIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMaxImbalancesIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14636,6 +14856,15 @@ impl UpdatePerpMarketMaxImbalancesIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMaxImbalancesIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_max_imbalances_ix<
@@ -14792,12 +15021,6 @@ impl From<UpdatePerpMarketLiquidationFeeIxArgs> for UpdatePerpMarketLiquidationF
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketLiquidationFeeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketLiquidationFeeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14813,6 +15036,15 @@ impl UpdatePerpMarketLiquidationFeeIxData {
         Ok(Self(UpdatePerpMarketLiquidationFeeIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_liquidation_fee_ix<
@@ -14972,12 +15204,6 @@ impl From<UpdateInsuranceFundUnstakingPeriodIxArgs> for UpdateInsuranceFundUnsta
         Self(args)
     }
 }
-impl BorshSerialize for UpdateInsuranceFundUnstakingPeriodIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateInsuranceFundUnstakingPeriodIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -14993,6 +15219,15 @@ impl UpdateInsuranceFundUnstakingPeriodIxData {
         Ok(Self(UpdateInsuranceFundUnstakingPeriodIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_insurance_fund_unstaking_period_ix<
@@ -15151,12 +15386,6 @@ impl From<UpdateSpotMarketLiquidationFeeIxArgs> for UpdateSpotMarketLiquidationF
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketLiquidationFeeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketLiquidationFeeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -15172,6 +15401,15 @@ impl UpdateSpotMarketLiquidationFeeIxData {
         Ok(Self(UpdateSpotMarketLiquidationFeeIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_liquidation_fee_ix<
@@ -15327,12 +15565,6 @@ impl From<UpdateWithdrawGuardThresholdIxArgs> for UpdateWithdrawGuardThresholdIx
         Self(args)
     }
 }
-impl BorshSerialize for UpdateWithdrawGuardThresholdIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateWithdrawGuardThresholdIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -15346,6 +15578,15 @@ impl UpdateWithdrawGuardThresholdIxData {
             ));
         }
         Ok(Self(UpdateWithdrawGuardThresholdIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_withdraw_guard_threshold_ix<
@@ -15499,12 +15740,6 @@ impl From<UpdateSpotMarketIfFactorIxArgs> for UpdateSpotMarketIfFactorIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketIfFactorIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketIfFactorIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -15518,6 +15753,15 @@ impl UpdateSpotMarketIfFactorIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketIfFactorIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_if_factor_ix<
@@ -15674,12 +15918,6 @@ impl From<UpdateSpotMarketRevenueSettlePeriodIxArgs> for UpdateSpotMarketRevenue
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketRevenueSettlePeriodIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketRevenueSettlePeriodIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -15695,6 +15933,15 @@ impl UpdateSpotMarketRevenueSettlePeriodIxData {
         Ok(Self(
             UpdateSpotMarketRevenueSettlePeriodIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_revenue_settle_period_ix<
@@ -15847,12 +16094,6 @@ impl From<UpdateSpotMarketStatusIxArgs> for UpdateSpotMarketStatusIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketStatusIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_STATUS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketStatusIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -15866,6 +16107,15 @@ impl UpdateSpotMarketStatusIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketStatusIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_STATUS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_status_ix<
@@ -16013,12 +16263,6 @@ impl From<UpdateSpotMarketAssetTierIxArgs> for UpdateSpotMarketAssetTierIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketAssetTierIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketAssetTierIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16032,6 +16276,15 @@ impl UpdateSpotMarketAssetTierIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketAssetTierIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_asset_tier_ix<
@@ -16188,12 +16441,6 @@ impl From<UpdateSpotMarketMarginWeightsIxArgs> for UpdateSpotMarketMarginWeights
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketMarginWeightsIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketMarginWeightsIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16207,6 +16454,15 @@ impl UpdateSpotMarketMarginWeightsIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketMarginWeightsIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_margin_weights_ix<
@@ -16364,12 +16620,6 @@ impl From<UpdateSpotMarketBorrowRateIxArgs> for UpdateSpotMarketBorrowRateIxData
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketBorrowRateIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketBorrowRateIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16383,6 +16633,15 @@ impl UpdateSpotMarketBorrowRateIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketBorrowRateIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_borrow_rate_ix<
@@ -16539,12 +16798,6 @@ impl From<UpdateSpotMarketMaxTokenDepositsIxArgs> for UpdateSpotMarketMaxTokenDe
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketMaxTokenDepositsIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketMaxTokenDepositsIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16560,6 +16813,15 @@ impl UpdateSpotMarketMaxTokenDepositsIxData {
         Ok(Self(UpdateSpotMarketMaxTokenDepositsIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_max_token_deposits_ix<
@@ -16720,12 +16982,6 @@ impl From<UpdateSpotMarketOracleIxArgs> for UpdateSpotMarketOracleIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketOracleIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_ORACLE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketOracleIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16739,6 +16995,15 @@ impl UpdateSpotMarketOracleIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketOracleIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_ORACLE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_oracle_ix<
@@ -16894,12 +17159,6 @@ impl From<UpdateSpotMarketStepSizeAndTickSizeIxArgs> for UpdateSpotMarketStepSiz
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketStepSizeAndTickSizeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketStepSizeAndTickSizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -16915,6 +17174,15 @@ impl UpdateSpotMarketStepSizeAndTickSizeIxData {
         Ok(Self(
             UpdateSpotMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_step_size_and_tick_size_ix<
@@ -17071,12 +17339,6 @@ impl From<UpdateSpotMarketMinOrderSizeIxArgs> for UpdateSpotMarketMinOrderSizeIx
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketMinOrderSizeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketMinOrderSizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17090,6 +17352,15 @@ impl UpdateSpotMarketMinOrderSizeIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketMinOrderSizeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_min_order_size_ix<
@@ -17246,12 +17517,6 @@ impl From<UpdateSpotMarketOrdersEnabledIxArgs> for UpdateSpotMarketOrdersEnabled
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketOrdersEnabledIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketOrdersEnabledIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17265,6 +17530,15 @@ impl UpdateSpotMarketOrdersEnabledIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketOrdersEnabledIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_orders_enabled_ix<
@@ -17414,12 +17688,6 @@ impl From<UpdateSpotMarketNameIxArgs> for UpdateSpotMarketNameIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotMarketNameIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_MARKET_NAME_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotMarketNameIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17433,6 +17701,15 @@ impl UpdateSpotMarketNameIxData {
             ));
         }
         Ok(Self(UpdateSpotMarketNameIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_MARKET_NAME_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_market_name_ix<
@@ -17578,12 +17855,6 @@ impl From<UpdatePerpMarketStatusIxArgs> for UpdatePerpMarketStatusIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketStatusIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_STATUS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketStatusIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17597,6 +17868,15 @@ impl UpdatePerpMarketStatusIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketStatusIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_STATUS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_status_ix<
@@ -17747,12 +18027,6 @@ impl From<UpdatePerpMarketContractTierIxArgs> for UpdatePerpMarketContractTierIx
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketContractTierIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketContractTierIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17766,6 +18040,15 @@ impl UpdatePerpMarketContractTierIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketContractTierIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_contract_tier_ix<
@@ -17920,12 +18203,6 @@ impl From<UpdatePerpMarketImfFactorIxArgs> for UpdatePerpMarketImfFactorIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketImfFactorIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketImfFactorIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -17939,6 +18216,15 @@ impl UpdatePerpMarketImfFactorIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketImfFactorIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_imf_factor_ix<
@@ -18100,12 +18386,6 @@ impl From<UpdatePerpMarketUnrealizedAssetWeightIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketUnrealizedAssetWeightIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketUnrealizedAssetWeightIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18121,6 +18401,15 @@ impl UpdatePerpMarketUnrealizedAssetWeightIxData {
         Ok(Self(
             UpdatePerpMarketUnrealizedAssetWeightIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_unrealized_asset_weight_ix<
@@ -18281,12 +18570,6 @@ impl From<UpdatePerpMarketConcentrationCoefIxArgs> for UpdatePerpMarketConcentra
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketConcentrationCoefIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketConcentrationCoefIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18302,6 +18585,15 @@ impl UpdatePerpMarketConcentrationCoefIxData {
         Ok(Self(UpdatePerpMarketConcentrationCoefIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_concentration_coef_ix<
@@ -18466,12 +18758,6 @@ impl From<UpdatePerpMarketCurveUpdateIntensityIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketCurveUpdateIntensityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketCurveUpdateIntensityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18487,6 +18773,15 @@ impl UpdatePerpMarketCurveUpdateIntensityIxData {
         Ok(Self(
             UpdatePerpMarketCurveUpdateIntensityIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_curve_update_intensity_ix<
@@ -18656,12 +18951,6 @@ impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18677,6 +18966,15 @@ impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
         Ok(Self(
             UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_ix<
@@ -18817,12 +19115,6 @@ impl From<UpdateLpCooldownTimeIxArgs> for UpdateLpCooldownTimeIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateLpCooldownTimeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_LP_COOLDOWN_TIME_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateLpCooldownTimeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18836,6 +19128,15 @@ impl UpdateLpCooldownTimeIxData {
             ));
         }
         Ok(Self(UpdateLpCooldownTimeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_LP_COOLDOWN_TIME_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_lp_cooldown_time_ix<
@@ -18970,12 +19271,6 @@ impl From<UpdatePerpFeeStructureIxArgs> for UpdatePerpFeeStructureIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpFeeStructureIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_FEE_STRUCTURE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpFeeStructureIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -18989,6 +19284,15 @@ impl UpdatePerpFeeStructureIxData {
             ));
         }
         Ok(Self(UpdatePerpFeeStructureIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_FEE_STRUCTURE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_fee_structure_ix<
@@ -19123,12 +19427,6 @@ impl From<UpdateSpotFeeStructureIxArgs> for UpdateSpotFeeStructureIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotFeeStructureIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotFeeStructureIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19142,6 +19440,15 @@ impl UpdateSpotFeeStructureIxData {
             ));
         }
         Ok(Self(UpdateSpotFeeStructureIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_fee_structure_ix<
@@ -19281,12 +19588,6 @@ impl From<UpdateInitialPctToLiquidateIxArgs> for UpdateInitialPctToLiquidateIxDa
         Self(args)
     }
 }
-impl BorshSerialize for UpdateInitialPctToLiquidateIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateInitialPctToLiquidateIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19300,6 +19601,15 @@ impl UpdateInitialPctToLiquidateIxData {
             ));
         }
         Ok(Self(UpdateInitialPctToLiquidateIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_initial_pct_to_liquidate_ix<
@@ -19437,12 +19747,6 @@ impl From<UpdateLiquidationDurationIxArgs> for UpdateLiquidationDurationIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateLiquidationDurationIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_LIQUIDATION_DURATION_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateLiquidationDurationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19456,6 +19760,15 @@ impl UpdateLiquidationDurationIxData {
             ));
         }
         Ok(Self(UpdateLiquidationDurationIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_LIQUIDATION_DURATION_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_liquidation_duration_ix<
@@ -19593,12 +19906,6 @@ impl From<UpdateOracleGuardRailsIxArgs> for UpdateOracleGuardRailsIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateOracleGuardRailsIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_ORACLE_GUARD_RAILS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateOracleGuardRailsIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19612,6 +19919,15 @@ impl UpdateOracleGuardRailsIxData {
             ));
         }
         Ok(Self(UpdateOracleGuardRailsIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_ORACLE_GUARD_RAILS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_oracle_guard_rails_ix<
@@ -19750,12 +20066,6 @@ impl From<UpdateStateSettlementDurationIxArgs> for UpdateStateSettlementDuration
         Self(args)
     }
 }
-impl BorshSerialize for UpdateStateSettlementDurationIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateStateSettlementDurationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19769,6 +20079,15 @@ impl UpdateStateSettlementDurationIxData {
             ));
         }
         Ok(Self(UpdateStateSettlementDurationIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_state_settlement_duration_ix<
@@ -19927,12 +20246,6 @@ impl From<UpdatePerpMarketOracleIxArgs> for UpdatePerpMarketOracleIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketOracleIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_ORACLE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketOracleIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -19946,6 +20259,15 @@ impl UpdatePerpMarketOracleIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketOracleIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_ORACLE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_oracle_ix<
@@ -20096,12 +20418,6 @@ impl From<UpdatePerpMarketBaseSpreadIxArgs> for UpdatePerpMarketBaseSpreadIxData
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketBaseSpreadIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketBaseSpreadIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20115,6 +20431,15 @@ impl UpdatePerpMarketBaseSpreadIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketBaseSpreadIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_base_spread_ix<
@@ -20261,12 +20586,6 @@ impl From<UpdateAmmJitIntensityIxArgs> for UpdateAmmJitIntensityIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateAmmJitIntensityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_AMM_JIT_INTENSITY_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateAmmJitIntensityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20280,6 +20599,15 @@ impl UpdateAmmJitIntensityIxData {
             ));
         }
         Ok(Self(UpdateAmmJitIntensityIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_AMM_JIT_INTENSITY_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_amm_jit_intensity_ix<
@@ -20427,12 +20755,6 @@ impl From<UpdatePerpMarketMaxSpreadIxArgs> for UpdatePerpMarketMaxSpreadIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMaxSpreadIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMaxSpreadIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20446,6 +20768,15 @@ impl UpdatePerpMarketMaxSpreadIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMaxSpreadIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_max_spread_ix<
@@ -20603,12 +20934,6 @@ impl From<UpdatePerpMarketStepSizeAndTickSizeIxArgs> for UpdatePerpMarketStepSiz
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketStepSizeAndTickSizeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketStepSizeAndTickSizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20624,6 +20949,15 @@ impl UpdatePerpMarketStepSizeAndTickSizeIxData {
         Ok(Self(
             UpdatePerpMarketStepSizeAndTickSizeIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_step_size_and_tick_size_ix<
@@ -20774,12 +21108,6 @@ impl From<UpdatePerpMarketNameIxArgs> for UpdatePerpMarketNameIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketNameIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_NAME_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketNameIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20793,6 +21121,15 @@ impl UpdatePerpMarketNameIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketNameIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_NAME_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_name_ix<
@@ -20942,12 +21279,6 @@ impl From<UpdatePerpMarketMinOrderSizeIxArgs> for UpdatePerpMarketMinOrderSizeIx
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMinOrderSizeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMinOrderSizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -20961,6 +21292,15 @@ impl UpdatePerpMarketMinOrderSizeIxData {
             ));
         }
         Ok(Self(UpdatePerpMarketMinOrderSizeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_min_order_size_ix<
@@ -21120,12 +21460,6 @@ impl From<UpdatePerpMarketMaxSlippageRatioIxArgs> for UpdatePerpMarketMaxSlippag
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMaxSlippageRatioIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMaxSlippageRatioIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21141,6 +21475,15 @@ impl UpdatePerpMarketMaxSlippageRatioIxData {
         Ok(Self(UpdatePerpMarketMaxSlippageRatioIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_max_slippage_ratio_ix<
@@ -21308,12 +21651,6 @@ impl From<UpdatePerpMarketMaxFillReserveFractionIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMaxFillReserveFractionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMaxFillReserveFractionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21329,6 +21666,15 @@ impl UpdatePerpMarketMaxFillReserveFractionIxData {
         Ok(Self(
             UpdatePerpMarketMaxFillReserveFractionIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_max_fill_reserve_fraction_ix<
@@ -21489,12 +21835,6 @@ impl From<UpdatePerpMarketMaxOpenInterestIxArgs> for UpdatePerpMarketMaxOpenInte
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpMarketMaxOpenInterestIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpMarketMaxOpenInterestIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21510,6 +21850,15 @@ impl UpdatePerpMarketMaxOpenInterestIxData {
         Ok(Self(UpdatePerpMarketMaxOpenInterestIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_market_max_open_interest_ix<
@@ -21649,12 +21998,6 @@ impl From<UpdateAdminIxArgs> for UpdateAdminIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateAdminIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_ADMIN_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateAdminIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21668,6 +22011,15 @@ impl UpdateAdminIxData {
             ));
         }
         Ok(Self(UpdateAdminIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_ADMIN_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_admin_ix<K: Into<UpdateAdminKeys>, A: Into<UpdateAdminIxArgs>>(
@@ -21795,12 +22147,6 @@ impl From<UpdateWhitelistMintIxArgs> for UpdateWhitelistMintIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateWhitelistMintIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_WHITELIST_MINT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateWhitelistMintIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21814,6 +22160,15 @@ impl UpdateWhitelistMintIxData {
             ));
         }
         Ok(Self(UpdateWhitelistMintIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_WHITELIST_MINT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_whitelist_mint_ix<
@@ -21944,12 +22299,6 @@ impl From<UpdateDiscountMintIxArgs> for UpdateDiscountMintIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateDiscountMintIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_DISCOUNT_MINT_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateDiscountMintIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -21963,6 +22312,15 @@ impl UpdateDiscountMintIxData {
             ));
         }
         Ok(Self(UpdateDiscountMintIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_DISCOUNT_MINT_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_discount_mint_ix<
@@ -22093,12 +22451,6 @@ impl From<UpdateExchangeStatusIxArgs> for UpdateExchangeStatusIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateExchangeStatusIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_EXCHANGE_STATUS_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateExchangeStatusIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -22112,6 +22464,15 @@ impl UpdateExchangeStatusIxData {
             ));
         }
         Ok(Self(UpdateExchangeStatusIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_EXCHANGE_STATUS_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_exchange_status_ix<
@@ -22248,12 +22609,6 @@ impl From<UpdatePerpAuctionDurationIxArgs> for UpdatePerpAuctionDurationIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePerpAuctionDurationIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_PERP_AUCTION_DURATION_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePerpAuctionDurationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -22267,6 +22622,15 @@ impl UpdatePerpAuctionDurationIxData {
             ));
         }
         Ok(Self(UpdatePerpAuctionDurationIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_PERP_AUCTION_DURATION_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_perp_auction_duration_ix<
@@ -22406,12 +22770,6 @@ impl From<UpdateSpotAuctionDurationIxArgs> for UpdateSpotAuctionDurationIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateSpotAuctionDurationIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&UPDATE_SPOT_AUCTION_DURATION_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateSpotAuctionDurationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -22425,6 +22783,15 @@ impl UpdateSpotAuctionDurationIxData {
             ));
         }
         Ok(Self(UpdateSpotAuctionDurationIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&UPDATE_SPOT_AUCTION_DURATION_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_spot_auction_duration_ix<
@@ -22606,12 +22973,6 @@ impl From<AdminRemoveInsuranceFundStakeIxArgs> for AdminRemoveInsuranceFundStake
         Self(args)
     }
 }
-impl BorshSerialize for AdminRemoveInsuranceFundStakeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
-        self.0.serialize(writer)
-    }
-}
 impl AdminRemoveInsuranceFundStakeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = <[u8; 8]>::deserialize(buf)?;
@@ -22625,6 +22986,15 @@ impl AdminRemoveInsuranceFundStakeIxData {
             ));
         }
         Ok(Self(AdminRemoveInsuranceFundStakeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM)?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn admin_remove_insurance_fund_stake_ix<

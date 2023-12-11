@@ -1,3 +1,6 @@
+// TODO: determine borsh version for more efficient implementations of deserialize_reader
+// that makes use of ix_args' deserialize_reader method if available
+
 use heck::{ToPascalCase, ToShoutySnakeCase, ToSnakeCase};
 use itertools::Itertools;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -227,6 +230,10 @@ impl ToTokens for NamedInstruction {
         )
         .unwrap();
         let discm_value_tokens: TokenStream = format!("{:?}", discm).parse().unwrap();
+
+        // using std::io instead of borsh:: because borsh changed their paths from
+        // borsh::maybestd::io to borsh::io from 0.X to 1.X
+
         tokens.extend(quote! {
             #[derive(Clone, Debug, PartialEq)]
             pub struct #ix_data_ident(pub #ix_args_ident);
@@ -236,13 +243,6 @@ impl ToTokens for NamedInstruction {
             impl From<#ix_args_ident> for #ix_data_ident {
                 fn from(args: #ix_args_ident) -> Self {
                     Self(args)
-                }
-            }
-
-            impl BorshSerialize for #ix_data_ident {
-                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    writer.write_all(&#discm_ident)?;
-                    self.0.serialize(writer)
                 }
             }
 
@@ -257,6 +257,17 @@ impl ToTokens for NamedInstruction {
                         );
                     }
                     Ok(Self(#ix_args_ident::deserialize(buf)?))
+                }
+
+                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+                    writer.write_all(&#discm_ident)?;
+                    self.0.serialize(&mut writer)
+                }
+
+                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+                    let mut data = Vec::new();
+                    self.serialize(&mut data)?;
+                    Ok(data)
                 }
             }
         });

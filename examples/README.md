@@ -12,7 +12,7 @@ To save disk space, we've decided to make all examples use workspace versions of
 
 ## Testing
 
-Testing consists of 2 stages: generating + checking the examples and then testing the consumer crates.
+Testing the examples consists of 2 stages: generating + checking the examples and then testing the consumer crates.
 
 ### Generating the example
 
