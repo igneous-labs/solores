@@ -44,129 +44,6 @@ pub enum MplTokenMetadataProgramIx {
     ThawDelegatedAccount(ThawDelegatedAccountIxArgs),
     RemoveCreatorVerification(RemoveCreatorVerificationIxArgs),
 }
-impl BorshSerialize for MplTokenMetadataProgramIx {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        match self {
-            Self::CreateMetadataAccount(args) => {
-                CREATE_METADATA_ACCOUNT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateMetadataAccount(args) => {
-                UPDATE_METADATA_ACCOUNT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedCreateMasterEdition(args) => {
-                DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(args) => {
-                DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
-                    .serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdatePrimarySaleHappenedViaToken(args) => {
-                UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedSetReservationList(args) => {
-                DEPRECATED_SET_RESERVATION_LIST_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedCreateReservationList(args) => {
-                DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SignMetadata(args) => {
-                SIGN_METADATA_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedMintPrintingTokensViaToken(args) => {
-                DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::DeprecatedMintPrintingTokens(args) => {
-                DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CreateMasterEdition(args) => {
-                CREATE_MASTER_EDITION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::MintNewEditionFromMasterEditionViaToken(args) => {
-                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ConvertMasterEditionV1ToV2(args) => {
-                CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::MintNewEditionFromMasterEditionViaVaultProxy(args) => {
-                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::PuffMetadata(args) => {
-                PUFF_METADATA_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UpdateMetadataAccountV2(args) => {
-                UPDATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CreateMetadataAccountV2(args) => {
-                CREATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::CreateMasterEditionV3(args) => {
-                CREATE_MASTER_EDITION_V3_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::VerifyCollection(args) => {
-                VERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::Utilize(args) => {
-                UTILIZE_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ApproveUseAuthority(args) => {
-                APPROVE_USE_AUTHORITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RevokeUseAuthority(args) => {
-                REVOKE_USE_AUTHORITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::UnverifyCollection(args) => {
-                UNVERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ApproveCollectionAuthority(args) => {
-                APPROVE_COLLECTION_AUTHORITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RevokeCollectionAuthority(args) => {
-                REVOKE_COLLECTION_AUTHORITY_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::SetAndVerifyCollection(args) => {
-                SET_AND_VERIFY_COLLECTION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::FreezeDelegatedAccount(args) => {
-                FREEZE_DELEGATED_ACCOUNT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::ThawDelegatedAccount(args) => {
-                THAW_DELEGATED_ACCOUNT_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-            Self::RemoveCreatorVerification(args) => {
-                REMOVE_CREATOR_VERIFICATION_IX_DISCM.serialize(writer)?;
-                args.serialize(writer)
-            }
-        }
-    }
-}
 impl MplTokenMetadataProgramIx {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -271,6 +148,133 @@ impl MplTokenMetadataProgramIx {
                 format!("discm {:?} not found", maybe_discm),
             )),
         }
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        match self {
+            Self::CreateMetadataAccount(args) => {
+                CREATE_METADATA_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateMetadataAccount(args) => {
+                UPDATE_METADATA_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedCreateMasterEdition(args) => {
+                DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedMintNewEditionFromMasterEditionViaPrintingToken(args) => {
+                DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM
+                    .serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdatePrimarySaleHappenedViaToken(args) => {
+                UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedSetReservationList(args) => {
+                DEPRECATED_SET_RESERVATION_LIST_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedCreateReservationList(args) => {
+                DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SignMetadata(args) => {
+                SIGN_METADATA_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedMintPrintingTokensViaToken(args) => {
+                DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::DeprecatedMintPrintingTokens(args) => {
+                DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CreateMasterEdition(args) => {
+                CREATE_MASTER_EDITION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::MintNewEditionFromMasterEditionViaToken(args) => {
+                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ConvertMasterEditionV1ToV2(args) => {
+                CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::MintNewEditionFromMasterEditionViaVaultProxy(args) => {
+                MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM
+                    .serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::PuffMetadata(args) => {
+                PUFF_METADATA_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UpdateMetadataAccountV2(args) => {
+                UPDATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CreateMetadataAccountV2(args) => {
+                CREATE_METADATA_ACCOUNT_V2_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::CreateMasterEditionV3(args) => {
+                CREATE_MASTER_EDITION_V3_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::VerifyCollection(args) => {
+                VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::Utilize(args) => {
+                UTILIZE_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ApproveUseAuthority(args) => {
+                APPROVE_USE_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RevokeUseAuthority(args) => {
+                REVOKE_USE_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::UnverifyCollection(args) => {
+                UNVERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ApproveCollectionAuthority(args) => {
+                APPROVE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RevokeCollectionAuthority(args) => {
+                REVOKE_COLLECTION_AUTHORITY_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::SetAndVerifyCollection(args) => {
+                SET_AND_VERIFY_COLLECTION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::FreezeDelegatedAccount(args) => {
+                FREEZE_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::ThawDelegatedAccount(args) => {
+                THAW_DELEGATED_ACCOUNT_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+            Self::RemoveCreatorVerification(args) => {
+                REMOVE_CREATOR_VERIFICATION_IX_DISCM.serialize(&mut writer)?;
+                args.serialize(&mut writer)
+            }
+        }
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub const CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 7;
@@ -390,12 +394,6 @@ impl From<CreateMetadataAccountIxArgs> for CreateMetadataAccountIxData {
         Self(args)
     }
 }
-impl BorshSerialize for CreateMetadataAccountIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[CREATE_METADATA_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl CreateMetadataAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -409,6 +407,15 @@ impl CreateMetadataAccountIxData {
             ));
         }
         Ok(Self(CreateMetadataAccountIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[CREATE_METADATA_ACCOUNT_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn create_metadata_account_ix<
@@ -550,12 +557,6 @@ impl From<UpdateMetadataAccountIxArgs> for UpdateMetadataAccountIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateMetadataAccountIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[UPDATE_METADATA_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateMetadataAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -569,6 +570,15 @@ impl UpdateMetadataAccountIxData {
             ));
         }
         Ok(Self(UpdateMetadataAccountIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[UPDATE_METADATA_ACCOUNT_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_metadata_account_ix<
@@ -819,12 +829,6 @@ impl From<DeprecatedCreateMasterEditionIxArgs> for DeprecatedCreateMasterEdition
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedCreateMasterEditionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedCreateMasterEditionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -838,6 +842,15 @@ impl DeprecatedCreateMasterEditionIxData {
             ));
         }
         Ok(Self(DeprecatedCreateMasterEditionIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[DEPRECATED_CREATE_MASTER_EDITION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_create_master_edition_ix<
@@ -1165,14 +1178,6 @@ impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[
-            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM,
-        ])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -1191,6 +1196,17 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
         Ok(Self(
             DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[
+            DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_DISCM,
+        ])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
@@ -1392,12 +1408,6 @@ impl From<UpdatePrimarySaleHappenedViaTokenIxArgs> for UpdatePrimarySaleHappened
         Self(args)
     }
 }
-impl BorshSerialize for UpdatePrimarySaleHappenedViaTokenIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdatePrimarySaleHappenedViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -1413,6 +1423,15 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
         Ok(Self(UpdatePrimarySaleHappenedViaTokenIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_primary_sale_happened_via_token_ix<
@@ -1575,12 +1594,6 @@ impl From<DeprecatedSetReservationListIxArgs> for DeprecatedSetReservationListIx
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedSetReservationListIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_SET_RESERVATION_LIST_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedSetReservationListIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -1594,6 +1607,15 @@ impl DeprecatedSetReservationListIxData {
             ));
         }
         Ok(Self(DeprecatedSetReservationListIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[DEPRECATED_SET_RESERVATION_LIST_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_set_reservation_list_ix<
@@ -1800,12 +1822,6 @@ impl From<DeprecatedCreateReservationListIxArgs> for DeprecatedCreateReservation
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedCreateReservationListIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedCreateReservationListIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -1821,6 +1837,15 @@ impl DeprecatedCreateReservationListIxData {
         Ok(Self(DeprecatedCreateReservationListIxArgs::deserialize(
             buf,
         )?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[DEPRECATED_CREATE_RESERVATION_LIST_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_create_reservation_list_ix<
@@ -1967,12 +1992,6 @@ impl From<SignMetadataIxArgs> for SignMetadataIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SignMetadataIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[SIGN_METADATA_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl SignMetadataIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -1986,6 +2005,15 @@ impl SignMetadataIxData {
             ));
         }
         Ok(Self(SignMetadataIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[SIGN_METADATA_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn sign_metadata_ix<K: Into<SignMetadataKeys>, A: Into<SignMetadataIxArgs>>(
@@ -2198,12 +2226,6 @@ impl From<DeprecatedMintPrintingTokensViaTokenIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedMintPrintingTokensViaTokenIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedMintPrintingTokensViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -2219,6 +2241,15 @@ impl DeprecatedMintPrintingTokensViaTokenIxData {
         Ok(Self(
             DeprecatedMintPrintingTokensViaTokenIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_mint_printing_tokens_via_token_ix<
@@ -2431,12 +2462,6 @@ impl From<DeprecatedMintPrintingTokensIxArgs> for DeprecatedMintPrintingTokensIx
         Self(args)
     }
 }
-impl BorshSerialize for DeprecatedMintPrintingTokensIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl DeprecatedMintPrintingTokensIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -2450,6 +2475,15 @@ impl DeprecatedMintPrintingTokensIxData {
             ));
         }
         Ok(Self(DeprecatedMintPrintingTokensIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[DEPRECATED_MINT_PRINTING_TOKENS_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn deprecated_mint_printing_tokens_ix<
@@ -2663,12 +2697,6 @@ impl From<CreateMasterEditionIxArgs> for CreateMasterEditionIxData {
         Self(args)
     }
 }
-impl BorshSerialize for CreateMasterEditionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[CREATE_MASTER_EDITION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl CreateMasterEditionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -2682,6 +2710,15 @@ impl CreateMasterEditionIxData {
             ));
         }
         Ok(Self(CreateMasterEditionIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[CREATE_MASTER_EDITION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn create_master_edition_ix<
@@ -2955,12 +2992,6 @@ impl From<MintNewEditionFromMasterEditionViaTokenIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for MintNewEditionFromMasterEditionViaTokenIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl MintNewEditionFromMasterEditionViaTokenIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -2976,6 +3007,15 @@ impl MintNewEditionFromMasterEditionViaTokenIxData {
         Ok(Self(
             MintNewEditionFromMasterEditionViaTokenIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn mint_new_edition_from_master_edition_via_token_ix<
@@ -3160,12 +3200,6 @@ impl From<ConvertMasterEditionV1ToV2IxArgs> for ConvertMasterEditionV1ToV2IxData
         Self(args)
     }
 }
-impl BorshSerialize for ConvertMasterEditionV1ToV2IxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl ConvertMasterEditionV1ToV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -3179,6 +3213,15 @@ impl ConvertMasterEditionV1ToV2IxData {
             ));
         }
         Ok(Self(ConvertMasterEditionV1ToV2IxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[CONVERT_MASTER_EDITION_V1_TO_V2_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn convert_master_edition_v1_to_v2_ix<
@@ -3475,12 +3518,6 @@ impl From<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>
         Self(args)
     }
 }
-impl BorshSerialize for MintNewEditionFromMasterEditionViaVaultProxyIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -3496,6 +3533,15 @@ impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
         Ok(Self(
             MintNewEditionFromMasterEditionViaVaultProxyIxArgs::deserialize(buf)?,
         ))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix<
@@ -3659,12 +3705,6 @@ impl From<PuffMetadataIxArgs> for PuffMetadataIxData {
         Self(args)
     }
 }
-impl BorshSerialize for PuffMetadataIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[PUFF_METADATA_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl PuffMetadataIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -3678,6 +3718,15 @@ impl PuffMetadataIxData {
             ));
         }
         Ok(Self(PuffMetadataIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[PUFF_METADATA_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>, A: Into<PuffMetadataIxArgs>>(
@@ -3803,12 +3852,6 @@ impl From<UpdateMetadataAccountV2IxArgs> for UpdateMetadataAccountV2IxData {
         Self(args)
     }
 }
-impl BorshSerialize for UpdateMetadataAccountV2IxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[UPDATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl UpdateMetadataAccountV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -3822,6 +3865,15 @@ impl UpdateMetadataAccountV2IxData {
             ));
         }
         Ok(Self(UpdateMetadataAccountV2IxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[UPDATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn update_metadata_account_v2_ix<
@@ -4008,12 +4060,6 @@ impl From<CreateMetadataAccountV2IxArgs> for CreateMetadataAccountV2IxData {
         Self(args)
     }
 }
-impl BorshSerialize for CreateMetadataAccountV2IxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[CREATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl CreateMetadataAccountV2IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -4027,6 +4073,15 @@ impl CreateMetadataAccountV2IxData {
             ));
         }
         Ok(Self(CreateMetadataAccountV2IxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[CREATE_METADATA_ACCOUNT_V2_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn create_metadata_account_v2_ix<
@@ -4234,12 +4289,6 @@ impl From<CreateMasterEditionV3IxArgs> for CreateMasterEditionV3IxData {
         Self(args)
     }
 }
-impl BorshSerialize for CreateMasterEditionV3IxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[CREATE_MASTER_EDITION_V3_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl CreateMasterEditionV3IxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -4253,6 +4302,15 @@ impl CreateMasterEditionV3IxData {
             ));
         }
         Ok(Self(CreateMasterEditionV3IxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[CREATE_MASTER_EDITION_V3_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn create_master_edition_v3_ix<
@@ -4437,12 +4495,6 @@ impl From<VerifyCollectionIxArgs> for VerifyCollectionIxData {
         Self(args)
     }
 }
-impl BorshSerialize for VerifyCollectionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[VERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl VerifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -4456,6 +4508,15 @@ impl VerifyCollectionIxData {
             ));
         }
         Ok(Self(VerifyCollectionIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[VERIFY_COLLECTION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>, A: Into<VerifyCollectionIxArgs>>(
@@ -4679,12 +4740,6 @@ impl From<UtilizeIxArgs> for UtilizeIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UtilizeIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[UTILIZE_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl UtilizeIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -4698,6 +4753,15 @@ impl UtilizeIxData {
             ));
         }
         Ok(Self(UtilizeIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[UTILIZE_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn utilize_ix<K: Into<UtilizeKeys>, A: Into<UtilizeIxArgs>>(
@@ -4930,12 +4994,6 @@ impl From<ApproveUseAuthorityIxArgs> for ApproveUseAuthorityIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ApproveUseAuthorityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[APPROVE_USE_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl ApproveUseAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -4949,6 +5007,15 @@ impl ApproveUseAuthorityIxData {
             ));
         }
         Ok(Self(ApproveUseAuthorityIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[APPROVE_USE_AUTHORITY_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn approve_use_authority_ix<
@@ -5159,12 +5226,6 @@ impl From<RevokeUseAuthorityIxArgs> for RevokeUseAuthorityIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RevokeUseAuthorityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[REVOKE_USE_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl RevokeUseAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -5178,6 +5239,15 @@ impl RevokeUseAuthorityIxData {
             ));
         }
         Ok(Self(RevokeUseAuthorityIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[REVOKE_USE_AUTHORITY_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn revoke_use_authority_ix<
@@ -5359,12 +5429,6 @@ impl From<UnverifyCollectionIxArgs> for UnverifyCollectionIxData {
         Self(args)
     }
 }
-impl BorshSerialize for UnverifyCollectionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[UNVERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl UnverifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -5378,6 +5442,15 @@ impl UnverifyCollectionIxData {
             ));
         }
         Ok(Self(UnverifyCollectionIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[UNVERIFY_COLLECTION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn unverify_collection_ix<
@@ -5584,12 +5657,6 @@ impl From<ApproveCollectionAuthorityIxArgs> for ApproveCollectionAuthorityIxData
         Self(args)
     }
 }
-impl BorshSerialize for ApproveCollectionAuthorityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl ApproveCollectionAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -5603,6 +5670,15 @@ impl ApproveCollectionAuthorityIxData {
             ));
         }
         Ok(Self(ApproveCollectionAuthorityIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[APPROVE_COLLECTION_AUTHORITY_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn approve_collection_authority_ix<
@@ -5775,12 +5851,6 @@ impl From<RevokeCollectionAuthorityIxArgs> for RevokeCollectionAuthorityIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RevokeCollectionAuthorityIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl RevokeCollectionAuthorityIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -5794,6 +5864,15 @@ impl RevokeCollectionAuthorityIxData {
             ));
         }
         Ok(Self(RevokeCollectionAuthorityIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[REVOKE_COLLECTION_AUTHORITY_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn revoke_collection_authority_ix<
@@ -5995,12 +6074,6 @@ impl From<SetAndVerifyCollectionIxArgs> for SetAndVerifyCollectionIxData {
         Self(args)
     }
 }
-impl BorshSerialize for SetAndVerifyCollectionIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl SetAndVerifyCollectionIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -6014,6 +6087,15 @@ impl SetAndVerifyCollectionIxData {
             ));
         }
         Ok(Self(SetAndVerifyCollectionIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[SET_AND_VERIFY_COLLECTION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn set_and_verify_collection_ix<
@@ -6193,12 +6275,6 @@ impl From<FreezeDelegatedAccountIxArgs> for FreezeDelegatedAccountIxData {
         Self(args)
     }
 }
-impl BorshSerialize for FreezeDelegatedAccountIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl FreezeDelegatedAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -6212,6 +6288,15 @@ impl FreezeDelegatedAccountIxData {
             ));
         }
         Ok(Self(FreezeDelegatedAccountIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[FREEZE_DELEGATED_ACCOUNT_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn freeze_delegated_account_ix<
@@ -6379,12 +6464,6 @@ impl From<ThawDelegatedAccountIxArgs> for ThawDelegatedAccountIxData {
         Self(args)
     }
 }
-impl BorshSerialize for ThawDelegatedAccountIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl ThawDelegatedAccountIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -6398,6 +6477,15 @@ impl ThawDelegatedAccountIxData {
             ));
         }
         Ok(Self(ThawDelegatedAccountIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[THAW_DELEGATED_ACCOUNT_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn thaw_delegated_account_ix<
@@ -6537,12 +6625,6 @@ impl From<RemoveCreatorVerificationIxArgs> for RemoveCreatorVerificationIxData {
         Self(args)
     }
 }
-impl BorshSerialize for RemoveCreatorVerificationIxData {
-    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-        writer.write_all(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])?;
-        self.0.serialize(writer)
-    }
-}
 impl RemoveCreatorVerificationIxData {
     pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
         let maybe_discm = u8::deserialize(buf)?;
@@ -6556,6 +6638,15 @@ impl RemoveCreatorVerificationIxData {
             ));
         }
         Ok(Self(RemoveCreatorVerificationIxArgs::deserialize(buf)?))
+    }
+    pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+        writer.write_all(&[REMOVE_CREATOR_VERIFICATION_IX_DISCM])?;
+        self.0.serialize(&mut writer)
+    }
+    pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+        let mut data = Vec::new();
+        self.serialize(&mut data)?;
+        Ok(data)
     }
 }
 pub fn remove_creator_verification_ix<

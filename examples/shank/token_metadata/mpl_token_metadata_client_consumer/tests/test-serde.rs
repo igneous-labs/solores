@@ -1,4 +1,3 @@
-use borsh::BorshSerialize;
 use mpl_token_metadata_interface::{
     CreateMasterEditionArgs, CreateMasterEditionV3IxArgs, CreateMasterEditionV3IxData,
     MplTokenMetadataProgramIx, RevokeUseAuthorityIxArgs,

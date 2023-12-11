@@ -223,13 +223,6 @@ impl ToTokens for NamedInstruction {
                 }
             }
 
-            impl BorshSerialize for #ix_data_ident {
-                fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
-                    writer.write_all(&[#discm_ident])?;
-                    self.0.serialize(writer)
-                }
-            }
-
             impl #ix_data_ident {
                 pub fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
                     let maybe_discm = u8::deserialize(buf)?;
@@ -241,6 +234,17 @@ impl ToTokens for NamedInstruction {
                         );
                     }
                     Ok(Self(#ix_args_ident::deserialize(buf)?))
+                }
+
+                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
+                    writer.write_all(&[#discm_ident])?;
+                    self.0.serialize(&mut writer)
+                }
+
+                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
+                    let mut data = Vec::new();
+                    self.serialize(&mut data)?;
+                    Ok(data)
                 }
             }
         });
