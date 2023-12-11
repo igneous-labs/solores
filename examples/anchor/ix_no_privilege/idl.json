@@ -1,0 +1,22 @@
+{
+  "version": "0.0.0",
+  "name": "anchor_ix_no_privilege",
+  "instructions": [
+    {
+      "name": "noPrivilegedAccountIx",
+      "accounts": [
+        {
+          "name": "a",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "arg",
+          "type": "u8"
+        }
+      ]
+    }
+  ]
+}

@@ -1082,13 +1082,41 @@ impl From<&InitializeUserAccounts<'_, '_>> for InitializeUserKeys {
 impl From<&InitializeUserKeys> for [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializeUserKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1135,6 +1163,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN]
         }
     }
 }
+pub const INITIALIZE_USER_IX_DISCM: [u8; 8] = [111, 17, 185, 250, 60, 122, 38, 254];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeUserIxArgs {
@@ -1143,7 +1172,6 @@ pub struct InitializeUserIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeUserIxData(pub InitializeUserIxArgs);
-pub const INITIALIZE_USER_IX_DISCM: [u8; 8] = [111, 17, 185, 250, 60, 122, 38, 254];
 impl From<InitializeUserIxArgs> for InitializeUserIxData {
     fn from(args: InitializeUserIxArgs) -> Self {
         Self(args)
@@ -1280,12 +1308,36 @@ impl From<&InitializeUserStatsAccounts<'_, '_>> for InitializeUserStatsKeys {
 impl From<&InitializeUserStatsKeys> for [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializeUserStatsKeys) -> Self {
         [
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1329,12 +1381,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNT
         }
     }
 }
+pub const INITIALIZE_USER_STATS_IX_DISCM: [u8; 8] = [254, 243, 72, 98, 251, 130, 168, 213];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeUserStatsIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeUserStatsIxData(pub InitializeUserStatsIxArgs);
-pub const INITIALIZE_USER_STATS_IX_DISCM: [u8; 8] = [254, 243, 72, 98, 251, 130, 168, 213];
 impl From<InitializeUserStatsIxArgs> for InitializeUserStatsIxData {
     fn from(args: InitializeUserStatsIxArgs) -> Self {
         Self(args)
@@ -1471,13 +1523,41 @@ impl From<&InitializeReferrerNameAccounts<'_, '_>> for InitializeReferrerNameKey
 impl From<&InitializeReferrerNameKeys> for [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializeReferrerNameKeys) -> Self {
         [
-            AccountMeta::new(keys.referrer_name, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.referrer_name,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1524,6 +1604,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCO
         }
     }
 }
+pub const INITIALIZE_REFERRER_NAME_IX_DISCM: [u8; 8] = [235, 126, 231, 10, 42, 164, 26, 61];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeReferrerNameIxArgs {
@@ -1531,7 +1612,6 @@ pub struct InitializeReferrerNameIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeReferrerNameIxData(pub InitializeReferrerNameIxArgs);
-pub const INITIALIZE_REFERRER_NAME_IX_DISCM: [u8; 8] = [235, 126, 231, 10, 42, 164, 26, 61];
 impl From<InitializeReferrerNameIxArgs> for InitializeReferrerNameIxData {
     fn from(args: InitializeReferrerNameIxArgs) -> Self {
         Self(args)
@@ -1678,13 +1758,41 @@ impl From<&DepositAccounts<'_, '_>> for DepositKeys {
 impl From<&DepositKeys> for [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] {
     fn from(keys: &DepositKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.user_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1729,6 +1837,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const DEPOSIT_IX_DISCM: [u8; 8] = [242, 35, 198, 137, 82, 225, 242, 182];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIxArgs {
@@ -1738,7 +1847,6 @@ pub struct DepositIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DepositIxData(pub DepositIxArgs);
-pub const DEPOSIT_IX_DISCM: [u8; 8] = [242, 35, 198, 137, 82, 225, 242, 182];
 impl From<DepositIxArgs> for DepositIxData {
     fn from(args: DepositIxArgs) -> Self {
         Self(args)
@@ -1881,14 +1989,46 @@ impl From<&WithdrawAccounts<'_, '_>> for WithdrawKeys {
 impl From<&WithdrawKeys> for [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] {
     fn from(keys: &WithdrawKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.user_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -1936,6 +2076,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const WITHDRAW_IX_DISCM: [u8; 8] = [183, 18, 70, 156, 148, 109, 161, 34];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WithdrawIxArgs {
@@ -1945,7 +2086,6 @@ pub struct WithdrawIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct WithdrawIxData(pub WithdrawIxArgs);
-pub const WITHDRAW_IX_DISCM: [u8; 8] = [183, 18, 70, 156, 148, 109, 161, 34];
 impl From<WithdrawIxArgs> for WithdrawIxData {
     fn from(args: WithdrawIxArgs) -> Self {
         Self(args)
@@ -2083,12 +2223,36 @@ impl From<&TransferDepositAccounts<'_, '_>> for TransferDepositKeys {
 impl From<&TransferDepositKeys> for [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] {
     fn from(keys: &TransferDepositKeys) -> Self {
         [
-            AccountMeta::new(keys.from_user, false),
-            AccountMeta::new(keys.to_user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.spot_market_vault, false),
+            AccountMeta {
+                pubkey: keys.from_user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.to_user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2132,6 +2296,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const TRANSFER_DEPOSIT_IX_DISCM: [u8; 8] = [20, 20, 147, 223, 41, 63, 204, 111];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TransferDepositIxArgs {
@@ -2140,7 +2305,6 @@ pub struct TransferDepositIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct TransferDepositIxData(pub TransferDepositIxArgs);
-pub const TRANSFER_DEPOSIT_IX_DISCM: [u8; 8] = [20, 20, 147, 223, 41, 63, 204, 111];
 impl From<TransferDepositIxArgs> for TransferDepositIxData {
     fn from(args: TransferDepositIxArgs) -> Self {
         Self(args)
@@ -2262,9 +2426,21 @@ impl From<&PlacePerpOrderAccounts<'_, '_>> for PlacePerpOrderKeys {
 impl From<&PlacePerpOrderKeys> for [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlacePerpOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2299,6 +2475,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const PLACE_PERP_ORDER_IX_DISCM: [u8; 8] = [69, 161, 93, 202, 120, 126, 76, 185];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlacePerpOrderIxArgs {
@@ -2306,7 +2483,6 @@ pub struct PlacePerpOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlacePerpOrderIxData(pub PlacePerpOrderIxArgs);
-pub const PLACE_PERP_ORDER_IX_DISCM: [u8; 8] = [69, 161, 93, 202, 120, 126, 76, 185];
 impl From<PlacePerpOrderIxArgs> for PlacePerpOrderIxData {
     fn from(args: PlacePerpOrderIxArgs) -> Self {
         Self(args)
@@ -2425,9 +2601,21 @@ impl From<&CancelOrderAccounts<'_, '_>> for CancelOrderKeys {
 impl From<&CancelOrderKeys> for [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &CancelOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2462,6 +2650,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const CANCEL_ORDER_IX_DISCM: [u8; 8] = [95, 129, 237, 240, 8, 49, 223, 132];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrderIxArgs {
@@ -2469,7 +2658,6 @@ pub struct CancelOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CancelOrderIxData(pub CancelOrderIxArgs);
-pub const CANCEL_ORDER_IX_DISCM: [u8; 8] = [95, 129, 237, 240, 8, 49, 223, 132];
 impl From<CancelOrderIxArgs> for CancelOrderIxData {
     fn from(args: CancelOrderIxArgs) -> Self {
         Self(args)
@@ -2588,9 +2776,21 @@ impl From<&CancelOrderByUserIdAccounts<'_, '_>> for CancelOrderByUserIdKeys {
 impl From<&CancelOrderByUserIdKeys> for [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
     fn from(keys: &CancelOrderByUserIdKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2625,6 +2825,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOU
         }
     }
 }
+pub const CANCEL_ORDER_BY_USER_ID_IX_DISCM: [u8; 8] = [107, 211, 250, 133, 18, 37, 57, 100];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrderByUserIdIxArgs {
@@ -2632,7 +2833,6 @@ pub struct CancelOrderByUserIdIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CancelOrderByUserIdIxData(pub CancelOrderByUserIdIxArgs);
-pub const CANCEL_ORDER_BY_USER_ID_IX_DISCM: [u8; 8] = [107, 211, 250, 133, 18, 37, 57, 100];
 impl From<CancelOrderByUserIdIxArgs> for CancelOrderByUserIdIxData {
     fn from(args: CancelOrderByUserIdIxArgs) -> Self {
         Self(args)
@@ -2756,9 +2956,21 @@ impl From<&CancelOrdersAccounts<'_, '_>> for CancelOrdersKeys {
 impl From<&CancelOrdersKeys> for [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
     fn from(keys: &CancelOrdersKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2793,6 +3005,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const CANCEL_ORDERS_IX_DISCM: [u8; 8] = [238, 225, 95, 158, 227, 103, 8, 194];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelOrdersIxArgs {
@@ -2802,7 +3015,6 @@ pub struct CancelOrdersIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct CancelOrdersIxData(pub CancelOrdersIxArgs);
-pub const CANCEL_ORDERS_IX_DISCM: [u8; 8] = [238, 225, 95, 158, 227, 103, 8, 194];
 impl From<CancelOrdersIxArgs> for CancelOrdersIxData {
     fn from(args: CancelOrdersIxArgs) -> Self {
         Self(args)
@@ -2921,9 +3133,21 @@ impl From<&ModifyOrderAccounts<'_, '_>> for ModifyOrderKeys {
 impl From<&ModifyOrderKeys> for [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &ModifyOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -2958,6 +3182,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const MODIFY_ORDER_IX_DISCM: [u8; 8] = [47, 124, 117, 255, 201, 197, 130, 94];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderIxArgs {
@@ -2966,7 +3191,6 @@ pub struct ModifyOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ModifyOrderIxData(pub ModifyOrderIxArgs);
-pub const MODIFY_ORDER_IX_DISCM: [u8; 8] = [47, 124, 117, 255, 201, 197, 130, 94];
 impl From<ModifyOrderIxArgs> for ModifyOrderIxData {
     fn from(args: ModifyOrderIxArgs) -> Self {
         Self(args)
@@ -3085,9 +3309,21 @@ impl From<&ModifyOrderByUserIdAccounts<'_, '_>> for ModifyOrderByUserIdKeys {
 impl From<&ModifyOrderByUserIdKeys> for [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] {
     fn from(keys: &ModifyOrderByUserIdKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3122,6 +3358,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOU
         }
     }
 }
+pub const MODIFY_ORDER_BY_USER_ID_IX_DISCM: [u8; 8] = [158, 77, 4, 253, 252, 194, 161, 179];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ModifyOrderByUserIdIxArgs {
@@ -3130,7 +3367,6 @@ pub struct ModifyOrderByUserIdIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ModifyOrderByUserIdIxData(pub ModifyOrderByUserIdIxArgs);
-pub const MODIFY_ORDER_BY_USER_ID_IX_DISCM: [u8; 8] = [158, 77, 4, 253, 252, 194, 161, 179];
 impl From<ModifyOrderByUserIdIxArgs> for ModifyOrderByUserIdIxData {
     fn from(args: ModifyOrderByUserIdIxArgs) -> Self {
         Self(args)
@@ -3257,10 +3493,26 @@ impl From<&PlaceAndTakePerpOrderAccounts<'_, '_>> for PlaceAndTakePerpOrderKeys 
 impl From<&PlaceAndTakePerpOrderKeys> for [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlaceAndTakePerpOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3298,6 +3550,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACC
         }
     }
 }
+pub const PLACE_AND_TAKE_PERP_ORDER_IX_DISCM: [u8; 8] = [213, 51, 1, 187, 108, 220, 230, 224];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndTakePerpOrderIxArgs {
@@ -3306,7 +3559,6 @@ pub struct PlaceAndTakePerpOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlaceAndTakePerpOrderIxData(pub PlaceAndTakePerpOrderIxArgs);
-pub const PLACE_AND_TAKE_PERP_ORDER_IX_DISCM: [u8; 8] = [213, 51, 1, 187, 108, 220, 230, 224];
 impl From<PlaceAndTakePerpOrderIxArgs> for PlaceAndTakePerpOrderIxData {
     fn from(args: PlaceAndTakePerpOrderIxArgs) -> Self {
         Self(args)
@@ -3440,12 +3692,36 @@ impl From<&PlaceAndMakePerpOrderAccounts<'_, '_>> for PlaceAndMakePerpOrderKeys 
 impl From<&PlaceAndMakePerpOrderKeys> for [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlaceAndMakePerpOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.taker, false),
-            AccountMeta::new(keys.taker_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.taker,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.taker_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3489,6 +3765,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACC
         }
     }
 }
+pub const PLACE_AND_MAKE_PERP_ORDER_IX_DISCM: [u8; 8] = [149, 117, 11, 237, 47, 95, 89, 237];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndMakePerpOrderIxArgs {
@@ -3497,7 +3774,6 @@ pub struct PlaceAndMakePerpOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlaceAndMakePerpOrderIxData(pub PlaceAndMakePerpOrderIxArgs);
-pub const PLACE_AND_MAKE_PERP_ORDER_IX_DISCM: [u8; 8] = [149, 117, 11, 237, 47, 95, 89, 237];
 impl From<PlaceAndMakePerpOrderIxArgs> for PlaceAndMakePerpOrderIxData {
     fn from(args: PlaceAndMakePerpOrderIxArgs) -> Self {
         Self(args)
@@ -3629,9 +3905,21 @@ impl From<&PlaceSpotOrderAccounts<'_, '_>> for PlaceSpotOrderKeys {
 impl From<&PlaceSpotOrderKeys> for [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlaceSpotOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3666,6 +3954,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const PLACE_SPOT_ORDER_IX_DISCM: [u8; 8] = [45, 79, 81, 160, 248, 90, 91, 220];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceSpotOrderIxArgs {
@@ -3673,7 +3962,6 @@ pub struct PlaceSpotOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlaceSpotOrderIxData(pub PlaceSpotOrderIxArgs);
-pub const PLACE_SPOT_ORDER_IX_DISCM: [u8; 8] = [45, 79, 81, 160, 248, 90, 91, 220];
 impl From<PlaceSpotOrderIxArgs> for PlaceSpotOrderIxData {
     fn from(args: PlaceSpotOrderIxArgs) -> Self {
         Self(args)
@@ -3795,10 +4083,26 @@ impl From<&PlaceAndTakeSpotOrderAccounts<'_, '_>> for PlaceAndTakeSpotOrderKeys 
 impl From<&PlaceAndTakeSpotOrderKeys> for [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlaceAndTakeSpotOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -3836,6 +4140,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACC
         }
     }
 }
+pub const PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM: [u8; 8] = [191, 3, 138, 71, 114, 198, 202, 100];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndTakeSpotOrderIxArgs {
@@ -3845,7 +4150,6 @@ pub struct PlaceAndTakeSpotOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlaceAndTakeSpotOrderIxData(pub PlaceAndTakeSpotOrderIxArgs);
-pub const PLACE_AND_TAKE_SPOT_ORDER_IX_DISCM: [u8; 8] = [191, 3, 138, 71, 114, 198, 202, 100];
 impl From<PlaceAndTakeSpotOrderIxArgs> for PlaceAndTakeSpotOrderIxData {
     fn from(args: PlaceAndTakeSpotOrderIxArgs) -> Self {
         Self(args)
@@ -3979,12 +4283,36 @@ impl From<&PlaceAndMakeSpotOrderAccounts<'_, '_>> for PlaceAndMakeSpotOrderKeys 
 impl From<&PlaceAndMakeSpotOrderKeys> for [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &PlaceAndMakeSpotOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.taker, false),
-            AccountMeta::new(keys.taker_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.taker,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.taker_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4028,6 +4356,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACC
         }
     }
 }
+pub const PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM: [u8; 8] = [149, 158, 85, 66, 239, 9, 243, 98];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PlaceAndMakeSpotOrderIxArgs {
@@ -4037,7 +4366,6 @@ pub struct PlaceAndMakeSpotOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlaceAndMakeSpotOrderIxData(pub PlaceAndMakeSpotOrderIxArgs);
-pub const PLACE_AND_MAKE_SPOT_ORDER_IX_DISCM: [u8; 8] = [149, 158, 85, 66, 239, 9, 243, 98];
 impl From<PlaceAndMakeSpotOrderIxArgs> for PlaceAndMakeSpotOrderIxData {
     fn from(args: PlaceAndMakeSpotOrderIxArgs) -> Self {
         Self(args)
@@ -4193,17 +4521,61 @@ impl From<&BeginSwapAccounts<'_, '_>> for BeginSwapKeys {
 impl From<&BeginSwapKeys> for [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] {
     fn from(keys: &BeginSwapKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.out_spot_market_vault, false),
-            AccountMeta::new(keys.in_spot_market_vault, false),
-            AccountMeta::new(keys.out_token_account, false),
-            AccountMeta::new(keys.in_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.instructions, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.out_spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.in_spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.out_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.in_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.instructions,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4262,6 +4634,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const BEGIN_SWAP_IX_DISCM: [u8; 8] = [174, 109, 228, 1, 242, 105, 232, 105];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BeginSwapIxArgs {
@@ -4271,7 +4644,6 @@ pub struct BeginSwapIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct BeginSwapIxData(pub BeginSwapIxArgs);
-pub const BEGIN_SWAP_IX_DISCM: [u8; 8] = [174, 109, 228, 1, 242, 105, 232, 105];
 impl From<BeginSwapIxArgs> for BeginSwapIxData {
     fn from(args: BeginSwapIxArgs) -> Self {
         Self(args)
@@ -4435,17 +4807,61 @@ impl From<&EndSwapAccounts<'_, '_>> for EndSwapKeys {
 impl From<&EndSwapKeys> for [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] {
     fn from(keys: &EndSwapKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.out_spot_market_vault, false),
-            AccountMeta::new(keys.in_spot_market_vault, false),
-            AccountMeta::new(keys.out_token_account, false),
-            AccountMeta::new(keys.in_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.instructions, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.out_spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.in_spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.out_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.in_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.instructions,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4502,6 +4918,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const END_SWAP_IX_DISCM: [u8; 8] = [177, 184, 27, 193, 34, 13, 210, 145];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EndSwapIxArgs {
@@ -4512,7 +4929,6 @@ pub struct EndSwapIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct EndSwapIxData(pub EndSwapIxArgs);
-pub const END_SWAP_IX_DISCM: [u8; 8] = [177, 184, 27, 193, 34, 13, 210, 145];
 impl From<EndSwapIxArgs> for EndSwapIxData {
     fn from(args: EndSwapIxArgs) -> Self {
         Self(args)
@@ -4652,9 +5068,21 @@ impl From<&AddPerpLpSharesAccounts<'_, '_>> for AddPerpLpSharesKeys {
 impl From<&AddPerpLpSharesKeys> for [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
     fn from(keys: &AddPerpLpSharesKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4689,6 +5117,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_L
         }
     }
 }
+pub const ADD_PERP_LP_SHARES_IX_DISCM: [u8; 8] = [56, 209, 56, 197, 119, 254, 188, 117];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddPerpLpSharesIxArgs {
@@ -4697,7 +5126,6 @@ pub struct AddPerpLpSharesIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddPerpLpSharesIxData(pub AddPerpLpSharesIxArgs);
-pub const ADD_PERP_LP_SHARES_IX_DISCM: [u8; 8] = [56, 209, 56, 197, 119, 254, 188, 117];
 impl From<AddPerpLpSharesIxArgs> for AddPerpLpSharesIxData {
     fn from(args: AddPerpLpSharesIxArgs) -> Self {
         Self(args)
@@ -4816,9 +5244,21 @@ impl From<&RemovePerpLpSharesAccounts<'_, '_>> for RemovePerpLpSharesKeys {
 impl From<&RemovePerpLpSharesKeys> for [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] {
     fn from(keys: &RemovePerpLpSharesKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -4853,6 +5293,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNT
         }
     }
 }
+pub const REMOVE_PERP_LP_SHARES_IX_DISCM: [u8; 8] = [213, 89, 217, 18, 160, 55, 53, 141];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemovePerpLpSharesIxArgs {
@@ -4861,7 +5302,6 @@ pub struct RemovePerpLpSharesIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RemovePerpLpSharesIxData(pub RemovePerpLpSharesIxArgs);
-pub const REMOVE_PERP_LP_SHARES_IX_DISCM: [u8; 8] = [213, 89, 217, 18, 160, 55, 53, 141];
 impl From<RemovePerpLpSharesIxArgs> for RemovePerpLpSharesIxData {
     fn from(args: RemovePerpLpSharesIxArgs) -> Self {
         Self(args)
@@ -4984,8 +5424,16 @@ impl From<&RemovePerpLpSharesInExpiringMarketKeys>
 {
     fn from(keys: &RemovePerpLpSharesInExpiringMarketKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -5019,6 +5467,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM: [u8; 8] =
+    [83, 254, 253, 137, 59, 122, 68, 156];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemovePerpLpSharesInExpiringMarketIxArgs {
@@ -5027,8 +5477,6 @@ pub struct RemovePerpLpSharesInExpiringMarketIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RemovePerpLpSharesInExpiringMarketIxData(pub RemovePerpLpSharesInExpiringMarketIxArgs);
-pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_DISCM: [u8; 8] =
-    [83, 254, 253, 137, 59, 122, 68, 156];
 impl From<RemovePerpLpSharesInExpiringMarketIxArgs> for RemovePerpLpSharesInExpiringMarketIxData {
     fn from(args: RemovePerpLpSharesInExpiringMarketIxArgs) -> Self {
         Self(args)
@@ -5152,8 +5600,16 @@ impl From<&UpdateUserNameAccounts<'_, '_>> for UpdateUserNameKeys {
 impl From<&UpdateUserNameKeys> for [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateUserNameKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5182,6 +5638,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const UPDATE_USER_NAME_IX_DISCM: [u8; 8] = [135, 25, 185, 56, 165, 53, 34, 136];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserNameIxArgs {
@@ -5190,7 +5647,6 @@ pub struct UpdateUserNameIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserNameIxData(pub UpdateUserNameIxArgs);
-pub const UPDATE_USER_NAME_IX_DISCM: [u8; 8] = [135, 25, 185, 56, 165, 53, 34, 136];
 impl From<UpdateUserNameIxArgs> for UpdateUserNameIxData {
     fn from(args: UpdateUserNameIxArgs) -> Self {
         Self(args)
@@ -5307,8 +5763,16 @@ impl From<&UpdateUserCustomMarginRatioKeys>
 {
     fn from(keys: &UpdateUserCustomMarginRatioKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5341,6 +5805,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_
         }
     }
 }
+pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM: [u8; 8] = [21, 221, 140, 187, 32, 129, 11, 123];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserCustomMarginRatioIxArgs {
@@ -5349,7 +5814,6 @@ pub struct UpdateUserCustomMarginRatioIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserCustomMarginRatioIxData(pub UpdateUserCustomMarginRatioIxArgs);
-pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_DISCM: [u8; 8] = [21, 221, 140, 187, 32, 129, 11, 123];
 impl From<UpdateUserCustomMarginRatioIxArgs> for UpdateUserCustomMarginRatioIxData {
     fn from(args: UpdateUserCustomMarginRatioIxArgs) -> Self {
         Self(args)
@@ -5476,8 +5940,16 @@ impl From<&UpdateUserMarginTradingEnabledKeys>
 {
     fn from(keys: &UpdateUserMarginTradingEnabledKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5510,6 +5982,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABL
         }
     }
 }
+pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM: [u8; 8] =
+    [194, 92, 204, 223, 246, 188, 31, 203];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserMarginTradingEnabledIxArgs {
@@ -5518,8 +5992,6 @@ pub struct UpdateUserMarginTradingEnabledIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserMarginTradingEnabledIxData(pub UpdateUserMarginTradingEnabledIxArgs);
-pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_DISCM: [u8; 8] =
-    [194, 92, 204, 223, 246, 188, 31, 203];
 impl From<UpdateUserMarginTradingEnabledIxArgs> for UpdateUserMarginTradingEnabledIxData {
     fn from(args: UpdateUserMarginTradingEnabledIxArgs) -> Self {
         Self(args)
@@ -5647,8 +6119,16 @@ impl From<&UpdateUserDelegateAccounts<'_, '_>> for UpdateUserDelegateKeys {
 impl From<&UpdateUserDelegateKeys> for [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateUserDelegateKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5677,6 +6157,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS
         }
     }
 }
+pub const UPDATE_USER_DELEGATE_IX_DISCM: [u8; 8] = [139, 205, 141, 141, 113, 36, 94, 187];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserDelegateIxArgs {
@@ -5685,7 +6166,6 @@ pub struct UpdateUserDelegateIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserDelegateIxData(pub UpdateUserDelegateIxArgs);
-pub const UPDATE_USER_DELEGATE_IX_DISCM: [u8; 8] = [139, 205, 141, 141, 113, 36, 94, 187];
 impl From<UpdateUserDelegateIxArgs> for UpdateUserDelegateIxData {
     fn from(args: UpdateUserDelegateIxArgs) -> Self {
         Self(args)
@@ -5809,10 +6289,26 @@ impl From<&DeleteUserAccounts<'_, '_>> for DeleteUserKeys {
 impl From<&DeleteUserKeys> for [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] {
     fn from(keys: &DeleteUserKeys) -> Self {
         [
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -5850,12 +6346,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const DELETE_USER_IX_DISCM: [u8; 8] = [186, 85, 17, 249, 219, 231, 98, 251];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteUserIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeleteUserIxData(pub DeleteUserIxArgs);
-pub const DELETE_USER_IX_DISCM: [u8; 8] = [186, 85, 17, 249, 219, 231, 98, 251];
 impl From<DeleteUserIxArgs> for DeleteUserIxData {
     fn from(args: DeleteUserIxArgs) -> Self {
         Self(args)
@@ -5984,12 +6480,36 @@ impl From<&FillPerpOrderAccounts<'_, '_>> for FillPerpOrderKeys {
 impl From<&FillPerpOrderKeys> for [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &FillPerpOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.filler_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.filler_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6033,6 +6553,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN]
         }
     }
 }
+pub const FILL_PERP_ORDER_IX_DISCM: [u8; 8] = [13, 188, 248, 103, 134, 217, 106, 240];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillPerpOrderIxArgs {
@@ -6041,7 +6562,6 @@ pub struct FillPerpOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct FillPerpOrderIxData(pub FillPerpOrderIxArgs);
-pub const FILL_PERP_ORDER_IX_DISCM: [u8; 8] = [13, 188, 248, 103, 134, 217, 106, 240];
 impl From<FillPerpOrderIxArgs> for FillPerpOrderIxData {
     fn from(args: FillPerpOrderIxArgs) -> Self {
         Self(args)
@@ -6171,10 +6691,26 @@ impl From<&RevertFillAccounts<'_, '_>> for RevertFillKeys {
 impl From<&RevertFillKeys> for [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] {
     fn from(keys: &RevertFillKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.filler_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.filler_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6212,12 +6748,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const REVERT_FILL_IX_DISCM: [u8; 8] = [236, 238, 176, 69, 239, 10, 181, 193];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RevertFillIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct RevertFillIxData(pub RevertFillIxArgs);
-pub const REVERT_FILL_IX_DISCM: [u8; 8] = [236, 238, 176, 69, 239, 10, 181, 193];
 impl From<RevertFillIxArgs> for RevertFillIxData {
     fn from(args: RevertFillIxArgs) -> Self {
         Self(args)
@@ -6346,12 +6882,36 @@ impl From<&FillSpotOrderAccounts<'_, '_>> for FillSpotOrderKeys {
 impl From<&FillSpotOrderKeys> for [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &FillSpotOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.filler_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.filler_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6395,6 +6955,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN]
         }
     }
 }
+pub const FILL_SPOT_ORDER_IX_DISCM: [u8; 8] = [212, 206, 130, 173, 21, 34, 199, 40];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FillSpotOrderIxArgs {
@@ -6404,7 +6965,6 @@ pub struct FillSpotOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct FillSpotOrderIxData(pub FillSpotOrderIxArgs);
-pub const FILL_SPOT_ORDER_IX_DISCM: [u8; 8] = [212, 206, 130, 173, 21, 34, 199, 40];
 impl From<FillSpotOrderIxArgs> for FillSpotOrderIxData {
     fn from(args: FillSpotOrderIxArgs) -> Self {
         Self(args)
@@ -6534,10 +7094,26 @@ impl From<&TriggerOrderAccounts<'_, '_>> for TriggerOrderKeys {
 impl From<&TriggerOrderKeys> for [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] {
     fn from(keys: &TriggerOrderKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6575,6 +7151,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const TRIGGER_ORDER_IX_DISCM: [u8; 8] = [63, 112, 51, 233, 232, 47, 240, 199];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriggerOrderIxArgs {
@@ -6582,7 +7159,6 @@ pub struct TriggerOrderIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct TriggerOrderIxData(pub TriggerOrderIxArgs);
-pub const TRIGGER_ORDER_IX_DISCM: [u8; 8] = [63, 112, 51, 233, 232, 47, 240, 199];
 impl From<TriggerOrderIxArgs> for TriggerOrderIxData {
     fn from(args: TriggerOrderIxArgs) -> Self {
         Self(args)
@@ -6705,10 +7281,26 @@ impl From<&ForceCancelOrdersAccounts<'_, '_>> for ForceCancelOrdersKeys {
 impl From<&ForceCancelOrdersKeys> for [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] {
     fn from(keys: &ForceCancelOrdersKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6746,12 +7338,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_
         }
     }
 }
+pub const FORCE_CANCEL_ORDERS_IX_DISCM: [u8; 8] = [64, 181, 196, 63, 222, 72, 64, 232];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ForceCancelOrdersIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ForceCancelOrdersIxData(pub ForceCancelOrdersIxArgs);
-pub const FORCE_CANCEL_ORDERS_IX_DISCM: [u8; 8] = [64, 181, 196, 63, 222, 72, 64, 232];
 impl From<ForceCancelOrdersIxArgs> for ForceCancelOrdersIxData {
     fn from(args: ForceCancelOrdersIxArgs) -> Self {
         Self(args)
@@ -6874,10 +7466,26 @@ impl From<&UpdateUserIdleAccounts<'_, '_>> for UpdateUserIdleKeys {
 impl From<&UpdateUserIdleKeys> for [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateUserIdleKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -6915,12 +7523,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN
         }
     }
 }
+pub const UPDATE_USER_IDLE_IX_DISCM: [u8; 8] = [253, 133, 67, 22, 103, 161, 20, 100];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserIdleIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserIdleIxData(pub UpdateUserIdleIxArgs);
-pub const UPDATE_USER_IDLE_IX_DISCM: [u8; 8] = [253, 133, 67, 22, 103, 161, 20, 100];
 impl From<UpdateUserIdleIxArgs> for UpdateUserIdleIxData {
     fn from(args: UpdateUserIdleIxArgs) -> Self {
         Self(args)
@@ -7045,10 +7653,26 @@ impl From<&UpdateUserOpenOrdersCountKeys>
 {
     fn from(keys: &UpdateUserOpenOrdersCountKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.filler, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.filler,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -7088,12 +7712,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX
         }
     }
 }
+pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM: [u8; 8] = [104, 39, 65, 210, 250, 163, 100, 134];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserOpenOrdersCountIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserOpenOrdersCountIxData(pub UpdateUserOpenOrdersCountIxArgs);
-pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_DISCM: [u8; 8] = [104, 39, 65, 210, 250, 163, 100, 134];
 impl From<UpdateUserOpenOrdersCountIxArgs> for UpdateUserOpenOrdersCountIxData {
     fn from(args: UpdateUserOpenOrdersCountIxArgs) -> Self {
         Self(args)
@@ -7226,10 +7850,26 @@ impl From<&SettlePnlAccounts<'_, '_>> for SettlePnlKeys {
 impl From<&SettlePnlKeys> for [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] {
     fn from(keys: &SettlePnlKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new_readonly(keys.spot_market_vault, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -7267,6 +7907,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const SETTLE_PNL_IX_DISCM: [u8; 8] = [43, 61, 234, 45, 15, 95, 152, 153];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettlePnlIxArgs {
@@ -7274,7 +7915,6 @@ pub struct SettlePnlIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SettlePnlIxData(pub SettlePnlIxArgs);
-pub const SETTLE_PNL_IX_DISCM: [u8; 8] = [43, 61, 234, 45, 15, 95, 152, 153];
 impl From<SettlePnlIxArgs> for SettlePnlIxData {
     fn from(args: SettlePnlIxArgs) -> Self {
         Self(args)
@@ -7391,8 +8031,16 @@ impl From<&SettleFundingPaymentAccounts<'_, '_>> for SettleFundingPaymentKeys {
 impl From<&SettleFundingPaymentKeys> for [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] {
     fn from(keys: &SettleFundingPaymentKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -7421,12 +8069,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUN
         }
     }
 }
+pub const SETTLE_FUNDING_PAYMENT_IX_DISCM: [u8; 8] = [222, 90, 202, 94, 28, 45, 115, 183];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleFundingPaymentIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct SettleFundingPaymentIxData(pub SettleFundingPaymentIxArgs);
-pub const SETTLE_FUNDING_PAYMENT_IX_DISCM: [u8; 8] = [222, 90, 202, 94, 28, 45, 115, 183];
 impl From<SettleFundingPaymentIxArgs> for SettleFundingPaymentIxData {
     fn from(args: SettleFundingPaymentIxArgs) -> Self {
         Self(args)
@@ -7541,8 +8189,16 @@ impl From<&SettleLpAccounts<'_, '_>> for SettleLpKeys {
 impl From<&SettleLpKeys> for [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] {
     fn from(keys: &SettleLpKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.user, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -7569,6 +8225,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const SETTLE_LP_IX_DISCM: [u8; 8] = [155, 231, 116, 113, 97, 229, 139, 141];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleLpIxArgs {
@@ -7576,7 +8233,6 @@ pub struct SettleLpIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SettleLpIxData(pub SettleLpIxArgs);
-pub const SETTLE_LP_IX_DISCM: [u8; 8] = [155, 231, 116, 113, 97, 229, 139, 141];
 impl From<SettleLpIxArgs> for SettleLpIxData {
     fn from(args: SettleLpIxArgs) -> Self {
         Self(args)
@@ -7686,8 +8342,16 @@ impl From<&SettleExpiredMarketAccounts<'_, '_>> for SettleExpiredMarketKeys {
 impl From<&SettleExpiredMarketKeys> for [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] {
     fn from(keys: &SettleExpiredMarketKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -7716,6 +8380,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNT
         }
     }
 }
+pub const SETTLE_EXPIRED_MARKET_IX_DISCM: [u8; 8] = [120, 89, 11, 25, 122, 77, 72, 193];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleExpiredMarketIxArgs {
@@ -7723,7 +8388,6 @@ pub struct SettleExpiredMarketIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SettleExpiredMarketIxData(pub SettleExpiredMarketIxArgs);
-pub const SETTLE_EXPIRED_MARKET_IX_DISCM: [u8; 8] = [120, 89, 11, 25, 122, 77, 72, 193];
 impl From<SettleExpiredMarketIxArgs> for SettleExpiredMarketIxData {
     fn from(args: SettleExpiredMarketIxArgs) -> Self {
         Self(args)
@@ -7848,12 +8512,36 @@ impl From<&LiquidatePerpAccounts<'_, '_>> for LiquidatePerpKeys {
 impl From<&LiquidatePerpKeys> for [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] {
     fn from(keys: &LiquidatePerpKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -7897,6 +8585,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const LIQUIDATE_PERP_IX_DISCM: [u8; 8] = [75, 35, 119, 247, 191, 18, 139, 2];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpIxArgs {
@@ -7906,7 +8595,6 @@ pub struct LiquidatePerpIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct LiquidatePerpIxData(pub LiquidatePerpIxArgs);
-pub const LIQUIDATE_PERP_IX_DISCM: [u8; 8] = [75, 35, 119, 247, 191, 18, 139, 2];
 impl From<LiquidatePerpIxArgs> for LiquidatePerpIxData {
     fn from(args: LiquidatePerpIxArgs) -> Self {
         Self(args)
@@ -8042,12 +8730,36 @@ impl From<&LiquidateSpotAccounts<'_, '_>> for LiquidateSpotKeys {
 impl From<&LiquidateSpotKeys> for [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] {
     fn from(keys: &LiquidateSpotKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -8091,6 +8803,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const LIQUIDATE_SPOT_IX_DISCM: [u8; 8] = [107, 0, 128, 41, 35, 229, 251, 18];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateSpotIxArgs {
@@ -8101,7 +8814,6 @@ pub struct LiquidateSpotIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct LiquidateSpotIxData(pub LiquidateSpotIxArgs);
-pub const LIQUIDATE_SPOT_IX_DISCM: [u8; 8] = [107, 0, 128, 41, 35, 229, 251, 18];
 impl From<LiquidateSpotIxArgs> for LiquidateSpotIxData {
     fn from(args: LiquidateSpotIxArgs) -> Self {
         Self(args)
@@ -8239,12 +8951,36 @@ impl From<&LiquidateBorrowForPerpPnlKeys>
 {
     fn from(keys: &LiquidateBorrowForPerpPnlKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -8290,6 +9026,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX
         }
     }
 }
+pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM: [u8; 8] = [169, 17, 32, 90, 207, 148, 209, 27];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidateBorrowForPerpPnlIxArgs {
@@ -8300,7 +9037,6 @@ pub struct LiquidateBorrowForPerpPnlIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct LiquidateBorrowForPerpPnlIxData(pub LiquidateBorrowForPerpPnlIxArgs);
-pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_DISCM: [u8; 8] = [169, 17, 32, 90, 207, 148, 209, 27];
 impl From<LiquidateBorrowForPerpPnlIxArgs> for LiquidateBorrowForPerpPnlIxData {
     fn from(args: LiquidateBorrowForPerpPnlIxArgs) -> Self {
         Self(args)
@@ -8448,12 +9184,36 @@ impl From<&LiquidatePerpPnlForDepositKeys>
 {
     fn from(keys: &LiquidatePerpPnlForDepositKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -8501,6 +9261,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_I
         }
     }
 }
+pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM: [u8; 8] = [237, 75, 198, 235, 233, 186, 75, 35];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LiquidatePerpPnlForDepositIxArgs {
@@ -8511,7 +9272,6 @@ pub struct LiquidatePerpPnlForDepositIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct LiquidatePerpPnlForDepositIxData(pub LiquidatePerpPnlForDepositIxArgs);
-pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_DISCM: [u8; 8] = [237, 75, 198, 235, 233, 186, 75, 35];
 impl From<LiquidatePerpPnlForDepositIxArgs> for LiquidatePerpPnlForDepositIxData {
     fn from(args: LiquidatePerpPnlForDepositIxArgs) -> Self {
         Self(args)
@@ -8657,12 +9417,36 @@ impl From<&ResolvePerpPnlDeficitAccounts<'_, '_>> for ResolvePerpPnlDeficitKeys 
 impl From<&ResolvePerpPnlDeficitKeys> for [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] {
     fn from(keys: &ResolvePerpPnlDeficitKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -8706,6 +9490,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCO
         }
     }
 }
+pub const RESOLVE_PERP_PNL_DEFICIT_IX_DISCM: [u8; 8] = [168, 204, 68, 150, 159, 126, 95, 148];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolvePerpPnlDeficitIxArgs {
@@ -8714,7 +9499,6 @@ pub struct ResolvePerpPnlDeficitIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ResolvePerpPnlDeficitIxData(pub ResolvePerpPnlDeficitIxArgs);
-pub const RESOLVE_PERP_PNL_DEFICIT_IX_DISCM: [u8; 8] = [168, 204, 68, 150, 159, 126, 95, 148];
 impl From<ResolvePerpPnlDeficitIxArgs> for ResolvePerpPnlDeficitIxData {
     fn from(args: ResolvePerpPnlDeficitIxArgs) -> Self {
         Self(args)
@@ -8865,16 +9649,56 @@ impl From<&ResolvePerpBankruptcyAccounts<'_, '_>> for ResolvePerpBankruptcyKeys 
 impl From<&ResolvePerpBankruptcyKeys> for [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] {
     fn from(keys: &ResolvePerpBankruptcyKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -8930,6 +9754,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOU
         }
     }
 }
+pub const RESOLVE_PERP_BANKRUPTCY_IX_DISCM: [u8; 8] = [224, 16, 176, 214, 162, 213, 183, 222];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolvePerpBankruptcyIxArgs {
@@ -8938,7 +9763,6 @@ pub struct ResolvePerpBankruptcyIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ResolvePerpBankruptcyIxData(pub ResolvePerpBankruptcyIxArgs);
-pub const RESOLVE_PERP_BANKRUPTCY_IX_DISCM: [u8; 8] = [224, 16, 176, 214, 162, 213, 183, 222];
 impl From<ResolvePerpBankruptcyIxArgs> for ResolvePerpBankruptcyIxData {
     fn from(args: ResolvePerpBankruptcyIxArgs) -> Self {
         Self(args)
@@ -9100,16 +9924,56 @@ impl From<&ResolveSpotBankruptcyAccounts<'_, '_>> for ResolveSpotBankruptcyKeys 
 impl From<&ResolveSpotBankruptcyKeys> for [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] {
     fn from(keys: &ResolveSpotBankruptcyKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.liquidator, false),
-            AccountMeta::new(keys.liquidator_stats, false),
-            AccountMeta::new(keys.user, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.liquidator_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -9165,6 +10029,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOU
         }
     }
 }
+pub const RESOLVE_SPOT_BANKRUPTCY_IX_DISCM: [u8; 8] = [124, 194, 240, 254, 198, 213, 52, 122];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResolveSpotBankruptcyIxArgs {
@@ -9172,7 +10037,6 @@ pub struct ResolveSpotBankruptcyIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct ResolveSpotBankruptcyIxData(pub ResolveSpotBankruptcyIxArgs);
-pub const RESOLVE_SPOT_BANKRUPTCY_IX_DISCM: [u8; 8] = [124, 194, 240, 254, 198, 213, 52, 122];
 impl From<ResolveSpotBankruptcyIxArgs> for ResolveSpotBankruptcyIxData {
     fn from(args: ResolveSpotBankruptcyIxArgs) -> Self {
         Self(args)
@@ -9324,12 +10188,36 @@ impl From<&SettleRevenueToInsuranceFundKeys>
 {
     fn from(keys: &SettleRevenueToInsuranceFundKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -9377,6 +10265,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND
         }
     }
 }
+pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM: [u8; 8] =
+    [200, 120, 93, 136, 69, 38, 199, 159];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleRevenueToInsuranceFundIxArgs {
@@ -9384,8 +10274,6 @@ pub struct SettleRevenueToInsuranceFundIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct SettleRevenueToInsuranceFundIxData(pub SettleRevenueToInsuranceFundIxArgs);
-pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_DISCM: [u8; 8] =
-    [200, 120, 93, 136, 69, 38, 199, 159];
 impl From<SettleRevenueToInsuranceFundIxArgs> for SettleRevenueToInsuranceFundIxData {
     fn from(args: SettleRevenueToInsuranceFundIxArgs) -> Self {
         Self(args)
@@ -9522,9 +10410,21 @@ impl From<&UpdateFundingRateAccounts<'_, '_>> for UpdateFundingRateKeys {
 impl From<&UpdateFundingRateKeys> for [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateFundingRateKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -9559,6 +10459,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_
         }
     }
 }
+pub const UPDATE_FUNDING_RATE_IX_DISCM: [u8; 8] = [201, 178, 116, 212, 166, 144, 72, 238];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateFundingRateIxArgs {
@@ -9566,7 +10467,6 @@ pub struct UpdateFundingRateIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateFundingRateIxData(pub UpdateFundingRateIxArgs);
-pub const UPDATE_FUNDING_RATE_IX_DISCM: [u8; 8] = [201, 178, 116, 212, 166, 144, 72, 238];
 impl From<UpdateFundingRateIxArgs> for UpdateFundingRateIxData {
     fn from(args: UpdateFundingRateIxArgs) -> Self {
         Self(args)
@@ -9684,9 +10584,21 @@ impl From<&UpdateSpotMarketCumulativeInterestKeys>
 {
     fn from(keys: &UpdateSpotMarketCumulativeInterestKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -9726,13 +10638,13 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM: [u8; 8] =
+    [39, 166, 139, 243, 158, 165, 155, 225];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketCumulativeInterestIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketCumulativeInterestIxData(pub UpdateSpotMarketCumulativeInterestIxArgs);
-pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_DISCM: [u8; 8] =
-    [39, 166, 139, 243, 158, 165, 155, 225];
 impl From<UpdateSpotMarketCumulativeInterestIxArgs> for UpdateSpotMarketCumulativeInterestIxData {
     fn from(args: UpdateSpotMarketCumulativeInterestIxArgs) -> Self {
         Self(args)
@@ -9857,8 +10769,16 @@ impl From<&UpdateAmmsAccounts<'_, '_>> for UpdateAmmsKeys {
 impl From<&UpdateAmmsKeys> for [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateAmmsKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -9887,6 +10807,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UPDATE_AMMS_IX_DISCM: [u8; 8] = [201, 106, 217, 253, 4, 175, 228, 97];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAmmsIxArgs {
@@ -9894,7 +10815,6 @@ pub struct UpdateAmmsIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateAmmsIxData(pub UpdateAmmsIxArgs);
-pub const UPDATE_AMMS_IX_DISCM: [u8; 8] = [201, 106, 217, 253, 4, 175, 228, 97];
 impl From<UpdateAmmsIxArgs> for UpdateAmmsIxData {
     fn from(args: UpdateAmmsIxArgs) -> Self {
         Self(args)
@@ -10009,9 +10929,21 @@ impl From<&UpdateSpotMarketExpiryKeys>
 {
     fn from(keys: &UpdateSpotMarketExpiryKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -10046,6 +10978,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACC
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM: [u8; 8] = [208, 11, 211, 159, 226, 24, 11, 247];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketExpiryIxArgs {
@@ -10053,7 +10986,6 @@ pub struct UpdateSpotMarketExpiryIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketExpiryIxData(pub UpdateSpotMarketExpiryIxArgs);
-pub const UPDATE_SPOT_MARKET_EXPIRY_IX_DISCM: [u8; 8] = [208, 11, 211, 159, 226, 24, 11, 247];
 impl From<UpdateSpotMarketExpiryIxArgs> for UpdateSpotMarketExpiryIxData {
     fn from(args: UpdateSpotMarketExpiryIxArgs) -> Self {
         Self(args)
@@ -10192,12 +11124,36 @@ impl From<&UpdateUserQuoteAssetInsuranceStakeKeys>
 {
     fn from(keys: &UpdateUserQuoteAssetInsuranceStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.insurance_fund_vault, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -10246,13 +11202,13 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM: [u8; 8] =
+    [251, 101, 156, 7, 2, 63, 30, 23];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateUserQuoteAssetInsuranceStakeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateUserQuoteAssetInsuranceStakeIxData(pub UpdateUserQuoteAssetInsuranceStakeIxArgs);
-pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_DISCM: [u8; 8] =
-    [251, 101, 156, 7, 2, 63, 30, 23];
 impl From<UpdateUserQuoteAssetInsuranceStakeIxArgs> for UpdateUserQuoteAssetInsuranceStakeIxData {
     fn from(args: UpdateUserQuoteAssetInsuranceStakeIxArgs) -> Self {
         Self(args)
@@ -10415,14 +11371,46 @@ impl From<&InitializeInsuranceFundStakeKeys>
 {
     fn from(keys: &InitializeInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.payer, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.payer,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -10476,6 +11464,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_
         }
     }
 }
+pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [187, 179, 243, 70, 248, 90, 92, 147];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeInsuranceFundStakeIxArgs {
@@ -10483,7 +11472,6 @@ pub struct InitializeInsuranceFundStakeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeInsuranceFundStakeIxData(pub InitializeInsuranceFundStakeIxArgs);
-pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [187, 179, 243, 70, 248, 90, 92, 147];
 impl From<InitializeInsuranceFundStakeIxArgs> for InitializeInsuranceFundStakeIxData {
     fn from(args: InitializeInsuranceFundStakeIxArgs) -> Self {
         Self(args)
@@ -10648,16 +11636,56 @@ impl From<&AddInsuranceFundStakeAccounts<'_, '_>> for AddInsuranceFundStakeKeys 
 impl From<&AddInsuranceFundStakeKeys> for [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] {
     fn from(keys: &AddInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.user_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -10713,6 +11741,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCO
         }
     }
 }
+pub const ADD_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [251, 144, 115, 11, 222, 47, 62, 236];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AddInsuranceFundStakeIxArgs {
@@ -10721,7 +11750,6 @@ pub struct AddInsuranceFundStakeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct AddInsuranceFundStakeIxData(pub AddInsuranceFundStakeIxArgs);
-pub const ADD_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [251, 144, 115, 11, 222, 47, 62, 236];
 impl From<AddInsuranceFundStakeIxArgs> for AddInsuranceFundStakeIxData {
     fn from(args: AddInsuranceFundStakeIxArgs) -> Self {
         Self(args)
@@ -10874,11 +11902,31 @@ impl From<&RequestRemoveInsuranceFundStakeKeys>
 {
     fn from(keys: &RequestRemoveInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.insurance_fund_vault, false),
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -10924,6 +11972,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
+    [142, 70, 204, 92, 73, 106, 180, 52];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RequestRemoveInsuranceFundStakeIxArgs {
@@ -10932,8 +11982,6 @@ pub struct RequestRemoveInsuranceFundStakeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RequestRemoveInsuranceFundStakeIxData(pub RequestRemoveInsuranceFundStakeIxArgs);
-pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
-    [142, 70, 204, 92, 73, 106, 180, 52];
 impl From<RequestRemoveInsuranceFundStakeIxArgs> for RequestRemoveInsuranceFundStakeIxData {
     fn from(args: RequestRemoveInsuranceFundStakeIxArgs) -> Self {
         Self(args)
@@ -11087,11 +12135,31 @@ impl From<&CancelRequestRemoveInsuranceFundStakeKeys>
 {
     fn from(keys: &CancelRequestRemoveInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.insurance_fund_vault, false),
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -11137,6 +12205,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
+    [97, 235, 78, 62, 212, 42, 241, 127];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CancelRequestRemoveInsuranceFundStakeIxArgs {
@@ -11146,8 +12216,6 @@ pub struct CancelRequestRemoveInsuranceFundStakeIxArgs {
 pub struct CancelRequestRemoveInsuranceFundStakeIxData(
     pub CancelRequestRemoveInsuranceFundStakeIxArgs,
 );
-pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
-    [97, 235, 78, 62, 212, 42, 241, 127];
 impl From<CancelRequestRemoveInsuranceFundStakeIxArgs>
     for CancelRequestRemoveInsuranceFundStakeIxData
 {
@@ -11314,15 +12382,51 @@ impl From<&RemoveInsuranceFundStakeKeys>
 {
     fn from(keys: &RemoveInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_stake, false),
-            AccountMeta::new(keys.user_stats, false),
-            AccountMeta::new_readonly(keys.authority, true),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.user_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_stake,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.user_stats,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.authority,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.user_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -11375,6 +12479,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_A
         }
     }
 }
+pub const REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [128, 166, 142, 9, 254, 187, 143, 174];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RemoveInsuranceFundStakeIxArgs {
@@ -11382,7 +12487,6 @@ pub struct RemoveInsuranceFundStakeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RemoveInsuranceFundStakeIxData(pub RemoveInsuranceFundStakeIxArgs);
-pub const REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] = [128, 166, 142, 9, 254, 187, 143, 174];
 impl From<RemoveInsuranceFundStakeIxArgs> for RemoveInsuranceFundStakeIxData {
     fn from(args: RemoveInsuranceFundStakeIxArgs) -> Self {
         Self(args)
@@ -11537,13 +12641,41 @@ impl From<&InitializeAccounts<'_, '_>> for InitializeKeys {
 impl From<&InitializeKeys> for [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializeKeys) -> Self {
         [
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.quote_asset_mint, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.quote_asset_mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -11590,12 +12722,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const INITIALIZE_IX_DISCM: [u8; 8] = [175, 175, 109, 31, 13, 152, 155, 237];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeIxData(pub InitializeIxArgs);
-pub const INITIALIZE_IX_DISCM: [u8; 8] = [175, 175, 109, 31, 13, 152, 155, 237];
 impl From<InitializeIxArgs> for InitializeIxData {
     fn from(args: InitializeIxArgs) -> Self {
         Self(args)
@@ -11742,17 +12874,61 @@ impl From<&InitializeSpotMarketAccounts<'_, '_>> for InitializeSpotMarketKeys {
 impl From<&InitializeSpotMarketKeys> for [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializeSpotMarketKeys) -> Self {
         [
-            AccountMeta::new(keys.spot_market, false),
-            AccountMeta::new_readonly(keys.spot_market_mint, false),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_mint,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -11811,6 +12987,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUN
         }
     }
 }
+pub const INITIALIZE_SPOT_MARKET_IX_DISCM: [u8; 8] = [234, 196, 128, 44, 94, 15, 48, 201];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeSpotMarketIxArgs {
@@ -11829,7 +13006,6 @@ pub struct InitializeSpotMarketIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeSpotMarketIxData(pub InitializeSpotMarketIxArgs);
-pub const INITIALIZE_SPOT_MARKET_IX_DISCM: [u8; 8] = [234, 196, 128, 44, 94, 15, 48, 201];
 impl From<InitializeSpotMarketIxArgs> for InitializeSpotMarketIxData {
     fn from(args: InitializeSpotMarketIxArgs) -> Self {
         Self(args)
@@ -11998,17 +13174,61 @@ impl From<&InitializeSerumFulfillmentConfigKeys>
 {
     fn from(keys: &InitializeSerumFulfillmentConfigKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.base_spot_market, false),
-            AccountMeta::new_readonly(keys.quote_spot_market, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.serum_program, false),
-            AccountMeta::new_readonly(keys.serum_market, false),
-            AccountMeta::new(keys.serum_open_orders, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.serum_fulfillment_config, false),
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.base_spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.quote_spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.serum_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.serum_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.serum_open_orders,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.serum_fulfillment_config,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -12072,6 +13292,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM: [u8; 8] =
+    [193, 211, 132, 172, 70, 171, 7, 94];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeSerumFulfillmentConfigIxArgs {
@@ -12079,8 +13301,6 @@ pub struct InitializeSerumFulfillmentConfigIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializeSerumFulfillmentConfigIxData(pub InitializeSerumFulfillmentConfigIxArgs);
-pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_DISCM: [u8; 8] =
-    [193, 211, 132, 172, 70, 171, 7, 94];
 impl From<InitializeSerumFulfillmentConfigIxArgs> for InitializeSerumFulfillmentConfigIxData {
     fn from(args: InitializeSerumFulfillmentConfigIxArgs) -> Self {
         Self(args)
@@ -12232,9 +13452,21 @@ impl From<&UpdateSerumFulfillmentConfigStatusKeys>
 {
     fn from(keys: &UpdateSerumFulfillmentConfigStatusKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.serum_fulfillment_config, false),
-            AccountMeta::new(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.serum_fulfillment_config,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -12274,6 +13506,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM: [u8; 8] =
+    [171, 109, 240, 251, 95, 1, 149, 89];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSerumFulfillmentConfigStatusIxArgs {
@@ -12281,8 +13515,6 @@ pub struct UpdateSerumFulfillmentConfigStatusIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSerumFulfillmentConfigStatusIxData(pub UpdateSerumFulfillmentConfigStatusIxArgs);
-pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_DISCM: [u8; 8] =
-    [171, 109, 240, 251, 95, 1, 149, 89];
 impl From<UpdateSerumFulfillmentConfigStatusIxArgs> for UpdateSerumFulfillmentConfigStatusIxData {
     fn from(args: UpdateSerumFulfillmentConfigStatusIxArgs) -> Self {
         Self(args)
@@ -12443,16 +13675,56 @@ impl From<&InitializePhoenixFulfillmentConfigKeys>
 {
     fn from(keys: &InitializePhoenixFulfillmentConfigKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.base_spot_market, false),
-            AccountMeta::new_readonly(keys.quote_spot_market, false),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new_readonly(keys.phoenix_program, false),
-            AccountMeta::new_readonly(keys.phoenix_market, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.phoenix_fulfillment_config, false),
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.base_spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.quote_spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.phoenix_program,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.phoenix_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.phoenix_fulfillment_config,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -12513,6 +13785,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM: [u8; 8] =
+    [135, 132, 110, 107, 185, 160, 169, 154];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializePhoenixFulfillmentConfigIxArgs {
@@ -12520,8 +13794,6 @@ pub struct InitializePhoenixFulfillmentConfigIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializePhoenixFulfillmentConfigIxData(pub InitializePhoenixFulfillmentConfigIxArgs);
-pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_DISCM: [u8; 8] =
-    [135, 132, 110, 107, 185, 160, 169, 154];
 impl From<InitializePhoenixFulfillmentConfigIxArgs> for InitializePhoenixFulfillmentConfigIxData {
     fn from(args: InitializePhoenixFulfillmentConfigIxArgs) -> Self {
         Self(args)
@@ -12670,9 +13942,21 @@ impl From<&PhoenixFulfillmentConfigStatusKeys>
 {
     fn from(keys: &PhoenixFulfillmentConfigStatusKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.phoenix_fulfillment_config, false),
-            AccountMeta::new(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.phoenix_fulfillment_config,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -12711,6 +13995,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATU
         }
     }
 }
+pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM: [u8; 8] = [96, 31, 113, 32, 12, 203, 7, 154];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PhoenixFulfillmentConfigStatusIxArgs {
@@ -12718,7 +14003,6 @@ pub struct PhoenixFulfillmentConfigStatusIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct PhoenixFulfillmentConfigStatusIxData(pub PhoenixFulfillmentConfigStatusIxArgs);
-pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_DISCM: [u8; 8] = [96, 31, 113, 32, 12, 203, 7, 154];
 impl From<PhoenixFulfillmentConfigStatusIxArgs> for PhoenixFulfillmentConfigStatusIxData {
     fn from(args: PhoenixFulfillmentConfigStatusIxArgs) -> Self {
         Self(args)
@@ -12853,9 +14137,21 @@ impl From<&UpdateSerumVaultAccounts<'_, '_>> for UpdateSerumVaultKeys {
 impl From<&UpdateSerumVaultKeys> for [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateSerumVaultKeys) -> Self {
         [
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new_readonly(keys.srm_vault, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.srm_vault,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -12890,12 +14186,12 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_L
         }
     }
 }
+pub const UPDATE_SERUM_VAULT_IX_DISCM: [u8; 8] = [219, 8, 246, 96, 169, 121, 91, 110];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSerumVaultIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSerumVaultIxData(pub UpdateSerumVaultIxArgs);
-pub const UPDATE_SERUM_VAULT_IX_DISCM: [u8; 8] = [219, 8, 246, 96, 169, 121, 91, 110];
 impl From<UpdateSerumVaultIxArgs> for UpdateSerumVaultIxData {
     fn from(args: UpdateSerumVaultIxArgs) -> Self {
         Self(args)
@@ -13023,12 +14319,36 @@ impl From<&InitializePerpMarketAccounts<'_, '_>> for InitializePerpMarketKeys {
 impl From<&InitializePerpMarketKeys> for [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] {
     fn from(keys: &InitializePerpMarketKeys) -> Self {
         [
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new_readonly(keys.rent, false),
-            AccountMeta::new_readonly(keys.system_program, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.rent,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.system_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -13072,6 +14392,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUN
         }
     }
 }
+pub const INITIALIZE_PERP_MARKET_IX_DISCM: [u8; 8] = [132, 9, 229, 118, 117, 118, 117, 62];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializePerpMarketIxArgs {
@@ -13089,7 +14410,6 @@ pub struct InitializePerpMarketIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitializePerpMarketIxData(pub InitializePerpMarketIxArgs);
-pub const INITIALIZE_PERP_MARKET_IX_DISCM: [u8; 8] = [132, 9, 229, 118, 117, 118, 117, 62];
 impl From<InitializePerpMarketIxArgs> for InitializePerpMarketIxData {
     fn from(args: InitializePerpMarketIxArgs) -> Self {
         Self(args)
@@ -13218,9 +14538,21 @@ impl From<&DeleteInitializedPerpMarketKeys>
 {
     fn from(keys: &DeleteInitializedPerpMarketKeys) -> Self {
         [
-            AccountMeta::new(keys.admin, true),
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -13259,6 +14591,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_I
         }
     }
 }
+pub const DELETE_INITIALIZED_PERP_MARKET_IX_DISCM: [u8; 8] = [91, 154, 24, 87, 106, 59, 190, 66];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteInitializedPerpMarketIxArgs {
@@ -13266,7 +14599,6 @@ pub struct DeleteInitializedPerpMarketIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeleteInitializedPerpMarketIxData(pub DeleteInitializedPerpMarketIxArgs);
-pub const DELETE_INITIALIZED_PERP_MARKET_IX_DISCM: [u8; 8] = [91, 154, 24, 87, 106, 59, 190, 66];
 impl From<DeleteInitializedPerpMarketIxArgs> for DeleteInitializedPerpMarketIxData {
     fn from(args: DeleteInitializedPerpMarketIxArgs) -> Self {
         Self(args)
@@ -13395,9 +14727,21 @@ impl From<&MoveAmmPriceAccounts<'_, '_>> for MoveAmmPriceKeys {
 impl From<&MoveAmmPriceKeys> for [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] {
     fn from(keys: &MoveAmmPriceKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -13432,6 +14776,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const MOVE_AMM_PRICE_IX_DISCM: [u8; 8] = [235, 109, 2, 82, 219, 118, 6, 159];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MoveAmmPriceIxArgs {
@@ -13441,7 +14786,6 @@ pub struct MoveAmmPriceIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct MoveAmmPriceIxData(pub MoveAmmPriceIxArgs);
-pub const MOVE_AMM_PRICE_IX_DISCM: [u8; 8] = [235, 109, 2, 82, 219, 118, 6, 159];
 impl From<MoveAmmPriceIxArgs> for MoveAmmPriceIxData {
     fn from(args: MoveAmmPriceIxArgs) -> Self {
         Self(args)
@@ -13562,9 +14906,21 @@ impl From<&UpdatePerpMarketExpiryKeys>
 {
     fn from(keys: &UpdatePerpMarketExpiryKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -13599,6 +14955,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACC
         }
     }
 }
+pub const UPDATE_PERP_MARKET_EXPIRY_IX_DISCM: [u8; 8] = [44, 221, 227, 151, 131, 140, 22, 110];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketExpiryIxArgs {
@@ -13606,7 +14963,6 @@ pub struct UpdatePerpMarketExpiryIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketExpiryIxData(pub UpdatePerpMarketExpiryIxArgs);
-pub const UPDATE_PERP_MARKET_EXPIRY_IX_DISCM: [u8; 8] = [44, 221, 227, 151, 131, 140, 22, 110];
 impl From<UpdatePerpMarketExpiryIxArgs> for UpdatePerpMarketExpiryIxData {
     fn from(args: UpdatePerpMarketExpiryIxArgs) -> Self {
         Self(args)
@@ -13739,10 +15095,26 @@ impl From<&SettleExpiredMarketPoolsToRevenuePoolKeys>
 {
     fn from(keys: &SettleExpiredMarketPoolsToRevenuePoolKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.spot_market, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -13787,6 +15159,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM: [u8; 8] =
+    [55, 19, 238, 169, 227, 90, 200, 184];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SettleExpiredMarketPoolsToRevenuePoolIxArgs {}
@@ -13794,8 +15168,6 @@ pub struct SettleExpiredMarketPoolsToRevenuePoolIxArgs {}
 pub struct SettleExpiredMarketPoolsToRevenuePoolIxData(
     pub SettleExpiredMarketPoolsToRevenuePoolIxArgs,
 );
-pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_DISCM: [u8; 8] =
-    [55, 19, 238, 169, 227, 90, 200, 184];
 impl From<SettleExpiredMarketPoolsToRevenuePoolIxArgs>
     for SettleExpiredMarketPoolsToRevenuePoolIxData
 {
@@ -13948,14 +15320,46 @@ impl From<&DepositIntoPerpMarketFeePoolKeys>
 {
     fn from(keys: &DepositIntoPerpMarketFeePoolKeys) -> Self {
         [
-            AccountMeta::new(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.source_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.quote_spot_market, false),
-            AccountMeta::new(keys.spot_market_vault, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.source_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.quote_spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -14009,6 +15413,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POO
         }
     }
 }
+pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM: [u8; 8] = [34, 58, 57, 68, 97, 80, 244, 6];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DepositIntoPerpMarketFeePoolIxArgs {
@@ -14016,7 +15421,6 @@ pub struct DepositIntoPerpMarketFeePoolIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct DepositIntoPerpMarketFeePoolIxData(pub DepositIntoPerpMarketFeePoolIxArgs);
-pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_DISCM: [u8; 8] = [34, 58, 57, 68, 97, 80, 244, 6];
 impl From<DepositIntoPerpMarketFeePoolIxArgs> for DepositIntoPerpMarketFeePoolIxData {
     fn from(args: DepositIntoPerpMarketFeePoolIxArgs) -> Self {
         Self(args)
@@ -14162,10 +15566,26 @@ impl From<&RepegAmmCurveAccounts<'_, '_>> for RepegAmmCurveKeys {
 impl From<&RepegAmmCurveKeys> for [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] {
     fn from(keys: &RepegAmmCurveKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new_readonly(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -14203,6 +15623,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN]
         }
     }
 }
+pub const REPEG_AMM_CURVE_IX_DISCM: [u8; 8] = [3, 36, 102, 89, 180, 128, 120, 213];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RepegAmmCurveIxArgs {
@@ -14210,7 +15631,6 @@ pub struct RepegAmmCurveIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct RepegAmmCurveIxData(pub RepegAmmCurveIxArgs);
-pub const REPEG_AMM_CURVE_IX_DISCM: [u8; 8] = [3, 36, 102, 89, 180, 128, 120, 213];
 impl From<RepegAmmCurveIxArgs> for RepegAmmCurveIxData {
     fn from(args: RepegAmmCurveIxArgs) -> Self {
         Self(args)
@@ -14335,10 +15755,26 @@ impl From<&UpdatePerpMarketAmmOracleTwapKeys>
 {
     fn from(keys: &UpdatePerpMarketAmmOracleTwapKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new_readonly(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -14380,13 +15816,13 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TW
         }
     }
 }
+pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
+    [241, 74, 114, 123, 206, 153, 24, 202];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketAmmOracleTwapIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketAmmOracleTwapIxData(pub UpdatePerpMarketAmmOracleTwapIxArgs);
-pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
-    [241, 74, 114, 123, 206, 153, 24, 202];
 impl From<UpdatePerpMarketAmmOracleTwapIxArgs> for UpdatePerpMarketAmmOracleTwapIxData {
     fn from(args: UpdatePerpMarketAmmOracleTwapIxArgs) -> Self {
         Self(args)
@@ -14524,10 +15960,26 @@ impl From<&ResetPerpMarketAmmOracleTwapKeys>
 {
     fn from(keys: &ResetPerpMarketAmmOracleTwapKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new_readonly(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -14569,13 +16021,13 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWA
         }
     }
 }
+pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
+    [127, 10, 55, 164, 123, 226, 47, 24];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ResetPerpMarketAmmOracleTwapIxArgs {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct ResetPerpMarketAmmOracleTwapIxData(pub ResetPerpMarketAmmOracleTwapIxArgs);
-pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_DISCM: [u8; 8] =
-    [127, 10, 55, 164, 123, 226, 47, 24];
 impl From<ResetPerpMarketAmmOracleTwapIxArgs> for ResetPerpMarketAmmOracleTwapIxData {
     fn from(args: ResetPerpMarketAmmOracleTwapIxArgs) -> Self {
         Self(args)
@@ -14711,10 +16163,26 @@ impl From<&UpdateKAccounts<'_, '_>> for UpdateKKeys {
 impl From<&UpdateKKeys> for [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateKKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -14750,6 +16218,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UPDATE_K_IX_DISCM: [u8; 8] = [72, 98, 9, 139, 129, 229, 172, 56];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateKIxArgs {
@@ -14757,7 +16226,6 @@ pub struct UpdateKIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateKIxData(pub UpdateKIxArgs);
-pub const UPDATE_K_IX_DISCM: [u8; 8] = [72, 98, 9, 139, 129, 229, 172, 56];
 impl From<UpdateKIxArgs> for UpdateKIxData {
     fn from(args: UpdateKIxArgs) -> Self {
         Self(args)
@@ -14879,9 +16347,21 @@ impl From<&UpdatePerpMarketMarginRatioKeys>
 {
     fn from(keys: &UpdatePerpMarketMarginRatioKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -14920,6 +16400,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM: [u8; 8] =
+    [130, 173, 107, 45, 119, 105, 26, 113];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMarginRatioIxArgs {
@@ -14928,8 +16410,6 @@ pub struct UpdatePerpMarketMarginRatioIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMarginRatioIxData(pub UpdatePerpMarketMarginRatioIxArgs);
-pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_DISCM: [u8; 8] =
-    [130, 173, 107, 45, 119, 105, 26, 113];
 impl From<UpdatePerpMarketMarginRatioIxArgs> for UpdatePerpMarketMarginRatioIxData {
     fn from(args: UpdatePerpMarketMarginRatioIxArgs) -> Self {
         Self(args)
@@ -15060,9 +16540,21 @@ impl From<&UpdatePerpMarketMaxImbalancesKeys>
 {
     fn from(keys: &UpdatePerpMarketMaxImbalancesKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -15101,6 +16593,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCE
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM: [u8; 8] = [15, 206, 73, 133, 60, 8, 86, 89];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxImbalancesIxArgs {
@@ -15110,7 +16603,6 @@ pub struct UpdatePerpMarketMaxImbalancesIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMaxImbalancesIxData(pub UpdatePerpMarketMaxImbalancesIxArgs);
-pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_DISCM: [u8; 8] = [15, 206, 73, 133, 60, 8, 86, 89];
 impl From<UpdatePerpMarketMaxImbalancesIxArgs> for UpdatePerpMarketMaxImbalancesIxData {
     fn from(args: UpdatePerpMarketMaxImbalancesIxArgs) -> Self {
         Self(args)
@@ -15244,9 +16736,21 @@ impl From<&UpdatePerpMarketLiquidationFeeKeys>
 {
     fn from(keys: &UpdatePerpMarketLiquidationFeeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -15285,6 +16789,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_F
         }
     }
 }
+pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM: [u8; 8] = [90, 137, 9, 145, 41, 8, 148, 117];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketLiquidationFeeIxArgs {
@@ -15293,7 +16798,6 @@ pub struct UpdatePerpMarketLiquidationFeeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketLiquidationFeeIxData(pub UpdatePerpMarketLiquidationFeeIxArgs);
-pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_DISCM: [u8; 8] = [90, 137, 9, 145, 41, 8, 148, 117];
 impl From<UpdatePerpMarketLiquidationFeeIxArgs> for UpdatePerpMarketLiquidationFeeIxData {
     fn from(args: UpdatePerpMarketLiquidationFeeIxArgs) -> Self {
         Self(args)
@@ -15429,9 +16933,21 @@ impl From<&UpdateInsuranceFundUnstakingPeriodKeys>
 {
     fn from(keys: &UpdateInsuranceFundUnstakingPeriodKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -15471,6 +16987,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM: [u8; 8] =
+    [44, 69, 43, 226, 204, 223, 202, 52];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateInsuranceFundUnstakingPeriodIxArgs {
@@ -15478,8 +16996,6 @@ pub struct UpdateInsuranceFundUnstakingPeriodIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateInsuranceFundUnstakingPeriodIxData(pub UpdateInsuranceFundUnstakingPeriodIxArgs);
-pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_DISCM: [u8; 8] =
-    [44, 69, 43, 226, 204, 223, 202, 52];
 impl From<UpdateInsuranceFundUnstakingPeriodIxArgs> for UpdateInsuranceFundUnstakingPeriodIxData {
     fn from(args: UpdateInsuranceFundUnstakingPeriodIxArgs) -> Self {
         Self(args)
@@ -15614,9 +17130,21 @@ impl From<&UpdateSpotMarketLiquidationFeeKeys>
 {
     fn from(keys: &UpdateSpotMarketLiquidationFeeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -15655,6 +17183,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_F
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM: [u8; 8] =
+    [11, 13, 255, 53, 56, 136, 104, 177];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketLiquidationFeeIxArgs {
@@ -15663,8 +17193,6 @@ pub struct UpdateSpotMarketLiquidationFeeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketLiquidationFeeIxData(pub UpdateSpotMarketLiquidationFeeIxArgs);
-pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_DISCM: [u8; 8] =
-    [11, 13, 255, 53, 56, 136, 104, 177];
 impl From<UpdateSpotMarketLiquidationFeeIxArgs> for UpdateSpotMarketLiquidationFeeIxData {
     fn from(args: UpdateSpotMarketLiquidationFeeIxArgs) -> Self {
         Self(args)
@@ -15798,9 +17326,21 @@ impl From<&UpdateWithdrawGuardThresholdKeys>
 {
     fn from(keys: &UpdateWithdrawGuardThresholdKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -15839,6 +17379,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_
         }
     }
 }
+pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM: [u8; 8] = [56, 18, 39, 61, 155, 211, 44, 133];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWithdrawGuardThresholdIxArgs {
@@ -15846,7 +17387,6 @@ pub struct UpdateWithdrawGuardThresholdIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateWithdrawGuardThresholdIxData(pub UpdateWithdrawGuardThresholdIxArgs);
-pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_DISCM: [u8; 8] = [56, 18, 39, 61, 155, 211, 44, 133];
 impl From<UpdateWithdrawGuardThresholdIxArgs> for UpdateWithdrawGuardThresholdIxData {
     fn from(args: UpdateWithdrawGuardThresholdIxArgs) -> Self {
         Self(args)
@@ -15980,9 +17520,21 @@ impl From<&UpdateSpotMarketIfFactorKeys>
 {
     fn from(keys: &UpdateSpotMarketIfFactorKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16017,6 +17569,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM: [u8; 8] = [147, 30, 224, 34, 18, 230, 105, 4];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketIfFactorIxArgs {
@@ -16026,7 +17579,6 @@ pub struct UpdateSpotMarketIfFactorIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketIfFactorIxData(pub UpdateSpotMarketIfFactorIxArgs);
-pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_DISCM: [u8; 8] = [147, 30, 224, 34, 18, 230, 105, 4];
 impl From<UpdateSpotMarketIfFactorIxArgs> for UpdateSpotMarketIfFactorIxData {
     fn from(args: UpdateSpotMarketIfFactorIxArgs) -> Self {
         Self(args)
@@ -16159,9 +17711,21 @@ impl From<&UpdateSpotMarketRevenueSettlePeriodKeys>
 {
     fn from(keys: &UpdateSpotMarketRevenueSettlePeriodKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16201,6 +17765,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM: [u8; 8] =
+    [81, 92, 126, 41, 250, 225, 156, 219];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketRevenueSettlePeriodIxArgs {
@@ -16208,8 +17774,6 @@ pub struct UpdateSpotMarketRevenueSettlePeriodIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketRevenueSettlePeriodIxData(pub UpdateSpotMarketRevenueSettlePeriodIxArgs);
-pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_DISCM: [u8; 8] =
-    [81, 92, 126, 41, 250, 225, 156, 219];
 impl From<UpdateSpotMarketRevenueSettlePeriodIxArgs> for UpdateSpotMarketRevenueSettlePeriodIxData {
     fn from(args: UpdateSpotMarketRevenueSettlePeriodIxArgs) -> Self {
         Self(args)
@@ -16344,9 +17908,21 @@ impl From<&UpdateSpotMarketStatusKeys>
 {
     fn from(keys: &UpdateSpotMarketStatusKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16381,6 +17957,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACC
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_STATUS_IX_DISCM: [u8; 8] = [78, 94, 16, 188, 193, 110, 231, 31];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketStatusIxArgs {
@@ -16388,7 +17965,6 @@ pub struct UpdateSpotMarketStatusIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketStatusIxData(pub UpdateSpotMarketStatusIxArgs);
-pub const UPDATE_SPOT_MARKET_STATUS_IX_DISCM: [u8; 8] = [78, 94, 16, 188, 193, 110, 231, 31];
 impl From<UpdateSpotMarketStatusIxArgs> for UpdateSpotMarketStatusIxData {
     fn from(args: UpdateSpotMarketStatusIxArgs) -> Self {
         Self(args)
@@ -16516,9 +18092,21 @@ impl From<&UpdateSpotMarketAssetTierKeys>
 {
     fn from(keys: &UpdateSpotMarketAssetTierKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16555,6 +18143,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM: [u8; 8] = [253, 209, 231, 14, 242, 208, 243, 130];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketAssetTierIxArgs {
@@ -16562,7 +18151,6 @@ pub struct UpdateSpotMarketAssetTierIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketAssetTierIxData(pub UpdateSpotMarketAssetTierIxArgs);
-pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_DISCM: [u8; 8] = [253, 209, 231, 14, 242, 208, 243, 130];
 impl From<UpdateSpotMarketAssetTierIxArgs> for UpdateSpotMarketAssetTierIxData {
     fn from(args: UpdateSpotMarketAssetTierIxArgs) -> Self {
         Self(args)
@@ -16693,9 +18281,21 @@ impl From<&UpdateSpotMarketMarginWeightsKeys>
 {
     fn from(keys: &UpdateSpotMarketMarginWeightsKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16734,6 +18334,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHT
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM: [u8; 8] = [109, 33, 87, 195, 255, 36, 6, 81];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMarginWeightsIxArgs {
@@ -16745,7 +18346,6 @@ pub struct UpdateSpotMarketMarginWeightsIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketMarginWeightsIxData(pub UpdateSpotMarketMarginWeightsIxArgs);
-pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_DISCM: [u8; 8] = [109, 33, 87, 195, 255, 36, 6, 81];
 impl From<UpdateSpotMarketMarginWeightsIxArgs> for UpdateSpotMarketMarginWeightsIxData {
     fn from(args: UpdateSpotMarketMarginWeightsIxArgs) -> Self {
         Self(args)
@@ -16879,9 +18479,21 @@ impl From<&UpdateSpotMarketBorrowRateKeys>
 {
     fn from(keys: &UpdateSpotMarketBorrowRateKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -16920,6 +18532,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_I
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM: [u8; 8] = [71, 239, 236, 153, 210, 62, 254, 76];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketBorrowRateIxArgs {
@@ -16929,7 +18542,6 @@ pub struct UpdateSpotMarketBorrowRateIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketBorrowRateIxData(pub UpdateSpotMarketBorrowRateIxArgs);
-pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_DISCM: [u8; 8] = [71, 239, 236, 153, 210, 62, 254, 76];
 impl From<UpdateSpotMarketBorrowRateIxArgs> for UpdateSpotMarketBorrowRateIxData {
     fn from(args: UpdateSpotMarketBorrowRateIxArgs) -> Self {
         Self(args)
@@ -17062,9 +18674,21 @@ impl From<&UpdateSpotMarketMaxTokenDepositsKeys>
 {
     fn from(keys: &UpdateSpotMarketMaxTokenDepositsKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -17104,6 +18728,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM: [u8; 8] =
+    [56, 191, 79, 18, 26, 121, 80, 208];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMaxTokenDepositsIxArgs {
@@ -17111,8 +18737,6 @@ pub struct UpdateSpotMarketMaxTokenDepositsIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketMaxTokenDepositsIxData(pub UpdateSpotMarketMaxTokenDepositsIxArgs);
-pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_DISCM: [u8; 8] =
-    [56, 191, 79, 18, 26, 121, 80, 208];
 impl From<UpdateSpotMarketMaxTokenDepositsIxArgs> for UpdateSpotMarketMaxTokenDepositsIxData {
     fn from(args: UpdateSpotMarketMaxTokenDepositsIxArgs) -> Self {
         Self(args)
@@ -17250,10 +18874,26 @@ impl From<&UpdateSpotMarketOracleKeys>
 {
     fn from(keys: &UpdateSpotMarketOracleKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -17291,6 +18931,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACC
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_ORACLE_IX_DISCM: [u8; 8] = [114, 184, 102, 37, 246, 186, 180, 99];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOracleIxArgs {
@@ -17299,7 +18940,6 @@ pub struct UpdateSpotMarketOracleIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketOracleIxData(pub UpdateSpotMarketOracleIxArgs);
-pub const UPDATE_SPOT_MARKET_ORACLE_IX_DISCM: [u8; 8] = [114, 184, 102, 37, 246, 186, 180, 99];
 impl From<UpdateSpotMarketOracleIxArgs> for UpdateSpotMarketOracleIxData {
     fn from(args: UpdateSpotMarketOracleIxArgs) -> Self {
         Self(args)
@@ -17430,9 +19070,21 @@ impl From<&UpdateSpotMarketStepSizeAndTickSizeKeys>
 {
     fn from(keys: &UpdateSpotMarketStepSizeAndTickSizeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -17472,6 +19124,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM: [u8; 8] =
+    [238, 153, 137, 80, 206, 59, 250, 61];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketStepSizeAndTickSizeIxArgs {
@@ -17480,8 +19134,6 @@ pub struct UpdateSpotMarketStepSizeAndTickSizeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketStepSizeAndTickSizeIxData(pub UpdateSpotMarketStepSizeAndTickSizeIxArgs);
-pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM: [u8; 8] =
-    [238, 153, 137, 80, 206, 59, 250, 61];
 impl From<UpdateSpotMarketStepSizeAndTickSizeIxArgs> for UpdateSpotMarketStepSizeAndTickSizeIxData {
     fn from(args: UpdateSpotMarketStepSizeAndTickSizeIxArgs) -> Self {
         Self(args)
@@ -17616,9 +19268,21 @@ impl From<&UpdateSpotMarketMinOrderSizeKeys>
 {
     fn from(keys: &UpdateSpotMarketMinOrderSizeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -17657,6 +19321,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZ
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM: [u8; 8] = [93, 128, 11, 119, 26, 20, 181, 50];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketMinOrderSizeIxArgs {
@@ -17664,7 +19329,6 @@ pub struct UpdateSpotMarketMinOrderSizeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketMinOrderSizeIxData(pub UpdateSpotMarketMinOrderSizeIxArgs);
-pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_DISCM: [u8; 8] = [93, 128, 11, 119, 26, 20, 181, 50];
 impl From<UpdateSpotMarketMinOrderSizeIxArgs> for UpdateSpotMarketMinOrderSizeIxData {
     fn from(args: UpdateSpotMarketMinOrderSizeIxArgs) -> Self {
         Self(args)
@@ -17798,9 +19462,21 @@ impl From<&UpdateSpotMarketOrdersEnabledKeys>
 {
     fn from(keys: &UpdateSpotMarketOrdersEnabledKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -17839,6 +19515,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLE
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM: [u8; 8] =
+    [190, 79, 206, 15, 26, 229, 229, 43];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketOrdersEnabledIxArgs {
@@ -17846,8 +19524,6 @@ pub struct UpdateSpotMarketOrdersEnabledIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketOrdersEnabledIxData(pub UpdateSpotMarketOrdersEnabledIxArgs);
-pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_DISCM: [u8; 8] =
-    [190, 79, 206, 15, 26, 229, 229, 43];
 impl From<UpdateSpotMarketOrdersEnabledIxArgs> for UpdateSpotMarketOrdersEnabledIxData {
     fn from(args: UpdateSpotMarketOrdersEnabledIxArgs) -> Self {
         Self(args)
@@ -17979,9 +19655,21 @@ impl From<&UpdateSpotMarketNameAccounts<'_, '_>> for UpdateSpotMarketNameKeys {
 impl From<&UpdateSpotMarketNameKeys> for [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateSpotMarketNameKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.spot_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18016,6 +19704,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOU
         }
     }
 }
+pub const UPDATE_SPOT_MARKET_NAME_IX_DISCM: [u8; 8] = [17, 208, 1, 1, 162, 211, 188, 224];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotMarketNameIxArgs {
@@ -18023,7 +19712,6 @@ pub struct UpdateSpotMarketNameIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotMarketNameIxData(pub UpdateSpotMarketNameIxArgs);
-pub const UPDATE_SPOT_MARKET_NAME_IX_DISCM: [u8; 8] = [17, 208, 1, 1, 162, 211, 188, 224];
 impl From<UpdateSpotMarketNameIxArgs> for UpdateSpotMarketNameIxData {
     fn from(args: UpdateSpotMarketNameIxArgs) -> Self {
         Self(args)
@@ -18149,9 +19837,21 @@ impl From<&UpdatePerpMarketStatusKeys>
 {
     fn from(keys: &UpdatePerpMarketStatusKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18186,6 +19886,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACC
         }
     }
 }
+pub const UPDATE_PERP_MARKET_STATUS_IX_DISCM: [u8; 8] = [71, 201, 175, 122, 255, 207, 196, 207];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketStatusIxArgs {
@@ -18193,7 +19894,6 @@ pub struct UpdatePerpMarketStatusIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketStatusIxData(pub UpdatePerpMarketStatusIxArgs);
-pub const UPDATE_PERP_MARKET_STATUS_IX_DISCM: [u8; 8] = [71, 201, 175, 122, 255, 207, 196, 207];
 impl From<UpdatePerpMarketStatusIxArgs> for UpdatePerpMarketStatusIxData {
     fn from(args: UpdatePerpMarketStatusIxArgs) -> Self {
         Self(args)
@@ -18321,9 +20021,21 @@ impl From<&UpdatePerpMarketContractTierKeys>
 {
     fn from(keys: &UpdatePerpMarketContractTierKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18362,6 +20074,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER
         }
     }
 }
+pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM: [u8; 8] =
+    [236, 128, 15, 95, 203, 214, 68, 117];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketContractTierIxArgs {
@@ -18369,8 +20083,6 @@ pub struct UpdatePerpMarketContractTierIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketContractTierIxData(pub UpdatePerpMarketContractTierIxArgs);
-pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_DISCM: [u8; 8] =
-    [236, 128, 15, 95, 203, 214, 68, 117];
 impl From<UpdatePerpMarketContractTierIxArgs> for UpdatePerpMarketContractTierIxData {
     fn from(args: UpdatePerpMarketContractTierIxArgs) -> Self {
         Self(args)
@@ -18504,9 +20216,21 @@ impl From<&UpdatePerpMarketImfFactorKeys>
 {
     fn from(keys: &UpdatePerpMarketImfFactorKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18543,6 +20267,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX
         }
     }
 }
+pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM: [u8; 8] = [207, 194, 56, 132, 35, 67, 71, 244];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketImfFactorIxArgs {
@@ -18551,7 +20276,6 @@ pub struct UpdatePerpMarketImfFactorIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketImfFactorIxData(pub UpdatePerpMarketImfFactorIxArgs);
-pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_DISCM: [u8; 8] = [207, 194, 56, 132, 35, 67, 71, 244];
 impl From<UpdatePerpMarketImfFactorIxArgs> for UpdatePerpMarketImfFactorIxData {
     fn from(args: UpdatePerpMarketImfFactorIxArgs) -> Self {
         Self(args)
@@ -18684,9 +20408,21 @@ impl From<&UpdatePerpMarketUnrealizedAssetWeightKeys>
 {
     fn from(keys: &UpdatePerpMarketUnrealizedAssetWeightKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18726,6 +20462,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM: [u8; 8] =
+    [135, 132, 205, 165, 109, 150, 166, 106];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketUnrealizedAssetWeightIxArgs {
@@ -18736,8 +20474,6 @@ pub struct UpdatePerpMarketUnrealizedAssetWeightIxArgs {
 pub struct UpdatePerpMarketUnrealizedAssetWeightIxData(
     pub UpdatePerpMarketUnrealizedAssetWeightIxArgs,
 );
-pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_DISCM: [u8; 8] =
-    [135, 132, 205, 165, 109, 150, 166, 106];
 impl From<UpdatePerpMarketUnrealizedAssetWeightIxArgs>
     for UpdatePerpMarketUnrealizedAssetWeightIxData
 {
@@ -18876,9 +20612,21 @@ impl From<&UpdatePerpMarketConcentrationCoefKeys>
 {
     fn from(keys: &UpdatePerpMarketConcentrationCoefKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -18918,6 +20666,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM: [u8; 8] =
+    [24, 78, 232, 126, 169, 176, 230, 16];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketConcentrationCoefIxArgs {
@@ -18925,8 +20675,6 @@ pub struct UpdatePerpMarketConcentrationCoefIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketConcentrationCoefIxData(pub UpdatePerpMarketConcentrationCoefIxArgs);
-pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_DISCM: [u8; 8] =
-    [24, 78, 232, 126, 169, 176, 230, 16];
 impl From<UpdatePerpMarketConcentrationCoefIxArgs> for UpdatePerpMarketConcentrationCoefIxData {
     fn from(args: UpdatePerpMarketConcentrationCoefIxArgs) -> Self {
         Self(args)
@@ -19063,9 +20811,21 @@ impl From<&UpdatePerpMarketCurveUpdateIntensityKeys>
 {
     fn from(keys: &UpdatePerpMarketCurveUpdateIntensityKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19105,6 +20865,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM: [u8; 8] =
+    [50, 131, 6, 156, 226, 231, 189, 72];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketCurveUpdateIntensityIxArgs {
@@ -19114,8 +20876,6 @@ pub struct UpdatePerpMarketCurveUpdateIntensityIxArgs {
 pub struct UpdatePerpMarketCurveUpdateIntensityIxData(
     pub UpdatePerpMarketCurveUpdateIntensityIxArgs,
 );
-pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_DISCM: [u8; 8] =
-    [50, 131, 6, 156, 226, 231, 189, 72];
 impl From<UpdatePerpMarketCurveUpdateIntensityIxArgs>
     for UpdatePerpMarketCurveUpdateIntensityIxData
 {
@@ -19254,9 +21014,21 @@ impl From<&UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>
 {
     fn from(keys: &UpdatePerpMarketTargetBaseAssetAmountPerLpKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19301,6 +21073,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM: [u8; 8] =
+    [62, 87, 68, 115, 29, 150, 150, 165];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs {
@@ -19310,8 +21084,6 @@ pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs {
 pub struct UpdatePerpMarketTargetBaseAssetAmountPerLpIxData(
     pub UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
 );
-pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_DISCM: [u8; 8] =
-    [62, 87, 68, 115, 29, 150, 150, 165];
 impl From<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>
     for UpdatePerpMarketTargetBaseAssetAmountPerLpIxData
 {
@@ -19443,8 +21215,16 @@ impl From<&UpdateLpCooldownTimeAccounts<'_, '_>> for UpdateLpCooldownTimeKeys {
 impl From<&UpdateLpCooldownTimeKeys> for [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateLpCooldownTimeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19473,6 +21253,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOU
         }
     }
 }
+pub const UPDATE_LP_COOLDOWN_TIME_IX_DISCM: [u8; 8] = [198, 133, 88, 41, 241, 119, 61, 14];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLpCooldownTimeIxArgs {
@@ -19480,7 +21261,6 @@ pub struct UpdateLpCooldownTimeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateLpCooldownTimeIxData(pub UpdateLpCooldownTimeIxArgs);
-pub const UPDATE_LP_COOLDOWN_TIME_IX_DISCM: [u8; 8] = [198, 133, 88, 41, 241, 119, 61, 14];
 impl From<UpdateLpCooldownTimeIxArgs> for UpdateLpCooldownTimeIxData {
     fn from(args: UpdateLpCooldownTimeIxArgs) -> Self {
         Self(args)
@@ -19602,8 +21382,16 @@ impl From<&UpdatePerpFeeStructureKeys>
 {
     fn from(keys: &UpdatePerpFeeStructureKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19632,6 +21420,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACC
         }
     }
 }
+pub const UPDATE_PERP_FEE_STRUCTURE_IX_DISCM: [u8; 8] = [23, 178, 111, 203, 73, 22, 140, 75];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpFeeStructureIxArgs {
@@ -19639,7 +21428,6 @@ pub struct UpdatePerpFeeStructureIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpFeeStructureIxData(pub UpdatePerpFeeStructureIxArgs);
-pub const UPDATE_PERP_FEE_STRUCTURE_IX_DISCM: [u8; 8] = [23, 178, 111, 203, 73, 22, 140, 75];
 impl From<UpdatePerpFeeStructureIxArgs> for UpdatePerpFeeStructureIxData {
     fn from(args: UpdatePerpFeeStructureIxArgs) -> Self {
         Self(args)
@@ -19763,8 +21551,16 @@ impl From<&UpdateSpotFeeStructureKeys>
 {
     fn from(keys: &UpdateSpotFeeStructureKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19793,6 +21589,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACC
         }
     }
 }
+pub const UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM: [u8; 8] = [97, 216, 105, 131, 113, 246, 142, 141];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotFeeStructureIxArgs {
@@ -19800,7 +21597,6 @@ pub struct UpdateSpotFeeStructureIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotFeeStructureIxData(pub UpdateSpotFeeStructureIxArgs);
-pub const UPDATE_SPOT_FEE_STRUCTURE_IX_DISCM: [u8; 8] = [97, 216, 105, 131, 113, 246, 142, 141];
 impl From<UpdateSpotFeeStructureIxArgs> for UpdateSpotFeeStructureIxData {
     fn from(args: UpdateSpotFeeStructureIxArgs) -> Self {
         Self(args)
@@ -19924,8 +21720,16 @@ impl From<&UpdateInitialPctToLiquidateKeys>
 {
     fn from(keys: &UpdateInitialPctToLiquidateKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -19958,6 +21762,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_
         }
     }
 }
+pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM: [u8; 8] =
+    [210, 133, 225, 128, 194, 50, 13, 109];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateInitialPctToLiquidateIxArgs {
@@ -19965,8 +21771,6 @@ pub struct UpdateInitialPctToLiquidateIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateInitialPctToLiquidateIxData(pub UpdateInitialPctToLiquidateIxArgs);
-pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_DISCM: [u8; 8] =
-    [210, 133, 225, 128, 194, 50, 13, 109];
 impl From<UpdateInitialPctToLiquidateIxArgs> for UpdateInitialPctToLiquidateIxData {
     fn from(args: UpdateInitialPctToLiquidateIxArgs) -> Self {
         Self(args)
@@ -20093,8 +21897,16 @@ impl From<&UpdateLiquidationDurationKeys>
 {
     fn from(keys: &UpdateLiquidationDurationKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -20123,6 +21935,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_A
         }
     }
 }
+pub const UPDATE_LIQUIDATION_DURATION_IX_DISCM: [u8; 8] = [28, 154, 20, 249, 102, 192, 73, 71];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateLiquidationDurationIxArgs {
@@ -20130,7 +21943,6 @@ pub struct UpdateLiquidationDurationIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateLiquidationDurationIxData(pub UpdateLiquidationDurationIxArgs);
-pub const UPDATE_LIQUIDATION_DURATION_IX_DISCM: [u8; 8] = [28, 154, 20, 249, 102, 192, 73, 71];
 impl From<UpdateLiquidationDurationIxArgs> for UpdateLiquidationDurationIxData {
     fn from(args: UpdateLiquidationDurationIxArgs) -> Self {
         Self(args)
@@ -20257,8 +22069,16 @@ impl From<&UpdateOracleGuardRailsKeys>
 {
     fn from(keys: &UpdateOracleGuardRailsKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -20287,6 +22107,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACC
         }
     }
 }
+pub const UPDATE_ORACLE_GUARD_RAILS_IX_DISCM: [u8; 8] = [131, 112, 10, 59, 32, 54, 40, 164];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateOracleGuardRailsIxArgs {
@@ -20294,7 +22115,6 @@ pub struct UpdateOracleGuardRailsIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateOracleGuardRailsIxData(pub UpdateOracleGuardRailsIxArgs);
-pub const UPDATE_ORACLE_GUARD_RAILS_IX_DISCM: [u8; 8] = [131, 112, 10, 59, 32, 54, 40, 164];
 impl From<UpdateOracleGuardRailsIxArgs> for UpdateOracleGuardRailsIxData {
     fn from(args: UpdateOracleGuardRailsIxArgs) -> Self {
         Self(args)
@@ -20418,8 +22238,16 @@ impl From<&UpdateStateSettlementDurationKeys>
 {
     fn from(keys: &UpdateStateSettlementDurationKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -20452,6 +22280,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION
         }
     }
 }
+pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM: [u8; 8] = [97, 68, 199, 235, 131, 80, 61, 173];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateStateSettlementDurationIxArgs {
@@ -20459,7 +22288,6 @@ pub struct UpdateStateSettlementDurationIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateStateSettlementDurationIxData(pub UpdateStateSettlementDurationIxArgs);
-pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_DISCM: [u8; 8] = [97, 68, 199, 235, 131, 80, 61, 173];
 impl From<UpdateStateSettlementDurationIxArgs> for UpdateStateSettlementDurationIxData {
     fn from(args: UpdateStateSettlementDurationIxArgs) -> Self {
         Self(args)
@@ -20595,10 +22423,26 @@ impl From<&UpdatePerpMarketOracleKeys>
 {
     fn from(keys: &UpdatePerpMarketOracleKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
-            AccountMeta::new_readonly(keys.oracle, false),
-            AccountMeta::new_readonly(keys.admin, true),
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.oracle,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -20636,6 +22480,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACC
         }
     }
 }
+pub const UPDATE_PERP_MARKET_ORACLE_IX_DISCM: [u8; 8] = [182, 113, 111, 160, 67, 174, 89, 191];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketOracleIxArgs {
@@ -20644,7 +22489,6 @@ pub struct UpdatePerpMarketOracleIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketOracleIxData(pub UpdatePerpMarketOracleIxArgs);
-pub const UPDATE_PERP_MARKET_ORACLE_IX_DISCM: [u8; 8] = [182, 113, 111, 160, 67, 174, 89, 191];
 impl From<UpdatePerpMarketOracleIxArgs> for UpdatePerpMarketOracleIxData {
     fn from(args: UpdatePerpMarketOracleIxArgs) -> Self {
         Self(args)
@@ -20773,9 +22617,21 @@ impl From<&UpdatePerpMarketBaseSpreadKeys>
 {
     fn from(keys: &UpdatePerpMarketBaseSpreadKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -20814,6 +22670,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_I
         }
     }
 }
+pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM: [u8; 8] = [71, 95, 84, 168, 9, 157, 198, 65];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketBaseSpreadIxArgs {
@@ -20821,7 +22678,6 @@ pub struct UpdatePerpMarketBaseSpreadIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketBaseSpreadIxData(pub UpdatePerpMarketBaseSpreadIxArgs);
-pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_DISCM: [u8; 8] = [71, 95, 84, 168, 9, 157, 198, 65];
 impl From<UpdatePerpMarketBaseSpreadIxArgs> for UpdatePerpMarketBaseSpreadIxData {
     fn from(args: UpdatePerpMarketBaseSpreadIxArgs) -> Self {
         Self(args)
@@ -20950,9 +22806,21 @@ impl From<&UpdateAmmJitIntensityAccounts<'_, '_>> for UpdateAmmJitIntensityKeys 
 impl From<&UpdateAmmJitIntensityKeys> for [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateAmmJitIntensityKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -20987,6 +22855,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCO
         }
     }
 }
+pub const UPDATE_AMM_JIT_INTENSITY_IX_DISCM: [u8; 8] = [181, 191, 53, 109, 166, 249, 55, 142];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAmmJitIntensityIxArgs {
@@ -20994,7 +22863,6 @@ pub struct UpdateAmmJitIntensityIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateAmmJitIntensityIxData(pub UpdateAmmJitIntensityIxArgs);
-pub const UPDATE_AMM_JIT_INTENSITY_IX_DISCM: [u8; 8] = [181, 191, 53, 109, 166, 249, 55, 142];
 impl From<UpdateAmmJitIntensityIxArgs> for UpdateAmmJitIntensityIxData {
     fn from(args: UpdateAmmJitIntensityIxArgs) -> Self {
         Self(args)
@@ -21120,9 +22988,21 @@ impl From<&UpdatePerpMarketMaxSpreadKeys>
 {
     fn from(keys: &UpdatePerpMarketMaxSpreadKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -21159,6 +23039,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM: [u8; 8] = [80, 252, 122, 62, 40, 218, 91, 100];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxSpreadIxArgs {
@@ -21166,7 +23047,6 @@ pub struct UpdatePerpMarketMaxSpreadIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMaxSpreadIxData(pub UpdatePerpMarketMaxSpreadIxArgs);
-pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_DISCM: [u8; 8] = [80, 252, 122, 62, 40, 218, 91, 100];
 impl From<UpdatePerpMarketMaxSpreadIxArgs> for UpdatePerpMarketMaxSpreadIxData {
     fn from(args: UpdatePerpMarketMaxSpreadIxArgs) -> Self {
         Self(args)
@@ -21299,9 +23179,21 @@ impl From<&UpdatePerpMarketStepSizeAndTickSizeKeys>
 {
     fn from(keys: &UpdatePerpMarketStepSizeAndTickSizeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -21341,6 +23233,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM: [u8; 8] =
+    [231, 255, 97, 25, 146, 139, 174, 4];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketStepSizeAndTickSizeIxArgs {
@@ -21349,8 +23243,6 @@ pub struct UpdatePerpMarketStepSizeAndTickSizeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketStepSizeAndTickSizeIxData(pub UpdatePerpMarketStepSizeAndTickSizeIxArgs);
-pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_DISCM: [u8; 8] =
-    [231, 255, 97, 25, 146, 139, 174, 4];
 impl From<UpdatePerpMarketStepSizeAndTickSizeIxArgs> for UpdatePerpMarketStepSizeAndTickSizeIxData {
     fn from(args: UpdatePerpMarketStepSizeAndTickSizeIxArgs) -> Self {
         Self(args)
@@ -21483,9 +23375,21 @@ impl From<&UpdatePerpMarketNameAccounts<'_, '_>> for UpdatePerpMarketNameKeys {
 impl From<&UpdatePerpMarketNameKeys> for [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdatePerpMarketNameKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -21520,6 +23424,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOU
         }
     }
 }
+pub const UPDATE_PERP_MARKET_NAME_IX_DISCM: [u8; 8] = [211, 31, 21, 210, 64, 108, 66, 201];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketNameIxArgs {
@@ -21527,7 +23432,6 @@ pub struct UpdatePerpMarketNameIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketNameIxData(pub UpdatePerpMarketNameIxArgs);
-pub const UPDATE_PERP_MARKET_NAME_IX_DISCM: [u8; 8] = [211, 31, 21, 210, 64, 108, 66, 201];
 impl From<UpdatePerpMarketNameIxArgs> for UpdatePerpMarketNameIxData {
     fn from(args: UpdatePerpMarketNameIxArgs) -> Self {
         Self(args)
@@ -21653,9 +23557,21 @@ impl From<&UpdatePerpMarketMinOrderSizeKeys>
 {
     fn from(keys: &UpdatePerpMarketMinOrderSizeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -21694,6 +23610,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZ
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM: [u8; 8] = [226, 74, 5, 89, 108, 223, 46, 141];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMinOrderSizeIxArgs {
@@ -21701,7 +23618,6 @@ pub struct UpdatePerpMarketMinOrderSizeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMinOrderSizeIxData(pub UpdatePerpMarketMinOrderSizeIxArgs);
-pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_DISCM: [u8; 8] = [226, 74, 5, 89, 108, 223, 46, 141];
 impl From<UpdatePerpMarketMinOrderSizeIxArgs> for UpdatePerpMarketMinOrderSizeIxData {
     fn from(args: UpdatePerpMarketMinOrderSizeIxArgs) -> Self {
         Self(args)
@@ -21837,9 +23753,21 @@ impl From<&UpdatePerpMarketMaxSlippageRatioKeys>
 {
     fn from(keys: &UpdatePerpMarketMaxSlippageRatioKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -21879,6 +23807,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM: [u8; 8] =
+    [235, 37, 40, 196, 70, 146, 54, 201];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxSlippageRatioIxArgs {
@@ -21886,8 +23816,6 @@ pub struct UpdatePerpMarketMaxSlippageRatioIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMaxSlippageRatioIxData(pub UpdatePerpMarketMaxSlippageRatioIxArgs);
-pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_DISCM: [u8; 8] =
-    [235, 37, 40, 196, 70, 146, 54, 201];
 impl From<UpdatePerpMarketMaxSlippageRatioIxArgs> for UpdatePerpMarketMaxSlippageRatioIxData {
     fn from(args: UpdatePerpMarketMaxSlippageRatioIxArgs) -> Self {
         Self(args)
@@ -22024,9 +23952,21 @@ impl From<&UpdatePerpMarketMaxFillReserveFractionKeys>
 {
     fn from(keys: &UpdatePerpMarketMaxFillReserveFractionKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22069,6 +24009,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM: [u8; 8] =
+    [19, 172, 114, 154, 42, 135, 161, 133];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxFillReserveFractionIxArgs {
@@ -22078,8 +24020,6 @@ pub struct UpdatePerpMarketMaxFillReserveFractionIxArgs {
 pub struct UpdatePerpMarketMaxFillReserveFractionIxData(
     pub UpdatePerpMarketMaxFillReserveFractionIxArgs,
 );
-pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_DISCM: [u8; 8] =
-    [19, 172, 114, 154, 42, 135, 161, 133];
 impl From<UpdatePerpMarketMaxFillReserveFractionIxArgs>
     for UpdatePerpMarketMaxFillReserveFractionIxData
 {
@@ -22218,9 +24158,21 @@ impl From<&UpdatePerpMarketMaxOpenInterestKeys>
 {
     fn from(keys: &UpdatePerpMarketMaxOpenInterestKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new(keys.perp_market, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.perp_market,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22260,6 +24212,8 @@ impl<'me, 'info>
         }
     }
 }
+pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM: [u8; 8] =
+    [194, 79, 149, 224, 246, 102, 186, 140];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpMarketMaxOpenInterestIxArgs {
@@ -22267,8 +24221,6 @@ pub struct UpdatePerpMarketMaxOpenInterestIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpMarketMaxOpenInterestIxData(pub UpdatePerpMarketMaxOpenInterestIxArgs);
-pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_DISCM: [u8; 8] =
-    [194, 79, 149, 224, 246, 102, 186, 140];
 impl From<UpdatePerpMarketMaxOpenInterestIxArgs> for UpdatePerpMarketMaxOpenInterestIxData {
     fn from(args: UpdatePerpMarketMaxOpenInterestIxArgs) -> Self {
         Self(args)
@@ -22397,8 +24349,16 @@ impl From<&UpdateAdminAccounts<'_, '_>> for UpdateAdminKeys {
 impl From<&UpdateAdminKeys> for [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateAdminKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22427,6 +24387,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN]>
         }
     }
 }
+pub const UPDATE_ADMIN_IX_DISCM: [u8; 8] = [161, 176, 40, 213, 60, 184, 179, 228];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateAdminIxArgs {
@@ -22434,7 +24395,6 @@ pub struct UpdateAdminIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateAdminIxData(pub UpdateAdminIxArgs);
-pub const UPDATE_ADMIN_IX_DISCM: [u8; 8] = [161, 176, 40, 213, 60, 184, 179, 228];
 impl From<UpdateAdminIxArgs> for UpdateAdminIxData {
     fn from(args: UpdateAdminIxArgs) -> Self {
         Self(args)
@@ -22549,8 +24509,16 @@ impl From<&UpdateWhitelistMintAccounts<'_, '_>> for UpdateWhitelistMintKeys {
 impl From<&UpdateWhitelistMintKeys> for [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateWhitelistMintKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22579,6 +24547,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNT
         }
     }
 }
+pub const UPDATE_WHITELIST_MINT_IX_DISCM: [u8; 8] = [161, 15, 162, 19, 148, 120, 144, 151];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWhitelistMintIxArgs {
@@ -22586,7 +24555,6 @@ pub struct UpdateWhitelistMintIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateWhitelistMintIxData(pub UpdateWhitelistMintIxArgs);
-pub const UPDATE_WHITELIST_MINT_IX_DISCM: [u8; 8] = [161, 15, 162, 19, 148, 120, 144, 151];
 impl From<UpdateWhitelistMintIxArgs> for UpdateWhitelistMintIxData {
     fn from(args: UpdateWhitelistMintIxArgs) -> Self {
         Self(args)
@@ -22704,8 +24672,16 @@ impl From<&UpdateDiscountMintAccounts<'_, '_>> for UpdateDiscountMintKeys {
 impl From<&UpdateDiscountMintKeys> for [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateDiscountMintKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22734,6 +24710,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS
         }
     }
 }
+pub const UPDATE_DISCOUNT_MINT_IX_DISCM: [u8; 8] = [32, 252, 122, 211, 66, 31, 47, 241];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateDiscountMintIxArgs {
@@ -22741,7 +24718,6 @@ pub struct UpdateDiscountMintIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateDiscountMintIxData(pub UpdateDiscountMintIxArgs);
-pub const UPDATE_DISCOUNT_MINT_IX_DISCM: [u8; 8] = [32, 252, 122, 211, 66, 31, 47, 241];
 impl From<UpdateDiscountMintIxArgs> for UpdateDiscountMintIxData {
     fn from(args: UpdateDiscountMintIxArgs) -> Self {
         Self(args)
@@ -22859,8 +24835,16 @@ impl From<&UpdateExchangeStatusAccounts<'_, '_>> for UpdateExchangeStatusKeys {
 impl From<&UpdateExchangeStatusKeys> for [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] {
     fn from(keys: &UpdateExchangeStatusKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -22889,6 +24873,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUN
         }
     }
 }
+pub const UPDATE_EXCHANGE_STATUS_IX_DISCM: [u8; 8] = [83, 160, 252, 250, 129, 116, 49, 223];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateExchangeStatusIxArgs {
@@ -22896,7 +24881,6 @@ pub struct UpdateExchangeStatusIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateExchangeStatusIxData(pub UpdateExchangeStatusIxArgs);
-pub const UPDATE_EXCHANGE_STATUS_IX_DISCM: [u8; 8] = [83, 160, 252, 250, 129, 116, 49, 223];
 impl From<UpdateExchangeStatusIxArgs> for UpdateExchangeStatusIxData {
     fn from(args: UpdateExchangeStatusIxArgs) -> Self {
         Self(args)
@@ -23018,8 +25002,16 @@ impl From<&UpdatePerpAuctionDurationKeys>
 {
     fn from(keys: &UpdatePerpAuctionDurationKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -23050,6 +25042,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_
         }
     }
 }
+pub const UPDATE_PERP_AUCTION_DURATION_IX_DISCM: [u8; 8] = [126, 110, 52, 174, 30, 206, 215, 90];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdatePerpAuctionDurationIxArgs {
@@ -23057,7 +25050,6 @@ pub struct UpdatePerpAuctionDurationIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdatePerpAuctionDurationIxData(pub UpdatePerpAuctionDurationIxArgs);
-pub const UPDATE_PERP_AUCTION_DURATION_IX_DISCM: [u8; 8] = [126, 110, 52, 174, 30, 206, 215, 90];
 impl From<UpdatePerpAuctionDurationIxArgs> for UpdatePerpAuctionDurationIxData {
     fn from(args: UpdatePerpAuctionDurationIxArgs) -> Self {
         Self(args)
@@ -23184,8 +25176,16 @@ impl From<&UpdateSpotAuctionDurationKeys>
 {
     fn from(keys: &UpdateSpotAuctionDurationKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new(keys.state, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: true,
+            },
         ]
     }
 }
@@ -23216,6 +25216,7 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_
         }
     }
 }
+pub const UPDATE_SPOT_AUCTION_DURATION_IX_DISCM: [u8; 8] = [182, 178, 203, 72, 187, 143, 157, 107];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateSpotAuctionDurationIxArgs {
@@ -23223,7 +25224,6 @@ pub struct UpdateSpotAuctionDurationIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct UpdateSpotAuctionDurationIxData(pub UpdateSpotAuctionDurationIxArgs);
-pub const UPDATE_SPOT_AUCTION_DURATION_IX_DISCM: [u8; 8] = [182, 178, 203, 72, 187, 143, 157, 107];
 impl From<UpdateSpotAuctionDurationIxArgs> for UpdateSpotAuctionDurationIxData {
     fn from(args: UpdateSpotAuctionDurationIxArgs) -> Self {
         Self(args)
@@ -23365,13 +25365,41 @@ impl From<&AdminRemoveInsuranceFundStakeKeys>
 {
     fn from(keys: &AdminRemoveInsuranceFundStakeKeys) -> Self {
         [
-            AccountMeta::new_readonly(keys.admin, true),
-            AccountMeta::new_readonly(keys.state, false),
-            AccountMeta::new_readonly(keys.spot_market, false),
-            AccountMeta::new(keys.insurance_fund_vault, false),
-            AccountMeta::new_readonly(keys.drift_signer, false),
-            AccountMeta::new(keys.admin_token_account, false),
-            AccountMeta::new_readonly(keys.token_program, false),
+            AccountMeta {
+                pubkey: keys.admin,
+                is_signer: true,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.state,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.spot_market,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.insurance_fund_vault,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.drift_signer,
+                is_signer: false,
+                is_writable: false,
+            },
+            AccountMeta {
+                pubkey: keys.admin_token_account,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: keys.token_program,
+                is_signer: false,
+                is_writable: false,
+            },
         ]
     }
 }
@@ -23422,6 +25450,8 @@ impl<'me, 'info> From<&'me [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAK
         }
     }
 }
+pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
+    [35, 13, 111, 220, 103, 217, 174, 115];
 #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AdminRemoveInsuranceFundStakeIxArgs {
@@ -23430,8 +25460,6 @@ pub struct AdminRemoveInsuranceFundStakeIxArgs {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct AdminRemoveInsuranceFundStakeIxData(pub AdminRemoveInsuranceFundStakeIxArgs);
-pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_DISCM: [u8; 8] =
-    [35, 13, 111, 220, 103, 217, 174, 115];
 impl From<AdminRemoveInsuranceFundStakeIxArgs> for AdminRemoveInsuranceFundStakeIxData {
     fn from(args: AdminRemoveInsuranceFundStakeIxArgs) -> Self {
         Self(args)

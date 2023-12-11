@@ -2,6 +2,7 @@
 resolver = "2"
 
 members = [
+    "examples/anchor/ix_no_privilege/*",
     "examples/anchor/drift/*",
     "examples/anchor/marinade/*",
     "examples/anchor/unstake_it/*",
