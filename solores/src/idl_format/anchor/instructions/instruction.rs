@@ -134,7 +134,7 @@ impl NamedInstruction {
         });
     }
 
-    /// From<&XAccounts> for XKeys
+    /// From<XAccounts> for XKeys
     pub fn write_from_accounts_for_keys(
         &self,
         tokens: &mut TokenStream,
@@ -152,8 +152,8 @@ impl NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl From<&#accounts_ident<'_, '_>> for #keys_ident {
-                fn from(accounts: &#accounts_ident) -> Self {
+            impl From<#accounts_ident<'_, '_>> for #keys_ident {
+                fn from(accounts: #accounts_ident) -> Self {
                     Self {
                         #(#from_keys_fields),*
                     }
@@ -171,8 +171,8 @@ impl NamedInstruction {
         let accounts_len_ident = self.accounts_len_ident();
         let from_keys_meta = accounts.iter().map(|acc| acc.to_keys_account_meta_tokens());
         tokens.extend(quote! {
-            impl From<&#keys_ident> for [AccountMeta; #accounts_len_ident] {
-                fn from(keys: &#keys_ident) -> Self {
+            impl From<#keys_ident> for [AccountMeta; #accounts_len_ident] {
+                fn from(keys: #keys_ident) -> Self {
                     [
                         #(#from_keys_meta),*
                     ]
@@ -228,8 +228,8 @@ impl NamedInstruction {
             }
         });
         tokens.extend(quote! {
-            impl<'info> From<&#accounts_ident<'_, 'info>> for [AccountInfo<'info>; #accounts_len_ident] {
-                fn from(accounts: &#accounts_ident<'_, 'info>) -> Self {
+            impl<'info> From<#accounts_ident<'_, 'info>> for [AccountInfo<'info>; #accounts_len_ident] {
+                fn from(accounts: #accounts_ident<'_, 'info>) -> Self {
                     [
                         #(#account_info_clone),*
                     ]
@@ -417,7 +417,7 @@ impl NamedInstruction {
             (
                 quote! {
                     let keys: #keys_ident = accounts.into();
-                    let metas: [AccountMeta; #accounts_len_ident] = (&keys).into();
+                    let metas: [AccountMeta; #accounts_len_ident] = keys.into();
                 },
                 quote! {
                     Vec::from(metas)
@@ -480,7 +480,7 @@ impl NamedInstruction {
         let accounts_ident = self.accounts_ident();
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! {accounts: &#accounts_ident<'_, 'info>,});
+            fn_params.extend(quote! {accounts: #accounts_ident<'_, 'info>,});
         }
         if self.has_ix_args() {
             fn_params.extend(quote! { args: A, })
@@ -588,15 +588,15 @@ impl NamedInstruction {
                     #(#key_tups),*
                 ] {
                     if actual != expected {
-                        return Err((*actual, *expected));
+                        return Err((actual, expected));
                     }
                 }
             }
         };
         tokens.extend(quote! {
             pub fn #verify_account_keys_fn_ident(
-                accounts: &#accounts_ident<'_, '_>,
-                keys: &#keys_ident
+                accounts: #accounts_ident<'_, '_>,
+                keys: #keys_ident
             ) -> Result<(), (Pubkey, Pubkey)> {
                 #pubkeys_loop_check
                 Ok(())
@@ -670,7 +670,7 @@ impl NamedInstruction {
         let accounts_ident = self.accounts_ident();
         tokens.extend(quote! {
             pub fn #verify_account_privileges_fn_ident<'me, 'info>(
-                accounts: &#accounts_ident<'me, 'info>,
+                accounts: #accounts_ident<'me, 'info>,
             ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
                 #writables_loop_check
                 #signers_loop_check
@@ -786,7 +786,7 @@ impl IxAccount {
     pub fn to_verify_account_keys_tuple(&self) -> TokenStream {
         let name = self.field_ident();
         quote! {
-            (accounts.#name.key, &keys.#name)
+            (*accounts.#name.key, keys.#name)
         }
     }
 }

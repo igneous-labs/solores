@@ -254,8 +254,8 @@ pub struct CreateMetadataAccountKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&CreateMetadataAccountAccounts<'_, '_>> for CreateMetadataAccountKeys {
-    fn from(accounts: &CreateMetadataAccountAccounts) -> Self {
+impl From<CreateMetadataAccountAccounts<'_, '_>> for CreateMetadataAccountKeys {
+    fn from(accounts: CreateMetadataAccountAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             mint: *accounts.mint.key,
@@ -267,8 +267,8 @@ impl From<&CreateMetadataAccountAccounts<'_, '_>> for CreateMetadataAccountKeys 
         }
     }
 }
-impl From<&CreateMetadataAccountKeys> for [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CreateMetadataAccountKeys) -> Self {
+impl From<CreateMetadataAccountKeys> for [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: CreateMetadataAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -321,10 +321,10 @@ impl From<[Pubkey; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]> for CreateMetadataA
         }
     }
 }
-impl<'info> From<&CreateMetadataAccountAccounts<'_, 'info>>
+impl<'info> From<CreateMetadataAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CreateMetadataAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CreateMetadataAccountAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.mint.clone(),
@@ -399,7 +399,7 @@ pub fn create_metadata_account_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CreateMetadataAccountKeys = accounts.into();
-    let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CreateMetadataAccountIxArgs = args.into();
     let data: CreateMetadataAccountIxData = args_full.into();
     Ok(Instruction {
@@ -409,7 +409,7 @@ pub fn create_metadata_account_ix<
     })
 }
 pub fn create_metadata_account_invoke<'info, A: Into<CreateMetadataAccountIxArgs>>(
-    accounts: &CreateMetadataAccountAccounts<'_, 'info>,
+    accounts: CreateMetadataAccountAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = create_metadata_account_ix(accounts, args)?;
@@ -418,7 +418,7 @@ pub fn create_metadata_account_invoke<'info, A: Into<CreateMetadataAccountIxArgs
     invoke(&ix, &account_info)
 }
 pub fn create_metadata_account_invoke_signed<'info, A: Into<CreateMetadataAccountIxArgs>>(
-    accounts: &CreateMetadataAccountAccounts<'_, 'info>,
+    accounts: CreateMetadataAccountAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -428,8 +428,8 @@ pub fn create_metadata_account_invoke_signed<'info, A: Into<CreateMetadataAccoun
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn create_metadata_account_verify_account_keys(
-    accounts: &CreateMetadataAccountAccounts<'_, '_>,
-    keys: &CreateMetadataAccountKeys,
+    accounts: CreateMetadataAccountAccounts<'_, '_>,
+    keys: CreateMetadataAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -447,7 +447,7 @@ pub fn create_metadata_account_verify_account_keys(
     Ok(())
 }
 pub fn create_metadata_account_verify_account_privileges<'me, 'info>(
-    accounts: &CreateMetadataAccountAccounts<'me, 'info>,
+    accounts: CreateMetadataAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -476,16 +476,16 @@ pub struct UpdateMetadataAccountKeys {
     ///Update authority key
     pub update_authority: Pubkey,
 }
-impl From<&UpdateMetadataAccountAccounts<'_, '_>> for UpdateMetadataAccountKeys {
-    fn from(accounts: &UpdateMetadataAccountAccounts) -> Self {
+impl From<UpdateMetadataAccountAccounts<'_, '_>> for UpdateMetadataAccountKeys {
+    fn from(accounts: UpdateMetadataAccountAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             update_authority: *accounts.update_authority.key,
         }
     }
 }
-impl From<&UpdateMetadataAccountKeys> for [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UpdateMetadataAccountKeys) -> Self {
+impl From<UpdateMetadataAccountKeys> for [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: UpdateMetadataAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -508,10 +508,10 @@ impl From<[Pubkey; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]> for UpdateMetadataA
         }
     }
 }
-impl<'info> From<&UpdateMetadataAccountAccounts<'_, 'info>>
+impl<'info> From<UpdateMetadataAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateMetadataAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateMetadataAccountAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
     }
 }
@@ -573,7 +573,7 @@ pub fn update_metadata_account_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateMetadataAccountKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateMetadataAccountIxArgs = args.into();
     let data: UpdateMetadataAccountIxData = args_full.into();
     Ok(Instruction {
@@ -583,7 +583,7 @@ pub fn update_metadata_account_ix<
     })
 }
 pub fn update_metadata_account_invoke<'info, A: Into<UpdateMetadataAccountIxArgs>>(
-    accounts: &UpdateMetadataAccountAccounts<'_, 'info>,
+    accounts: UpdateMetadataAccountAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_metadata_account_ix(accounts, args)?;
@@ -592,7 +592,7 @@ pub fn update_metadata_account_invoke<'info, A: Into<UpdateMetadataAccountIxArgs
     invoke(&ix, &account_info)
 }
 pub fn update_metadata_account_invoke_signed<'info, A: Into<UpdateMetadataAccountIxArgs>>(
-    accounts: &UpdateMetadataAccountAccounts<'_, 'info>,
+    accounts: UpdateMetadataAccountAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -602,8 +602,8 @@ pub fn update_metadata_account_invoke_signed<'info, A: Into<UpdateMetadataAccoun
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_metadata_account_verify_account_keys(
-    accounts: &UpdateMetadataAccountAccounts<'_, '_>,
-    keys: &UpdateMetadataAccountKeys,
+    accounts: UpdateMetadataAccountAccounts<'_, '_>,
+    keys: UpdateMetadataAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -616,7 +616,7 @@ pub fn update_metadata_account_verify_account_keys(
     Ok(())
 }
 pub fn update_metadata_account_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateMetadataAccountAccounts<'me, 'info>,
+    accounts: UpdateMetadataAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -689,8 +689,8 @@ pub struct DeprecatedCreateMasterEditionKeys {
     ///One time authorization printing mint authority - must be provided if using max supply. THIS WILL TRANSFER AUTHORITY AWAY FROM THIS KEY.
     pub one_time_printing_authorization_mint_authority: Pubkey,
 }
-impl From<&DeprecatedCreateMasterEditionAccounts<'_, '_>> for DeprecatedCreateMasterEditionKeys {
-    fn from(accounts: &DeprecatedCreateMasterEditionAccounts) -> Self {
+impl From<DeprecatedCreateMasterEditionAccounts<'_, '_>> for DeprecatedCreateMasterEditionKeys {
+    fn from(accounts: DeprecatedCreateMasterEditionAccounts) -> Self {
         Self {
             edition: *accounts.edition.key,
             mint: *accounts.mint.key,
@@ -712,10 +712,10 @@ impl From<&DeprecatedCreateMasterEditionAccounts<'_, '_>> for DeprecatedCreateMa
         }
     }
 }
-impl From<&DeprecatedCreateMasterEditionKeys>
+impl From<DeprecatedCreateMasterEditionKeys>
     for [AccountMeta; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedCreateMasterEditionKeys) -> Self {
+    fn from(keys: DeprecatedCreateMasterEditionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.edition,
@@ -806,10 +806,10 @@ impl From<[Pubkey; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeprecatedCreateMasterEditionAccounts<'_, 'info>>
+impl<'info> From<DeprecatedCreateMasterEditionAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeprecatedCreateMasterEditionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>) -> Self {
         [
             accounts.edition.clone(),
             accounts.mint.clone(),
@@ -902,7 +902,7 @@ pub fn deprecated_create_master_edition_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
-    let metas: [AccountMeta; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DeprecatedCreateMasterEditionIxArgs = args.into();
     let data: DeprecatedCreateMasterEditionIxData = args_full.into();
     Ok(Instruction {
@@ -915,7 +915,7 @@ pub fn deprecated_create_master_edition_invoke<
     'info,
     A: Into<DeprecatedCreateMasterEditionIxArgs>,
 >(
-    accounts: &DeprecatedCreateMasterEditionAccounts<'_, 'info>,
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deprecated_create_master_edition_ix(accounts, args)?;
@@ -927,7 +927,7 @@ pub fn deprecated_create_master_edition_invoke_signed<
     'info,
     A: Into<DeprecatedCreateMasterEditionIxArgs>,
 >(
-    accounts: &DeprecatedCreateMasterEditionAccounts<'_, 'info>,
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -937,8 +937,8 @@ pub fn deprecated_create_master_edition_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_create_master_edition_verify_account_keys(
-    accounts: &DeprecatedCreateMasterEditionAccounts<'_, '_>,
-    keys: &DeprecatedCreateMasterEditionKeys,
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
+    keys: DeprecatedCreateMasterEditionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.edition.key, &keys.edition),
@@ -971,7 +971,7 @@ pub fn deprecated_create_master_edition_verify_account_keys(
     Ok(())
 }
 pub fn deprecated_create_master_edition_verify_account_privileges<'me, 'info>(
-    accounts: &DeprecatedCreateMasterEditionAccounts<'me, 'info>,
+    accounts: DeprecatedCreateMasterEditionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.edition,
@@ -1068,10 +1068,10 @@ pub struct DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys {
     ///Reservation List - If present, and you are on this list, you can get an edition number given by your position on the list.
     pub reservation_list: Pubkey,
 }
-impl From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>>
+impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>>
     for DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys
 {
-    fn from(accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts) -> Self {
+    fn from(accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             edition: *accounts.edition.key,
@@ -1092,11 +1092,11 @@ impl From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_,
         }
     }
 }
-impl From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>
+impl From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>
     for [AccountMeta;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys) -> Self {
+    fn from(keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -1210,12 +1210,12 @@ impl
         }
     }
 }
-impl<'info> From<&DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>>
+impl<'info> From<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN]
 {
     fn from(
-        accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
+        accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
     ) -> Self {
         [
             accounts.metadata.clone(),
@@ -1310,7 +1310,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
     let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
     let metas: [AccountMeta;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1318,7 +1318,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
     })
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke<'info>(
-    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>;
@@ -1327,7 +1327,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke
     invoke(&ix, &account_info)
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed<'info>(
-    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
@@ -1337,8 +1337,8 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_keys(
-    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
-    keys: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
+    keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -1374,7 +1374,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify
     'me,
     'info,
 >(
-    accounts: &DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.metadata,
@@ -1420,10 +1420,10 @@ pub struct UpdatePrimarySaleHappenedViaTokenKeys {
     ///Account containing tokens from the metadata's mint
     pub token: Pubkey,
 }
-impl From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>>
+impl From<UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>>
     for UpdatePrimarySaleHappenedViaTokenKeys
 {
-    fn from(accounts: &UpdatePrimarySaleHappenedViaTokenAccounts) -> Self {
+    fn from(accounts: UpdatePrimarySaleHappenedViaTokenAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             owner: *accounts.owner.key,
@@ -1431,10 +1431,10 @@ impl From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>>
         }
     }
 }
-impl From<&UpdatePrimarySaleHappenedViaTokenKeys>
+impl From<UpdatePrimarySaleHappenedViaTokenKeys>
     for [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdatePrimarySaleHappenedViaTokenKeys) -> Self {
+    fn from(keys: UpdatePrimarySaleHappenedViaTokenKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -1465,10 +1465,10 @@ impl From<[Pubkey; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>>
+impl<'info> From<UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.owner.clone(),
@@ -1523,8 +1523,7 @@ pub fn update_primary_sale_happened_via_token_ix<K: Into<UpdatePrimarySaleHappen
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
-    let metas: [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+    let metas: [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1532,7 +1531,7 @@ pub fn update_primary_sale_happened_via_token_ix<K: Into<UpdatePrimarySaleHappen
     })
 }
 pub fn update_primary_sale_happened_via_token_invoke<'info>(
-    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = update_primary_sale_happened_via_token_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
@@ -1540,7 +1539,7 @@ pub fn update_primary_sale_happened_via_token_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn update_primary_sale_happened_via_token_invoke_signed<'info>(
-    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = update_primary_sale_happened_via_token_ix(accounts)?;
@@ -1549,8 +1548,8 @@ pub fn update_primary_sale_happened_via_token_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_primary_sale_happened_via_token_verify_account_keys(
-    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
-    keys: &UpdatePrimarySaleHappenedViaTokenKeys,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
+    keys: UpdatePrimarySaleHappenedViaTokenKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -1564,7 +1563,7 @@ pub fn update_primary_sale_happened_via_token_verify_account_keys(
     Ok(())
 }
 pub fn update_primary_sale_happened_via_token_verify_account_privileges<'me, 'info>(
-    accounts: &UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -1597,8 +1596,8 @@ pub struct DeprecatedSetReservationListKeys {
     ///The resource you tied the reservation list too
     pub resource: Pubkey,
 }
-impl From<&DeprecatedSetReservationListAccounts<'_, '_>> for DeprecatedSetReservationListKeys {
-    fn from(accounts: &DeprecatedSetReservationListAccounts) -> Self {
+impl From<DeprecatedSetReservationListAccounts<'_, '_>> for DeprecatedSetReservationListKeys {
+    fn from(accounts: DeprecatedSetReservationListAccounts) -> Self {
         Self {
             master_edition: *accounts.master_edition.key,
             reservation_list: *accounts.reservation_list.key,
@@ -1606,10 +1605,10 @@ impl From<&DeprecatedSetReservationListAccounts<'_, '_>> for DeprecatedSetReserv
         }
     }
 }
-impl From<&DeprecatedSetReservationListKeys>
+impl From<DeprecatedSetReservationListKeys>
     for [AccountMeta; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedSetReservationListKeys) -> Self {
+    fn from(keys: DeprecatedSetReservationListKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.master_edition,
@@ -1640,10 +1639,10 @@ impl From<[Pubkey; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeprecatedSetReservationListAccounts<'_, 'info>>
+impl<'info> From<DeprecatedSetReservationListAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeprecatedSetReservationListAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeprecatedSetReservationListAccounts<'_, 'info>) -> Self {
         [
             accounts.master_edition.clone(),
             accounts.reservation_list.clone(),
@@ -1714,7 +1713,7 @@ pub fn deprecated_set_reservation_list_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedSetReservationListKeys = accounts.into();
-    let metas: [AccountMeta; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DeprecatedSetReservationListIxArgs = args.into();
     let data: DeprecatedSetReservationListIxData = args_full.into();
     Ok(Instruction {
@@ -1727,7 +1726,7 @@ pub fn deprecated_set_reservation_list_invoke<
     'info,
     A: Into<DeprecatedSetReservationListIxArgs>,
 >(
-    accounts: &DeprecatedSetReservationListAccounts<'_, 'info>,
+    accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deprecated_set_reservation_list_ix(accounts, args)?;
@@ -1739,7 +1738,7 @@ pub fn deprecated_set_reservation_list_invoke_signed<
     'info,
     A: Into<DeprecatedSetReservationListIxArgs>,
 >(
-    accounts: &DeprecatedSetReservationListAccounts<'_, 'info>,
+    accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -1749,8 +1748,8 @@ pub fn deprecated_set_reservation_list_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_set_reservation_list_verify_account_keys(
-    accounts: &DeprecatedSetReservationListAccounts<'_, '_>,
-    keys: &DeprecatedSetReservationListKeys,
+    accounts: DeprecatedSetReservationListAccounts<'_, '_>,
+    keys: DeprecatedSetReservationListKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.master_edition.key, &keys.master_edition),
@@ -1764,7 +1763,7 @@ pub fn deprecated_set_reservation_list_verify_account_keys(
     Ok(())
 }
 pub fn deprecated_set_reservation_list_verify_account_privileges<'me, 'info>(
-    accounts: &DeprecatedSetReservationListAccounts<'me, 'info>,
+    accounts: DeprecatedSetReservationListAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.master_edition, accounts.reservation_list] {
         if !should_be_writable.is_writable {
@@ -1817,10 +1816,8 @@ pub struct DeprecatedCreateReservationListKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&DeprecatedCreateReservationListAccounts<'_, '_>>
-    for DeprecatedCreateReservationListKeys
-{
-    fn from(accounts: &DeprecatedCreateReservationListAccounts) -> Self {
+impl From<DeprecatedCreateReservationListAccounts<'_, '_>> for DeprecatedCreateReservationListKeys {
+    fn from(accounts: DeprecatedCreateReservationListAccounts) -> Self {
         Self {
             reservation_list: *accounts.reservation_list.key,
             payer: *accounts.payer.key,
@@ -1833,10 +1830,10 @@ impl From<&DeprecatedCreateReservationListAccounts<'_, '_>>
         }
     }
 }
-impl From<&DeprecatedCreateReservationListKeys>
+impl From<DeprecatedCreateReservationListKeys>
     for [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedCreateReservationListKeys) -> Self {
+    fn from(keys: DeprecatedCreateReservationListKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.reservation_list,
@@ -1897,10 +1894,10 @@ impl From<[Pubkey; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeprecatedCreateReservationListAccounts<'_, 'info>>
+impl<'info> From<DeprecatedCreateReservationListAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeprecatedCreateReservationListAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeprecatedCreateReservationListAccounts<'_, 'info>) -> Self {
         [
             accounts.reservation_list.clone(),
             accounts.payer.clone(),
@@ -1964,7 +1961,7 @@ pub fn deprecated_create_reservation_list_ix<K: Into<DeprecatedCreateReservation
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedCreateReservationListKeys = accounts.into();
-    let metas: [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -1972,7 +1969,7 @@ pub fn deprecated_create_reservation_list_ix<K: Into<DeprecatedCreateReservation
     })
 }
 pub fn deprecated_create_reservation_list_invoke<'info>(
-    accounts: &DeprecatedCreateReservationListAccounts<'_, 'info>,
+    accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = deprecated_create_reservation_list_ix(accounts)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
@@ -1980,7 +1977,7 @@ pub fn deprecated_create_reservation_list_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn deprecated_create_reservation_list_invoke_signed<'info>(
-    accounts: &DeprecatedCreateReservationListAccounts<'_, 'info>,
+    accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = deprecated_create_reservation_list_ix(accounts)?;
@@ -1989,8 +1986,8 @@ pub fn deprecated_create_reservation_list_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_create_reservation_list_verify_account_keys(
-    accounts: &DeprecatedCreateReservationListAccounts<'_, '_>,
-    keys: &DeprecatedCreateReservationListKeys,
+    accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
+    keys: DeprecatedCreateReservationListKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.reservation_list.key, &keys.reservation_list),
@@ -2009,7 +2006,7 @@ pub fn deprecated_create_reservation_list_verify_account_keys(
     Ok(())
 }
 pub fn deprecated_create_reservation_list_verify_account_privileges<'me, 'info>(
-    accounts: &DeprecatedCreateReservationListAccounts<'me, 'info>,
+    accounts: DeprecatedCreateReservationListAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.reservation_list] {
         if !should_be_writable.is_writable {
@@ -2038,16 +2035,16 @@ pub struct SignMetadataKeys {
     ///Creator
     pub creator: Pubkey,
 }
-impl From<&SignMetadataAccounts<'_, '_>> for SignMetadataKeys {
-    fn from(accounts: &SignMetadataAccounts) -> Self {
+impl From<SignMetadataAccounts<'_, '_>> for SignMetadataKeys {
+    fn from(accounts: SignMetadataAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             creator: *accounts.creator.key,
         }
     }
 }
-impl From<&SignMetadataKeys> for [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] {
-    fn from(keys: &SignMetadataKeys) -> Self {
+impl From<SignMetadataKeys> for [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] {
+    fn from(keys: SignMetadataKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -2070,10 +2067,10 @@ impl From<[Pubkey; SIGN_METADATA_IX_ACCOUNTS_LEN]> for SignMetadataKeys {
         }
     }
 }
-impl<'info> From<&SignMetadataAccounts<'_, 'info>>
+impl<'info> From<SignMetadataAccounts<'_, 'info>>
     for [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SignMetadataAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SignMetadataAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
     }
 }
@@ -2118,20 +2115,20 @@ impl SignMetadataIxData {
 }
 pub fn sign_metadata_ix<K: Into<SignMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: SignMetadataKeys = accounts.into();
-    let metas: [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: SignMetadataIxData.try_to_vec()?,
     })
 }
-pub fn sign_metadata_invoke<'info>(accounts: &SignMetadataAccounts<'_, 'info>) -> ProgramResult {
+pub fn sign_metadata_invoke<'info>(accounts: SignMetadataAccounts<'_, 'info>) -> ProgramResult {
     let ix = sign_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn sign_metadata_invoke_signed<'info>(
-    accounts: &SignMetadataAccounts<'_, 'info>,
+    accounts: SignMetadataAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = sign_metadata_ix(accounts)?;
@@ -2139,8 +2136,8 @@ pub fn sign_metadata_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn sign_metadata_verify_account_keys(
-    accounts: &SignMetadataAccounts<'_, '_>,
-    keys: &SignMetadataKeys,
+    accounts: SignMetadataAccounts<'_, '_>,
+    keys: SignMetadataKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -2153,7 +2150,7 @@ pub fn sign_metadata_verify_account_keys(
     Ok(())
 }
 pub fn sign_metadata_verify_account_privileges<'me, 'info>(
-    accounts: &SignMetadataAccounts<'me, 'info>,
+    accounts: SignMetadataAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -2210,10 +2207,10 @@ pub struct DeprecatedMintPrintingTokensViaTokenKeys {
     ///Rent
     pub rent: Pubkey,
 }
-impl From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>>
+impl From<DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>>
     for DeprecatedMintPrintingTokensViaTokenKeys
 {
-    fn from(accounts: &DeprecatedMintPrintingTokensViaTokenAccounts) -> Self {
+    fn from(accounts: DeprecatedMintPrintingTokensViaTokenAccounts) -> Self {
         Self {
             destination: *accounts.destination.key,
             token: *accounts.token.key,
@@ -2229,10 +2226,10 @@ impl From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>>
         }
     }
 }
-impl From<&DeprecatedMintPrintingTokensViaTokenKeys>
+impl From<DeprecatedMintPrintingTokensViaTokenKeys>
     for [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedMintPrintingTokensViaTokenKeys) -> Self {
+    fn from(keys: DeprecatedMintPrintingTokensViaTokenKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.destination,
@@ -2299,10 +2296,10 @@ impl From<[Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>>
+impl<'info> From<DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>) -> Self {
         [
             accounts.destination.clone(),
             accounts.token.clone(),
@@ -2391,7 +2388,7 @@ pub fn deprecated_mint_printing_tokens_via_token_ix<
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: DeprecatedMintPrintingTokensViaTokenIxArgs = args.into();
     let data: DeprecatedMintPrintingTokensViaTokenIxData = args_full.into();
     Ok(Instruction {
@@ -2404,7 +2401,7 @@ pub fn deprecated_mint_printing_tokens_via_token_invoke<
     'info,
     A: Into<DeprecatedMintPrintingTokensViaTokenIxArgs>,
 >(
-    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deprecated_mint_printing_tokens_via_token_ix(accounts, args)?;
@@ -2416,7 +2413,7 @@ pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<
     'info,
     A: Into<DeprecatedMintPrintingTokensViaTokenIxArgs>,
 >(
-    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2426,8 +2423,8 @@ pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_mint_printing_tokens_via_token_verify_account_keys(
-    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
-    keys: &DeprecatedMintPrintingTokensViaTokenKeys,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
+    keys: DeprecatedMintPrintingTokensViaTokenKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.destination.key, &keys.destination),
@@ -2450,7 +2447,7 @@ pub fn deprecated_mint_printing_tokens_via_token_verify_account_keys(
     Ok(())
 }
 pub fn deprecated_mint_printing_tokens_via_token_verify_account_privileges<'me, 'info>(
-    accounts: &DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.destination,
@@ -2504,8 +2501,8 @@ pub struct DeprecatedMintPrintingTokensKeys {
     ///Rent
     pub rent: Pubkey,
 }
-impl From<&DeprecatedMintPrintingTokensAccounts<'_, '_>> for DeprecatedMintPrintingTokensKeys {
-    fn from(accounts: &DeprecatedMintPrintingTokensAccounts) -> Self {
+impl From<DeprecatedMintPrintingTokensAccounts<'_, '_>> for DeprecatedMintPrintingTokensKeys {
+    fn from(accounts: DeprecatedMintPrintingTokensAccounts) -> Self {
         Self {
             destination: *accounts.destination.key,
             printing_mint: *accounts.printing_mint.key,
@@ -2517,10 +2514,10 @@ impl From<&DeprecatedMintPrintingTokensAccounts<'_, '_>> for DeprecatedMintPrint
         }
     }
 }
-impl From<&DeprecatedMintPrintingTokensKeys>
+impl From<DeprecatedMintPrintingTokensKeys>
     for [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &DeprecatedMintPrintingTokensKeys) -> Self {
+    fn from(keys: DeprecatedMintPrintingTokensKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.destination,
@@ -2575,10 +2572,10 @@ impl From<[Pubkey; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&DeprecatedMintPrintingTokensAccounts<'_, 'info>>
+impl<'info> From<DeprecatedMintPrintingTokensAccounts<'_, 'info>>
     for [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &DeprecatedMintPrintingTokensAccounts<'_, 'info>) -> Self {
+    fn from(accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>) -> Self {
         [
             accounts.destination.clone(),
             accounts.printing_mint.clone(),
@@ -2657,7 +2654,7 @@ pub fn deprecated_mint_printing_tokens_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
-    let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: DeprecatedMintPrintingTokensIxArgs = args.into();
     let data: DeprecatedMintPrintingTokensIxData = args_full.into();
     Ok(Instruction {
@@ -2670,7 +2667,7 @@ pub fn deprecated_mint_printing_tokens_invoke<
     'info,
     A: Into<DeprecatedMintPrintingTokensIxArgs>,
 >(
-    accounts: &DeprecatedMintPrintingTokensAccounts<'_, 'info>,
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = deprecated_mint_printing_tokens_ix(accounts, args)?;
@@ -2682,7 +2679,7 @@ pub fn deprecated_mint_printing_tokens_invoke_signed<
     'info,
     A: Into<DeprecatedMintPrintingTokensIxArgs>,
 >(
-    accounts: &DeprecatedMintPrintingTokensAccounts<'_, 'info>,
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2692,8 +2689,8 @@ pub fn deprecated_mint_printing_tokens_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn deprecated_mint_printing_tokens_verify_account_keys(
-    accounts: &DeprecatedMintPrintingTokensAccounts<'_, '_>,
-    keys: &DeprecatedMintPrintingTokensKeys,
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
+    keys: DeprecatedMintPrintingTokensKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.destination.key, &keys.destination),
@@ -2711,7 +2708,7 @@ pub fn deprecated_mint_printing_tokens_verify_account_keys(
     Ok(())
 }
 pub fn deprecated_mint_printing_tokens_verify_account_privileges<'me, 'info>(
-    accounts: &DeprecatedMintPrintingTokensAccounts<'me, 'info>,
+    accounts: DeprecatedMintPrintingTokensAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.destination, accounts.printing_mint] {
         if !should_be_writable.is_writable {
@@ -2768,8 +2765,8 @@ pub struct CreateMasterEditionKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&CreateMasterEditionAccounts<'_, '_>> for CreateMasterEditionKeys {
-    fn from(accounts: &CreateMasterEditionAccounts) -> Self {
+impl From<CreateMasterEditionAccounts<'_, '_>> for CreateMasterEditionKeys {
+    fn from(accounts: CreateMasterEditionAccounts) -> Self {
         Self {
             edition: *accounts.edition.key,
             mint: *accounts.mint.key,
@@ -2783,8 +2780,8 @@ impl From<&CreateMasterEditionAccounts<'_, '_>> for CreateMasterEditionKeys {
         }
     }
 }
-impl From<&CreateMasterEditionKeys> for [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CreateMasterEditionKeys) -> Self {
+impl From<CreateMasterEditionKeys> for [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] {
+    fn from(keys: CreateMasterEditionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.edition,
@@ -2849,10 +2846,10 @@ impl From<[Pubkey; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]> for CreateMasterEditi
         }
     }
 }
-impl<'info> From<&CreateMasterEditionAccounts<'_, 'info>>
+impl<'info> From<CreateMasterEditionAccounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CreateMasterEditionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: CreateMasterEditionAccounts<'_, 'info>) -> Self {
         [
             accounts.edition.clone(),
             accounts.mint.clone(),
@@ -2931,7 +2928,7 @@ pub fn create_master_edition_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CreateMasterEditionKeys = accounts.into();
-    let metas: [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CreateMasterEditionIxArgs = args.into();
     let data: CreateMasterEditionIxData = args_full.into();
     Ok(Instruction {
@@ -2941,7 +2938,7 @@ pub fn create_master_edition_ix<
     })
 }
 pub fn create_master_edition_invoke<'info, A: Into<CreateMasterEditionIxArgs>>(
-    accounts: &CreateMasterEditionAccounts<'_, 'info>,
+    accounts: CreateMasterEditionAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = create_master_edition_ix(accounts, args)?;
@@ -2949,7 +2946,7 @@ pub fn create_master_edition_invoke<'info, A: Into<CreateMasterEditionIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn create_master_edition_invoke_signed<'info, A: Into<CreateMasterEditionIxArgs>>(
-    accounts: &CreateMasterEditionAccounts<'_, 'info>,
+    accounts: CreateMasterEditionAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -2958,8 +2955,8 @@ pub fn create_master_edition_invoke_signed<'info, A: Into<CreateMasterEditionIxA
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn create_master_edition_verify_account_keys(
-    accounts: &CreateMasterEditionAccounts<'_, '_>,
-    keys: &CreateMasterEditionKeys,
+    accounts: CreateMasterEditionAccounts<'_, '_>,
+    keys: CreateMasterEditionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.edition.key, &keys.edition),
@@ -2979,7 +2976,7 @@ pub fn create_master_edition_verify_account_keys(
     Ok(())
 }
 pub fn create_master_edition_verify_account_privileges<'me, 'info>(
-    accounts: &CreateMasterEditionAccounts<'me, 'info>,
+    accounts: CreateMasterEditionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.edition, accounts.mint] {
         if !should_be_writable.is_writable {
@@ -3060,10 +3057,10 @@ pub struct MintNewEditionFromMasterEditionViaTokenKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>>
+impl From<MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>>
     for MintNewEditionFromMasterEditionViaTokenKeys
 {
-    fn from(accounts: &MintNewEditionFromMasterEditionViaTokenAccounts) -> Self {
+    fn from(accounts: MintNewEditionFromMasterEditionViaTokenAccounts) -> Self {
         Self {
             new_metadata: *accounts.new_metadata.key,
             new_edition: *accounts.new_edition.key,
@@ -3082,10 +3079,10 @@ impl From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>>
         }
     }
 }
-impl From<&MintNewEditionFromMasterEditionViaTokenKeys>
+impl From<MintNewEditionFromMasterEditionViaTokenKeys>
     for [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &MintNewEditionFromMasterEditionViaTokenKeys) -> Self {
+    fn from(keys: MintNewEditionFromMasterEditionViaTokenKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.new_metadata,
@@ -3184,10 +3181,10 @@ impl From<[Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LE
         }
     }
 }
-impl<'info> From<&MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>>
+impl<'info> From<MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>>
     for [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>) -> Self {
+    fn from(accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>) -> Self {
         [
             accounts.new_metadata.clone(),
             accounts.new_edition.clone(),
@@ -3288,7 +3285,7 @@ pub fn mint_new_edition_from_master_edition_via_token_ix<
 ) -> std::io::Result<Instruction> {
     let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
     let metas: [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: MintNewEditionFromMasterEditionViaTokenIxArgs = args.into();
     let data: MintNewEditionFromMasterEditionViaTokenIxData = args_full.into();
     Ok(Instruction {
@@ -3301,7 +3298,7 @@ pub fn mint_new_edition_from_master_edition_via_token_invoke<
     'info,
     A: Into<MintNewEditionFromMasterEditionViaTokenIxArgs>,
 >(
-    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = mint_new_edition_from_master_edition_via_token_ix(accounts, args)?;
@@ -3313,7 +3310,7 @@ pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<
     'info,
     A: Into<MintNewEditionFromMasterEditionViaTokenIxArgs>,
 >(
-    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3323,8 +3320,8 @@ pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn mint_new_edition_from_master_edition_via_token_verify_account_keys(
-    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
-    keys: &MintNewEditionFromMasterEditionViaTokenKeys,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
+    keys: MintNewEditionFromMasterEditionViaTokenKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.new_metadata.key, &keys.new_metadata),
@@ -3352,7 +3349,7 @@ pub fn mint_new_edition_from_master_edition_via_token_verify_account_keys(
     Ok(())
 }
 pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges<'me, 'info>(
-    accounts: &MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.new_metadata,
@@ -3395,8 +3392,8 @@ pub struct ConvertMasterEditionV1ToV2Keys {
     ///Printing mint
     pub printing_mint: Pubkey,
 }
-impl From<&ConvertMasterEditionV1ToV2Accounts<'_, '_>> for ConvertMasterEditionV1ToV2Keys {
-    fn from(accounts: &ConvertMasterEditionV1ToV2Accounts) -> Self {
+impl From<ConvertMasterEditionV1ToV2Accounts<'_, '_>> for ConvertMasterEditionV1ToV2Keys {
+    fn from(accounts: ConvertMasterEditionV1ToV2Accounts) -> Self {
         Self {
             master_edition: *accounts.master_edition.key,
             one_time_auth: *accounts.one_time_auth.key,
@@ -3404,10 +3401,10 @@ impl From<&ConvertMasterEditionV1ToV2Accounts<'_, '_>> for ConvertMasterEditionV
         }
     }
 }
-impl From<&ConvertMasterEditionV1ToV2Keys>
+impl From<ConvertMasterEditionV1ToV2Keys>
     for [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &ConvertMasterEditionV1ToV2Keys) -> Self {
+    fn from(keys: ConvertMasterEditionV1ToV2Keys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.master_edition,
@@ -3438,10 +3435,10 @@ impl From<[Pubkey; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&ConvertMasterEditionV1ToV2Accounts<'_, 'info>>
+impl<'info> From<ConvertMasterEditionV1ToV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ConvertMasterEditionV1ToV2Accounts<'_, 'info>) -> Self {
+    fn from(accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>) -> Self {
         [
             accounts.master_edition.clone(),
             accounts.one_time_auth.clone(),
@@ -3495,7 +3492,7 @@ pub fn convert_master_edition_v1_to_v2_ix<K: Into<ConvertMasterEditionV1ToV2Keys
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
-    let metas: [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -3503,7 +3500,7 @@ pub fn convert_master_edition_v1_to_v2_ix<K: Into<ConvertMasterEditionV1ToV2Keys
     })
 }
 pub fn convert_master_edition_v1_to_v2_invoke<'info>(
-    accounts: &ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
@@ -3511,7 +3508,7 @@ pub fn convert_master_edition_v1_to_v2_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn convert_master_edition_v1_to_v2_invoke_signed<'info>(
-    accounts: &ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
@@ -3520,8 +3517,8 @@ pub fn convert_master_edition_v1_to_v2_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn convert_master_edition_v1_to_v2_verify_account_keys(
-    accounts: &ConvertMasterEditionV1ToV2Accounts<'_, '_>,
-    keys: &ConvertMasterEditionV1ToV2Keys,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
+    keys: ConvertMasterEditionV1ToV2Keys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.master_edition.key, &keys.master_edition),
@@ -3535,7 +3532,7 @@ pub fn convert_master_edition_v1_to_v2_verify_account_keys(
     Ok(())
 }
 pub fn convert_master_edition_v1_to_v2_verify_account_privileges<'me, 'info>(
-    accounts: &ConvertMasterEditionV1ToV2Accounts<'me, 'info>,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.master_edition,
@@ -3623,10 +3620,10 @@ pub struct MintNewEditionFromMasterEditionViaVaultProxyKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>>
+impl From<MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>>
     for MintNewEditionFromMasterEditionViaVaultProxyKeys
 {
-    fn from(accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts) -> Self {
+    fn from(accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts) -> Self {
         Self {
             new_metadata: *accounts.new_metadata.key,
             new_edition: *accounts.new_edition.key,
@@ -3648,10 +3645,10 @@ impl From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>>
         }
     }
 }
-impl From<&MintNewEditionFromMasterEditionViaVaultProxyKeys>
+impl From<MintNewEditionFromMasterEditionViaVaultProxyKeys>
     for [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &MintNewEditionFromMasterEditionViaVaultProxyKeys) -> Self {
+    fn from(keys: MintNewEditionFromMasterEditionViaVaultProxyKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.new_metadata,
@@ -3768,10 +3765,10 @@ impl From<[Pubkey; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOU
         }
     }
 }
-impl<'info> From<&MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>>
+impl<'info> From<MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>>
     for [AccountInfo<'info>; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>) -> Self {
+    fn from(accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>) -> Self {
         [
             accounts.new_metadata.clone(),
             accounts.new_edition.clone(),
@@ -3880,7 +3877,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix<
 ) -> std::io::Result<Instruction> {
     let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
     let metas: [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] =
-        (&keys).into();
+        keys.into();
     let args_full: MintNewEditionFromMasterEditionViaVaultProxyIxArgs = args.into();
     let data: MintNewEditionFromMasterEditionViaVaultProxyIxData = args_full.into();
     Ok(Instruction {
@@ -3893,7 +3890,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke<
     'info,
     A: Into<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>,
 >(
-    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(accounts, args)?;
@@ -3905,7 +3902,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<
     'info,
     A: Into<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>,
 >(
-    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -3915,8 +3912,8 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_keys(
-    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
-    keys: &MintNewEditionFromMasterEditionViaVaultProxyKeys,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
+    keys: MintNewEditionFromMasterEditionViaVaultProxyKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.new_metadata.key, &keys.new_metadata),
@@ -3953,7 +3950,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privi
     'me,
     'info,
 >(
-    accounts: &MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.new_metadata,
@@ -3988,15 +3985,15 @@ pub struct PuffMetadataKeys {
     ///Metadata account
     pub metadata: Pubkey,
 }
-impl From<&PuffMetadataAccounts<'_, '_>> for PuffMetadataKeys {
-    fn from(accounts: &PuffMetadataAccounts) -> Self {
+impl From<PuffMetadataAccounts<'_, '_>> for PuffMetadataKeys {
+    fn from(accounts: PuffMetadataAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
         }
     }
 }
-impl From<&PuffMetadataKeys> for [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] {
-    fn from(keys: &PuffMetadataKeys) -> Self {
+impl From<PuffMetadataKeys> for [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] {
+    fn from(keys: PuffMetadataKeys) -> Self {
         [AccountMeta {
             pubkey: keys.metadata,
             is_signer: false,
@@ -4011,10 +4008,10 @@ impl From<[Pubkey; PUFF_METADATA_IX_ACCOUNTS_LEN]> for PuffMetadataKeys {
         }
     }
 }
-impl<'info> From<&PuffMetadataAccounts<'_, 'info>>
+impl<'info> From<PuffMetadataAccounts<'_, 'info>>
     for [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &PuffMetadataAccounts<'_, 'info>) -> Self {
+    fn from(accounts: PuffMetadataAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone()]
     }
 }
@@ -4056,20 +4053,20 @@ impl PuffMetadataIxData {
 }
 pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
     let keys: PuffMetadataKeys = accounts.into();
-    let metas: [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: PuffMetadataIxData.try_to_vec()?,
     })
 }
-pub fn puff_metadata_invoke<'info>(accounts: &PuffMetadataAccounts<'_, 'info>) -> ProgramResult {
+pub fn puff_metadata_invoke<'info>(accounts: PuffMetadataAccounts<'_, 'info>) -> ProgramResult {
     let ix = puff_metadata_ix(accounts)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn puff_metadata_invoke_signed<'info>(
-    accounts: &PuffMetadataAccounts<'_, 'info>,
+    accounts: PuffMetadataAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = puff_metadata_ix(accounts)?;
@@ -4077,8 +4074,8 @@ pub fn puff_metadata_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn puff_metadata_verify_account_keys(
-    accounts: &PuffMetadataAccounts<'_, '_>,
-    keys: &PuffMetadataKeys,
+    accounts: PuffMetadataAccounts<'_, '_>,
+    keys: PuffMetadataKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [(accounts.metadata.key, &keys.metadata)] {
         if actual != expected {
@@ -4088,7 +4085,7 @@ pub fn puff_metadata_verify_account_keys(
     Ok(())
 }
 pub fn puff_metadata_verify_account_privileges<'me, 'info>(
-    accounts: &PuffMetadataAccounts<'me, 'info>,
+    accounts: PuffMetadataAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -4112,18 +4109,18 @@ pub struct UpdateMetadataAccountV2Keys {
     ///Update authority key
     pub update_authority: Pubkey,
 }
-impl From<&UpdateMetadataAccountV2Accounts<'_, '_>> for UpdateMetadataAccountV2Keys {
-    fn from(accounts: &UpdateMetadataAccountV2Accounts) -> Self {
+impl From<UpdateMetadataAccountV2Accounts<'_, '_>> for UpdateMetadataAccountV2Keys {
+    fn from(accounts: UpdateMetadataAccountV2Accounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             update_authority: *accounts.update_authority.key,
         }
     }
 }
-impl From<&UpdateMetadataAccountV2Keys>
+impl From<UpdateMetadataAccountV2Keys>
     for [AccountMeta; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &UpdateMetadataAccountV2Keys) -> Self {
+    fn from(keys: UpdateMetadataAccountV2Keys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -4146,10 +4143,10 @@ impl From<[Pubkey; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]> for UpdateMetada
         }
     }
 }
-impl<'info> From<&UpdateMetadataAccountV2Accounts<'_, 'info>>
+impl<'info> From<UpdateMetadataAccountV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UpdateMetadataAccountV2Accounts<'_, 'info>) -> Self {
+    fn from(accounts: UpdateMetadataAccountV2Accounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.update_authority.clone()]
     }
 }
@@ -4213,7 +4210,7 @@ pub fn update_metadata_account_v2_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UpdateMetadataAccountV2Keys = accounts.into();
-    let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UpdateMetadataAccountV2IxArgs = args.into();
     let data: UpdateMetadataAccountV2IxData = args_full.into();
     Ok(Instruction {
@@ -4223,7 +4220,7 @@ pub fn update_metadata_account_v2_ix<
     })
 }
 pub fn update_metadata_account_v2_invoke<'info, A: Into<UpdateMetadataAccountV2IxArgs>>(
-    accounts: &UpdateMetadataAccountV2Accounts<'_, 'info>,
+    accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = update_metadata_account_v2_ix(accounts, args)?;
@@ -4232,7 +4229,7 @@ pub fn update_metadata_account_v2_invoke<'info, A: Into<UpdateMetadataAccountV2I
     invoke(&ix, &account_info)
 }
 pub fn update_metadata_account_v2_invoke_signed<'info, A: Into<UpdateMetadataAccountV2IxArgs>>(
-    accounts: &UpdateMetadataAccountV2Accounts<'_, 'info>,
+    accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4242,8 +4239,8 @@ pub fn update_metadata_account_v2_invoke_signed<'info, A: Into<UpdateMetadataAcc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn update_metadata_account_v2_verify_account_keys(
-    accounts: &UpdateMetadataAccountV2Accounts<'_, '_>,
-    keys: &UpdateMetadataAccountV2Keys,
+    accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
+    keys: UpdateMetadataAccountV2Keys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -4256,7 +4253,7 @@ pub fn update_metadata_account_v2_verify_account_keys(
     Ok(())
 }
 pub fn update_metadata_account_v2_verify_account_privileges<'me, 'info>(
-    accounts: &UpdateMetadataAccountV2Accounts<'me, 'info>,
+    accounts: UpdateMetadataAccountV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -4305,8 +4302,8 @@ pub struct CreateMetadataAccountV2Keys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&CreateMetadataAccountV2Accounts<'_, '_>> for CreateMetadataAccountV2Keys {
-    fn from(accounts: &CreateMetadataAccountV2Accounts) -> Self {
+impl From<CreateMetadataAccountV2Accounts<'_, '_>> for CreateMetadataAccountV2Keys {
+    fn from(accounts: CreateMetadataAccountV2Accounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             mint: *accounts.mint.key,
@@ -4318,10 +4315,10 @@ impl From<&CreateMetadataAccountV2Accounts<'_, '_>> for CreateMetadataAccountV2K
         }
     }
 }
-impl From<&CreateMetadataAccountV2Keys>
+impl From<CreateMetadataAccountV2Keys>
     for [AccountMeta; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &CreateMetadataAccountV2Keys) -> Self {
+    fn from(keys: CreateMetadataAccountV2Keys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -4374,10 +4371,10 @@ impl From<[Pubkey; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]> for CreateMetada
         }
     }
 }
-impl<'info> From<&CreateMetadataAccountV2Accounts<'_, 'info>>
+impl<'info> From<CreateMetadataAccountV2Accounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CreateMetadataAccountV2Accounts<'_, 'info>) -> Self {
+    fn from(accounts: CreateMetadataAccountV2Accounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.mint.clone(),
@@ -4454,7 +4451,7 @@ pub fn create_metadata_account_v2_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CreateMetadataAccountV2Keys = accounts.into();
-    let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CreateMetadataAccountV2IxArgs = args.into();
     let data: CreateMetadataAccountV2IxData = args_full.into();
     Ok(Instruction {
@@ -4464,7 +4461,7 @@ pub fn create_metadata_account_v2_ix<
     })
 }
 pub fn create_metadata_account_v2_invoke<'info, A: Into<CreateMetadataAccountV2IxArgs>>(
-    accounts: &CreateMetadataAccountV2Accounts<'_, 'info>,
+    accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = create_metadata_account_v2_ix(accounts, args)?;
@@ -4473,7 +4470,7 @@ pub fn create_metadata_account_v2_invoke<'info, A: Into<CreateMetadataAccountV2I
     invoke(&ix, &account_info)
 }
 pub fn create_metadata_account_v2_invoke_signed<'info, A: Into<CreateMetadataAccountV2IxArgs>>(
-    accounts: &CreateMetadataAccountV2Accounts<'_, 'info>,
+    accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4483,8 +4480,8 @@ pub fn create_metadata_account_v2_invoke_signed<'info, A: Into<CreateMetadataAcc
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn create_metadata_account_v2_verify_account_keys(
-    accounts: &CreateMetadataAccountV2Accounts<'_, '_>,
-    keys: &CreateMetadataAccountV2Keys,
+    accounts: CreateMetadataAccountV2Accounts<'_, '_>,
+    keys: CreateMetadataAccountV2Keys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -4502,7 +4499,7 @@ pub fn create_metadata_account_v2_verify_account_keys(
     Ok(())
 }
 pub fn create_metadata_account_v2_verify_account_privileges<'me, 'info>(
-    accounts: &CreateMetadataAccountV2Accounts<'me, 'info>,
+    accounts: CreateMetadataAccountV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -4559,8 +4556,8 @@ pub struct CreateMasterEditionV3Keys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&CreateMasterEditionV3Accounts<'_, '_>> for CreateMasterEditionV3Keys {
-    fn from(accounts: &CreateMasterEditionV3Accounts) -> Self {
+impl From<CreateMasterEditionV3Accounts<'_, '_>> for CreateMasterEditionV3Keys {
+    fn from(accounts: CreateMasterEditionV3Accounts) -> Self {
         Self {
             edition: *accounts.edition.key,
             mint: *accounts.mint.key,
@@ -4574,8 +4571,8 @@ impl From<&CreateMasterEditionV3Accounts<'_, '_>> for CreateMasterEditionV3Keys 
         }
     }
 }
-impl From<&CreateMasterEditionV3Keys> for [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] {
-    fn from(keys: &CreateMasterEditionV3Keys) -> Self {
+impl From<CreateMasterEditionV3Keys> for [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] {
+    fn from(keys: CreateMasterEditionV3Keys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.edition,
@@ -4640,10 +4637,10 @@ impl From<[Pubkey; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]> for CreateMasterEd
         }
     }
 }
-impl<'info> From<&CreateMasterEditionV3Accounts<'_, 'info>>
+impl<'info> From<CreateMasterEditionV3Accounts<'_, 'info>>
     for [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &CreateMasterEditionV3Accounts<'_, 'info>) -> Self {
+    fn from(accounts: CreateMasterEditionV3Accounts<'_, 'info>) -> Self {
         [
             accounts.edition.clone(),
             accounts.mint.clone(),
@@ -4722,7 +4719,7 @@ pub fn create_master_edition_v3_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: CreateMasterEditionV3Keys = accounts.into();
-    let metas: [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: CreateMasterEditionV3IxArgs = args.into();
     let data: CreateMasterEditionV3IxData = args_full.into();
     Ok(Instruction {
@@ -4732,7 +4729,7 @@ pub fn create_master_edition_v3_ix<
     })
 }
 pub fn create_master_edition_v3_invoke<'info, A: Into<CreateMasterEditionV3IxArgs>>(
-    accounts: &CreateMasterEditionV3Accounts<'_, 'info>,
+    accounts: CreateMasterEditionV3Accounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = create_master_edition_v3_ix(accounts, args)?;
@@ -4741,7 +4738,7 @@ pub fn create_master_edition_v3_invoke<'info, A: Into<CreateMasterEditionV3IxArg
     invoke(&ix, &account_info)
 }
 pub fn create_master_edition_v3_invoke_signed<'info, A: Into<CreateMasterEditionV3IxArgs>>(
-    accounts: &CreateMasterEditionV3Accounts<'_, 'info>,
+    accounts: CreateMasterEditionV3Accounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -4751,8 +4748,8 @@ pub fn create_master_edition_v3_invoke_signed<'info, A: Into<CreateMasterEdition
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn create_master_edition_v3_verify_account_keys(
-    accounts: &CreateMasterEditionV3Accounts<'_, '_>,
-    keys: &CreateMasterEditionV3Keys,
+    accounts: CreateMasterEditionV3Accounts<'_, '_>,
+    keys: CreateMasterEditionV3Keys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.edition.key, &keys.edition),
@@ -4772,7 +4769,7 @@ pub fn create_master_edition_v3_verify_account_keys(
     Ok(())
 }
 pub fn create_master_edition_v3_verify_account_privileges<'me, 'info>(
-    accounts: &CreateMasterEditionV3Accounts<'me, 'info>,
+    accounts: CreateMasterEditionV3Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.edition, accounts.mint, accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -4821,8 +4818,8 @@ pub struct VerifyCollectionKeys {
     ///MasterEdition2 Account of the Collection Token
     pub collection_master_edition_account: Pubkey,
 }
-impl From<&VerifyCollectionAccounts<'_, '_>> for VerifyCollectionKeys {
-    fn from(accounts: &VerifyCollectionAccounts) -> Self {
+impl From<VerifyCollectionAccounts<'_, '_>> for VerifyCollectionKeys {
+    fn from(accounts: VerifyCollectionAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             collection_authority: *accounts.collection_authority.key,
@@ -4833,8 +4830,8 @@ impl From<&VerifyCollectionAccounts<'_, '_>> for VerifyCollectionKeys {
         }
     }
 }
-impl From<&VerifyCollectionKeys> for [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
-    fn from(keys: &VerifyCollectionKeys) -> Self {
+impl From<VerifyCollectionKeys> for [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
+    fn from(keys: VerifyCollectionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -4881,10 +4878,10 @@ impl From<[Pubkey; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for VerifyCollectionKeys 
         }
     }
 }
-impl<'info> From<&VerifyCollectionAccounts<'_, 'info>>
+impl<'info> From<VerifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &VerifyCollectionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: VerifyCollectionAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.collection_authority.clone(),
@@ -4942,7 +4939,7 @@ pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: VerifyCollectionKeys = accounts.into();
-    let metas: [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -4950,14 +4947,14 @@ pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>>(
     })
 }
 pub fn verify_collection_invoke<'info>(
-    accounts: &VerifyCollectionAccounts<'_, 'info>,
+    accounts: VerifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn verify_collection_invoke_signed<'info>(
-    accounts: &VerifyCollectionAccounts<'_, 'info>,
+    accounts: VerifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = verify_collection_ix(accounts)?;
@@ -4965,8 +4962,8 @@ pub fn verify_collection_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn verify_collection_verify_account_keys(
-    accounts: &VerifyCollectionAccounts<'_, '_>,
-    keys: &VerifyCollectionKeys,
+    accounts: VerifyCollectionAccounts<'_, '_>,
+    keys: VerifyCollectionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -4989,7 +4986,7 @@ pub fn verify_collection_verify_account_keys(
     Ok(())
 }
 pub fn verify_collection_verify_account_privileges<'me, 'info>(
-    accounts: &VerifyCollectionAccounts<'me, 'info>,
+    accounts: VerifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -5054,8 +5051,8 @@ pub struct UtilizeKeys {
     ///Program As Signer (Burner)
     pub burner: Pubkey,
 }
-impl From<&UtilizeAccounts<'_, '_>> for UtilizeKeys {
-    fn from(accounts: &UtilizeAccounts) -> Self {
+impl From<UtilizeAccounts<'_, '_>> for UtilizeKeys {
+    fn from(accounts: UtilizeAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             token_account: *accounts.token_account.key,
@@ -5071,8 +5068,8 @@ impl From<&UtilizeAccounts<'_, '_>> for UtilizeKeys {
         }
     }
 }
-impl From<&UtilizeKeys> for [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UtilizeKeys) -> Self {
+impl From<UtilizeKeys> for [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] {
+    fn from(keys: UtilizeKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -5149,8 +5146,8 @@ impl From<[Pubkey; UTILIZE_IX_ACCOUNTS_LEN]> for UtilizeKeys {
         }
     }
 }
-impl<'info> From<&UtilizeAccounts<'_, 'info>> for [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] {
-    fn from(accounts: &UtilizeAccounts<'_, 'info>) -> Self {
+impl<'info> From<UtilizeAccounts<'_, 'info>> for [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] {
+    fn from(accounts: UtilizeAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.token_account.clone(),
@@ -5230,7 +5227,7 @@ pub fn utilize_ix<K: Into<UtilizeKeys>, A: Into<UtilizeIxArgs>>(
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: UtilizeKeys = accounts.into();
-    let metas: [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: UtilizeIxArgs = args.into();
     let data: UtilizeIxData = args_full.into();
     Ok(Instruction {
@@ -5240,7 +5237,7 @@ pub fn utilize_ix<K: Into<UtilizeKeys>, A: Into<UtilizeIxArgs>>(
     })
 }
 pub fn utilize_invoke<'info, A: Into<UtilizeIxArgs>>(
-    accounts: &UtilizeAccounts<'_, 'info>,
+    accounts: UtilizeAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = utilize_ix(accounts, args)?;
@@ -5248,7 +5245,7 @@ pub fn utilize_invoke<'info, A: Into<UtilizeIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn utilize_invoke_signed<'info, A: Into<UtilizeIxArgs>>(
-    accounts: &UtilizeAccounts<'_, 'info>,
+    accounts: UtilizeAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5257,8 +5254,8 @@ pub fn utilize_invoke_signed<'info, A: Into<UtilizeIxArgs>>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn utilize_verify_account_keys(
-    accounts: &UtilizeAccounts<'_, '_>,
-    keys: &UtilizeKeys,
+    accounts: UtilizeAccounts<'_, '_>,
+    keys: UtilizeKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -5283,7 +5280,7 @@ pub fn utilize_verify_account_keys(
     Ok(())
 }
 pub fn utilize_verify_account_privileges<'me, 'info>(
-    accounts: &UtilizeAccounts<'me, 'info>,
+    accounts: UtilizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
         accounts.metadata,
@@ -5353,8 +5350,8 @@ pub struct ApproveUseAuthorityKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&ApproveUseAuthorityAccounts<'_, '_>> for ApproveUseAuthorityKeys {
-    fn from(accounts: &ApproveUseAuthorityAccounts) -> Self {
+impl From<ApproveUseAuthorityAccounts<'_, '_>> for ApproveUseAuthorityKeys {
+    fn from(accounts: ApproveUseAuthorityAccounts) -> Self {
         Self {
             use_authority_record: *accounts.use_authority_record.key,
             owner: *accounts.owner.key,
@@ -5370,8 +5367,8 @@ impl From<&ApproveUseAuthorityAccounts<'_, '_>> for ApproveUseAuthorityKeys {
         }
     }
 }
-impl From<&ApproveUseAuthorityKeys> for [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ApproveUseAuthorityKeys) -> Self {
+impl From<ApproveUseAuthorityKeys> for [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: ApproveUseAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.use_authority_record,
@@ -5448,10 +5445,10 @@ impl From<[Pubkey; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]> for ApproveUseAuthori
         }
     }
 }
-impl<'info> From<&ApproveUseAuthorityAccounts<'_, 'info>>
+impl<'info> From<ApproveUseAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ApproveUseAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ApproveUseAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.use_authority_record.clone(),
             accounts.owner.clone(),
@@ -5534,7 +5531,7 @@ pub fn approve_use_authority_ix<
     args: A,
 ) -> std::io::Result<Instruction> {
     let keys: ApproveUseAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     let args_full: ApproveUseAuthorityIxArgs = args.into();
     let data: ApproveUseAuthorityIxData = args_full.into();
     Ok(Instruction {
@@ -5544,7 +5541,7 @@ pub fn approve_use_authority_ix<
     })
 }
 pub fn approve_use_authority_invoke<'info, A: Into<ApproveUseAuthorityIxArgs>>(
-    accounts: &ApproveUseAuthorityAccounts<'_, 'info>,
+    accounts: ApproveUseAuthorityAccounts<'_, 'info>,
     args: A,
 ) -> ProgramResult {
     let ix = approve_use_authority_ix(accounts, args)?;
@@ -5552,7 +5549,7 @@ pub fn approve_use_authority_invoke<'info, A: Into<ApproveUseAuthorityIxArgs>>(
     invoke(&ix, &account_info)
 }
 pub fn approve_use_authority_invoke_signed<'info, A: Into<ApproveUseAuthorityIxArgs>>(
-    accounts: &ApproveUseAuthorityAccounts<'_, 'info>,
+    accounts: ApproveUseAuthorityAccounts<'_, 'info>,
     args: A,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
@@ -5561,8 +5558,8 @@ pub fn approve_use_authority_invoke_signed<'info, A: Into<ApproveUseAuthorityIxA
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn approve_use_authority_verify_account_keys(
-    accounts: &ApproveUseAuthorityAccounts<'_, '_>,
-    keys: &ApproveUseAuthorityKeys,
+    accounts: ApproveUseAuthorityAccounts<'_, '_>,
+    keys: ApproveUseAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (
@@ -5587,7 +5584,7 @@ pub fn approve_use_authority_verify_account_keys(
     Ok(())
 }
 pub fn approve_use_authority_verify_account_privileges<'me, 'info>(
-    accounts: &ApproveUseAuthorityAccounts<'me, 'info>,
+    accounts: ApproveUseAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
         if !should_be_writable.is_writable {
@@ -5644,8 +5641,8 @@ pub struct RevokeUseAuthorityKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&RevokeUseAuthorityAccounts<'_, '_>> for RevokeUseAuthorityKeys {
-    fn from(accounts: &RevokeUseAuthorityAccounts) -> Self {
+impl From<RevokeUseAuthorityAccounts<'_, '_>> for RevokeUseAuthorityKeys {
+    fn from(accounts: RevokeUseAuthorityAccounts) -> Self {
         Self {
             use_authority_record: *accounts.use_authority_record.key,
             owner: *accounts.owner.key,
@@ -5659,8 +5656,8 @@ impl From<&RevokeUseAuthorityAccounts<'_, '_>> for RevokeUseAuthorityKeys {
         }
     }
 }
-impl From<&RevokeUseAuthorityKeys> for [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
-    fn from(keys: &RevokeUseAuthorityKeys) -> Self {
+impl From<RevokeUseAuthorityKeys> for [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] {
+    fn from(keys: RevokeUseAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.use_authority_record,
@@ -5725,10 +5722,10 @@ impl From<[Pubkey; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]> for RevokeUseAuthority
         }
     }
 }
-impl<'info> From<&RevokeUseAuthorityAccounts<'_, 'info>>
+impl<'info> From<RevokeUseAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RevokeUseAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RevokeUseAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.use_authority_record.clone(),
             accounts.owner.clone(),
@@ -5792,7 +5789,7 @@ pub fn revoke_use_authority_ix<K: Into<RevokeUseAuthorityKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: RevokeUseAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -5800,14 +5797,14 @@ pub fn revoke_use_authority_ix<K: Into<RevokeUseAuthorityKeys>>(
     })
 }
 pub fn revoke_use_authority_invoke<'info>(
-    accounts: &RevokeUseAuthorityAccounts<'_, 'info>,
+    accounts: RevokeUseAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = revoke_use_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn revoke_use_authority_invoke_signed<'info>(
-    accounts: &RevokeUseAuthorityAccounts<'_, 'info>,
+    accounts: RevokeUseAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = revoke_use_authority_ix(accounts)?;
@@ -5815,8 +5812,8 @@ pub fn revoke_use_authority_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn revoke_use_authority_verify_account_keys(
-    accounts: &RevokeUseAuthorityAccounts<'_, '_>,
-    keys: &RevokeUseAuthorityKeys,
+    accounts: RevokeUseAuthorityAccounts<'_, '_>,
+    keys: RevokeUseAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (
@@ -5839,7 +5836,7 @@ pub fn revoke_use_authority_verify_account_keys(
     Ok(())
 }
 pub fn revoke_use_authority_verify_account_privileges<'me, 'info>(
-    accounts: &RevokeUseAuthorityAccounts<'me, 'info>,
+    accounts: RevokeUseAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
         if !should_be_writable.is_writable {
@@ -5884,8 +5881,8 @@ pub struct UnverifyCollectionKeys {
     ///Collection Authority Record PDA
     pub collection_authority_record: Pubkey,
 }
-impl From<&UnverifyCollectionAccounts<'_, '_>> for UnverifyCollectionKeys {
-    fn from(accounts: &UnverifyCollectionAccounts) -> Self {
+impl From<UnverifyCollectionAccounts<'_, '_>> for UnverifyCollectionKeys {
+    fn from(accounts: UnverifyCollectionAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             collection_authority: *accounts.collection_authority.key,
@@ -5896,8 +5893,8 @@ impl From<&UnverifyCollectionAccounts<'_, '_>> for UnverifyCollectionKeys {
         }
     }
 }
-impl From<&UnverifyCollectionKeys> for [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
-    fn from(keys: &UnverifyCollectionKeys) -> Self {
+impl From<UnverifyCollectionKeys> for [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
+    fn from(keys: UnverifyCollectionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -5944,10 +5941,10 @@ impl From<[Pubkey; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for UnverifyCollectionK
         }
     }
 }
-impl<'info> From<&UnverifyCollectionAccounts<'_, 'info>>
+impl<'info> From<UnverifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &UnverifyCollectionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: UnverifyCollectionAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.collection_authority.clone(),
@@ -6005,7 +6002,7 @@ pub fn unverify_collection_ix<K: Into<UnverifyCollectionKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: UnverifyCollectionKeys = accounts.into();
-    let metas: [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6013,14 +6010,14 @@ pub fn unverify_collection_ix<K: Into<UnverifyCollectionKeys>>(
     })
 }
 pub fn unverify_collection_invoke<'info>(
-    accounts: &UnverifyCollectionAccounts<'_, 'info>,
+    accounts: UnverifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = unverify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
 pub fn unverify_collection_invoke_signed<'info>(
-    accounts: &UnverifyCollectionAccounts<'_, 'info>,
+    accounts: UnverifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = unverify_collection_ix(accounts)?;
@@ -6028,8 +6025,8 @@ pub fn unverify_collection_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn unverify_collection_verify_account_keys(
-    accounts: &UnverifyCollectionAccounts<'_, '_>,
-    keys: &UnverifyCollectionKeys,
+    accounts: UnverifyCollectionAccounts<'_, '_>,
+    keys: UnverifyCollectionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -6055,7 +6052,7 @@ pub fn unverify_collection_verify_account_keys(
     Ok(())
 }
 pub fn unverify_collection_verify_account_privileges<'me, 'info>(
-    accounts: &UnverifyCollectionAccounts<'me, 'info>,
+    accounts: UnverifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -6108,8 +6105,8 @@ pub struct ApproveCollectionAuthorityKeys {
     ///Rent info
     pub rent: Pubkey,
 }
-impl From<&ApproveCollectionAuthorityAccounts<'_, '_>> for ApproveCollectionAuthorityKeys {
-    fn from(accounts: &ApproveCollectionAuthorityAccounts) -> Self {
+impl From<ApproveCollectionAuthorityAccounts<'_, '_>> for ApproveCollectionAuthorityKeys {
+    fn from(accounts: ApproveCollectionAuthorityAccounts) -> Self {
         Self {
             collection_authority_record: *accounts.collection_authority_record.key,
             new_collection_authority: *accounts.new_collection_authority.key,
@@ -6122,10 +6119,10 @@ impl From<&ApproveCollectionAuthorityAccounts<'_, '_>> for ApproveCollectionAuth
         }
     }
 }
-impl From<&ApproveCollectionAuthorityKeys>
+impl From<ApproveCollectionAuthorityKeys>
     for [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &ApproveCollectionAuthorityKeys) -> Self {
+    fn from(keys: ApproveCollectionAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.collection_authority_record,
@@ -6186,10 +6183,10 @@ impl From<[Pubkey; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]>
         }
     }
 }
-impl<'info> From<&ApproveCollectionAuthorityAccounts<'_, 'info>>
+impl<'info> From<ApproveCollectionAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ApproveCollectionAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ApproveCollectionAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.collection_authority_record.clone(),
             accounts.new_collection_authority.clone(),
@@ -6251,7 +6248,7 @@ pub fn approve_collection_authority_ix<K: Into<ApproveCollectionAuthorityKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ApproveCollectionAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6259,7 +6256,7 @@ pub fn approve_collection_authority_ix<K: Into<ApproveCollectionAuthorityKeys>>(
     })
 }
 pub fn approve_collection_authority_invoke<'info>(
-    accounts: &ApproveCollectionAuthorityAccounts<'_, 'info>,
+    accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = approve_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
@@ -6267,7 +6264,7 @@ pub fn approve_collection_authority_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn approve_collection_authority_invoke_signed<'info>(
-    accounts: &ApproveCollectionAuthorityAccounts<'_, 'info>,
+    accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = approve_collection_authority_ix(accounts)?;
@@ -6276,8 +6273,8 @@ pub fn approve_collection_authority_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn approve_collection_authority_verify_account_keys(
-    accounts: &ApproveCollectionAuthorityAccounts<'_, '_>,
-    keys: &ApproveCollectionAuthorityKeys,
+    accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
+    keys: ApproveCollectionAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (
@@ -6302,7 +6299,7 @@ pub fn approve_collection_authority_verify_account_keys(
     Ok(())
 }
 pub fn approve_collection_authority_verify_account_privileges<'me, 'info>(
-    accounts: &ApproveCollectionAuthorityAccounts<'me, 'info>,
+    accounts: ApproveCollectionAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.collection_authority_record] {
         if !should_be_writable.is_writable {
@@ -6339,8 +6336,8 @@ pub struct RevokeCollectionAuthorityKeys {
     ///Mint of Metadata
     pub mint: Pubkey,
 }
-impl From<&RevokeCollectionAuthorityAccounts<'_, '_>> for RevokeCollectionAuthorityKeys {
-    fn from(accounts: &RevokeCollectionAuthorityAccounts) -> Self {
+impl From<RevokeCollectionAuthorityAccounts<'_, '_>> for RevokeCollectionAuthorityKeys {
+    fn from(accounts: RevokeCollectionAuthorityAccounts) -> Self {
         Self {
             collection_authority_record: *accounts.collection_authority_record.key,
             update_authority: *accounts.update_authority.key,
@@ -6349,10 +6346,10 @@ impl From<&RevokeCollectionAuthorityAccounts<'_, '_>> for RevokeCollectionAuthor
         }
     }
 }
-impl From<&RevokeCollectionAuthorityKeys>
+impl From<RevokeCollectionAuthorityKeys>
     for [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &RevokeCollectionAuthorityKeys) -> Self {
+    fn from(keys: RevokeCollectionAuthorityKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.collection_authority_record,
@@ -6387,10 +6384,10 @@ impl From<[Pubkey; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]> for RevokeColle
         }
     }
 }
-impl<'info> From<&RevokeCollectionAuthorityAccounts<'_, 'info>>
+impl<'info> From<RevokeCollectionAuthorityAccounts<'_, 'info>>
     for [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RevokeCollectionAuthorityAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RevokeCollectionAuthorityAccounts<'_, 'info>) -> Self {
         [
             accounts.collection_authority_record.clone(),
             accounts.update_authority.clone(),
@@ -6444,7 +6441,7 @@ pub fn revoke_collection_authority_ix<K: Into<RevokeCollectionAuthorityKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: RevokeCollectionAuthorityKeys = accounts.into();
-    let metas: [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6452,7 +6449,7 @@ pub fn revoke_collection_authority_ix<K: Into<RevokeCollectionAuthorityKeys>>(
     })
 }
 pub fn revoke_collection_authority_invoke<'info>(
-    accounts: &RevokeCollectionAuthorityAccounts<'_, 'info>,
+    accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = revoke_collection_authority_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
@@ -6460,7 +6457,7 @@ pub fn revoke_collection_authority_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn revoke_collection_authority_invoke_signed<'info>(
-    accounts: &RevokeCollectionAuthorityAccounts<'_, 'info>,
+    accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = revoke_collection_authority_ix(accounts)?;
@@ -6469,8 +6466,8 @@ pub fn revoke_collection_authority_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn revoke_collection_authority_verify_account_keys(
-    accounts: &RevokeCollectionAuthorityAccounts<'_, '_>,
-    keys: &RevokeCollectionAuthorityKeys,
+    accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
+    keys: RevokeCollectionAuthorityKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (
@@ -6488,7 +6485,7 @@ pub fn revoke_collection_authority_verify_account_keys(
     Ok(())
 }
 pub fn revoke_collection_authority_verify_account_privileges<'me, 'info>(
-    accounts: &RevokeCollectionAuthorityAccounts<'me, 'info>,
+    accounts: RevokeCollectionAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.collection_authority_record] {
         if !should_be_writable.is_writable {
@@ -6541,8 +6538,8 @@ pub struct SetAndVerifyCollectionKeys {
     ///Collection Authority Record PDA
     pub collection_authority_record: Pubkey,
 }
-impl From<&SetAndVerifyCollectionAccounts<'_, '_>> for SetAndVerifyCollectionKeys {
-    fn from(accounts: &SetAndVerifyCollectionAccounts) -> Self {
+impl From<SetAndVerifyCollectionAccounts<'_, '_>> for SetAndVerifyCollectionKeys {
+    fn from(accounts: SetAndVerifyCollectionAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             collection_authority: *accounts.collection_authority.key,
@@ -6555,10 +6552,8 @@ impl From<&SetAndVerifyCollectionAccounts<'_, '_>> for SetAndVerifyCollectionKey
         }
     }
 }
-impl From<&SetAndVerifyCollectionKeys>
-    for [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]
-{
-    fn from(keys: &SetAndVerifyCollectionKeys) -> Self {
+impl From<SetAndVerifyCollectionKeys> for [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] {
+    fn from(keys: SetAndVerifyCollectionKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -6617,10 +6612,10 @@ impl From<[Pubkey; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]> for SetAndVerifyC
         }
     }
 }
-impl<'info> From<&SetAndVerifyCollectionAccounts<'_, 'info>>
+impl<'info> From<SetAndVerifyCollectionAccounts<'_, 'info>>
     for [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &SetAndVerifyCollectionAccounts<'_, 'info>) -> Self {
+    fn from(accounts: SetAndVerifyCollectionAccounts<'_, 'info>) -> Self {
         [
             accounts.metadata.clone(),
             accounts.collection_authority.clone(),
@@ -6682,7 +6677,7 @@ pub fn set_and_verify_collection_ix<K: Into<SetAndVerifyCollectionKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: SetAndVerifyCollectionKeys = accounts.into();
-    let metas: [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6690,7 +6685,7 @@ pub fn set_and_verify_collection_ix<K: Into<SetAndVerifyCollectionKeys>>(
     })
 }
 pub fn set_and_verify_collection_invoke<'info>(
-    accounts: &SetAndVerifyCollectionAccounts<'_, 'info>,
+    accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = set_and_verify_collection_ix(accounts)?;
     let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
@@ -6698,7 +6693,7 @@ pub fn set_and_verify_collection_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn set_and_verify_collection_invoke_signed<'info>(
-    accounts: &SetAndVerifyCollectionAccounts<'_, 'info>,
+    accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = set_and_verify_collection_ix(accounts)?;
@@ -6707,8 +6702,8 @@ pub fn set_and_verify_collection_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn set_and_verify_collection_verify_account_keys(
-    accounts: &SetAndVerifyCollectionAccounts<'_, '_>,
-    keys: &SetAndVerifyCollectionKeys,
+    accounts: SetAndVerifyCollectionAccounts<'_, '_>,
+    keys: SetAndVerifyCollectionKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -6736,7 +6731,7 @@ pub fn set_and_verify_collection_verify_account_keys(
     Ok(())
 }
 pub fn set_and_verify_collection_verify_account_privileges<'me, 'info>(
-    accounts: &SetAndVerifyCollectionAccounts<'me, 'info>,
+    accounts: SetAndVerifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {
@@ -6777,8 +6772,8 @@ pub struct FreezeDelegatedAccountKeys {
     ///Token Program
     pub token_program: Pubkey,
 }
-impl From<&FreezeDelegatedAccountAccounts<'_, '_>> for FreezeDelegatedAccountKeys {
-    fn from(accounts: &FreezeDelegatedAccountAccounts) -> Self {
+impl From<FreezeDelegatedAccountAccounts<'_, '_>> for FreezeDelegatedAccountKeys {
+    fn from(accounts: FreezeDelegatedAccountAccounts) -> Self {
         Self {
             delegate: *accounts.delegate.key,
             token_account: *accounts.token_account.key,
@@ -6788,8 +6783,8 @@ impl From<&FreezeDelegatedAccountAccounts<'_, '_>> for FreezeDelegatedAccountKey
         }
     }
 }
-impl From<&FreezeDelegatedAccountKeys> for [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &FreezeDelegatedAccountKeys) -> Self {
+impl From<FreezeDelegatedAccountKeys> for [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: FreezeDelegatedAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.delegate,
@@ -6830,10 +6825,10 @@ impl From<[Pubkey; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]> for FreezeDelegate
         }
     }
 }
-impl<'info> From<&FreezeDelegatedAccountAccounts<'_, 'info>>
+impl<'info> From<FreezeDelegatedAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &FreezeDelegatedAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: FreezeDelegatedAccountAccounts<'_, 'info>) -> Self {
         [
             accounts.delegate.clone(),
             accounts.token_account.clone(),
@@ -6889,7 +6884,7 @@ pub fn freeze_delegated_account_ix<K: Into<FreezeDelegatedAccountKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: FreezeDelegatedAccountKeys = accounts.into();
-    let metas: [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -6897,7 +6892,7 @@ pub fn freeze_delegated_account_ix<K: Into<FreezeDelegatedAccountKeys>>(
     })
 }
 pub fn freeze_delegated_account_invoke<'info>(
-    accounts: &FreezeDelegatedAccountAccounts<'_, 'info>,
+    accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = freeze_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
@@ -6905,7 +6900,7 @@ pub fn freeze_delegated_account_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn freeze_delegated_account_invoke_signed<'info>(
-    accounts: &FreezeDelegatedAccountAccounts<'_, 'info>,
+    accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = freeze_delegated_account_ix(accounts)?;
@@ -6914,8 +6909,8 @@ pub fn freeze_delegated_account_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn freeze_delegated_account_verify_account_keys(
-    accounts: &FreezeDelegatedAccountAccounts<'_, '_>,
-    keys: &FreezeDelegatedAccountKeys,
+    accounts: FreezeDelegatedAccountAccounts<'_, '_>,
+    keys: FreezeDelegatedAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.delegate.key, &keys.delegate),
@@ -6931,7 +6926,7 @@ pub fn freeze_delegated_account_verify_account_keys(
     Ok(())
 }
 pub fn freeze_delegated_account_verify_account_privileges<'me, 'info>(
-    accounts: &FreezeDelegatedAccountAccounts<'me, 'info>,
+    accounts: FreezeDelegatedAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.token_account] {
         if !should_be_writable.is_writable {
@@ -6972,8 +6967,8 @@ pub struct ThawDelegatedAccountKeys {
     ///Token Program
     pub token_program: Pubkey,
 }
-impl From<&ThawDelegatedAccountAccounts<'_, '_>> for ThawDelegatedAccountKeys {
-    fn from(accounts: &ThawDelegatedAccountAccounts) -> Self {
+impl From<ThawDelegatedAccountAccounts<'_, '_>> for ThawDelegatedAccountKeys {
+    fn from(accounts: ThawDelegatedAccountAccounts) -> Self {
         Self {
             delegate: *accounts.delegate.key,
             token_account: *accounts.token_account.key,
@@ -6983,8 +6978,8 @@ impl From<&ThawDelegatedAccountAccounts<'_, '_>> for ThawDelegatedAccountKeys {
         }
     }
 }
-impl From<&ThawDelegatedAccountKeys> for [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
-    fn from(keys: &ThawDelegatedAccountKeys) -> Self {
+impl From<ThawDelegatedAccountKeys> for [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] {
+    fn from(keys: ThawDelegatedAccountKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.delegate,
@@ -7025,10 +7020,10 @@ impl From<[Pubkey; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]> for ThawDelegatedAcc
         }
     }
 }
-impl<'info> From<&ThawDelegatedAccountAccounts<'_, 'info>>
+impl<'info> From<ThawDelegatedAccountAccounts<'_, 'info>>
     for [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &ThawDelegatedAccountAccounts<'_, 'info>) -> Self {
+    fn from(accounts: ThawDelegatedAccountAccounts<'_, 'info>) -> Self {
         [
             accounts.delegate.clone(),
             accounts.token_account.clone(),
@@ -7084,7 +7079,7 @@ pub fn thaw_delegated_account_ix<K: Into<ThawDelegatedAccountKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: ThawDelegatedAccountKeys = accounts.into();
-    let metas: [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7092,7 +7087,7 @@ pub fn thaw_delegated_account_ix<K: Into<ThawDelegatedAccountKeys>>(
     })
 }
 pub fn thaw_delegated_account_invoke<'info>(
-    accounts: &ThawDelegatedAccountAccounts<'_, 'info>,
+    accounts: ThawDelegatedAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = thaw_delegated_account_ix(accounts)?;
     let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
@@ -7100,7 +7095,7 @@ pub fn thaw_delegated_account_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn thaw_delegated_account_invoke_signed<'info>(
-    accounts: &ThawDelegatedAccountAccounts<'_, 'info>,
+    accounts: ThawDelegatedAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = thaw_delegated_account_ix(accounts)?;
@@ -7109,8 +7104,8 @@ pub fn thaw_delegated_account_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn thaw_delegated_account_verify_account_keys(
-    accounts: &ThawDelegatedAccountAccounts<'_, '_>,
-    keys: &ThawDelegatedAccountKeys,
+    accounts: ThawDelegatedAccountAccounts<'_, '_>,
+    keys: ThawDelegatedAccountKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.delegate.key, &keys.delegate),
@@ -7126,7 +7121,7 @@ pub fn thaw_delegated_account_verify_account_keys(
     Ok(())
 }
 pub fn thaw_delegated_account_verify_account_privileges<'me, 'info>(
-    accounts: &ThawDelegatedAccountAccounts<'me, 'info>,
+    accounts: ThawDelegatedAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.token_account] {
         if !should_be_writable.is_writable {
@@ -7155,18 +7150,18 @@ pub struct RemoveCreatorVerificationKeys {
     ///Creator
     pub creator: Pubkey,
 }
-impl From<&RemoveCreatorVerificationAccounts<'_, '_>> for RemoveCreatorVerificationKeys {
-    fn from(accounts: &RemoveCreatorVerificationAccounts) -> Self {
+impl From<RemoveCreatorVerificationAccounts<'_, '_>> for RemoveCreatorVerificationKeys {
+    fn from(accounts: RemoveCreatorVerificationAccounts) -> Self {
         Self {
             metadata: *accounts.metadata.key,
             creator: *accounts.creator.key,
         }
     }
 }
-impl From<&RemoveCreatorVerificationKeys>
+impl From<RemoveCreatorVerificationKeys>
     for [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]
 {
-    fn from(keys: &RemoveCreatorVerificationKeys) -> Self {
+    fn from(keys: RemoveCreatorVerificationKeys) -> Self {
         [
             AccountMeta {
                 pubkey: keys.metadata,
@@ -7189,10 +7184,10 @@ impl From<[Pubkey; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]> for RemoveCreat
         }
     }
 }
-impl<'info> From<&RemoveCreatorVerificationAccounts<'_, 'info>>
+impl<'info> From<RemoveCreatorVerificationAccounts<'_, 'info>>
     for [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN]
 {
-    fn from(accounts: &RemoveCreatorVerificationAccounts<'_, 'info>) -> Self {
+    fn from(accounts: RemoveCreatorVerificationAccounts<'_, 'info>) -> Self {
         [accounts.metadata.clone(), accounts.creator.clone()]
     }
 }
@@ -7239,7 +7234,7 @@ pub fn remove_creator_verification_ix<K: Into<RemoveCreatorVerificationKeys>>(
     accounts: K,
 ) -> std::io::Result<Instruction> {
     let keys: RemoveCreatorVerificationKeys = accounts.into();
-    let metas: [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] = (&keys).into();
+    let metas: [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
@@ -7247,7 +7242,7 @@ pub fn remove_creator_verification_ix<K: Into<RemoveCreatorVerificationKeys>>(
     })
 }
 pub fn remove_creator_verification_invoke<'info>(
-    accounts: &RemoveCreatorVerificationAccounts<'_, 'info>,
+    accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
 ) -> ProgramResult {
     let ix = remove_creator_verification_ix(accounts)?;
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
@@ -7255,7 +7250,7 @@ pub fn remove_creator_verification_invoke<'info>(
     invoke(&ix, &account_info)
 }
 pub fn remove_creator_verification_invoke_signed<'info>(
-    accounts: &RemoveCreatorVerificationAccounts<'_, 'info>,
+    accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let ix = remove_creator_verification_ix(accounts)?;
@@ -7264,8 +7259,8 @@ pub fn remove_creator_verification_invoke_signed<'info>(
     invoke_signed(&ix, &account_info, seeds)
 }
 pub fn remove_creator_verification_verify_account_keys(
-    accounts: &RemoveCreatorVerificationAccounts<'_, '_>,
-    keys: &RemoveCreatorVerificationKeys,
+    accounts: RemoveCreatorVerificationAccounts<'_, '_>,
+    keys: RemoveCreatorVerificationKeys,
 ) -> Result<(), (Pubkey, Pubkey)> {
     for (actual, expected) in [
         (accounts.metadata.key, &keys.metadata),
@@ -7278,7 +7273,7 @@ pub fn remove_creator_verification_verify_account_keys(
     Ok(())
 }
 pub fn remove_creator_verification_verify_account_privileges<'me, 'info>(
-    accounts: &RemoveCreatorVerificationAccounts<'me, 'info>,
+    accounts: RemoveCreatorVerificationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
         if !should_be_writable.is_writable {

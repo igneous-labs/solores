@@ -17,7 +17,7 @@ fn process_instruction(
         .unwrap();
     let accounts: UnstakeAccounts = cpi_slice.into();
 
-    if let Err((acc, err)) = unstake_verify_account_privileges(&accounts) {
+    if let Err((acc, err)) = unstake_verify_account_privileges(accounts) {
         solana_program::msg!(
             "Writable/signer privilege escalation for {}: {}",
             acc.key,
@@ -26,5 +26,5 @@ fn process_instruction(
         return Err(err);
     }
 
-    unstake_invoke(&accounts)
+    unstake_invoke(accounts)
 }
