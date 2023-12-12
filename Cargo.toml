@@ -21,6 +21,7 @@ members = [
 
 [workspace.dependencies]
 borsh = "^0.10"
+bs58 = ">=0.1"
 bytemuck = "^1"
 lazy_static = "^1"
 num-derive = "^0.3"

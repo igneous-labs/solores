@@ -4304,6 +4304,7 @@ dependencies = [
 name = "solores"
 version = "0.5.0"
 dependencies = [
+ "bs58",
  "clap 4.0.29",
  "env_logger 0.10.0",
  "heck",
@@ -4316,7 +4317,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.6",
- "solana-program",
  "syn 1.0.105",
  "test_utils",
  "toml 0.7.6",

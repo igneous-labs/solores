@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No longer generates `*IxArgs` struct if no instruction args.
 - No longer generates `*Accounts` `*Keys` structs and `*_verify_account_keys()` function if instruction has no account inputs.
 - All reference types for `*Keys` and `*Accounts` have been changed to pass by value since they impl `Copy`
+- Replaced `solana-program` dependency with `bs58`
 
 ## [0.4.0] - 2023-08-07
 

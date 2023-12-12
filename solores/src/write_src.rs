@@ -1,22 +1,35 @@
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
-use solana_program::pubkey::Pubkey;
-use std::{io::Write, path::Path, str::FromStr};
+use std::{io::Write, path::Path};
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
 const DEFAULT_PROGRAM_ID_STR: &str = "TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111";
 
+const MAX_BASE58_LEN: usize = 44;
+const PUBKEY_BYTES_SIZE: usize = 32;
+
+/// Copied from solana_program::Pubkey::from_str()
+/// so that we dont have to have solana_program as a dep
+fn is_valid_pubkey(s: &str) -> bool {
+    if s.len() > MAX_BASE58_LEN {
+        return false;
+    }
+    let pubkey_vec = match bs58::decode(s).into_vec() {
+        Ok(v) => v,
+        Err(_) => return false,
+    };
+    if pubkey_vec.len() != PUBKEY_BYTES_SIZE {
+        return false;
+    }
+    true
+}
+
 pub fn write_lib(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
-    let user_provided_id_opt = args.program_id.as_ref().and_then(|s| {
-        Pubkey::from_str(s)
-            .map_err(|e| {
-                log::warn!("provided pubkey {s} invalid. Error: {e}");
-                e
-            })
-            .ok()
-            .map(|_| s)
-    });
+    let user_provided_id_opt =
+        args.program_id
+            .as_ref()
+            .and_then(|s| if is_valid_pubkey(s) { Some(s) } else { None });
     let id = user_provided_id_opt
         .map(|string| string.as_ref())
         .unwrap_or_else(|| {
