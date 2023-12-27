@@ -219,6 +219,21 @@ impl MplTokenMetadataProgramIx {
         Ok(data)
     }
 }
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
 pub const CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 7;
 #[derive(Copy, Clone, Debug)]
 pub struct CreateMetadataAccountAccounts<'me, 'info> {
@@ -391,38 +406,56 @@ impl CreateMetadataAccountIxData {
         Ok(data)
     }
 }
-pub fn create_metadata_account_ix(
+pub fn create_metadata_account_ix_with_program_id(
+    program_id: Pubkey,
     keys: CreateMetadataAccountKeys,
     args: CreateMetadataAccountIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     let data: CreateMetadataAccountIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_metadata_account_invoke<'info>(
-    accounts: CreateMetadataAccountAccounts<'_, 'info>,
+pub fn create_metadata_account_ix(
+    keys: CreateMetadataAccountKeys,
+    args: CreateMetadataAccountIxArgs,
+) -> std::io::Result<Instruction> {
+    create_metadata_account_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn create_metadata_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMetadataAccountAccounts<'_, '_>,
     args: CreateMetadataAccountIxArgs,
 ) -> ProgramResult {
     let keys: CreateMetadataAccountKeys = accounts.into();
-    let ix = create_metadata_account_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = create_metadata_account_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn create_metadata_account_invoke_signed<'info>(
-    accounts: CreateMetadataAccountAccounts<'_, 'info>,
+pub fn create_metadata_account_invoke(
+    accounts: CreateMetadataAccountAccounts<'_, '_>,
+    args: CreateMetadataAccountIxArgs,
+) -> ProgramResult {
+    create_metadata_account_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn create_metadata_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMetadataAccountAccounts<'_, '_>,
     args: CreateMetadataAccountIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CreateMetadataAccountKeys = accounts.into();
-    let ix = create_metadata_account_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = create_metadata_account_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn create_metadata_account_invoke_signed(
+    accounts: CreateMetadataAccountAccounts<'_, '_>,
+    args: CreateMetadataAccountIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    create_metadata_account_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn create_metadata_account_verify_account_keys(
     accounts: CreateMetadataAccountAccounts<'_, '_>,
@@ -574,38 +607,56 @@ impl UpdateMetadataAccountIxData {
         Ok(data)
     }
 }
-pub fn update_metadata_account_ix(
+pub fn update_metadata_account_ix_with_program_id(
+    program_id: Pubkey,
     keys: UpdateMetadataAccountKeys,
     args: UpdateMetadataAccountIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     let data: UpdateMetadataAccountIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_metadata_account_invoke<'info>(
-    accounts: UpdateMetadataAccountAccounts<'_, 'info>,
+pub fn update_metadata_account_ix(
+    keys: UpdateMetadataAccountKeys,
+    args: UpdateMetadataAccountIxArgs,
+) -> std::io::Result<Instruction> {
+    update_metadata_account_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn update_metadata_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateMetadataAccountAccounts<'_, '_>,
     args: UpdateMetadataAccountIxArgs,
 ) -> ProgramResult {
     let keys: UpdateMetadataAccountKeys = accounts.into();
-    let ix = update_metadata_account_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = update_metadata_account_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn update_metadata_account_invoke_signed<'info>(
-    accounts: UpdateMetadataAccountAccounts<'_, 'info>,
+pub fn update_metadata_account_invoke(
+    accounts: UpdateMetadataAccountAccounts<'_, '_>,
+    args: UpdateMetadataAccountIxArgs,
+) -> ProgramResult {
+    update_metadata_account_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_metadata_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateMetadataAccountAccounts<'_, '_>,
     args: UpdateMetadataAccountIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UpdateMetadataAccountKeys = accounts.into();
-    let ix = update_metadata_account_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = update_metadata_account_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn update_metadata_account_invoke_signed(
+    accounts: UpdateMetadataAccountAccounts<'_, '_>,
+    args: UpdateMetadataAccountIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    update_metadata_account_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_metadata_account_verify_account_keys(
     accounts: UpdateMetadataAccountAccounts<'_, '_>,
@@ -912,38 +963,56 @@ impl DeprecatedCreateMasterEditionIxData {
         Ok(data)
     }
 }
-pub fn deprecated_create_master_edition_ix(
+pub fn deprecated_create_master_edition_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedCreateMasterEditionKeys,
     args: DeprecatedCreateMasterEditionIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
     let data: DeprecatedCreateMasterEditionIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_create_master_edition_invoke<'info>(
-    accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
+pub fn deprecated_create_master_edition_ix(
+    keys: DeprecatedCreateMasterEditionKeys,
+    args: DeprecatedCreateMasterEditionIxArgs,
+) -> std::io::Result<Instruction> {
+    deprecated_create_master_edition_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn deprecated_create_master_edition_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
     args: DeprecatedCreateMasterEditionIxArgs,
 ) -> ProgramResult {
     let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
-    let ix = deprecated_create_master_edition_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_create_master_edition_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_create_master_edition_invoke_signed<'info>(
-    accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
+pub fn deprecated_create_master_edition_invoke(
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
+    args: DeprecatedCreateMasterEditionIxArgs,
+) -> ProgramResult {
+    deprecated_create_master_edition_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deprecated_create_master_edition_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
     args: DeprecatedCreateMasterEditionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
-    let ix = deprecated_create_master_edition_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_create_master_edition_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_create_master_edition_invoke_signed(
+    accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
+    args: DeprecatedCreateMasterEditionIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_create_master_edition_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn deprecated_create_master_edition_verify_account_keys(
     accounts: DeprecatedCreateMasterEditionAccounts<'_, '_>,
@@ -1323,38 +1392,65 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke<'info>(
-    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(
+    keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
+) -> std::io::Result<Instruction> {
+    deprecated_mint_new_edition_from_master_edition_via_printing_token_ix_with_program_id(
+        crate::ID,
+        keys,
+    )
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(keys)?;
-    let account_info: [AccountInfo<'info>;
-        DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix_with_program_id(
+        program_id, keys,
+    )?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed<'info>(
-    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke(
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
+) -> ProgramResult {
+    deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_with_program_id(
+        crate::ID,
+        accounts,
+    )
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(keys)?;
-    let account_info: [AccountInfo<'info>;
-        DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix_with_program_id(
+        program_id, keys,
+    )?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed(
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        seeds,
+    )
 }
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_keys(
     accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, '_>,
@@ -1561,34 +1657,49 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
         Ok(data)
     }
 }
-pub fn update_primary_sale_happened_via_token_ix(
+pub fn update_primary_sale_happened_via_token_ix_with_program_id(
+    program_id: Pubkey,
     keys: UpdatePrimarySaleHappenedViaTokenKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: UpdatePrimarySaleHappenedViaTokenIxData.try_to_vec()?,
     })
 }
-pub fn update_primary_sale_happened_via_token_invoke<'info>(
-    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
+pub fn update_primary_sale_happened_via_token_ix(
+    keys: UpdatePrimarySaleHappenedViaTokenKeys,
+) -> std::io::Result<Instruction> {
+    update_primary_sale_happened_via_token_ix_with_program_id(crate::ID, keys)
+}
+pub fn update_primary_sale_happened_via_token_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
-    let ix = update_primary_sale_happened_via_token_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = update_primary_sale_happened_via_token_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn update_primary_sale_happened_via_token_invoke_signed<'info>(
-    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
+pub fn update_primary_sale_happened_via_token_invoke(
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
+) -> ProgramResult {
+    update_primary_sale_happened_via_token_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_primary_sale_happened_via_token_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
-    let ix = update_primary_sale_happened_via_token_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = update_primary_sale_happened_via_token_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn update_primary_sale_happened_via_token_invoke_signed(
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    update_primary_sale_happened_via_token_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_primary_sale_happened_via_token_verify_account_keys(
     accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, '_>,
@@ -1760,38 +1871,56 @@ impl DeprecatedSetReservationListIxData {
         Ok(data)
     }
 }
-pub fn deprecated_set_reservation_list_ix(
+pub fn deprecated_set_reservation_list_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedSetReservationListKeys,
     args: DeprecatedSetReservationListIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
     let data: DeprecatedSetReservationListIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_set_reservation_list_invoke<'info>(
-    accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
+pub fn deprecated_set_reservation_list_ix(
+    keys: DeprecatedSetReservationListKeys,
+    args: DeprecatedSetReservationListIxArgs,
+) -> std::io::Result<Instruction> {
+    deprecated_set_reservation_list_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn deprecated_set_reservation_list_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedSetReservationListAccounts<'_, '_>,
     args: DeprecatedSetReservationListIxArgs,
 ) -> ProgramResult {
     let keys: DeprecatedSetReservationListKeys = accounts.into();
-    let ix = deprecated_set_reservation_list_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_set_reservation_list_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_set_reservation_list_invoke_signed<'info>(
-    accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
+pub fn deprecated_set_reservation_list_invoke(
+    accounts: DeprecatedSetReservationListAccounts<'_, '_>,
+    args: DeprecatedSetReservationListIxArgs,
+) -> ProgramResult {
+    deprecated_set_reservation_list_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deprecated_set_reservation_list_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedSetReservationListAccounts<'_, '_>,
     args: DeprecatedSetReservationListIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedSetReservationListKeys = accounts.into();
-    let ix = deprecated_set_reservation_list_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_set_reservation_list_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_set_reservation_list_invoke_signed(
+    accounts: DeprecatedSetReservationListAccounts<'_, '_>,
+    args: DeprecatedSetReservationListIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_set_reservation_list_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn deprecated_set_reservation_list_verify_account_keys(
     accounts: DeprecatedSetReservationListAccounts<'_, '_>,
@@ -2015,34 +2144,49 @@ impl DeprecatedCreateReservationListIxData {
         Ok(data)
     }
 }
-pub fn deprecated_create_reservation_list_ix(
+pub fn deprecated_create_reservation_list_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedCreateReservationListKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: DeprecatedCreateReservationListIxData.try_to_vec()?,
     })
 }
-pub fn deprecated_create_reservation_list_invoke<'info>(
-    accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
+pub fn deprecated_create_reservation_list_ix(
+    keys: DeprecatedCreateReservationListKeys,
+) -> std::io::Result<Instruction> {
+    deprecated_create_reservation_list_ix_with_program_id(crate::ID, keys)
+}
+pub fn deprecated_create_reservation_list_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: DeprecatedCreateReservationListKeys = accounts.into();
-    let ix = deprecated_create_reservation_list_ix(keys)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_create_reservation_list_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_create_reservation_list_invoke_signed<'info>(
-    accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
+pub fn deprecated_create_reservation_list_invoke(
+    accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
+) -> ProgramResult {
+    deprecated_create_reservation_list_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn deprecated_create_reservation_list_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedCreateReservationListKeys = accounts.into();
-    let ix = deprecated_create_reservation_list_ix(keys)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_create_reservation_list_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_create_reservation_list_invoke_signed(
+    accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_create_reservation_list_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn deprecated_create_reservation_list_verify_account_keys(
     accounts: DeprecatedCreateReservationListAccounts<'_, '_>,
@@ -2184,28 +2328,45 @@ impl SignMetadataIxData {
         Ok(data)
     }
 }
-pub fn sign_metadata_ix(keys: SignMetadataKeys) -> std::io::Result<Instruction> {
+pub fn sign_metadata_ix_with_program_id(
+    program_id: Pubkey,
+    keys: SignMetadataKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: SignMetadataIxData.try_to_vec()?,
     })
 }
-pub fn sign_metadata_invoke<'info>(accounts: SignMetadataAccounts<'_, 'info>) -> ProgramResult {
-    let keys: SignMetadataKeys = accounts.into();
-    let ix = sign_metadata_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn sign_metadata_ix(keys: SignMetadataKeys) -> std::io::Result<Instruction> {
+    sign_metadata_ix_with_program_id(crate::ID, keys)
 }
-pub fn sign_metadata_invoke_signed<'info>(
-    accounts: SignMetadataAccounts<'_, 'info>,
+pub fn sign_metadata_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SignMetadataAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: SignMetadataKeys = accounts.into();
+    let ix = sign_metadata_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn sign_metadata_invoke(accounts: SignMetadataAccounts<'_, '_>) -> ProgramResult {
+    sign_metadata_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn sign_metadata_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SignMetadataAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SignMetadataKeys = accounts.into();
-    let ix = sign_metadata_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = sign_metadata_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn sign_metadata_invoke_signed(
+    accounts: SignMetadataAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    sign_metadata_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn sign_metadata_verify_account_keys(
     accounts: SignMetadataAccounts<'_, '_>,
@@ -2463,7 +2624,8 @@ impl DeprecatedMintPrintingTokensViaTokenIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_printing_tokens_via_token_ix(
+pub fn deprecated_mint_printing_tokens_via_token_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedMintPrintingTokensViaTokenKeys,
     args: DeprecatedMintPrintingTokensViaTokenIxArgs,
 ) -> std::io::Result<Instruction> {
@@ -2471,31 +2633,53 @@ pub fn deprecated_mint_printing_tokens_via_token_ix(
         keys.into();
     let data: DeprecatedMintPrintingTokensViaTokenIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_printing_tokens_via_token_invoke<'info>(
-    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
+pub fn deprecated_mint_printing_tokens_via_token_ix(
+    keys: DeprecatedMintPrintingTokensViaTokenKeys,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
+) -> std::io::Result<Instruction> {
+    deprecated_mint_printing_tokens_via_token_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn deprecated_mint_printing_tokens_via_token_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
     args: DeprecatedMintPrintingTokensViaTokenIxArgs,
 ) -> ProgramResult {
     let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
-    let ix = deprecated_mint_printing_tokens_via_token_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_mint_printing_tokens_via_token_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<'info>(
-    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
+pub fn deprecated_mint_printing_tokens_via_token_invoke(
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
+) -> ProgramResult {
+    deprecated_mint_printing_tokens_via_token_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deprecated_mint_printing_tokens_via_token_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
     args: DeprecatedMintPrintingTokensViaTokenIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
-    let ix = deprecated_mint_printing_tokens_via_token_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_mint_printing_tokens_via_token_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_mint_printing_tokens_via_token_invoke_signed(
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_mint_printing_tokens_via_token_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn deprecated_mint_printing_tokens_via_token_verify_account_keys(
     accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, '_>,
@@ -2733,38 +2917,56 @@ impl DeprecatedMintPrintingTokensIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_printing_tokens_ix(
+pub fn deprecated_mint_printing_tokens_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeprecatedMintPrintingTokensKeys,
     args: DeprecatedMintPrintingTokensIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] = keys.into();
     let data: DeprecatedMintPrintingTokensIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_printing_tokens_invoke<'info>(
-    accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
+pub fn deprecated_mint_printing_tokens_ix(
+    keys: DeprecatedMintPrintingTokensKeys,
+    args: DeprecatedMintPrintingTokensIxArgs,
+) -> std::io::Result<Instruction> {
+    deprecated_mint_printing_tokens_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn deprecated_mint_printing_tokens_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
     args: DeprecatedMintPrintingTokensIxArgs,
 ) -> ProgramResult {
     let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
-    let ix = deprecated_mint_printing_tokens_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deprecated_mint_printing_tokens_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deprecated_mint_printing_tokens_invoke_signed<'info>(
-    accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
+pub fn deprecated_mint_printing_tokens_invoke(
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
+    args: DeprecatedMintPrintingTokensIxArgs,
+) -> ProgramResult {
+    deprecated_mint_printing_tokens_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deprecated_mint_printing_tokens_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
     args: DeprecatedMintPrintingTokensIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
-    let ix = deprecated_mint_printing_tokens_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deprecated_mint_printing_tokens_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deprecated_mint_printing_tokens_invoke_signed(
+    accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
+    args: DeprecatedMintPrintingTokensIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deprecated_mint_printing_tokens_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn deprecated_mint_printing_tokens_verify_account_keys(
     accounts: DeprecatedMintPrintingTokensAccounts<'_, '_>,
@@ -3010,36 +3212,56 @@ impl CreateMasterEditionIxData {
         Ok(data)
     }
 }
-pub fn create_master_edition_ix(
+pub fn create_master_edition_ix_with_program_id(
+    program_id: Pubkey,
     keys: CreateMasterEditionKeys,
     args: CreateMasterEditionIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
     let data: CreateMasterEditionIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_master_edition_invoke<'info>(
-    accounts: CreateMasterEditionAccounts<'_, 'info>,
+pub fn create_master_edition_ix(
+    keys: CreateMasterEditionKeys,
+    args: CreateMasterEditionIxArgs,
+) -> std::io::Result<Instruction> {
+    create_master_edition_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn create_master_edition_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMasterEditionAccounts<'_, '_>,
     args: CreateMasterEditionIxArgs,
 ) -> ProgramResult {
     let keys: CreateMasterEditionKeys = accounts.into();
-    let ix = create_master_edition_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = create_master_edition_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn create_master_edition_invoke_signed<'info>(
-    accounts: CreateMasterEditionAccounts<'_, 'info>,
+pub fn create_master_edition_invoke(
+    accounts: CreateMasterEditionAccounts<'_, '_>,
+    args: CreateMasterEditionIxArgs,
+) -> ProgramResult {
+    create_master_edition_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn create_master_edition_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMasterEditionAccounts<'_, '_>,
     args: CreateMasterEditionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CreateMasterEditionKeys = accounts.into();
-    let ix = create_master_edition_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = create_master_edition_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn create_master_edition_invoke_signed(
+    accounts: CreateMasterEditionAccounts<'_, '_>,
+    args: CreateMasterEditionIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    create_master_edition_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn create_master_edition_verify_account_keys(
     accounts: CreateMasterEditionAccounts<'_, '_>,
@@ -3375,7 +3597,8 @@ impl MintNewEditionFromMasterEditionViaTokenIxData {
         Ok(data)
     }
 }
-pub fn mint_new_edition_from_master_edition_via_token_ix(
+pub fn mint_new_edition_from_master_edition_via_token_ix_with_program_id(
+    program_id: Pubkey,
     keys: MintNewEditionFromMasterEditionViaTokenKeys,
     args: MintNewEditionFromMasterEditionViaTokenIxArgs,
 ) -> std::io::Result<Instruction> {
@@ -3383,31 +3606,55 @@ pub fn mint_new_edition_from_master_edition_via_token_ix(
         keys.into();
     let data: MintNewEditionFromMasterEditionViaTokenIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn mint_new_edition_from_master_edition_via_token_invoke<'info>(
-    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
+pub fn mint_new_edition_from_master_edition_via_token_ix(
+    keys: MintNewEditionFromMasterEditionViaTokenKeys,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
+) -> std::io::Result<Instruction> {
+    mint_new_edition_from_master_edition_via_token_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn mint_new_edition_from_master_edition_via_token_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
     args: MintNewEditionFromMasterEditionViaTokenIxArgs,
 ) -> ProgramResult {
     let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
-    let ix = mint_new_edition_from_master_edition_via_token_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix =
+        mint_new_edition_from_master_edition_via_token_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<'info>(
-    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
+pub fn mint_new_edition_from_master_edition_via_token_invoke(
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
+) -> ProgramResult {
+    mint_new_edition_from_master_edition_via_token_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn mint_new_edition_from_master_edition_via_token_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
     args: MintNewEditionFromMasterEditionViaTokenIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
-    let ix = mint_new_edition_from_master_edition_via_token_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix =
+        mint_new_edition_from_master_edition_via_token_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn mint_new_edition_from_master_edition_via_token_invoke_signed(
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    mint_new_edition_from_master_edition_via_token_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn mint_new_edition_from_master_edition_via_token_verify_account_keys(
     accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, '_>,
@@ -3590,34 +3837,49 @@ impl ConvertMasterEditionV1ToV2IxData {
         Ok(data)
     }
 }
-pub fn convert_master_edition_v1_to_v2_ix(
+pub fn convert_master_edition_v1_to_v2_ix_with_program_id(
+    program_id: Pubkey,
     keys: ConvertMasterEditionV1ToV2Keys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ConvertMasterEditionV1ToV2IxData.try_to_vec()?,
     })
 }
-pub fn convert_master_edition_v1_to_v2_invoke<'info>(
-    accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
+pub fn convert_master_edition_v1_to_v2_ix(
+    keys: ConvertMasterEditionV1ToV2Keys,
+) -> std::io::Result<Instruction> {
+    convert_master_edition_v1_to_v2_ix_with_program_id(crate::ID, keys)
+}
+pub fn convert_master_edition_v1_to_v2_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
-    let ix = convert_master_edition_v1_to_v2_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = convert_master_edition_v1_to_v2_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn convert_master_edition_v1_to_v2_invoke_signed<'info>(
-    accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
+pub fn convert_master_edition_v1_to_v2_invoke(
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
+) -> ProgramResult {
+    convert_master_edition_v1_to_v2_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn convert_master_edition_v1_to_v2_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
-    let ix = convert_master_edition_v1_to_v2_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = convert_master_edition_v1_to_v2_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn convert_master_edition_v1_to_v2_invoke_signed(
+    accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    convert_master_edition_v1_to_v2_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn convert_master_edition_v1_to_v2_verify_account_keys(
     accounts: ConvertMasterEditionV1ToV2Accounts<'_, '_>,
@@ -3977,7 +4239,8 @@ impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
         Ok(data)
     }
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix(
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix_with_program_id(
+    program_id: Pubkey,
     keys: MintNewEditionFromMasterEditionViaVaultProxyKeys,
     args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 ) -> std::io::Result<Instruction> {
@@ -3985,31 +4248,61 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix(
         keys.into();
     let data: MintNewEditionFromMasterEditionViaVaultProxyIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke<'info>(
-    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix(
+    keys: MintNewEditionFromMasterEditionViaVaultProxyKeys,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
+) -> std::io::Result<Instruction> {
+    mint_new_edition_from_master_edition_via_vault_proxy_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
     args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 ) -> ProgramResult {
     let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
-    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix_with_program_id(
+        program_id, keys, args,
+    )?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<'info>(
-    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke(
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
+) -> ProgramResult {
+    mint_new_edition_from_master_edition_via_vault_proxy_invoke_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+    )
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
     args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
-    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix_with_program_id(
+        program_id, keys, args,
+    )?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed(
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_keys(
     accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, '_>,
@@ -4166,28 +4459,45 @@ impl PuffMetadataIxData {
         Ok(data)
     }
 }
-pub fn puff_metadata_ix(keys: PuffMetadataKeys) -> std::io::Result<Instruction> {
+pub fn puff_metadata_ix_with_program_id(
+    program_id: Pubkey,
+    keys: PuffMetadataKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: PuffMetadataIxData.try_to_vec()?,
     })
 }
-pub fn puff_metadata_invoke<'info>(accounts: PuffMetadataAccounts<'_, 'info>) -> ProgramResult {
-    let keys: PuffMetadataKeys = accounts.into();
-    let ix = puff_metadata_ix(keys)?;
-    let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn puff_metadata_ix(keys: PuffMetadataKeys) -> std::io::Result<Instruction> {
+    puff_metadata_ix_with_program_id(crate::ID, keys)
 }
-pub fn puff_metadata_invoke_signed<'info>(
-    accounts: PuffMetadataAccounts<'_, 'info>,
+pub fn puff_metadata_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: PuffMetadataAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: PuffMetadataKeys = accounts.into();
+    let ix = puff_metadata_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn puff_metadata_invoke(accounts: PuffMetadataAccounts<'_, '_>) -> ProgramResult {
+    puff_metadata_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn puff_metadata_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PuffMetadataAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: PuffMetadataKeys = accounts.into();
-    let ix = puff_metadata_ix(keys)?;
-    let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = puff_metadata_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn puff_metadata_invoke_signed(
+    accounts: PuffMetadataAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    puff_metadata_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn puff_metadata_verify_account_keys(
     accounts: PuffMetadataAccounts<'_, '_>,
@@ -4324,38 +4634,56 @@ impl UpdateMetadataAccountV2IxData {
         Ok(data)
     }
 }
-pub fn update_metadata_account_v2_ix(
+pub fn update_metadata_account_v2_ix_with_program_id(
+    program_id: Pubkey,
     keys: UpdateMetadataAccountV2Keys,
     args: UpdateMetadataAccountV2IxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
     let data: UpdateMetadataAccountV2IxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_metadata_account_v2_invoke<'info>(
-    accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
+pub fn update_metadata_account_v2_ix(
+    keys: UpdateMetadataAccountV2Keys,
+    args: UpdateMetadataAccountV2IxArgs,
+) -> std::io::Result<Instruction> {
+    update_metadata_account_v2_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn update_metadata_account_v2_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
     args: UpdateMetadataAccountV2IxArgs,
 ) -> ProgramResult {
     let keys: UpdateMetadataAccountV2Keys = accounts.into();
-    let ix = update_metadata_account_v2_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = update_metadata_account_v2_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn update_metadata_account_v2_invoke_signed<'info>(
-    accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
+pub fn update_metadata_account_v2_invoke(
+    accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
+    args: UpdateMetadataAccountV2IxArgs,
+) -> ProgramResult {
+    update_metadata_account_v2_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_metadata_account_v2_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
     args: UpdateMetadataAccountV2IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UpdateMetadataAccountV2Keys = accounts.into();
-    let ix = update_metadata_account_v2_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = update_metadata_account_v2_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn update_metadata_account_v2_invoke_signed(
+    accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
+    args: UpdateMetadataAccountV2IxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    update_metadata_account_v2_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_metadata_account_v2_verify_account_keys(
     accounts: UpdateMetadataAccountV2Accounts<'_, '_>,
@@ -4574,38 +4902,56 @@ impl CreateMetadataAccountV2IxData {
         Ok(data)
     }
 }
-pub fn create_metadata_account_v2_ix(
+pub fn create_metadata_account_v2_ix_with_program_id(
+    program_id: Pubkey,
     keys: CreateMetadataAccountV2Keys,
     args: CreateMetadataAccountV2IxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
     let data: CreateMetadataAccountV2IxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_metadata_account_v2_invoke<'info>(
-    accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
+pub fn create_metadata_account_v2_ix(
+    keys: CreateMetadataAccountV2Keys,
+    args: CreateMetadataAccountV2IxArgs,
+) -> std::io::Result<Instruction> {
+    create_metadata_account_v2_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn create_metadata_account_v2_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMetadataAccountV2Accounts<'_, '_>,
     args: CreateMetadataAccountV2IxArgs,
 ) -> ProgramResult {
     let keys: CreateMetadataAccountV2Keys = accounts.into();
-    let ix = create_metadata_account_v2_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = create_metadata_account_v2_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn create_metadata_account_v2_invoke_signed<'info>(
-    accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
+pub fn create_metadata_account_v2_invoke(
+    accounts: CreateMetadataAccountV2Accounts<'_, '_>,
+    args: CreateMetadataAccountV2IxArgs,
+) -> ProgramResult {
+    create_metadata_account_v2_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn create_metadata_account_v2_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMetadataAccountV2Accounts<'_, '_>,
     args: CreateMetadataAccountV2IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CreateMetadataAccountV2Keys = accounts.into();
-    let ix = create_metadata_account_v2_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = create_metadata_account_v2_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn create_metadata_account_v2_invoke_signed(
+    accounts: CreateMetadataAccountV2Accounts<'_, '_>,
+    args: CreateMetadataAccountV2IxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    create_metadata_account_v2_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn create_metadata_account_v2_verify_account_keys(
     accounts: CreateMetadataAccountV2Accounts<'_, '_>,
@@ -4851,38 +5197,56 @@ impl CreateMasterEditionV3IxData {
         Ok(data)
     }
 }
-pub fn create_master_edition_v3_ix(
+pub fn create_master_edition_v3_ix_with_program_id(
+    program_id: Pubkey,
     keys: CreateMasterEditionV3Keys,
     args: CreateMasterEditionV3IxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] = keys.into();
     let data: CreateMasterEditionV3IxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_master_edition_v3_invoke<'info>(
-    accounts: CreateMasterEditionV3Accounts<'_, 'info>,
+pub fn create_master_edition_v3_ix(
+    keys: CreateMasterEditionV3Keys,
+    args: CreateMasterEditionV3IxArgs,
+) -> std::io::Result<Instruction> {
+    create_master_edition_v3_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn create_master_edition_v3_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMasterEditionV3Accounts<'_, '_>,
     args: CreateMasterEditionV3IxArgs,
 ) -> ProgramResult {
     let keys: CreateMasterEditionV3Keys = accounts.into();
-    let ix = create_master_edition_v3_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = create_master_edition_v3_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn create_master_edition_v3_invoke_signed<'info>(
-    accounts: CreateMasterEditionV3Accounts<'_, 'info>,
+pub fn create_master_edition_v3_invoke(
+    accounts: CreateMasterEditionV3Accounts<'_, '_>,
+    args: CreateMasterEditionV3IxArgs,
+) -> ProgramResult {
+    create_master_edition_v3_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn create_master_edition_v3_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CreateMasterEditionV3Accounts<'_, '_>,
     args: CreateMasterEditionV3IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CreateMasterEditionV3Keys = accounts.into();
-    let ix = create_master_edition_v3_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = create_master_edition_v3_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn create_master_edition_v3_invoke_signed(
+    accounts: CreateMasterEditionV3Accounts<'_, '_>,
+    args: CreateMasterEditionV3IxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    create_master_edition_v3_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn create_master_edition_v3_verify_account_keys(
     accounts: CreateMasterEditionV3Accounts<'_, '_>,
@@ -5084,30 +5448,45 @@ impl VerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn verify_collection_ix(keys: VerifyCollectionKeys) -> std::io::Result<Instruction> {
+pub fn verify_collection_ix_with_program_id(
+    program_id: Pubkey,
+    keys: VerifyCollectionKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: VerifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn verify_collection_invoke<'info>(
-    accounts: VerifyCollectionAccounts<'_, 'info>,
+pub fn verify_collection_ix(keys: VerifyCollectionKeys) -> std::io::Result<Instruction> {
+    verify_collection_ix_with_program_id(crate::ID, keys)
+}
+pub fn verify_collection_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: VerifyCollectionAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: VerifyCollectionKeys = accounts.into();
-    let ix = verify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = verify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn verify_collection_invoke_signed<'info>(
-    accounts: VerifyCollectionAccounts<'_, 'info>,
+pub fn verify_collection_invoke(accounts: VerifyCollectionAccounts<'_, '_>) -> ProgramResult {
+    verify_collection_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn verify_collection_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: VerifyCollectionAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: VerifyCollectionKeys = accounts.into();
-    let ix = verify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = verify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn verify_collection_invoke_signed(
+    accounts: VerifyCollectionAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    verify_collection_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn verify_collection_verify_account_keys(
     accounts: VerifyCollectionAccounts<'_, '_>,
@@ -5382,33 +5761,50 @@ impl UtilizeIxData {
         Ok(data)
     }
 }
-pub fn utilize_ix(keys: UtilizeKeys, args: UtilizeIxArgs) -> std::io::Result<Instruction> {
+pub fn utilize_ix_with_program_id(
+    program_id: Pubkey,
+    keys: UtilizeKeys,
+    args: UtilizeIxArgs,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] = keys.into();
     let data: UtilizeIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn utilize_invoke<'info>(
-    accounts: UtilizeAccounts<'_, 'info>,
+pub fn utilize_ix(keys: UtilizeKeys, args: UtilizeIxArgs) -> std::io::Result<Instruction> {
+    utilize_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn utilize_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UtilizeAccounts<'_, '_>,
     args: UtilizeIxArgs,
 ) -> ProgramResult {
     let keys: UtilizeKeys = accounts.into();
-    let ix = utilize_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = utilize_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn utilize_invoke_signed<'info>(
-    accounts: UtilizeAccounts<'_, 'info>,
+pub fn utilize_invoke(accounts: UtilizeAccounts<'_, '_>, args: UtilizeIxArgs) -> ProgramResult {
+    utilize_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn utilize_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UtilizeAccounts<'_, '_>,
     args: UtilizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UtilizeKeys = accounts.into();
-    let ix = utilize_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = utilize_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn utilize_invoke_signed(
+    accounts: UtilizeAccounts<'_, '_>,
+    args: UtilizeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    utilize_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn utilize_verify_account_keys(
     accounts: UtilizeAccounts<'_, '_>,
@@ -5692,36 +6088,56 @@ impl ApproveUseAuthorityIxData {
         Ok(data)
     }
 }
-pub fn approve_use_authority_ix(
+pub fn approve_use_authority_ix_with_program_id(
+    program_id: Pubkey,
     keys: ApproveUseAuthorityKeys,
     args: ApproveUseAuthorityIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     let data: ApproveUseAuthorityIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn approve_use_authority_invoke<'info>(
-    accounts: ApproveUseAuthorityAccounts<'_, 'info>,
+pub fn approve_use_authority_ix(
+    keys: ApproveUseAuthorityKeys,
+    args: ApproveUseAuthorityIxArgs,
+) -> std::io::Result<Instruction> {
+    approve_use_authority_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn approve_use_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ApproveUseAuthorityAccounts<'_, '_>,
     args: ApproveUseAuthorityIxArgs,
 ) -> ProgramResult {
     let keys: ApproveUseAuthorityKeys = accounts.into();
-    let ix = approve_use_authority_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = approve_use_authority_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn approve_use_authority_invoke_signed<'info>(
-    accounts: ApproveUseAuthorityAccounts<'_, 'info>,
+pub fn approve_use_authority_invoke(
+    accounts: ApproveUseAuthorityAccounts<'_, '_>,
+    args: ApproveUseAuthorityIxArgs,
+) -> ProgramResult {
+    approve_use_authority_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn approve_use_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ApproveUseAuthorityAccounts<'_, '_>,
     args: ApproveUseAuthorityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ApproveUseAuthorityKeys = accounts.into();
-    let ix = approve_use_authority_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = approve_use_authority_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn approve_use_authority_invoke_signed(
+    accounts: ApproveUseAuthorityAccounts<'_, '_>,
+    args: ApproveUseAuthorityIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    approve_use_authority_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn approve_use_authority_verify_account_keys(
     accounts: ApproveUseAuthorityAccounts<'_, '_>,
@@ -5963,30 +6379,45 @@ impl RevokeUseAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_use_authority_ix(keys: RevokeUseAuthorityKeys) -> std::io::Result<Instruction> {
+pub fn revoke_use_authority_ix_with_program_id(
+    program_id: Pubkey,
+    keys: RevokeUseAuthorityKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: RevokeUseAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn revoke_use_authority_invoke<'info>(
-    accounts: RevokeUseAuthorityAccounts<'_, 'info>,
+pub fn revoke_use_authority_ix(keys: RevokeUseAuthorityKeys) -> std::io::Result<Instruction> {
+    revoke_use_authority_ix_with_program_id(crate::ID, keys)
+}
+pub fn revoke_use_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RevokeUseAuthorityAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: RevokeUseAuthorityKeys = accounts.into();
-    let ix = revoke_use_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = revoke_use_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn revoke_use_authority_invoke_signed<'info>(
-    accounts: RevokeUseAuthorityAccounts<'_, 'info>,
+pub fn revoke_use_authority_invoke(accounts: RevokeUseAuthorityAccounts<'_, '_>) -> ProgramResult {
+    revoke_use_authority_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn revoke_use_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RevokeUseAuthorityAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RevokeUseAuthorityKeys = accounts.into();
-    let ix = revoke_use_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = revoke_use_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn revoke_use_authority_invoke_signed(
+    accounts: RevokeUseAuthorityAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    revoke_use_authority_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn revoke_use_authority_verify_account_keys(
     accounts: RevokeUseAuthorityAccounts<'_, '_>,
@@ -6187,30 +6618,45 @@ impl UnverifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn unverify_collection_ix(keys: UnverifyCollectionKeys) -> std::io::Result<Instruction> {
+pub fn unverify_collection_ix_with_program_id(
+    program_id: Pubkey,
+    keys: UnverifyCollectionKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: UnverifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn unverify_collection_invoke<'info>(
-    accounts: UnverifyCollectionAccounts<'_, 'info>,
+pub fn unverify_collection_ix(keys: UnverifyCollectionKeys) -> std::io::Result<Instruction> {
+    unverify_collection_ix_with_program_id(crate::ID, keys)
+}
+pub fn unverify_collection_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UnverifyCollectionAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UnverifyCollectionKeys = accounts.into();
-    let ix = unverify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = unverify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn unverify_collection_invoke_signed<'info>(
-    accounts: UnverifyCollectionAccounts<'_, 'info>,
+pub fn unverify_collection_invoke(accounts: UnverifyCollectionAccounts<'_, '_>) -> ProgramResult {
+    unverify_collection_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn unverify_collection_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UnverifyCollectionAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UnverifyCollectionKeys = accounts.into();
-    let ix = unverify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = unverify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn unverify_collection_invoke_signed(
+    accounts: UnverifyCollectionAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    unverify_collection_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn unverify_collection_verify_account_keys(
     accounts: UnverifyCollectionAccounts<'_, '_>,
@@ -6444,34 +6890,49 @@ impl ApproveCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn approve_collection_authority_ix(
+pub fn approve_collection_authority_ix_with_program_id(
+    program_id: Pubkey,
     keys: ApproveCollectionAuthorityKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ApproveCollectionAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn approve_collection_authority_invoke<'info>(
-    accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
+pub fn approve_collection_authority_ix(
+    keys: ApproveCollectionAuthorityKeys,
+) -> std::io::Result<Instruction> {
+    approve_collection_authority_ix_with_program_id(crate::ID, keys)
+}
+pub fn approve_collection_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ApproveCollectionAuthorityKeys = accounts.into();
-    let ix = approve_collection_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = approve_collection_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn approve_collection_authority_invoke_signed<'info>(
-    accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
+pub fn approve_collection_authority_invoke(
+    accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
+) -> ProgramResult {
+    approve_collection_authority_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn approve_collection_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ApproveCollectionAuthorityKeys = accounts.into();
-    let ix = approve_collection_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = approve_collection_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn approve_collection_authority_invoke_signed(
+    accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    approve_collection_authority_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn approve_collection_authority_verify_account_keys(
     accounts: ApproveCollectionAuthorityAccounts<'_, '_>,
@@ -6650,34 +7111,49 @@ impl RevokeCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_collection_authority_ix(
+pub fn revoke_collection_authority_ix_with_program_id(
+    program_id: Pubkey,
     keys: RevokeCollectionAuthorityKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: RevokeCollectionAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn revoke_collection_authority_invoke<'info>(
-    accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
+pub fn revoke_collection_authority_ix(
+    keys: RevokeCollectionAuthorityKeys,
+) -> std::io::Result<Instruction> {
+    revoke_collection_authority_ix_with_program_id(crate::ID, keys)
+}
+pub fn revoke_collection_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: RevokeCollectionAuthorityKeys = accounts.into();
-    let ix = revoke_collection_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = revoke_collection_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn revoke_collection_authority_invoke_signed<'info>(
-    accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
+pub fn revoke_collection_authority_invoke(
+    accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
+) -> ProgramResult {
+    revoke_collection_authority_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn revoke_collection_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RevokeCollectionAuthorityKeys = accounts.into();
-    let ix = revoke_collection_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = revoke_collection_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn revoke_collection_authority_invoke_signed(
+    accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    revoke_collection_authority_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn revoke_collection_authority_verify_account_keys(
     accounts: RevokeCollectionAuthorityAccounts<'_, '_>,
@@ -6899,34 +7375,49 @@ impl SetAndVerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn set_and_verify_collection_ix(
+pub fn set_and_verify_collection_ix_with_program_id(
+    program_id: Pubkey,
     keys: SetAndVerifyCollectionKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: SetAndVerifyCollectionIxData.try_to_vec()?,
     })
 }
-pub fn set_and_verify_collection_invoke<'info>(
-    accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
+pub fn set_and_verify_collection_ix(
+    keys: SetAndVerifyCollectionKeys,
+) -> std::io::Result<Instruction> {
+    set_and_verify_collection_ix_with_program_id(crate::ID, keys)
+}
+pub fn set_and_verify_collection_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SetAndVerifyCollectionAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: SetAndVerifyCollectionKeys = accounts.into();
-    let ix = set_and_verify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = set_and_verify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn set_and_verify_collection_invoke_signed<'info>(
-    accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
+pub fn set_and_verify_collection_invoke(
+    accounts: SetAndVerifyCollectionAccounts<'_, '_>,
+) -> ProgramResult {
+    set_and_verify_collection_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn set_and_verify_collection_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SetAndVerifyCollectionAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SetAndVerifyCollectionKeys = accounts.into();
-    let ix = set_and_verify_collection_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = set_and_verify_collection_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn set_and_verify_collection_invoke_signed(
+    accounts: SetAndVerifyCollectionAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    set_and_verify_collection_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn set_and_verify_collection_verify_account_keys(
     accounts: SetAndVerifyCollectionAccounts<'_, '_>,
@@ -7119,34 +7610,49 @@ impl FreezeDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn freeze_delegated_account_ix(
+pub fn freeze_delegated_account_ix_with_program_id(
+    program_id: Pubkey,
     keys: FreezeDelegatedAccountKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: FreezeDelegatedAccountIxData.try_to_vec()?,
     })
 }
-pub fn freeze_delegated_account_invoke<'info>(
-    accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
+pub fn freeze_delegated_account_ix(
+    keys: FreezeDelegatedAccountKeys,
+) -> std::io::Result<Instruction> {
+    freeze_delegated_account_ix_with_program_id(crate::ID, keys)
+}
+pub fn freeze_delegated_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: FreezeDelegatedAccountAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: FreezeDelegatedAccountKeys = accounts.into();
-    let ix = freeze_delegated_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = freeze_delegated_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn freeze_delegated_account_invoke_signed<'info>(
-    accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
+pub fn freeze_delegated_account_invoke(
+    accounts: FreezeDelegatedAccountAccounts<'_, '_>,
+) -> ProgramResult {
+    freeze_delegated_account_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn freeze_delegated_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: FreezeDelegatedAccountAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: FreezeDelegatedAccountKeys = accounts.into();
-    let ix = freeze_delegated_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = freeze_delegated_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn freeze_delegated_account_invoke_signed(
+    accounts: FreezeDelegatedAccountAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    freeze_delegated_account_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn freeze_delegated_account_verify_account_keys(
     accounts: FreezeDelegatedAccountAccounts<'_, '_>,
@@ -7327,32 +7833,47 @@ impl ThawDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn thaw_delegated_account_ix(keys: ThawDelegatedAccountKeys) -> std::io::Result<Instruction> {
+pub fn thaw_delegated_account_ix_with_program_id(
+    program_id: Pubkey,
+    keys: ThawDelegatedAccountKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ThawDelegatedAccountIxData.try_to_vec()?,
     })
 }
-pub fn thaw_delegated_account_invoke<'info>(
-    accounts: ThawDelegatedAccountAccounts<'_, 'info>,
+pub fn thaw_delegated_account_ix(keys: ThawDelegatedAccountKeys) -> std::io::Result<Instruction> {
+    thaw_delegated_account_ix_with_program_id(crate::ID, keys)
+}
+pub fn thaw_delegated_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ThawDelegatedAccountAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ThawDelegatedAccountKeys = accounts.into();
-    let ix = thaw_delegated_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = thaw_delegated_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn thaw_delegated_account_invoke_signed<'info>(
-    accounts: ThawDelegatedAccountAccounts<'_, 'info>,
+pub fn thaw_delegated_account_invoke(
+    accounts: ThawDelegatedAccountAccounts<'_, '_>,
+) -> ProgramResult {
+    thaw_delegated_account_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn thaw_delegated_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ThawDelegatedAccountAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ThawDelegatedAccountKeys = accounts.into();
-    let ix = thaw_delegated_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = thaw_delegated_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn thaw_delegated_account_invoke_signed(
+    accounts: ThawDelegatedAccountAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    thaw_delegated_account_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn thaw_delegated_account_verify_account_keys(
     accounts: ThawDelegatedAccountAccounts<'_, '_>,
@@ -7493,34 +8014,49 @@ impl RemoveCreatorVerificationIxData {
         Ok(data)
     }
 }
-pub fn remove_creator_verification_ix(
+pub fn remove_creator_verification_ix_with_program_id(
+    program_id: Pubkey,
     keys: RemoveCreatorVerificationKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: RemoveCreatorVerificationIxData.try_to_vec()?,
     })
 }
-pub fn remove_creator_verification_invoke<'info>(
-    accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
+pub fn remove_creator_verification_ix(
+    keys: RemoveCreatorVerificationKeys,
+) -> std::io::Result<Instruction> {
+    remove_creator_verification_ix_with_program_id(crate::ID, keys)
+}
+pub fn remove_creator_verification_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RemoveCreatorVerificationAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: RemoveCreatorVerificationKeys = accounts.into();
-    let ix = remove_creator_verification_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = remove_creator_verification_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn remove_creator_verification_invoke_signed<'info>(
-    accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
+pub fn remove_creator_verification_invoke(
+    accounts: RemoveCreatorVerificationAccounts<'_, '_>,
+) -> ProgramResult {
+    remove_creator_verification_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn remove_creator_verification_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RemoveCreatorVerificationAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RemoveCreatorVerificationKeys = accounts.into();
-    let ix = remove_creator_verification_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = remove_creator_verification_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn remove_creator_verification_invoke_signed(
+    accounts: RemoveCreatorVerificationAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    remove_creator_verification_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn remove_creator_verification_verify_account_keys(
     accounts: RemoveCreatorVerificationAccounts<'_, '_>,

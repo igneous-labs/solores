@@ -36,6 +36,21 @@ impl ShankIxNoArgsProgramIx {
         Ok(data)
     }
 }
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
 pub const NO_ARGS_IX_IX_ACCOUNTS_LEN: usize = 1;
 #[derive(Copy, Clone, Debug)]
 pub struct NoArgsIxAccounts<'me, 'info> {
@@ -105,28 +120,45 @@ impl NoArgsIxIxData {
         Ok(data)
     }
 }
-pub fn no_args_ix_ix(keys: NoArgsIxKeys) -> std::io::Result<Instruction> {
+pub fn no_args_ix_ix_with_program_id(
+    program_id: Pubkey,
+    keys: NoArgsIxKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: NoArgsIxIxData.try_to_vec()?,
     })
 }
-pub fn no_args_ix_invoke<'info>(accounts: NoArgsIxAccounts<'_, 'info>) -> ProgramResult {
-    let keys: NoArgsIxKeys = accounts.into();
-    let ix = no_args_ix_ix(keys)?;
-    let account_info: [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn no_args_ix_ix(keys: NoArgsIxKeys) -> std::io::Result<Instruction> {
+    no_args_ix_ix_with_program_id(crate::ID, keys)
 }
-pub fn no_args_ix_invoke_signed<'info>(
-    accounts: NoArgsIxAccounts<'_, 'info>,
+pub fn no_args_ix_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: NoArgsIxAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: NoArgsIxKeys = accounts.into();
+    let ix = no_args_ix_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn no_args_ix_invoke(accounts: NoArgsIxAccounts<'_, '_>) -> ProgramResult {
+    no_args_ix_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn no_args_ix_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: NoArgsIxAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: NoArgsIxKeys = accounts.into();
-    let ix = no_args_ix_ix(keys)?;
-    let account_info: [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = no_args_ix_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn no_args_ix_invoke_signed(
+    accounts: NoArgsIxAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    no_args_ix_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn no_args_ix_verify_account_keys(
     accounts: NoArgsIxAccounts<'_, '_>,

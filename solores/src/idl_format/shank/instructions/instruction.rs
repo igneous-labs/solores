@@ -28,6 +28,10 @@ impl NamedInstruction {
         format_ident!("{}_ix", self.name.to_snake_case())
     }
 
+    pub fn ix_fn_with_program_id_ident(&self) -> Ident {
+        format_ident!("{}_ix_with_program_id", self.name.to_snake_case())
+    }
+
     pub fn discm_ident(&self) -> Ident {
         format_ident!("{}_IX_DISCM", &self.name.to_shouty_snake_case())
     }
@@ -391,19 +395,24 @@ impl NamedInstruction {
     }
 
     /// _ix()
+    /// _ix_with_program_id()
     pub fn write_ix_fn(&self, tokens: &mut TokenStream) {
         let ix_fn_ident = self.ix_fn_ident();
+        let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
         let keys_ident = self.keys_ident();
         let ix_args_ident = self.ix_args_ident();
         let accounts_len_ident = self.accounts_len_ident();
         let ix_data_ident = self.ix_data_ident();
 
         let mut fn_params = quote! {};
+        let mut fn_args = quote! {};
         if self.has_accounts() {
             fn_params.extend(quote! { keys: #keys_ident, });
+            fn_args.extend(quote! { keys, });
         }
         if self.has_ix_args() {
             fn_params.extend(quote! { args: #ix_args_ident, });
+            fn_args.extend(quote! { args, });
         }
 
         let (mut fn_body, accounts_expr) = if self.has_accounts() {
@@ -435,23 +444,19 @@ impl NamedInstruction {
         };
 
         tokens.extend(quote! {
-            pub fn #ix_fn_ident(#fn_params) -> std::io::Result<Instruction> {
+            pub fn #ix_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> std::io::Result<Instruction> {
                 #fn_body
                 Ok(Instruction {
-                    program_id: crate::ID,
+                    program_id,
                     accounts: #accounts_expr,
                     data: #data_expr,
                 })
             }
-        });
-    }
 
-    fn invoke_fn_generics(&self) -> TokenStream {
-        if self.has_accounts() {
-            quote! { 'info }
-        } else {
-            quote! {}
-        }
+            pub fn #ix_fn_ident(#fn_params) -> std::io::Result<Instruction> {
+                #ix_with_program_id_fn_ident(crate::ID, #fn_args)
+            }
+        });
     }
 
     fn invoke_fn_params_prefix(&self) -> TokenStream {
@@ -459,7 +464,7 @@ impl NamedInstruction {
         let ix_args_ident = self.ix_args_ident();
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! { accounts: #accounts_ident<'_, 'info>, });
+            fn_params.extend(quote! { accounts: #accounts_ident<'_, '_>, });
         }
         if self.has_ix_args() {
             fn_params.extend(quote! { args: #ix_args_ident, })
@@ -467,8 +472,19 @@ impl NamedInstruction {
         fn_params
     }
 
-    fn ix_fn_call_assign(&self) -> TokenStream {
-        let ix_fn_ident = self.ix_fn_ident();
+    fn invoke_fn_args_prefix(&self) -> TokenStream {
+        let mut fn_args = quote! {};
+        if self.has_accounts() {
+            fn_args.extend(quote! { accounts, });
+        }
+        if self.has_ix_args() {
+            fn_args.extend(quote! { args, })
+        }
+        fn_args
+    }
+
+    fn ix_call_assign(&self) -> TokenStream {
+        let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
         let keys_ident = self.keys_ident();
         let mut res = quote! {};
         let mut args = quote! {};
@@ -482,27 +498,23 @@ impl NamedInstruction {
             args.extend(quote! { args });
         }
         res.extend(quote! {
-            let ix = #ix_fn_ident(#args)?;
+            let ix = #ix_with_program_id_fn_ident(program_id, #args)?;
         });
         res
     }
 
     /// _invoke()
+    /// _invoke_with_program_id()
     pub fn write_invoke_fn(&self, tokens: &mut TokenStream) {
         let invoke_fn_ident = format_ident!("{}_invoke", self.name.to_snake_case());
-        let accounts_len_ident = self.accounts_len_ident();
-        let fn_generics = self.invoke_fn_generics();
+        let invoke_with_program_id_fn_ident =
+            format_ident!("{}_invoke_with_program_id", self.name.to_snake_case());
         let fn_params = self.invoke_fn_params_prefix();
-        let fn_decl = if fn_generics.is_empty() {
-            quote! { #invoke_fn_ident(#fn_params) }
-        } else {
-            quote! { #invoke_fn_ident<#fn_generics>(#fn_params) }
-        };
-        let call_assign = self.ix_fn_call_assign();
+        let fn_args = self.invoke_fn_args_prefix();
+        let call_assign = self.ix_call_assign();
         let invoke = if self.has_accounts() {
             quote! {
-                let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
-                invoke(&ix, &account_info)
+                invoke_instruction(&ix, accounts)
             }
         } else {
             quote! {
@@ -510,30 +522,33 @@ impl NamedInstruction {
             }
         };
         tokens.extend(quote! {
-            pub fn #fn_decl -> ProgramResult {
+            pub fn #invoke_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> ProgramResult {
                 #call_assign
                 #invoke
+            }
+
+            pub fn #invoke_fn_ident(#fn_params) -> ProgramResult {
+                #invoke_with_program_id_fn_ident(crate::ID, #fn_args)
             }
         });
     }
 
     /// _invoke_signed()
+    /// _invoke_signed_with_program_id()
     pub fn write_invoke_signed_fn(&self, tokens: &mut TokenStream) {
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", self.name.to_snake_case());
-        let accounts_len_ident = self.accounts_len_ident();
-        let fn_generics = self.invoke_fn_generics();
+        let invoke_signed_with_program_id_fn_ident = format_ident!(
+            "{}_invoke_signed_with_program_id",
+            self.name.to_snake_case()
+        );
         let mut fn_params = self.invoke_fn_params_prefix();
         fn_params.extend(quote! { seeds: &[&[&[u8]]], });
-        let fn_decl = if fn_generics.is_empty() {
-            quote! { #invoke_signed_fn_ident(#fn_params) }
-        } else {
-            quote! { #invoke_signed_fn_ident<#fn_generics>(#fn_params) }
-        };
-        let call_assign = self.ix_fn_call_assign();
+        let mut fn_args = self.invoke_fn_args_prefix();
+        fn_args.extend(quote! { seeds, });
+        let call_assign = self.ix_call_assign();
         let invoke = if self.has_accounts() {
             quote! {
-                let account_info: [AccountInfo<'info>; #accounts_len_ident] = accounts.into();
-                invoke_signed(&ix, &account_info, seeds)
+                invoke_instruction_signed(&ix, accounts, seeds)
             }
         } else {
             quote! {
@@ -541,9 +556,13 @@ impl NamedInstruction {
             }
         };
         tokens.extend(quote! {
-            pub fn #fn_decl -> ProgramResult {
+            pub fn #invoke_signed_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> ProgramResult {
                 #call_assign
                 #invoke
+            }
+
+            pub fn #invoke_signed_fn_ident(#fn_params) -> ProgramResult {
+                #invoke_signed_with_program_id_fn_ident(crate::ID, #fn_args)
             }
         });
     }

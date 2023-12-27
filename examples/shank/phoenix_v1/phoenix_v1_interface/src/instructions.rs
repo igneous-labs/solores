@@ -218,6 +218,21 @@ impl PhoenixV1ProgramIx {
         Ok(data)
     }
 }
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
 pub const SWAP_IX_ACCOUNTS_LEN: usize = 9;
 #[derive(Copy, Clone, Debug)]
 pub struct SwapAccounts<'me, 'info> {
@@ -412,30 +427,50 @@ impl SwapIxData {
         Ok(data)
     }
 }
-pub fn swap_ix(keys: SwapKeys, args: SwapIxArgs) -> std::io::Result<Instruction> {
+pub fn swap_ix_with_program_id(
+    program_id: Pubkey,
+    keys: SwapKeys,
+    args: SwapIxArgs,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SWAP_IX_ACCOUNTS_LEN] = keys.into();
     let data: SwapIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn swap_invoke<'info>(accounts: SwapAccounts<'_, 'info>, args: SwapIxArgs) -> ProgramResult {
-    let keys: SwapKeys = accounts.into();
-    let ix = swap_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SWAP_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn swap_ix(keys: SwapKeys, args: SwapIxArgs) -> std::io::Result<Instruction> {
+    swap_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn swap_invoke_signed<'info>(
-    accounts: SwapAccounts<'_, 'info>,
+pub fn swap_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SwapAccounts<'_, '_>,
+    args: SwapIxArgs,
+) -> ProgramResult {
+    let keys: SwapKeys = accounts.into();
+    let ix = swap_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn swap_invoke(accounts: SwapAccounts<'_, '_>, args: SwapIxArgs) -> ProgramResult {
+    swap_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn swap_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SwapAccounts<'_, '_>,
     args: SwapIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SwapKeys = accounts.into();
-    let ix = swap_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SWAP_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = swap_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn swap_invoke_signed(
+    accounts: SwapAccounts<'_, '_>,
+    args: SwapIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    swap_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn swap_verify_account_keys(
     accounts: SwapAccounts<'_, '_>,
@@ -633,36 +668,56 @@ impl SwapWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn swap_with_free_funds_ix(
+pub fn swap_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: SwapWithFreeFundsKeys,
     args: SwapWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: SwapWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn swap_with_free_funds_invoke<'info>(
-    accounts: SwapWithFreeFundsAccounts<'_, 'info>,
+pub fn swap_with_free_funds_ix(
+    keys: SwapWithFreeFundsKeys,
+    args: SwapWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    swap_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn swap_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SwapWithFreeFundsAccounts<'_, '_>,
     args: SwapWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: SwapWithFreeFundsKeys = accounts.into();
-    let ix = swap_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = swap_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn swap_with_free_funds_invoke_signed<'info>(
-    accounts: SwapWithFreeFundsAccounts<'_, 'info>,
+pub fn swap_with_free_funds_invoke(
+    accounts: SwapWithFreeFundsAccounts<'_, '_>,
+    args: SwapWithFreeFundsIxArgs,
+) -> ProgramResult {
+    swap_with_free_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn swap_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SwapWithFreeFundsAccounts<'_, '_>,
     args: SwapWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SwapWithFreeFundsKeys = accounts.into();
-    let ix = swap_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SWAP_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = swap_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn swap_with_free_funds_invoke_signed(
+    accounts: SwapWithFreeFundsAccounts<'_, '_>,
+    args: SwapWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    swap_with_free_funds_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn swap_with_free_funds_verify_account_keys(
     accounts: SwapWithFreeFundsAccounts<'_, '_>,
@@ -915,36 +970,56 @@ impl PlaceLimitOrderIxData {
         Ok(data)
     }
 }
-pub fn place_limit_order_ix(
+pub fn place_limit_order_ix_with_program_id(
+    program_id: Pubkey,
     keys: PlaceLimitOrderKeys,
     args: PlaceLimitOrderIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let data: PlaceLimitOrderIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_limit_order_invoke<'info>(
-    accounts: PlaceLimitOrderAccounts<'_, 'info>,
+pub fn place_limit_order_ix(
+    keys: PlaceLimitOrderKeys,
+    args: PlaceLimitOrderIxArgs,
+) -> std::io::Result<Instruction> {
+    place_limit_order_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn place_limit_order_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceLimitOrderAccounts<'_, '_>,
     args: PlaceLimitOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceLimitOrderKeys = accounts.into();
-    let ix = place_limit_order_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = place_limit_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn place_limit_order_invoke_signed<'info>(
-    accounts: PlaceLimitOrderAccounts<'_, 'info>,
+pub fn place_limit_order_invoke(
+    accounts: PlaceLimitOrderAccounts<'_, '_>,
+    args: PlaceLimitOrderIxArgs,
+) -> ProgramResult {
+    place_limit_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_limit_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceLimitOrderAccounts<'_, '_>,
     args: PlaceLimitOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: PlaceLimitOrderKeys = accounts.into();
-    let ix = place_limit_order_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_LIMIT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = place_limit_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn place_limit_order_invoke_signed(
+    accounts: PlaceLimitOrderAccounts<'_, '_>,
+    args: PlaceLimitOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    place_limit_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_limit_order_verify_account_keys(
     accounts: PlaceLimitOrderAccounts<'_, '_>,
@@ -1151,38 +1226,61 @@ impl PlaceLimitOrderWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn place_limit_order_with_free_funds_ix(
+pub fn place_limit_order_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: PlaceLimitOrderWithFreeFundsKeys,
     args: PlaceLimitOrderWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: PlaceLimitOrderWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_limit_order_with_free_funds_invoke<'info>(
-    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
+pub fn place_limit_order_with_free_funds_ix(
+    keys: PlaceLimitOrderWithFreeFundsKeys,
+    args: PlaceLimitOrderWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    place_limit_order_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn place_limit_order_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
     args: PlaceLimitOrderWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: PlaceLimitOrderWithFreeFundsKeys = accounts.into();
-    let ix = place_limit_order_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = place_limit_order_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn place_limit_order_with_free_funds_invoke_signed<'info>(
-    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, 'info>,
+pub fn place_limit_order_with_free_funds_invoke(
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
+    args: PlaceLimitOrderWithFreeFundsIxArgs,
+) -> ProgramResult {
+    place_limit_order_with_free_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_limit_order_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
     args: PlaceLimitOrderWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: PlaceLimitOrderWithFreeFundsKeys = accounts.into();
-    let ix = place_limit_order_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_LIMIT_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = place_limit_order_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn place_limit_order_with_free_funds_invoke_signed(
+    accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
+    args: PlaceLimitOrderWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    place_limit_order_with_free_funds_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn place_limit_order_with_free_funds_verify_account_keys(
     accounts: PlaceLimitOrderWithFreeFundsAccounts<'_, '_>,
@@ -1424,36 +1522,56 @@ impl ReduceOrderIxData {
         Ok(data)
     }
 }
-pub fn reduce_order_ix(
+pub fn reduce_order_ix_with_program_id(
+    program_id: Pubkey,
     keys: ReduceOrderKeys,
     args: ReduceOrderIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REDUCE_ORDER_IX_ACCOUNTS_LEN] = keys.into();
     let data: ReduceOrderIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn reduce_order_invoke<'info>(
-    accounts: ReduceOrderAccounts<'_, 'info>,
+pub fn reduce_order_ix(
+    keys: ReduceOrderKeys,
+    args: ReduceOrderIxArgs,
+) -> std::io::Result<Instruction> {
+    reduce_order_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn reduce_order_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ReduceOrderAccounts<'_, '_>,
     args: ReduceOrderIxArgs,
 ) -> ProgramResult {
     let keys: ReduceOrderKeys = accounts.into();
-    let ix = reduce_order_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REDUCE_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = reduce_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn reduce_order_invoke_signed<'info>(
-    accounts: ReduceOrderAccounts<'_, 'info>,
+pub fn reduce_order_invoke(
+    accounts: ReduceOrderAccounts<'_, '_>,
+    args: ReduceOrderIxArgs,
+) -> ProgramResult {
+    reduce_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn reduce_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ReduceOrderAccounts<'_, '_>,
     args: ReduceOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ReduceOrderKeys = accounts.into();
-    let ix = reduce_order_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REDUCE_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = reduce_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn reduce_order_invoke_signed(
+    accounts: ReduceOrderAccounts<'_, '_>,
+    args: ReduceOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    reduce_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn reduce_order_verify_account_keys(
     accounts: ReduceOrderAccounts<'_, '_>,
@@ -1644,38 +1762,56 @@ impl ReduceOrderWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn reduce_order_with_free_funds_ix(
+pub fn reduce_order_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: ReduceOrderWithFreeFundsKeys,
     args: ReduceOrderWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: ReduceOrderWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn reduce_order_with_free_funds_invoke<'info>(
-    accounts: ReduceOrderWithFreeFundsAccounts<'_, 'info>,
+pub fn reduce_order_with_free_funds_ix(
+    keys: ReduceOrderWithFreeFundsKeys,
+    args: ReduceOrderWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    reduce_order_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn reduce_order_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
     args: ReduceOrderWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: ReduceOrderWithFreeFundsKeys = accounts.into();
-    let ix = reduce_order_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = reduce_order_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn reduce_order_with_free_funds_invoke_signed<'info>(
-    accounts: ReduceOrderWithFreeFundsAccounts<'_, 'info>,
+pub fn reduce_order_with_free_funds_invoke(
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
+    args: ReduceOrderWithFreeFundsIxArgs,
+) -> ProgramResult {
+    reduce_order_with_free_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn reduce_order_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
     args: ReduceOrderWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ReduceOrderWithFreeFundsKeys = accounts.into();
-    let ix = reduce_order_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REDUCE_ORDER_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = reduce_order_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn reduce_order_with_free_funds_invoke_signed(
+    accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
+    args: ReduceOrderWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    reduce_order_with_free_funds_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn reduce_order_with_free_funds_verify_account_keys(
     accounts: ReduceOrderWithFreeFundsAccounts<'_, '_>,
@@ -1905,30 +2041,45 @@ impl CancelAllOrdersIxData {
         Ok(data)
     }
 }
-pub fn cancel_all_orders_ix(keys: CancelAllOrdersKeys) -> std::io::Result<Instruction> {
+pub fn cancel_all_orders_ix_with_program_id(
+    program_id: Pubkey,
+    keys: CancelAllOrdersKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: CancelAllOrdersIxData.try_to_vec()?,
     })
 }
-pub fn cancel_all_orders_invoke<'info>(
-    accounts: CancelAllOrdersAccounts<'_, 'info>,
+pub fn cancel_all_orders_ix(keys: CancelAllOrdersKeys) -> std::io::Result<Instruction> {
+    cancel_all_orders_ix_with_program_id(crate::ID, keys)
+}
+pub fn cancel_all_orders_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelAllOrdersAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: CancelAllOrdersKeys = accounts.into();
-    let ix = cancel_all_orders_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = cancel_all_orders_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_all_orders_invoke_signed<'info>(
-    accounts: CancelAllOrdersAccounts<'_, 'info>,
+pub fn cancel_all_orders_invoke(accounts: CancelAllOrdersAccounts<'_, '_>) -> ProgramResult {
+    cancel_all_orders_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn cancel_all_orders_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelAllOrdersAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelAllOrdersKeys = accounts.into();
-    let ix = cancel_all_orders_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = cancel_all_orders_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_all_orders_invoke_signed(
+    accounts: CancelAllOrdersAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_all_orders_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn cancel_all_orders_verify_account_keys(
     accounts: CancelAllOrdersAccounts<'_, '_>,
@@ -2110,34 +2261,49 @@ impl CancelAllOrdersWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn cancel_all_orders_with_free_funds_ix(
+pub fn cancel_all_orders_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: CancelAllOrdersWithFreeFundsKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: CancelAllOrdersWithFreeFundsIxData.try_to_vec()?,
     })
 }
-pub fn cancel_all_orders_with_free_funds_invoke<'info>(
-    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_all_orders_with_free_funds_ix(
+    keys: CancelAllOrdersWithFreeFundsKeys,
+) -> std::io::Result<Instruction> {
+    cancel_all_orders_with_free_funds_ix_with_program_id(crate::ID, keys)
+}
+pub fn cancel_all_orders_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: CancelAllOrdersWithFreeFundsKeys = accounts.into();
-    let ix = cancel_all_orders_with_free_funds_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = cancel_all_orders_with_free_funds_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_all_orders_with_free_funds_invoke_signed<'info>(
-    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_all_orders_with_free_funds_invoke(
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
+) -> ProgramResult {
+    cancel_all_orders_with_free_funds_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn cancel_all_orders_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelAllOrdersWithFreeFundsKeys = accounts.into();
-    let ix = cancel_all_orders_with_free_funds_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CANCEL_ALL_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = cancel_all_orders_with_free_funds_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_all_orders_with_free_funds_invoke_signed(
+    accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_all_orders_with_free_funds_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn cancel_all_orders_with_free_funds_verify_account_keys(
     accounts: CancelAllOrdersWithFreeFundsAccounts<'_, '_>,
@@ -2378,36 +2544,56 @@ impl CancelUpToIxData {
         Ok(data)
     }
 }
-pub fn cancel_up_to_ix(
+pub fn cancel_up_to_ix_with_program_id(
+    program_id: Pubkey,
     keys: CancelUpToKeys,
     args: CancelUpToIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CANCEL_UP_TO_IX_ACCOUNTS_LEN] = keys.into();
     let data: CancelUpToIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_up_to_invoke<'info>(
-    accounts: CancelUpToAccounts<'_, 'info>,
+pub fn cancel_up_to_ix(
+    keys: CancelUpToKeys,
+    args: CancelUpToIxArgs,
+) -> std::io::Result<Instruction> {
+    cancel_up_to_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn cancel_up_to_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelUpToAccounts<'_, '_>,
     args: CancelUpToIxArgs,
 ) -> ProgramResult {
     let keys: CancelUpToKeys = accounts.into();
-    let ix = cancel_up_to_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_UP_TO_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = cancel_up_to_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_up_to_invoke_signed<'info>(
-    accounts: CancelUpToAccounts<'_, 'info>,
+pub fn cancel_up_to_invoke(
+    accounts: CancelUpToAccounts<'_, '_>,
+    args: CancelUpToIxArgs,
+) -> ProgramResult {
+    cancel_up_to_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_up_to_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelUpToAccounts<'_, '_>,
     args: CancelUpToIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelUpToKeys = accounts.into();
-    let ix = cancel_up_to_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_UP_TO_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = cancel_up_to_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_up_to_invoke_signed(
+    accounts: CancelUpToAccounts<'_, '_>,
+    args: CancelUpToIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_up_to_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_up_to_verify_account_keys(
     accounts: CancelUpToAccounts<'_, '_>,
@@ -2598,38 +2784,56 @@ impl CancelUpToWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn cancel_up_to_with_free_funds_ix(
+pub fn cancel_up_to_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: CancelUpToWithFreeFundsKeys,
     args: CancelUpToWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: CancelUpToWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_up_to_with_free_funds_invoke<'info>(
-    accounts: CancelUpToWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_up_to_with_free_funds_ix(
+    keys: CancelUpToWithFreeFundsKeys,
+    args: CancelUpToWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    cancel_up_to_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn cancel_up_to_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
     args: CancelUpToWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: CancelUpToWithFreeFundsKeys = accounts.into();
-    let ix = cancel_up_to_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = cancel_up_to_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_up_to_with_free_funds_invoke_signed<'info>(
-    accounts: CancelUpToWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_up_to_with_free_funds_invoke(
+    accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
+    args: CancelUpToWithFreeFundsIxArgs,
+) -> ProgramResult {
+    cancel_up_to_with_free_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_up_to_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
     args: CancelUpToWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelUpToWithFreeFundsKeys = accounts.into();
-    let ix = cancel_up_to_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_UP_TO_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = cancel_up_to_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_up_to_with_free_funds_invoke_signed(
+    accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
+    args: CancelUpToWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_up_to_with_free_funds_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_up_to_with_free_funds_verify_account_keys(
     accounts: CancelUpToWithFreeFundsAccounts<'_, '_>,
@@ -2874,38 +3078,56 @@ impl CancelMultipleOrdersByIdIxData {
         Ok(data)
     }
 }
-pub fn cancel_multiple_orders_by_id_ix(
+pub fn cancel_multiple_orders_by_id_ix_with_program_id(
+    program_id: Pubkey,
     keys: CancelMultipleOrdersByIdKeys,
     args: CancelMultipleOrdersByIdIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN] = keys.into();
     let data: CancelMultipleOrdersByIdIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_multiple_orders_by_id_invoke<'info>(
-    accounts: CancelMultipleOrdersByIdAccounts<'_, 'info>,
+pub fn cancel_multiple_orders_by_id_ix(
+    keys: CancelMultipleOrdersByIdKeys,
+    args: CancelMultipleOrdersByIdIxArgs,
+) -> std::io::Result<Instruction> {
+    cancel_multiple_orders_by_id_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn cancel_multiple_orders_by_id_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
     args: CancelMultipleOrdersByIdIxArgs,
 ) -> ProgramResult {
     let keys: CancelMultipleOrdersByIdKeys = accounts.into();
-    let ix = cancel_multiple_orders_by_id_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = cancel_multiple_orders_by_id_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_multiple_orders_by_id_invoke_signed<'info>(
-    accounts: CancelMultipleOrdersByIdAccounts<'_, 'info>,
+pub fn cancel_multiple_orders_by_id_invoke(
+    accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
+    args: CancelMultipleOrdersByIdIxArgs,
+) -> ProgramResult {
+    cancel_multiple_orders_by_id_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_multiple_orders_by_id_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
     args: CancelMultipleOrdersByIdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelMultipleOrdersByIdKeys = accounts.into();
-    let ix = cancel_multiple_orders_by_id_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CANCEL_MULTIPLE_ORDERS_BY_ID_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = cancel_multiple_orders_by_id_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_multiple_orders_by_id_invoke_signed(
+    accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
+    args: CancelMultipleOrdersByIdIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_multiple_orders_by_id_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_multiple_orders_by_id_verify_account_keys(
     accounts: CancelMultipleOrdersByIdAccounts<'_, '_>,
@@ -3110,7 +3332,8 @@ impl CancelMultipleOrdersByIdWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn cancel_multiple_orders_by_id_with_free_funds_ix(
+pub fn cancel_multiple_orders_by_id_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: CancelMultipleOrdersByIdWithFreeFundsKeys,
     args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
@@ -3118,31 +3341,55 @@ pub fn cancel_multiple_orders_by_id_with_free_funds_ix(
         keys.into();
     let data: CancelMultipleOrdersByIdWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_multiple_orders_by_id_with_free_funds_invoke<'info>(
-    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_multiple_orders_by_id_with_free_funds_ix(
+    keys: CancelMultipleOrdersByIdWithFreeFundsKeys,
+    args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    cancel_multiple_orders_by_id_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
     args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: CancelMultipleOrdersByIdWithFreeFundsKeys = accounts.into();
-    let ix = cancel_multiple_orders_by_id_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix =
+        cancel_multiple_orders_by_id_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_signed<'info>(
-    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, 'info>,
+pub fn cancel_multiple_orders_by_id_with_free_funds_invoke(
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
+    args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
+) -> ProgramResult {
+    cancel_multiple_orders_by_id_with_free_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
     args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CancelMultipleOrdersByIdWithFreeFundsKeys = accounts.into();
-    let ix = cancel_multiple_orders_by_id_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        CANCEL_MULTIPLE_ORDERS_BY_ID_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix =
+        cancel_multiple_orders_by_id_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn cancel_multiple_orders_by_id_with_free_funds_invoke_signed(
+    accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
+    args: CancelMultipleOrdersByIdWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    cancel_multiple_orders_by_id_with_free_funds_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn cancel_multiple_orders_by_id_with_free_funds_verify_account_keys(
     accounts: CancelMultipleOrdersByIdWithFreeFundsAccounts<'_, '_>,
@@ -3383,36 +3630,56 @@ impl WithdrawFundsIxData {
         Ok(data)
     }
 }
-pub fn withdraw_funds_ix(
+pub fn withdraw_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: WithdrawFundsKeys,
     args: WithdrawFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: WithdrawFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn withdraw_funds_invoke<'info>(
-    accounts: WithdrawFundsAccounts<'_, 'info>,
+pub fn withdraw_funds_ix(
+    keys: WithdrawFundsKeys,
+    args: WithdrawFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    withdraw_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn withdraw_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: WithdrawFundsAccounts<'_, '_>,
     args: WithdrawFundsIxArgs,
 ) -> ProgramResult {
     let keys: WithdrawFundsKeys = accounts.into();
-    let ix = withdraw_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = withdraw_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn withdraw_funds_invoke_signed<'info>(
-    accounts: WithdrawFundsAccounts<'_, 'info>,
+pub fn withdraw_funds_invoke(
+    accounts: WithdrawFundsAccounts<'_, '_>,
+    args: WithdrawFundsIxArgs,
+) -> ProgramResult {
+    withdraw_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn withdraw_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: WithdrawFundsAccounts<'_, '_>,
     args: WithdrawFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: WithdrawFundsKeys = accounts.into();
-    let ix = withdraw_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; WITHDRAW_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = withdraw_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn withdraw_funds_invoke_signed(
+    accounts: WithdrawFundsAccounts<'_, '_>,
+    args: WithdrawFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    withdraw_funds_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn withdraw_funds_verify_account_keys(
     accounts: WithdrawFundsAccounts<'_, '_>,
@@ -3675,36 +3942,56 @@ impl DepositFundsIxData {
         Ok(data)
     }
 }
-pub fn deposit_funds_ix(
+pub fn deposit_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: DepositFundsKeys,
     args: DepositFundsIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] = keys.into();
     let data: DepositFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_funds_invoke<'info>(
-    accounts: DepositFundsAccounts<'_, 'info>,
+pub fn deposit_funds_ix(
+    keys: DepositFundsKeys,
+    args: DepositFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    deposit_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn deposit_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DepositFundsAccounts<'_, '_>,
     args: DepositFundsIxArgs,
 ) -> ProgramResult {
     let keys: DepositFundsKeys = accounts.into();
-    let ix = deposit_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deposit_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deposit_funds_invoke_signed<'info>(
-    accounts: DepositFundsAccounts<'_, 'info>,
+pub fn deposit_funds_invoke(
+    accounts: DepositFundsAccounts<'_, '_>,
+    args: DepositFundsIxArgs,
+) -> ProgramResult {
+    deposit_funds_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deposit_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DepositFundsAccounts<'_, '_>,
     args: DepositFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DepositFundsKeys = accounts.into();
-    let ix = deposit_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; DEPOSIT_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deposit_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deposit_funds_invoke_signed(
+    accounts: DepositFundsAccounts<'_, '_>,
+    args: DepositFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deposit_funds_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn deposit_funds_verify_account_keys(
     accounts: DepositFundsAccounts<'_, '_>,
@@ -3905,28 +4192,45 @@ impl RequestSeatIxData {
         Ok(data)
     }
 }
-pub fn request_seat_ix(keys: RequestSeatKeys) -> std::io::Result<Instruction> {
+pub fn request_seat_ix_with_program_id(
+    program_id: Pubkey,
+    keys: RequestSeatKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REQUEST_SEAT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: RequestSeatIxData.try_to_vec()?,
     })
 }
-pub fn request_seat_invoke<'info>(accounts: RequestSeatAccounts<'_, 'info>) -> ProgramResult {
-    let keys: RequestSeatKeys = accounts.into();
-    let ix = request_seat_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn request_seat_ix(keys: RequestSeatKeys) -> std::io::Result<Instruction> {
+    request_seat_ix_with_program_id(crate::ID, keys)
 }
-pub fn request_seat_invoke_signed<'info>(
-    accounts: RequestSeatAccounts<'_, 'info>,
+pub fn request_seat_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RequestSeatAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: RequestSeatKeys = accounts.into();
+    let ix = request_seat_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn request_seat_invoke(accounts: RequestSeatAccounts<'_, '_>) -> ProgramResult {
+    request_seat_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn request_seat_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RequestSeatAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RequestSeatKeys = accounts.into();
-    let ix = request_seat_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REQUEST_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = request_seat_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn request_seat_invoke_signed(
+    accounts: RequestSeatAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    request_seat_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn request_seat_verify_account_keys(
     accounts: RequestSeatAccounts<'_, '_>,
@@ -4048,28 +4352,39 @@ impl LogIxData {
         Ok(data)
     }
 }
-pub fn log_ix(keys: LogKeys) -> std::io::Result<Instruction> {
+pub fn log_ix_with_program_id(program_id: Pubkey, keys: LogKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; LOG_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: LogIxData.try_to_vec()?,
     })
 }
-pub fn log_invoke<'info>(accounts: LogAccounts<'_, 'info>) -> ProgramResult {
-    let keys: LogKeys = accounts.into();
-    let ix = log_ix(keys)?;
-    let account_info: [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn log_ix(keys: LogKeys) -> std::io::Result<Instruction> {
+    log_ix_with_program_id(crate::ID, keys)
 }
-pub fn log_invoke_signed<'info>(
-    accounts: LogAccounts<'_, 'info>,
+pub fn log_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: LogAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: LogKeys = accounts.into();
+    let ix = log_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn log_invoke(accounts: LogAccounts<'_, '_>) -> ProgramResult {
+    log_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn log_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: LogAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: LogKeys = accounts.into();
-    let ix = log_ix(keys)?;
-    let account_info: [AccountInfo<'info>; LOG_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = log_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn log_invoke_signed(accounts: LogAccounts<'_, '_>, seeds: &[&[&[u8]]]) -> ProgramResult {
+    log_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn log_verify_account_keys(
     accounts: LogAccounts<'_, '_>,
@@ -4313,38 +4628,56 @@ impl PlaceMultiplePostOnlyOrdersIxData {
         Ok(data)
     }
 }
-pub fn place_multiple_post_only_orders_ix(
+pub fn place_multiple_post_only_orders_ix_with_program_id(
+    program_id: Pubkey,
     keys: PlaceMultiplePostOnlyOrdersKeys,
     args: PlaceMultiplePostOnlyOrdersIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     let data: PlaceMultiplePostOnlyOrdersIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_multiple_post_only_orders_invoke<'info>(
-    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
+pub fn place_multiple_post_only_orders_ix(
+    keys: PlaceMultiplePostOnlyOrdersKeys,
+    args: PlaceMultiplePostOnlyOrdersIxArgs,
+) -> std::io::Result<Instruction> {
+    place_multiple_post_only_orders_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn place_multiple_post_only_orders_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
     args: PlaceMultiplePostOnlyOrdersIxArgs,
 ) -> ProgramResult {
     let keys: PlaceMultiplePostOnlyOrdersKeys = accounts.into();
-    let ix = place_multiple_post_only_orders_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = place_multiple_post_only_orders_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn place_multiple_post_only_orders_invoke_signed<'info>(
-    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, 'info>,
+pub fn place_multiple_post_only_orders_invoke(
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
+    args: PlaceMultiplePostOnlyOrdersIxArgs,
+) -> ProgramResult {
+    place_multiple_post_only_orders_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_multiple_post_only_orders_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
     args: PlaceMultiplePostOnlyOrdersIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: PlaceMultiplePostOnlyOrdersKeys = accounts.into();
-    let ix = place_multiple_post_only_orders_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; PLACE_MULTIPLE_POST_ONLY_ORDERS_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = place_multiple_post_only_orders_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn place_multiple_post_only_orders_invoke_signed(
+    accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
+    args: PlaceMultiplePostOnlyOrdersIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    place_multiple_post_only_orders_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_multiple_post_only_orders_verify_account_keys(
     accounts: PlaceMultiplePostOnlyOrdersAccounts<'_, '_>,
@@ -4561,7 +4894,8 @@ impl PlaceMultiplePostOnlyOrdersWithFreeFundsIxData {
         Ok(data)
     }
 }
-pub fn place_multiple_post_only_orders_with_free_funds_ix(
+pub fn place_multiple_post_only_orders_with_free_funds_ix_with_program_id(
+    program_id: Pubkey,
     keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys,
     args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
 ) -> std::io::Result<Instruction> {
@@ -4569,31 +4903,59 @@ pub fn place_multiple_post_only_orders_with_free_funds_ix(
         keys.into();
     let data: PlaceMultiplePostOnlyOrdersWithFreeFundsIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_multiple_post_only_orders_with_free_funds_invoke<'info>(
-    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
+pub fn place_multiple_post_only_orders_with_free_funds_ix(
+    keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys,
+    args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
+) -> std::io::Result<Instruction> {
+    place_multiple_post_only_orders_with_free_funds_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn place_multiple_post_only_orders_with_free_funds_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
     args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
 ) -> ProgramResult {
     let keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys = accounts.into();
-    let ix = place_multiple_post_only_orders_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix =
+        place_multiple_post_only_orders_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn place_multiple_post_only_orders_with_free_funds_invoke_signed<'info>(
-    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, 'info>,
+pub fn place_multiple_post_only_orders_with_free_funds_invoke(
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
+    args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
+) -> ProgramResult {
+    place_multiple_post_only_orders_with_free_funds_invoke_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+    )
+}
+pub fn place_multiple_post_only_orders_with_free_funds_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
     args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: PlaceMultiplePostOnlyOrdersWithFreeFundsKeys = accounts.into();
-    let ix = place_multiple_post_only_orders_with_free_funds_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>;
-        PLACE_MULTIPLE_POST_ONLY_ORDERS_WITH_FREE_FUNDS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix =
+        place_multiple_post_only_orders_with_free_funds_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn place_multiple_post_only_orders_with_free_funds_invoke_signed(
+    accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
+    args: PlaceMultiplePostOnlyOrdersWithFreeFundsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    place_multiple_post_only_orders_with_free_funds_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn place_multiple_post_only_orders_with_free_funds_verify_account_keys(
     accounts: PlaceMultiplePostOnlyOrdersWithFreeFundsAccounts<'_, '_>,
@@ -4850,36 +5212,56 @@ impl InitializeMarketIxData {
         Ok(data)
     }
 }
-pub fn initialize_market_ix(
+pub fn initialize_market_ix_with_program_id(
+    program_id: Pubkey,
     keys: InitializeMarketKeys,
     args: InitializeMarketIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] = keys.into();
     let data: InitializeMarketIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_market_invoke<'info>(
-    accounts: InitializeMarketAccounts<'_, 'info>,
+pub fn initialize_market_ix(
+    keys: InitializeMarketKeys,
+    args: InitializeMarketIxArgs,
+) -> std::io::Result<Instruction> {
+    initialize_market_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn initialize_market_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeMarketAccounts<'_, '_>,
     args: InitializeMarketIxArgs,
 ) -> ProgramResult {
     let keys: InitializeMarketKeys = accounts.into();
-    let ix = initialize_market_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = initialize_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn initialize_market_invoke_signed<'info>(
-    accounts: InitializeMarketAccounts<'_, 'info>,
+pub fn initialize_market_invoke(
+    accounts: InitializeMarketAccounts<'_, '_>,
+    args: InitializeMarketIxArgs,
+) -> ProgramResult {
+    initialize_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeMarketAccounts<'_, '_>,
     args: InitializeMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: InitializeMarketKeys = accounts.into();
-    let ix = initialize_market_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; INITIALIZE_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = initialize_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn initialize_market_invoke_signed(
+    accounts: InitializeMarketAccounts<'_, '_>,
+    args: InitializeMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    initialize_market_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_market_verify_account_keys(
     accounts: InitializeMarketAccounts<'_, '_>,
@@ -5057,28 +5439,45 @@ impl ClaimAuthorityIxData {
         Ok(data)
     }
 }
-pub fn claim_authority_ix(keys: ClaimAuthorityKeys) -> std::io::Result<Instruction> {
+pub fn claim_authority_ix_with_program_id(
+    program_id: Pubkey,
+    keys: ClaimAuthorityKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ClaimAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn claim_authority_invoke<'info>(accounts: ClaimAuthorityAccounts<'_, 'info>) -> ProgramResult {
-    let keys: ClaimAuthorityKeys = accounts.into();
-    let ix = claim_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn claim_authority_ix(keys: ClaimAuthorityKeys) -> std::io::Result<Instruction> {
+    claim_authority_ix_with_program_id(crate::ID, keys)
 }
-pub fn claim_authority_invoke_signed<'info>(
-    accounts: ClaimAuthorityAccounts<'_, 'info>,
+pub fn claim_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ClaimAuthorityAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: ClaimAuthorityKeys = accounts.into();
+    let ix = claim_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn claim_authority_invoke(accounts: ClaimAuthorityAccounts<'_, '_>) -> ProgramResult {
+    claim_authority_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn claim_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ClaimAuthorityAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ClaimAuthorityKeys = accounts.into();
-    let ix = claim_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CLAIM_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = claim_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn claim_authority_invoke_signed(
+    accounts: ClaimAuthorityAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    claim_authority_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn claim_authority_verify_account_keys(
     accounts: ClaimAuthorityAccounts<'_, '_>,
@@ -5256,36 +5655,56 @@ impl NameSuccessorIxData {
         Ok(data)
     }
 }
-pub fn name_successor_ix(
+pub fn name_successor_ix_with_program_id(
+    program_id: Pubkey,
     keys: NameSuccessorKeys,
     args: NameSuccessorIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] = keys.into();
     let data: NameSuccessorIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn name_successor_invoke<'info>(
-    accounts: NameSuccessorAccounts<'_, 'info>,
+pub fn name_successor_ix(
+    keys: NameSuccessorKeys,
+    args: NameSuccessorIxArgs,
+) -> std::io::Result<Instruction> {
+    name_successor_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn name_successor_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: NameSuccessorAccounts<'_, '_>,
     args: NameSuccessorIxArgs,
 ) -> ProgramResult {
     let keys: NameSuccessorKeys = accounts.into();
-    let ix = name_successor_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = name_successor_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn name_successor_invoke_signed<'info>(
-    accounts: NameSuccessorAccounts<'_, 'info>,
+pub fn name_successor_invoke(
+    accounts: NameSuccessorAccounts<'_, '_>,
+    args: NameSuccessorIxArgs,
+) -> ProgramResult {
+    name_successor_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn name_successor_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: NameSuccessorAccounts<'_, '_>,
     args: NameSuccessorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: NameSuccessorKeys = accounts.into();
-    let ix = name_successor_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; NAME_SUCCESSOR_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = name_successor_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn name_successor_invoke_signed(
+    accounts: NameSuccessorAccounts<'_, '_>,
+    args: NameSuccessorIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    name_successor_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn name_successor_verify_account_keys(
     accounts: NameSuccessorAccounts<'_, '_>,
@@ -5463,36 +5882,56 @@ impl ChangeMarketStatusIxData {
         Ok(data)
     }
 }
-pub fn change_market_status_ix(
+pub fn change_market_status_ix_with_program_id(
+    program_id: Pubkey,
     keys: ChangeMarketStatusKeys,
     args: ChangeMarketStatusIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let data: ChangeMarketStatusIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn change_market_status_invoke<'info>(
-    accounts: ChangeMarketStatusAccounts<'_, 'info>,
+pub fn change_market_status_ix(
+    keys: ChangeMarketStatusKeys,
+    args: ChangeMarketStatusIxArgs,
+) -> std::io::Result<Instruction> {
+    change_market_status_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn change_market_status_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeMarketStatusAccounts<'_, '_>,
     args: ChangeMarketStatusIxArgs,
 ) -> ProgramResult {
     let keys: ChangeMarketStatusKeys = accounts.into();
-    let ix = change_market_status_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = change_market_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn change_market_status_invoke_signed<'info>(
-    accounts: ChangeMarketStatusAccounts<'_, 'info>,
+pub fn change_market_status_invoke(
+    accounts: ChangeMarketStatusAccounts<'_, '_>,
+    args: ChangeMarketStatusIxArgs,
+) -> ProgramResult {
+    change_market_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn change_market_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeMarketStatusAccounts<'_, '_>,
     args: ChangeMarketStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ChangeMarketStatusKeys = accounts.into();
-    let ix = change_market_status_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CHANGE_MARKET_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = change_market_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn change_market_status_invoke_signed(
+    accounts: ChangeMarketStatusAccounts<'_, '_>,
+    args: ChangeMarketStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    change_market_status_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn change_market_status_verify_account_keys(
     accounts: ChangeMarketStatusAccounts<'_, '_>,
@@ -5681,36 +6120,56 @@ impl ChangeSeatStatusIxData {
         Ok(data)
     }
 }
-pub fn change_seat_status_ix(
+pub fn change_seat_status_ix_with_program_id(
+    program_id: Pubkey,
     keys: ChangeSeatStatusKeys,
     args: ChangeSeatStatusIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] = keys.into();
     let data: ChangeSeatStatusIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn change_seat_status_invoke<'info>(
-    accounts: ChangeSeatStatusAccounts<'_, 'info>,
+pub fn change_seat_status_ix(
+    keys: ChangeSeatStatusKeys,
+    args: ChangeSeatStatusIxArgs,
+) -> std::io::Result<Instruction> {
+    change_seat_status_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn change_seat_status_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeSeatStatusAccounts<'_, '_>,
     args: ChangeSeatStatusIxArgs,
 ) -> ProgramResult {
     let keys: ChangeSeatStatusKeys = accounts.into();
-    let ix = change_seat_status_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = change_seat_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn change_seat_status_invoke_signed<'info>(
-    accounts: ChangeSeatStatusAccounts<'_, 'info>,
+pub fn change_seat_status_invoke(
+    accounts: ChangeSeatStatusAccounts<'_, '_>,
+    args: ChangeSeatStatusIxArgs,
+) -> ProgramResult {
+    change_seat_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn change_seat_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeSeatStatusAccounts<'_, '_>,
     args: ChangeSeatStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ChangeSeatStatusKeys = accounts.into();
-    let ix = change_seat_status_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CHANGE_SEAT_STATUS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = change_seat_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn change_seat_status_invoke_signed(
+    accounts: ChangeSeatStatusAccounts<'_, '_>,
+    args: ChangeSeatStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    change_seat_status_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn change_seat_status_verify_account_keys(
     accounts: ChangeSeatStatusAccounts<'_, '_>,
@@ -5924,32 +6383,47 @@ impl RequestSeatAuthorizedIxData {
         Ok(data)
     }
 }
-pub fn request_seat_authorized_ix(keys: RequestSeatAuthorizedKeys) -> std::io::Result<Instruction> {
+pub fn request_seat_authorized_ix_with_program_id(
+    program_id: Pubkey,
+    keys: RequestSeatAuthorizedKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: RequestSeatAuthorizedIxData.try_to_vec()?,
     })
 }
-pub fn request_seat_authorized_invoke<'info>(
-    accounts: RequestSeatAuthorizedAccounts<'_, 'info>,
+pub fn request_seat_authorized_ix(keys: RequestSeatAuthorizedKeys) -> std::io::Result<Instruction> {
+    request_seat_authorized_ix_with_program_id(crate::ID, keys)
+}
+pub fn request_seat_authorized_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RequestSeatAuthorizedAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: RequestSeatAuthorizedKeys = accounts.into();
-    let ix = request_seat_authorized_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = request_seat_authorized_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn request_seat_authorized_invoke_signed<'info>(
-    accounts: RequestSeatAuthorizedAccounts<'_, 'info>,
+pub fn request_seat_authorized_invoke(
+    accounts: RequestSeatAuthorizedAccounts<'_, '_>,
+) -> ProgramResult {
+    request_seat_authorized_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn request_seat_authorized_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RequestSeatAuthorizedAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RequestSeatAuthorizedKeys = accounts.into();
-    let ix = request_seat_authorized_ix(keys)?;
-    let account_info: [AccountInfo<'info>; REQUEST_SEAT_AUTHORIZED_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = request_seat_authorized_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn request_seat_authorized_invoke_signed(
+    accounts: RequestSeatAuthorizedAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    request_seat_authorized_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn request_seat_authorized_verify_account_keys(
     accounts: RequestSeatAuthorizedAccounts<'_, '_>,
@@ -6201,28 +6675,45 @@ impl EvictSeatIxData {
         Ok(data)
     }
 }
-pub fn evict_seat_ix(keys: EvictSeatKeys) -> std::io::Result<Instruction> {
+pub fn evict_seat_ix_with_program_id(
+    program_id: Pubkey,
+    keys: EvictSeatKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; EVICT_SEAT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: EvictSeatIxData.try_to_vec()?,
     })
 }
-pub fn evict_seat_invoke<'info>(accounts: EvictSeatAccounts<'_, 'info>) -> ProgramResult {
-    let keys: EvictSeatKeys = accounts.into();
-    let ix = evict_seat_ix(keys)?;
-    let account_info: [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn evict_seat_ix(keys: EvictSeatKeys) -> std::io::Result<Instruction> {
+    evict_seat_ix_with_program_id(crate::ID, keys)
 }
-pub fn evict_seat_invoke_signed<'info>(
-    accounts: EvictSeatAccounts<'_, 'info>,
+pub fn evict_seat_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: EvictSeatAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: EvictSeatKeys = accounts.into();
+    let ix = evict_seat_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn evict_seat_invoke(accounts: EvictSeatAccounts<'_, '_>) -> ProgramResult {
+    evict_seat_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn evict_seat_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: EvictSeatAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: EvictSeatKeys = accounts.into();
-    let ix = evict_seat_ix(keys)?;
-    let account_info: [AccountInfo<'info>; EVICT_SEAT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = evict_seat_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn evict_seat_invoke_signed(
+    accounts: EvictSeatAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    evict_seat_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn evict_seat_verify_account_keys(
     accounts: EvictSeatAccounts<'_, '_>,
@@ -6502,36 +6993,56 @@ impl ForceCancelOrdersIxData {
         Ok(data)
     }
 }
-pub fn force_cancel_orders_ix(
+pub fn force_cancel_orders_ix_with_program_id(
+    program_id: Pubkey,
     keys: ForceCancelOrdersKeys,
     args: ForceCancelOrdersIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     let data: ForceCancelOrdersIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn force_cancel_orders_invoke<'info>(
-    accounts: ForceCancelOrdersAccounts<'_, 'info>,
+pub fn force_cancel_orders_ix(
+    keys: ForceCancelOrdersKeys,
+    args: ForceCancelOrdersIxArgs,
+) -> std::io::Result<Instruction> {
+    force_cancel_orders_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn force_cancel_orders_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
     args: ForceCancelOrdersIxArgs,
 ) -> ProgramResult {
     let keys: ForceCancelOrdersKeys = accounts.into();
-    let ix = force_cancel_orders_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = force_cancel_orders_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn force_cancel_orders_invoke_signed<'info>(
-    accounts: ForceCancelOrdersAccounts<'_, 'info>,
+pub fn force_cancel_orders_invoke(
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+    args: ForceCancelOrdersIxArgs,
+) -> ProgramResult {
+    force_cancel_orders_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn force_cancel_orders_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
     args: ForceCancelOrdersIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ForceCancelOrdersKeys = accounts.into();
-    let ix = force_cancel_orders_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = force_cancel_orders_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn force_cancel_orders_invoke_signed(
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+    args: ForceCancelOrdersIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    force_cancel_orders_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn force_cancel_orders_verify_account_keys(
     accounts: ForceCancelOrdersAccounts<'_, '_>,
@@ -6750,28 +7261,45 @@ impl CollectFeesIxData {
         Ok(data)
     }
 }
-pub fn collect_fees_ix(keys: CollectFeesKeys) -> std::io::Result<Instruction> {
+pub fn collect_fees_ix_with_program_id(
+    program_id: Pubkey,
+    keys: CollectFeesKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; COLLECT_FEES_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: CollectFeesIxData.try_to_vec()?,
     })
 }
-pub fn collect_fees_invoke<'info>(accounts: CollectFeesAccounts<'_, 'info>) -> ProgramResult {
-    let keys: CollectFeesKeys = accounts.into();
-    let ix = collect_fees_ix(keys)?;
-    let account_info: [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn collect_fees_ix(keys: CollectFeesKeys) -> std::io::Result<Instruction> {
+    collect_fees_ix_with_program_id(crate::ID, keys)
 }
-pub fn collect_fees_invoke_signed<'info>(
-    accounts: CollectFeesAccounts<'_, 'info>,
+pub fn collect_fees_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CollectFeesAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: CollectFeesKeys = accounts.into();
+    let ix = collect_fees_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn collect_fees_invoke(accounts: CollectFeesAccounts<'_, '_>) -> ProgramResult {
+    collect_fees_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn collect_fees_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CollectFeesAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CollectFeesKeys = accounts.into();
-    let ix = collect_fees_ix(keys)?;
-    let account_info: [AccountInfo<'info>; COLLECT_FEES_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = collect_fees_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn collect_fees_invoke_signed(
+    accounts: CollectFeesAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    collect_fees_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn collect_fees_verify_account_keys(
     accounts: CollectFeesAccounts<'_, '_>,
@@ -6958,30 +7486,45 @@ impl ChangeFeeRecipientIxData {
         Ok(data)
     }
 }
-pub fn change_fee_recipient_ix(keys: ChangeFeeRecipientKeys) -> std::io::Result<Instruction> {
+pub fn change_fee_recipient_ix_with_program_id(
+    program_id: Pubkey,
+    keys: ChangeFeeRecipientKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ChangeFeeRecipientIxData.try_to_vec()?,
     })
 }
-pub fn change_fee_recipient_invoke<'info>(
-    accounts: ChangeFeeRecipientAccounts<'_, 'info>,
+pub fn change_fee_recipient_ix(keys: ChangeFeeRecipientKeys) -> std::io::Result<Instruction> {
+    change_fee_recipient_ix_with_program_id(crate::ID, keys)
+}
+pub fn change_fee_recipient_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeFeeRecipientAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ChangeFeeRecipientKeys = accounts.into();
-    let ix = change_fee_recipient_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = change_fee_recipient_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn change_fee_recipient_invoke_signed<'info>(
-    accounts: ChangeFeeRecipientAccounts<'_, 'info>,
+pub fn change_fee_recipient_invoke(accounts: ChangeFeeRecipientAccounts<'_, '_>) -> ProgramResult {
+    change_fee_recipient_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn change_fee_recipient_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ChangeFeeRecipientAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ChangeFeeRecipientKeys = accounts.into();
-    let ix = change_fee_recipient_ix(keys)?;
-    let account_info: [AccountInfo<'info>; CHANGE_FEE_RECIPIENT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = change_fee_recipient_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn change_fee_recipient_invoke_signed(
+    accounts: ChangeFeeRecipientAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    change_fee_recipient_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn change_fee_recipient_verify_account_keys(
     accounts: ChangeFeeRecipientAccounts<'_, '_>,

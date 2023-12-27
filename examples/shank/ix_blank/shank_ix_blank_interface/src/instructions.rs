@@ -2,6 +2,7 @@ use solana_program::{
     entrypoint::ProgramResult,
     instruction::Instruction,
     program::{invoke, invoke_signed},
+    pubkey::Pubkey,
 };
 use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
@@ -62,18 +63,30 @@ impl BlankIxIxData {
         Ok(data)
     }
 }
-pub fn blank_ix_ix() -> std::io::Result<Instruction> {
+pub fn blank_ix_ix_with_program_id(program_id: Pubkey) -> std::io::Result<Instruction> {
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::new(),
         data: BlankIxIxData.try_to_vec()?,
     })
 }
-pub fn blank_ix_invoke() -> ProgramResult {
-    let ix = blank_ix_ix()?;
+pub fn blank_ix_ix() -> std::io::Result<Instruction> {
+    blank_ix_ix_with_program_id(crate::ID)
+}
+pub fn blank_ix_invoke_with_program_id(program_id: Pubkey) -> ProgramResult {
+    let ix = blank_ix_ix_with_program_id(program_id)?;
     invoke(&ix, &[])
 }
-pub fn blank_ix_invoke_signed(seeds: &[&[&[u8]]]) -> ProgramResult {
-    let ix = blank_ix_ix()?;
+pub fn blank_ix_invoke() -> ProgramResult {
+    blank_ix_invoke_with_program_id(crate::ID)
+}
+pub fn blank_ix_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = blank_ix_ix_with_program_id(program_id)?;
     invoke_signed(&ix, &[], seeds)
+}
+pub fn blank_ix_invoke_signed(seeds: &[&[&[u8]]]) -> ProgramResult {
+    blank_ix_invoke_signed_with_program_id(crate::ID, seeds)
 }

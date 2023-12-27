@@ -90,6 +90,21 @@ impl UnstakeProgramIx {
         Ok(data)
     }
 }
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
 pub const INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN: usize = 3;
 #[derive(Copy, Clone, Debug)]
 pub struct InitProtocolFeeAccounts<'me, 'info> {
@@ -192,30 +207,45 @@ impl InitProtocolFeeIxData {
         Ok(data)
     }
 }
-pub fn init_protocol_fee_ix(keys: InitProtocolFeeKeys) -> std::io::Result<Instruction> {
+pub fn init_protocol_fee_ix_with_program_id(
+    program_id: Pubkey,
+    keys: InitProtocolFeeKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: InitProtocolFeeIxData.try_to_vec()?,
     })
 }
-pub fn init_protocol_fee_invoke<'info>(
-    accounts: InitProtocolFeeAccounts<'_, 'info>,
+pub fn init_protocol_fee_ix(keys: InitProtocolFeeKeys) -> std::io::Result<Instruction> {
+    init_protocol_fee_ix_with_program_id(crate::ID, keys)
+}
+pub fn init_protocol_fee_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: InitProtocolFeeAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: InitProtocolFeeKeys = accounts.into();
-    let ix = init_protocol_fee_ix(keys)?;
-    let account_info: [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = init_protocol_fee_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn init_protocol_fee_invoke_signed<'info>(
-    accounts: InitProtocolFeeAccounts<'_, 'info>,
+pub fn init_protocol_fee_invoke(accounts: InitProtocolFeeAccounts<'_, '_>) -> ProgramResult {
+    init_protocol_fee_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn init_protocol_fee_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitProtocolFeeAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: InitProtocolFeeKeys = accounts.into();
-    let ix = init_protocol_fee_ix(keys)?;
-    let account_info: [AccountInfo<'info>; INIT_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = init_protocol_fee_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn init_protocol_fee_invoke_signed(
+    accounts: InitProtocolFeeAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    init_protocol_fee_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn init_protocol_fee_verify_account_keys(
     accounts: InitProtocolFeeAccounts<'_, '_>,
@@ -364,36 +394,56 @@ impl SetProtocolFeeIxData {
         Ok(data)
     }
 }
-pub fn set_protocol_fee_ix(
+pub fn set_protocol_fee_ix_with_program_id(
+    program_id: Pubkey,
     keys: SetProtocolFeeKeys,
     args: SetProtocolFeeIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let data: SetProtocolFeeIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn set_protocol_fee_invoke<'info>(
-    accounts: SetProtocolFeeAccounts<'_, 'info>,
+pub fn set_protocol_fee_ix(
+    keys: SetProtocolFeeKeys,
+    args: SetProtocolFeeIxArgs,
+) -> std::io::Result<Instruction> {
+    set_protocol_fee_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn set_protocol_fee_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SetProtocolFeeAccounts<'_, '_>,
     args: SetProtocolFeeIxArgs,
 ) -> ProgramResult {
     let keys: SetProtocolFeeKeys = accounts.into();
-    let ix = set_protocol_fee_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = set_protocol_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn set_protocol_fee_invoke_signed<'info>(
-    accounts: SetProtocolFeeAccounts<'_, 'info>,
+pub fn set_protocol_fee_invoke(
+    accounts: SetProtocolFeeAccounts<'_, '_>,
+    args: SetProtocolFeeIxArgs,
+) -> ProgramResult {
+    set_protocol_fee_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn set_protocol_fee_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SetProtocolFeeAccounts<'_, '_>,
     args: SetProtocolFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SetProtocolFeeKeys = accounts.into();
-    let ix = set_protocol_fee_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SET_PROTOCOL_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = set_protocol_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn set_protocol_fee_invoke_signed(
+    accounts: SetProtocolFeeAccounts<'_, '_>,
+    args: SetProtocolFeeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    set_protocol_fee_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn set_protocol_fee_verify_account_keys(
     accounts: SetProtocolFeeAccounts<'_, '_>,
@@ -618,36 +668,56 @@ impl CreatePoolIxData {
         Ok(data)
     }
 }
-pub fn create_pool_ix(
+pub fn create_pool_ix_with_program_id(
+    program_id: Pubkey,
     keys: CreatePoolKeys,
     args: CreatePoolIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CREATE_POOL_IX_ACCOUNTS_LEN] = keys.into();
     let data: CreatePoolIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_pool_invoke<'info>(
-    accounts: CreatePoolAccounts<'_, 'info>,
+pub fn create_pool_ix(
+    keys: CreatePoolKeys,
+    args: CreatePoolIxArgs,
+) -> std::io::Result<Instruction> {
+    create_pool_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn create_pool_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: CreatePoolAccounts<'_, '_>,
     args: CreatePoolIxArgs,
 ) -> ProgramResult {
     let keys: CreatePoolKeys = accounts.into();
-    let ix = create_pool_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = create_pool_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn create_pool_invoke_signed<'info>(
-    accounts: CreatePoolAccounts<'_, 'info>,
+pub fn create_pool_invoke(
+    accounts: CreatePoolAccounts<'_, '_>,
+    args: CreatePoolIxArgs,
+) -> ProgramResult {
+    create_pool_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn create_pool_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CreatePoolAccounts<'_, '_>,
     args: CreatePoolIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: CreatePoolKeys = accounts.into();
-    let ix = create_pool_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; CREATE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = create_pool_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn create_pool_invoke_signed(
+    accounts: CreatePoolAccounts<'_, '_>,
+    args: CreatePoolIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    create_pool_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn create_pool_verify_account_keys(
     accounts: CreatePoolAccounts<'_, '_>,
@@ -864,36 +934,56 @@ impl AddLiquidityIxData {
         Ok(data)
     }
 }
-pub fn add_liquidity_ix(
+pub fn add_liquidity_ix_with_program_id(
+    program_id: Pubkey,
     keys: AddLiquidityKeys,
     args: AddLiquidityIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
     let data: AddLiquidityIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn add_liquidity_invoke<'info>(
-    accounts: AddLiquidityAccounts<'_, 'info>,
+pub fn add_liquidity_ix(
+    keys: AddLiquidityKeys,
+    args: AddLiquidityIxArgs,
+) -> std::io::Result<Instruction> {
+    add_liquidity_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn add_liquidity_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: AddLiquidityAccounts<'_, '_>,
     args: AddLiquidityIxArgs,
 ) -> ProgramResult {
     let keys: AddLiquidityKeys = accounts.into();
-    let ix = add_liquidity_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = add_liquidity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn add_liquidity_invoke_signed<'info>(
-    accounts: AddLiquidityAccounts<'_, 'info>,
+pub fn add_liquidity_invoke(
+    accounts: AddLiquidityAccounts<'_, '_>,
+    args: AddLiquidityIxArgs,
+) -> ProgramResult {
+    add_liquidity_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn add_liquidity_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: AddLiquidityAccounts<'_, '_>,
     args: AddLiquidityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: AddLiquidityKeys = accounts.into();
-    let ix = add_liquidity_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = add_liquidity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn add_liquidity_invoke_signed(
+    accounts: AddLiquidityAccounts<'_, '_>,
+    args: AddLiquidityIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    add_liquidity_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn add_liquidity_verify_account_keys(
     accounts: AddLiquidityAccounts<'_, '_>,
@@ -1115,36 +1205,56 @@ impl RemoveLiquidityIxData {
         Ok(data)
     }
 }
-pub fn remove_liquidity_ix(
+pub fn remove_liquidity_ix_with_program_id(
+    program_id: Pubkey,
     keys: RemoveLiquidityKeys,
     args: RemoveLiquidityIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
     let data: RemoveLiquidityIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_liquidity_invoke<'info>(
-    accounts: RemoveLiquidityAccounts<'_, 'info>,
+pub fn remove_liquidity_ix(
+    keys: RemoveLiquidityKeys,
+    args: RemoveLiquidityIxArgs,
+) -> std::io::Result<Instruction> {
+    remove_liquidity_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn remove_liquidity_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RemoveLiquidityAccounts<'_, '_>,
     args: RemoveLiquidityIxArgs,
 ) -> ProgramResult {
     let keys: RemoveLiquidityKeys = accounts.into();
-    let ix = remove_liquidity_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = remove_liquidity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn remove_liquidity_invoke_signed<'info>(
-    accounts: RemoveLiquidityAccounts<'_, 'info>,
+pub fn remove_liquidity_invoke(
+    accounts: RemoveLiquidityAccounts<'_, '_>,
+    args: RemoveLiquidityIxArgs,
+) -> ProgramResult {
+    remove_liquidity_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn remove_liquidity_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RemoveLiquidityAccounts<'_, '_>,
     args: RemoveLiquidityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: RemoveLiquidityKeys = accounts.into();
-    let ix = remove_liquidity_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = remove_liquidity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn remove_liquidity_invoke_signed(
+    accounts: RemoveLiquidityAccounts<'_, '_>,
+    args: RemoveLiquidityIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    remove_liquidity_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn remove_liquidity_verify_account_keys(
     accounts: RemoveLiquidityAccounts<'_, '_>,
@@ -1335,33 +1445,50 @@ impl SetFeeIxData {
         Ok(data)
     }
 }
-pub fn set_fee_ix(keys: SetFeeKeys, args: SetFeeIxArgs) -> std::io::Result<Instruction> {
+pub fn set_fee_ix_with_program_id(
+    program_id: Pubkey,
+    keys: SetFeeKeys,
+    args: SetFeeIxArgs,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SET_FEE_IX_ACCOUNTS_LEN] = keys.into();
     let data: SetFeeIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn set_fee_invoke<'info>(
-    accounts: SetFeeAccounts<'_, 'info>,
+pub fn set_fee_ix(keys: SetFeeKeys, args: SetFeeIxArgs) -> std::io::Result<Instruction> {
+    set_fee_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn set_fee_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SetFeeAccounts<'_, '_>,
     args: SetFeeIxArgs,
 ) -> ProgramResult {
     let keys: SetFeeKeys = accounts.into();
-    let ix = set_fee_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = set_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn set_fee_invoke_signed<'info>(
-    accounts: SetFeeAccounts<'_, 'info>,
+pub fn set_fee_invoke(accounts: SetFeeAccounts<'_, '_>, args: SetFeeIxArgs) -> ProgramResult {
+    set_fee_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn set_fee_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SetFeeAccounts<'_, '_>,
     args: SetFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SetFeeKeys = accounts.into();
-    let ix = set_fee_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; SET_FEE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = set_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn set_fee_invoke_signed(
+    accounts: SetFeeAccounts<'_, '_>,
+    args: SetFeeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    set_fee_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn set_fee_verify_account_keys(
     accounts: SetFeeAccounts<'_, '_>,
@@ -1509,30 +1636,45 @@ impl SetFeeAuthorityIxData {
         Ok(data)
     }
 }
-pub fn set_fee_authority_ix(keys: SetFeeAuthorityKeys) -> std::io::Result<Instruction> {
+pub fn set_fee_authority_ix_with_program_id(
+    program_id: Pubkey,
+    keys: SetFeeAuthorityKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: SetFeeAuthorityIxData.try_to_vec()?,
     })
 }
-pub fn set_fee_authority_invoke<'info>(
-    accounts: SetFeeAuthorityAccounts<'_, 'info>,
+pub fn set_fee_authority_ix(keys: SetFeeAuthorityKeys) -> std::io::Result<Instruction> {
+    set_fee_authority_ix_with_program_id(crate::ID, keys)
+}
+pub fn set_fee_authority_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SetFeeAuthorityAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: SetFeeAuthorityKeys = accounts.into();
-    let ix = set_fee_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = set_fee_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn set_fee_authority_invoke_signed<'info>(
-    accounts: SetFeeAuthorityAccounts<'_, 'info>,
+pub fn set_fee_authority_invoke(accounts: SetFeeAuthorityAccounts<'_, '_>) -> ProgramResult {
+    set_fee_authority_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn set_fee_authority_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SetFeeAuthorityAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: SetFeeAuthorityKeys = accounts.into();
-    let ix = set_fee_authority_ix(keys)?;
-    let account_info: [AccountInfo<'info>; SET_FEE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = set_fee_authority_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn set_fee_authority_invoke_signed(
+    accounts: SetFeeAuthorityAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    set_fee_authority_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn set_fee_authority_verify_account_keys(
     accounts: SetFeeAuthorityAccounts<'_, '_>,
@@ -1700,34 +1842,49 @@ impl DeactivateStakeAccountIxData {
         Ok(data)
     }
 }
-pub fn deactivate_stake_account_ix(
+pub fn deactivate_stake_account_ix_with_program_id(
+    program_id: Pubkey,
     keys: DeactivateStakeAccountKeys,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: DeactivateStakeAccountIxData.try_to_vec()?,
     })
 }
-pub fn deactivate_stake_account_invoke<'info>(
-    accounts: DeactivateStakeAccountAccounts<'_, 'info>,
+pub fn deactivate_stake_account_ix(
+    keys: DeactivateStakeAccountKeys,
+) -> std::io::Result<Instruction> {
+    deactivate_stake_account_ix_with_program_id(crate::ID, keys)
+}
+pub fn deactivate_stake_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeactivateStakeAccountAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: DeactivateStakeAccountKeys = accounts.into();
-    let ix = deactivate_stake_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    let ix = deactivate_stake_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn deactivate_stake_account_invoke_signed<'info>(
-    accounts: DeactivateStakeAccountAccounts<'_, 'info>,
+pub fn deactivate_stake_account_invoke(
+    accounts: DeactivateStakeAccountAccounts<'_, '_>,
+) -> ProgramResult {
+    deactivate_stake_account_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn deactivate_stake_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeactivateStakeAccountAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: DeactivateStakeAccountKeys = accounts.into();
-    let ix = deactivate_stake_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = deactivate_stake_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn deactivate_stake_account_invoke_signed(
+    accounts: DeactivateStakeAccountAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    deactivate_stake_account_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn deactivate_stake_account_verify_account_keys(
     accounts: DeactivateStakeAccountAccounts<'_, '_>,
@@ -1908,30 +2065,47 @@ impl ReclaimStakeAccountIxData {
         Ok(data)
     }
 }
-pub fn reclaim_stake_account_ix(keys: ReclaimStakeAccountKeys) -> std::io::Result<Instruction> {
+pub fn reclaim_stake_account_ix_with_program_id(
+    program_id: Pubkey,
+    keys: ReclaimStakeAccountKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: ReclaimStakeAccountIxData.try_to_vec()?,
     })
 }
-pub fn reclaim_stake_account_invoke<'info>(
-    accounts: ReclaimStakeAccountAccounts<'_, 'info>,
+pub fn reclaim_stake_account_ix(keys: ReclaimStakeAccountKeys) -> std::io::Result<Instruction> {
+    reclaim_stake_account_ix_with_program_id(crate::ID, keys)
+}
+pub fn reclaim_stake_account_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ReclaimStakeAccountAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ReclaimStakeAccountKeys = accounts.into();
-    let ix = reclaim_stake_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+    let ix = reclaim_stake_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
 }
-pub fn reclaim_stake_account_invoke_signed<'info>(
-    accounts: ReclaimStakeAccountAccounts<'_, 'info>,
+pub fn reclaim_stake_account_invoke(
+    accounts: ReclaimStakeAccountAccounts<'_, '_>,
+) -> ProgramResult {
+    reclaim_stake_account_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn reclaim_stake_account_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ReclaimStakeAccountAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: ReclaimStakeAccountKeys = accounts.into();
-    let ix = reclaim_stake_account_ix(keys)?;
-    let account_info: [AccountInfo<'info>; RECLAIM_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = reclaim_stake_account_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn reclaim_stake_account_invoke_signed(
+    accounts: ReclaimStakeAccountAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    reclaim_stake_account_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn reclaim_stake_account_verify_account_keys(
     accounts: ReclaimStakeAccountAccounts<'_, '_>,
@@ -2186,28 +2360,45 @@ impl UnstakeIxData {
         Ok(data)
     }
 }
-pub fn unstake_ix(keys: UnstakeKeys) -> std::io::Result<Instruction> {
+pub fn unstake_ix_with_program_id(
+    program_id: Pubkey,
+    keys: UnstakeKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UNSTAKE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: UnstakeIxData.try_to_vec()?,
     })
 }
-pub fn unstake_invoke<'info>(accounts: UnstakeAccounts<'_, 'info>) -> ProgramResult {
-    let keys: UnstakeKeys = accounts.into();
-    let ix = unstake_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn unstake_ix(keys: UnstakeKeys) -> std::io::Result<Instruction> {
+    unstake_ix_with_program_id(crate::ID, keys)
 }
-pub fn unstake_invoke_signed<'info>(
-    accounts: UnstakeAccounts<'_, 'info>,
+pub fn unstake_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UnstakeAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: UnstakeKeys = accounts.into();
+    let ix = unstake_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn unstake_invoke(accounts: UnstakeAccounts<'_, '_>) -> ProgramResult {
+    unstake_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn unstake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UnstakeAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UnstakeKeys = accounts.into();
-    let ix = unstake_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = unstake_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn unstake_invoke_signed(
+    accounts: UnstakeAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    unstake_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn unstake_verify_account_keys(
     accounts: UnstakeAccounts<'_, '_>,
@@ -2501,28 +2692,45 @@ impl UnstakeWsolIxData {
         Ok(data)
     }
 }
-pub fn unstake_wsol_ix(keys: UnstakeWsolKeys) -> std::io::Result<Instruction> {
+pub fn unstake_wsol_ix_with_program_id(
+    program_id: Pubkey,
+    keys: UnstakeWsolKeys,
+) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: UnstakeWsolIxData.try_to_vec()?,
     })
 }
-pub fn unstake_wsol_invoke<'info>(accounts: UnstakeWsolAccounts<'_, 'info>) -> ProgramResult {
-    let keys: UnstakeWsolKeys = accounts.into();
-    let ix = unstake_wsol_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke(&ix, &account_info)
+pub fn unstake_wsol_ix(keys: UnstakeWsolKeys) -> std::io::Result<Instruction> {
+    unstake_wsol_ix_with_program_id(crate::ID, keys)
 }
-pub fn unstake_wsol_invoke_signed<'info>(
-    accounts: UnstakeWsolAccounts<'_, 'info>,
+pub fn unstake_wsol_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UnstakeWsolAccounts<'_, '_>,
+) -> ProgramResult {
+    let keys: UnstakeWsolKeys = accounts.into();
+    let ix = unstake_wsol_ix_with_program_id(program_id, keys)?;
+    invoke_instruction(&ix, accounts)
+}
+pub fn unstake_wsol_invoke(accounts: UnstakeWsolAccounts<'_, '_>) -> ProgramResult {
+    unstake_wsol_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn unstake_wsol_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UnstakeWsolAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: UnstakeWsolKeys = accounts.into();
-    let ix = unstake_wsol_ix(keys)?;
-    let account_info: [AccountInfo<'info>; UNSTAKE_WSOL_IX_ACCOUNTS_LEN] = accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    let ix = unstake_wsol_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
+}
+pub fn unstake_wsol_invoke_signed(
+    accounts: UnstakeWsolAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    unstake_wsol_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn unstake_wsol_verify_account_keys(
     accounts: UnstakeWsolAccounts<'_, '_>,

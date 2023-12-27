@@ -21,6 +21,7 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
     - [Accounts From Array](#accounts-from-array)
     - [Instruction Accounts Verification Functions](#instruction-accounts-verification-functions)
     - [Zero-copy/bytemuck support](#zero-copy-bytemuck-support)
+    - [`*_with_program_id()`](#_with_program_id)
   - [Comparison To Similar Libs](#comparison-to-similar-libs)
     - [anchor-gen](#anchor-gen)
   - [Known Missing Features](#known-missing-features)
@@ -264,6 +265,16 @@ This function is not generated if the instruction has no privileged account inpu
 ### Zero-copy/bytemuck support
 
 Pass `-z <name-of-type-or-account-in-idl>` to additionally derive `Pod + Zeroable + Copy` for the generated types. Accepts multiple options. The correctness of the derive is not checked.
+
+### `*_with_program_id()`
+
+The following instructions that take a program ID pubkey as argument are also exported:
+
+- `*_ix_with_program_id()`
+- `*_invoke_with_program_id()`
+- `*_invoke_signed_with_program_id()`
+
+They allow the creation of `Instruction`s and invoking of programs of the same interface at a different program ID.
 
 ## Comparison To Similar Libs
 
