@@ -139,7 +139,7 @@ pub fn no_args_ix_verify_account_keys(
     }
     Ok(())
 }
-pub fn no_args_ix_verify_account_privileges<'me, 'info>(
+pub fn no_args_ix_verify_writable_privileges<'me, 'info>(
     accounts: NoArgsIxAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.b] {
@@ -147,5 +147,11 @@ pub fn no_args_ix_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn no_args_ix_verify_account_privileges<'me, 'info>(
+    accounts: NoArgsIxAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    no_args_ix_verify_writable_privileges(accounts)?;
     Ok(())
 }

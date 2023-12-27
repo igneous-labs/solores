@@ -580,8 +580,10 @@ impl NamedInstruction {
         });
     }
 
-    // _verify_account_privileges
-    pub fn write_verify_account_privileges_fn(
+    // _verify_account_privileges()
+    // _verify_writable_privileges()
+    // _verify_signer_privileges()
+    pub fn write_verify_account_privileges_fns(
         &self,
         tokens: &mut TokenStream,
         unique_accounts: &[&IxAccount],
@@ -591,7 +593,14 @@ impl NamedInstruction {
         }
         let verify_account_privileges_fn_ident =
             format_ident!("{}_verify_account_privileges", self.name.to_snake_case());
+        let verify_writable_privileges_fn_ident =
+            format_ident!("{}_verify_writable_privileges", self.name.to_snake_case());
+        let verify_signer_privileges_fn_ident =
+            format_ident!("{}_verify_signer_privileges", self.name.to_snake_case());
         let accounts_ident = self.accounts_ident();
+
+        let mut verify_fn_body = quote! {};
+
         let mut writables = unique_accounts
             .iter()
             .filter_map(|a| {
@@ -605,19 +614,27 @@ impl NamedInstruction {
                 }
             })
             .peekable();
-        let writables_loop_check = if writables.peek().is_none() {
-            quote! {}
-        } else {
-            quote! {
-                for should_be_writable in [
-                    #(#writables),*
-                ] {
-                    if !should_be_writable.is_writable {
-                        return Err((should_be_writable, ProgramError::InvalidAccountData));
+        let has_writables = writables.peek().is_some();
+        if has_writables {
+            tokens.extend(quote! {
+                pub fn #verify_writable_privileges_fn_ident<'me, 'info>(
+                    accounts: #accounts_ident<'me, 'info>,
+                ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+                    for should_be_writable in [
+                        #(#writables),*
+                    ] {
+                        if !should_be_writable.is_writable {
+                            return Err((should_be_writable, ProgramError::InvalidAccountData));
+                        }
                     }
+                    Ok(())
                 }
-            }
-        };
+            });
+            verify_fn_body.extend(quote! {
+                #verify_writable_privileges_fn_ident(accounts)?;
+            });
+        }
+
         let mut signers = unique_accounts
             .iter()
             .filter_map(|a| {
@@ -631,25 +648,32 @@ impl NamedInstruction {
                 }
             })
             .peekable();
-        let signers_loop_check = if signers.peek().is_none() {
-            quote! {}
-        } else {
-            quote! {
-                for should_be_signer in [
-                    #(#signers),*
-                ] {
-                    if !should_be_signer.is_signer {
-                        return Err((should_be_signer, ProgramError::MissingRequiredSignature));
+        let has_signers = signers.peek().is_some();
+        if has_signers {
+            tokens.extend(quote! {
+                pub fn #verify_signer_privileges_fn_ident<'me, 'info>(
+                    accounts: #accounts_ident<'me, 'info>,
+                ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+                    for should_be_signer in [
+                        #(#signers),*
+                    ] {
+                        if !should_be_signer.is_signer {
+                            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
+                        }
                     }
+                    Ok(())
                 }
-            }
-        };
+            });
+            verify_fn_body.extend(quote! {
+                #verify_signer_privileges_fn_ident(accounts)?;
+            });
+        }
+
         tokens.extend(quote! {
             pub fn #verify_account_privileges_fn_ident<'me, 'info>(
                 accounts: #accounts_ident<'me, 'info>,
             ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
-                #writables_loop_check
-                #signers_loop_check
+                #verify_fn_body
                 Ok(())
             }
         });
@@ -691,7 +715,7 @@ impl ToTokens for NamedInstruction {
         self.write_invoke_signed_fn(tokens);
 
         self.write_verify_account_keys_fn(tokens, unique_accounts);
-        self.write_verify_account_privileges_fn(tokens, unique_accounts);
+        self.write_verify_account_privileges_fns(tokens, unique_accounts);
     }
 }
 

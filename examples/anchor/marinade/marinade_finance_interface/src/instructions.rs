@@ -480,7 +480,7 @@ pub fn initialize_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_verify_account_privileges<'me, 'info>(
+pub fn initialize_verify_writable_privileges<'me, 'info>(
     accounts: InitializeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.stake_list, accounts.validator_list] {
@@ -488,11 +488,23 @@ pub fn initialize_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.creator_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_account_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_verify_writable_privileges(accounts)?;
+    initialize_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CHANGE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 2;
@@ -639,7 +651,7 @@ pub fn change_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn change_authority_verify_account_privileges<'me, 'info>(
+pub fn change_authority_verify_writable_privileges<'me, 'info>(
     accounts: ChangeAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -647,11 +659,23 @@ pub fn change_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn change_authority_verify_signer_privileges<'me, 'info>(
+    accounts: ChangeAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn change_authority_verify_account_privileges<'me, 'info>(
+    accounts: ChangeAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    change_authority_verify_writable_privileges(accounts)?;
+    change_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_VALIDATOR_IX_ACCOUNTS_LEN: usize = 9;
@@ -885,7 +909,7 @@ pub fn add_validator_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_validator_verify_account_privileges<'me, 'info>(
+pub fn add_validator_verify_writable_privileges<'me, 'info>(
     accounts: AddValidatorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -898,11 +922,23 @@ pub fn add_validator_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_validator_verify_signer_privileges<'me, 'info>(
+    accounts: AddValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority, accounts.rent_payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_validator_verify_account_privileges<'me, 'info>(
+    accounts: AddValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_validator_verify_writable_privileges(accounts)?;
+    add_validator_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_VALIDATOR_IX_ACCOUNTS_LEN: usize = 5;
@@ -1092,7 +1128,7 @@ pub fn remove_validator_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_validator_verify_account_privileges<'me, 'info>(
+pub fn remove_validator_verify_writable_privileges<'me, 'info>(
     accounts: RemoveValidatorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1105,11 +1141,23 @@ pub fn remove_validator_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_validator_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_validator_verify_account_privileges<'me, 'info>(
+    accounts: RemoveValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_validator_verify_writable_privileges(accounts)?;
+    remove_validator_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN: usize = 3;
@@ -1273,7 +1321,7 @@ pub fn set_validator_score_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_validator_score_verify_account_privileges<'me, 'info>(
+pub fn set_validator_score_verify_writable_privileges<'me, 'info>(
     accounts: SetValidatorScoreAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.validator_list] {
@@ -1281,11 +1329,23 @@ pub fn set_validator_score_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn set_validator_score_verify_signer_privileges<'me, 'info>(
+    accounts: SetValidatorScoreAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn set_validator_score_verify_account_privileges<'me, 'info>(
+    accounts: SetValidatorScoreAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    set_validator_score_verify_writable_privileges(accounts)?;
+    set_validator_score_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN: usize = 2;
@@ -1434,7 +1494,7 @@ pub fn config_validator_system_verify_account_keys(
     }
     Ok(())
 }
-pub fn config_validator_system_verify_account_privileges<'me, 'info>(
+pub fn config_validator_system_verify_writable_privileges<'me, 'info>(
     accounts: ConfigValidatorSystemAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -1442,11 +1502,23 @@ pub fn config_validator_system_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn config_validator_system_verify_signer_privileges<'me, 'info>(
+    accounts: ConfigValidatorSystemAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn config_validator_system_verify_account_privileges<'me, 'info>(
+    accounts: ConfigValidatorSystemAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    config_validator_system_verify_writable_privileges(accounts)?;
+    config_validator_system_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 11;
@@ -1705,7 +1777,7 @@ pub fn deposit_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_verify_account_privileges<'me, 'info>(
+pub fn deposit_verify_writable_privileges<'me, 'info>(
     accounts: DepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1721,11 +1793,23 @@ pub fn deposit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_signer_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.transfer_from] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_account_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_verify_writable_privileges(accounts)?;
+    deposit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN: usize = 15;
@@ -2031,7 +2115,7 @@ pub fn deposit_stake_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
+pub fn deposit_stake_account_verify_writable_privileges<'me, 'info>(
     accounts: DepositStakeAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2048,11 +2132,23 @@ pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_stake_account_verify_signer_privileges<'me, 'info>(
+    accounts: DepositStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.stake_authority, accounts.rent_payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
+    accounts: DepositStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_stake_account_verify_writable_privileges(accounts)?;
+    deposit_stake_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUID_UNSTAKE_IX_ACCOUNTS_LEN: usize = 10;
@@ -2307,7 +2403,7 @@ pub fn liquid_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
+pub fn liquid_unstake_verify_writable_privileges<'me, 'info>(
     accounts: LiquidUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2323,11 +2419,23 @@ pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquid_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.get_msol_from_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
+    accounts: LiquidUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquid_unstake_verify_writable_privileges(accounts)?;
+    liquid_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 9;
@@ -2564,7 +2672,7 @@ pub fn add_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_liquidity_verify_account_privileges<'me, 'info>(
+pub fn add_liquidity_verify_writable_privileges<'me, 'info>(
     accounts: AddLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2578,11 +2686,23 @@ pub fn add_liquidity_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_liquidity_verify_signer_privileges<'me, 'info>(
+    accounts: AddLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.transfer_from] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: AddLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_liquidity_verify_writable_privileges(accounts)?;
+    add_liquidity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 11;
@@ -2846,7 +2966,7 @@ pub fn remove_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
+pub fn remove_liquidity_verify_writable_privileges<'me, 'info>(
     accounts: RemoveLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2862,11 +2982,23 @@ pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_liquidity_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.burn_from_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: RemoveLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_liquidity_verify_writable_privileges(accounts)?;
+    remove_liquidity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SET_LP_PARAMS_IX_ACCOUNTS_LEN: usize = 2;
@@ -3015,7 +3147,7 @@ pub fn set_lp_params_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_lp_params_verify_account_privileges<'me, 'info>(
+pub fn set_lp_params_verify_writable_privileges<'me, 'info>(
     accounts: SetLpParamsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -3023,11 +3155,23 @@ pub fn set_lp_params_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn set_lp_params_verify_signer_privileges<'me, 'info>(
+    accounts: SetLpParamsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn set_lp_params_verify_account_privileges<'me, 'info>(
+    accounts: SetLpParamsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    set_lp_params_verify_writable_privileges(accounts)?;
+    set_lp_params_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CONFIG_MARINADE_IX_ACCOUNTS_LEN: usize = 2;
@@ -3174,7 +3318,7 @@ pub fn config_marinade_verify_account_keys(
     }
     Ok(())
 }
-pub fn config_marinade_verify_account_privileges<'me, 'info>(
+pub fn config_marinade_verify_writable_privileges<'me, 'info>(
     accounts: ConfigMarinadeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -3182,11 +3326,23 @@ pub fn config_marinade_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn config_marinade_verify_signer_privileges<'me, 'info>(
+    accounts: ConfigMarinadeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn config_marinade_verify_account_privileges<'me, 'info>(
+    accounts: ConfigMarinadeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    config_marinade_verify_writable_privileges(accounts)?;
+    config_marinade_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ORDER_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
@@ -3408,7 +3564,7 @@ pub fn order_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn order_unstake_verify_account_privileges<'me, 'info>(
+pub fn order_unstake_verify_writable_privileges<'me, 'info>(
     accounts: OrderUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3421,11 +3577,23 @@ pub fn order_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn order_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: OrderUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.burn_msol_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn order_unstake_verify_account_privileges<'me, 'info>(
+    accounts: OrderUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    order_unstake_verify_writable_privileges(accounts)?;
+    order_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CLAIM_IX_ACCOUNTS_LEN: usize = 6;
@@ -3602,7 +3770,7 @@ pub fn claim_verify_account_keys(
     }
     Ok(())
 }
-pub fn claim_verify_account_privileges<'me, 'info>(
+pub fn claim_verify_writable_privileges<'me, 'info>(
     accounts: ClaimAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3615,6 +3783,12 @@ pub fn claim_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn claim_verify_account_privileges<'me, 'info>(
+    accounts: ClaimAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    claim_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const STAKE_RESERVE_IX_ACCOUNTS_LEN: usize = 14;
@@ -3911,7 +4085,7 @@ pub fn stake_reserve_verify_account_keys(
     }
     Ok(())
 }
-pub fn stake_reserve_verify_account_privileges<'me, 'info>(
+pub fn stake_reserve_verify_writable_privileges<'me, 'info>(
     accounts: StakeReserveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3926,6 +4100,12 @@ pub fn stake_reserve_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn stake_reserve_verify_account_privileges<'me, 'info>(
+    accounts: StakeReserveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    stake_reserve_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_ACTIVE_IX_ACCOUNTS_LEN: usize = 13;
@@ -4229,7 +4409,7 @@ pub fn update_active_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_active_verify_account_privileges<'me, 'info>(
+pub fn update_active_verify_writable_privileges<'me, 'info>(
     accounts: UpdateActiveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4245,6 +4425,12 @@ pub fn update_active_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_active_verify_account_privileges<'me, 'info>(
+    accounts: UpdateActiveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_active_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN: usize = 14;
@@ -4562,7 +4748,7 @@ pub fn update_deactivated_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_deactivated_verify_account_privileges<'me, 'info>(
+pub fn update_deactivated_verify_writable_privileges<'me, 'info>(
     accounts: UpdateDeactivatedAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4578,6 +4764,12 @@ pub fn update_deactivated_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_deactivated_verify_account_privileges<'me, 'info>(
+    accounts: UpdateDeactivatedAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_deactivated_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const DEACTIVATE_STAKE_IX_ACCOUNTS_LEN: usize = 14;
@@ -4878,7 +5070,7 @@ pub fn deactivate_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
+pub fn deactivate_stake_verify_writable_privileges<'me, 'info>(
     accounts: DeactivateStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4893,6 +5085,11 @@ pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deactivate_stake_verify_signer_privileges<'me, 'info>(
+    accounts: DeactivateStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.split_stake_account,
         accounts.split_stake_rent_payer,
@@ -4901,6 +5098,13 @@ pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
+    accounts: DeactivateStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deactivate_stake_verify_writable_privileges(accounts)?;
+    deactivate_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
@@ -5129,7 +5333,7 @@ pub fn emergency_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
+pub fn emergency_unstake_verify_writable_privileges<'me, 'info>(
     accounts: EmergencyUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -5142,11 +5346,23 @@ pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn emergency_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: EmergencyUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.validator_manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
+    accounts: EmergencyUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    emergency_unstake_verify_writable_privileges(accounts)?;
+    emergency_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MERGE_STAKES_IX_ACCOUNTS_LEN: usize = 11;
@@ -5415,7 +5631,7 @@ pub fn merge_stakes_verify_account_keys(
     }
     Ok(())
 }
-pub fn merge_stakes_verify_account_privileges<'me, 'info>(
+pub fn merge_stakes_verify_writable_privileges<'me, 'info>(
     accounts: MergeStakesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -5430,5 +5646,11 @@ pub fn merge_stakes_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn merge_stakes_verify_account_privileges<'me, 'info>(
+    accounts: MergeStakesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    merge_stakes_verify_writable_privileges(accounts)?;
     Ok(())
 }
