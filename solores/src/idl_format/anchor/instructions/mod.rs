@@ -19,21 +19,22 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
     fn gen_head(&self) -> TokenStream {
         let mut res = quote! {};
-        for ix in self.instructions {
-            if ix.has_ix_args() {
-                res.extend(quote! {
-                    use borsh::{BorshDeserialize, BorshSerialize};
-                });
-                break;
-            }
+        let has_args = self
+            .instructions
+            .iter()
+            .map(|ix| ix.has_ix_args())
+            .any(|b| b);
+        if has_args {
+            res.extend(quote! {
+                use borsh::{BorshDeserialize, BorshSerialize};
+            });
         }
-        let mut has_accounts = false;
-        for ix in self.instructions {
-            if ix.has_accounts() {
-                has_accounts = true;
-                break;
-            }
-        }
+        let has_accounts = self
+            .instructions
+            .iter()
+            .map(|ix| ix.has_accounts())
+            .any(|b| b);
+
         let mut solana_program_imports = if has_accounts {
             quote! {
                 account_info::AccountInfo,
@@ -43,32 +44,47 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 pubkey::Pubkey,
             }
         } else {
-            quote! {
+            let mut res = quote! {
                 entrypoint::ProgramResult,
                 instruction::Instruction,
                 program::{invoke, invoke_signed},
-            }
-        };
-        for ix in self.instructions {
-            if ix.has_privileged_accounts() {
-                solana_program_imports.extend(quote! {
-                    program_error::ProgramError,
+            };
+            let has_pubkey = self
+                .instructions
+                .iter()
+                .map(|ix| ix.args_has_pubkeys())
+                .any(|b| b);
+            if has_pubkey {
+                res.extend(quote! {
+                    pubkey::Pubkey,
                 });
-                break;
             }
+            res
+        };
+        let has_privileged_accounts = self
+            .instructions
+            .iter()
+            .map(|ix| ix.has_privileged_accounts())
+            .any(|b| b);
+        if has_privileged_accounts {
+            solana_program_imports.extend(quote! {
+                program_error::ProgramError,
+            });
         }
+
         res.extend(quote! {
             use solana_program::{#solana_program_imports};
             use std::io::Read;
         });
-
-        for ix in self.instructions {
-            if ix.args_has_defined_type() {
-                res.extend(quote! {
-                    use crate::*;
-                });
-                break;
-            }
+        let has_defined_type = self
+            .instructions
+            .iter()
+            .map(|ix| ix.args_has_defined_type())
+            .any(|b| b);
+        if has_defined_type {
+            res.extend(quote! {
+                use crate::*;
+            });
         }
 
         // program ix enum

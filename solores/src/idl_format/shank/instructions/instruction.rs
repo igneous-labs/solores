@@ -69,6 +69,15 @@ impl NamedInstruction {
         args.iter().map(|a| a.r#type.is_or_has_defined()).any(|b| b)
     }
 
+    pub fn args_has_pubkeys(&self) -> bool {
+        let args = if !self.has_ix_args() {
+            return false;
+        } else {
+            self.args.as_ref().unwrap()
+        };
+        args.iter().map(|a| a.r#type.is_or_has_pubkey()).any(|b| b)
+    }
+
     pub fn has_privileged_accounts(&self) -> bool {
         let accounts = if !self.has_accounts() {
             return false;

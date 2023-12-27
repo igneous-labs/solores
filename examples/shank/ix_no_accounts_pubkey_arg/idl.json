@@ -1,0 +1,23 @@
+{
+  "version": "0.0.0",
+  "name": "shank_ix_no_accounts_pubkey_arg",
+  "instructions": [
+    {
+      "name": "noAccountsPubkeyArgIx",
+      "args": [
+        {
+          "name": "arg",
+          "type": "publicKey"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 69
+      }
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "TH1S1SNoTAVAL1DPUBKEYDoNoTUSE11111111111111"
+  }
+}

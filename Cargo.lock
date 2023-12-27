@@ -4302,7 +4302,7 @@ dependencies = [
 
 [[package]]
 name = "solores"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "bs58",
  "clap 4.0.29",

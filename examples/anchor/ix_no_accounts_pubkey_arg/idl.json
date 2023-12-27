@@ -1,0 +1,15 @@
+{
+  "version": "0.0.0",
+  "name": "anchor_ix_no_accounts_pubkey_arg",
+  "instructions": [
+    {
+      "name": "noAccountsPubkeyArgIx",
+      "args": [
+        {
+          "name": "arg",
+          "type": "publicKey"
+        }
+      ]
+    }
+  ]
+}
