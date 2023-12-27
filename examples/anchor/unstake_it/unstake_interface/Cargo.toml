@@ -6,18 +6,22 @@ edition = "2021"
 [dependencies.borsh]
 workspace = true
 
-[dependencies.solana-program]
-workspace = true
-
-[dependencies.serde]
-optional = true
-workspace = true
-
-[dependencies.thiserror]
+[dependencies.bytemuck]
+features = ["derive"]
 workspace = true
 
 [dependencies.num-derive]
 workspace = true
 
 [dependencies.num-traits]
+workspace = true
+
+[dependencies.serde]
+optional = true
+workspace = true
+
+[dependencies.solana-program]
+workspace = true
+
+[dependencies.thiserror]
 workspace = true

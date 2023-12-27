@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Breaking
+
+- Changed instruction codegen internals to support `*_with_program_id()`
+- Changed `IdlFormat` trait def to make dependency and `Cargo.toml` writing more dyn
+
 ### Added
 
 - `*_ix_with_program_id()`, `*_invoke_with_program_id()`, `*_invoke_signed_with_program_id()`
