@@ -392,31 +392,17 @@ impl NamedInstruction {
         let accounts_len_ident = self.accounts_len_ident();
         let ix_data_ident = self.ix_data_ident();
 
-        let fn_generics = if !self.has_accounts() && !self.has_ix_args() {
-            quote! {}
-        } else {
-            let mut g = quote! {};
-            if self.has_accounts() {
-                g.extend(quote! { K: Into<#keys_ident>, });
-            }
-            if self.has_ix_args() {
-                g.extend(quote! {  A: Into<#ix_args_ident> });
-            }
-            g
-        };
-
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! { accounts: K, });
+            fn_params.extend(quote! { keys: #keys_ident, });
         }
         if self.has_ix_args() {
-            fn_params.extend(quote! { args: A,  });
+            fn_params.extend(quote! { args: #ix_args_ident, });
         }
 
         let (mut fn_body, accounts_expr) = if self.has_accounts() {
             (
                 quote! {
-                    let keys: #keys_ident = accounts.into();
                     let metas: [AccountMeta; #accounts_len_ident] = keys.into();
                 },
                 quote! {
@@ -433,8 +419,7 @@ impl NamedInstruction {
         };
         if self.has_ix_args() {
             fn_body.extend(quote! {
-                let args_full: #ix_args_ident = args.into();
-                let data: #ix_data_ident = args_full.into();
+                let data: #ix_data_ident = args.into();
             })
         }
         let data_expr = if self.has_ix_args() {
@@ -443,14 +428,8 @@ impl NamedInstruction {
             quote! { #ix_data_ident.try_to_vec()? }
         };
 
-        let fn_decl = if fn_generics.is_empty() {
-            quote! { #ix_fn_ident(#fn_params) }
-        } else {
-            quote! { #ix_fn_ident<#fn_generics>(#fn_params) }
-        };
-
         tokens.extend(quote! {
-            pub fn #fn_decl -> std::io::Result<Instruction> {
+            pub fn #ix_fn_ident(#fn_params) -> std::io::Result<Instruction> {
                 #fn_body
                 Ok(Instruction {
                     program_id: crate::ID,
@@ -462,44 +441,44 @@ impl NamedInstruction {
     }
 
     fn invoke_fn_generics(&self) -> TokenStream {
-        if !self.has_accounts() && !self.has_ix_args() {
-            return quote! {};
-        }
-        let mut res = quote! {};
         if self.has_accounts() {
-            res.extend(quote! {'info,})
+            quote! { 'info }
+        } else {
+            quote! {}
         }
-        if self.has_ix_args() {
-            let ix_args_ident = self.ix_args_ident();
-            res.extend(quote! { A: Into<#ix_args_ident> });
-        }
-        res
     }
 
     fn invoke_fn_params_prefix(&self) -> TokenStream {
         let accounts_ident = self.accounts_ident();
+        let ix_args_ident = self.ix_args_ident();
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! {accounts: #accounts_ident<'_, 'info>,});
+            fn_params.extend(quote! { accounts: #accounts_ident<'_, 'info>, });
         }
         if self.has_ix_args() {
-            fn_params.extend(quote! { args: A, })
+            fn_params.extend(quote! { args: #ix_args_ident, })
         }
         fn_params
     }
 
     fn ix_fn_call_assign(&self) -> TokenStream {
         let ix_fn_ident = self.ix_fn_ident();
+        let keys_ident = self.keys_ident();
+        let mut res = quote! {};
         let mut args = quote! {};
         if self.has_accounts() {
-            args.extend(quote! { accounts, });
+            res.extend(quote! {
+                let keys: #keys_ident = accounts.into();
+            });
+            args.extend(quote! { keys, });
         }
         if self.has_ix_args() {
             args.extend(quote! { args });
         }
-        quote! {
+        res.extend(quote! {
             let ix = #ix_fn_ident(#args)?;
-        }
+        });
+        res
     }
 
     /// _invoke()

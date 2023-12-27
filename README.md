@@ -16,7 +16,6 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
     - [Shank IDL](#shank-idl)
     - [Anchor IDL](#anchor-idl)
   - [Features](#features)
-    - [Instruction Function Generics](#instruction-function-generics)
     - [Serde](#serde)
     - [Keys From Array](#keys-from-array)
     - [Accounts From Array](#accounts-from-array)
@@ -174,46 +173,6 @@ The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). 
 - export event struct defs
 
 ## Features
-
-### Instruction Function Generics
-
-The generated `*_ix()` function parameters are genericized over any type that impls `Into<*Keys>` for the first arg and any type that impls `Into<*IxArgs>` for the second arg. This allows users to easily implement, for example, account structs that use known pubkeys:
-
-```rust ignore
-use my_token_interface::{TransferArgs, TransferIxArgs, TransferKeys, ID};
-use solana_program::pubkey::Pubkey;
-
-const MY_DEST_PUBKEY: Pubkey = ...;
-
-struct MyTransferKeys {
-    pub src: Pubkey,
-}
-
-impl From<MyTransferKeys> for TransferKeys {
-    fn from(my_transfer_keys: MyTransferKeys) -> Self {
-        Self {
-            src: my_transfer_keys.src,
-            dest: MY_DEST_PUBKEY,
-        }
-    }
-}
-
-struct MyTransferArgs;
-
-impl From<MyTransferArgs> for TransferIxArgs {
-    fn from(_unused: MyTransferArgs) -> Self {
-        Self {
-            transfer_args: TransferArgs { amount: 1000 },
-        }
-    }
-}
-
-//  Now you can do:
-//  let ix = transfer_ix(
-//      MyTransferKeys { src: my_pubkey },
-//      MyTransferArgs,
-//  );
-```
 
 ### Serde
 

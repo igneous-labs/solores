@@ -123,38 +123,35 @@ impl NoPrivilegedAccountIxIxData {
         Ok(data)
     }
 }
-pub fn no_privileged_account_ix_ix<
-    K: Into<NoPrivilegedAccountIxKeys>,
-    A: Into<NoPrivilegedAccountIxIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn no_privileged_account_ix_ix(
+    keys: NoPrivilegedAccountIxKeys,
+    args: NoPrivilegedAccountIxIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: NoPrivilegedAccountIxKeys = accounts.into();
     let metas: [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: NoPrivilegedAccountIxIxArgs = args.into();
-    let data: NoPrivilegedAccountIxIxData = args_full.into();
+    let data: NoPrivilegedAccountIxIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn no_privileged_account_ix_invoke<'info, A: Into<NoPrivilegedAccountIxIxArgs>>(
+pub fn no_privileged_account_ix_invoke<'info>(
     accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
-    args: A,
+    args: NoPrivilegedAccountIxIxArgs,
 ) -> ProgramResult {
-    let ix = no_privileged_account_ix_ix(accounts, args)?;
+    let keys: NoPrivilegedAccountIxKeys = accounts.into();
+    let ix = no_privileged_account_ix_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn no_privileged_account_ix_invoke_signed<'info, A: Into<NoPrivilegedAccountIxIxArgs>>(
+pub fn no_privileged_account_ix_invoke_signed<'info>(
     accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
-    args: A,
+    args: NoPrivilegedAccountIxIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = no_privileged_account_ix_ix(accounts, args)?;
+    let keys: NoPrivilegedAccountIxKeys = accounts.into();
+    let ix = no_privileged_account_ix_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)

@@ -79,23 +79,19 @@ impl NoAccountsIxIxData {
         Ok(data)
     }
 }
-pub fn no_accounts_ix_ix<A: Into<NoAccountsIxIxArgs>>(args: A) -> std::io::Result<Instruction> {
-    let args_full: NoAccountsIxIxArgs = args.into();
-    let data: NoAccountsIxIxData = args_full.into();
+pub fn no_accounts_ix_ix(args: NoAccountsIxIxArgs) -> std::io::Result<Instruction> {
+    let data: NoAccountsIxIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::new(),
         data: data.try_to_vec()?,
     })
 }
-pub fn no_accounts_ix_invoke<A: Into<NoAccountsIxIxArgs>>(args: A) -> ProgramResult {
+pub fn no_accounts_ix_invoke(args: NoAccountsIxIxArgs) -> ProgramResult {
     let ix = no_accounts_ix_ix(args)?;
     invoke(&ix, &[])
 }
-pub fn no_accounts_ix_invoke_signed<A: Into<NoAccountsIxIxArgs>>(
-    args: A,
-    seeds: &[&[&[u8]]],
-) -> ProgramResult {
+pub fn no_accounts_ix_invoke_signed(args: NoAccountsIxIxArgs, seeds: &[&[&[u8]]]) -> ProgramResult {
     let ix = no_accounts_ix_ix(args)?;
     invoke_signed(&ix, &[], seeds)
 }
