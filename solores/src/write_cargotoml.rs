@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use serde::Serialize;
-use toml::map::Map;
+use toml::{map::Map, Value};
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
@@ -48,7 +48,7 @@ impl<'a> CargoToml<'a> {
                 thiserror: thiserror.map(DependencyValue),
                 num_derive: num_derive.map(DependencyValue),
                 num_traits: num_traits.map(DependencyValue),
-                bytemuck: bytemuck.map(DependencyValue),
+                bytemuck: bytemuck.map(BytemuckDependencyValue),
             },
         }
     }
@@ -78,9 +78,11 @@ pub struct GeneratedCrateDependencies<'a> {
     #[serde(rename = "num-traits")]
     pub num_traits: Option<DependencyValue<'a>>,
 
-    pub bytemuck: Option<DependencyValue<'a>>,
+    pub bytemuck: Option<BytemuckDependencyValue<'a>>,
 }
 
+/// Contained str value is the version string arg.
+/// e.g. "^1.16", "workspace = true"
 pub struct DependencyValue<'a>(pub &'a str);
 
 impl Serialize for DependencyValue<'_> {
@@ -95,6 +97,17 @@ impl Serialize for DependencyValue<'_> {
     }
 }
 
+fn version_str_to_dep_map(s: &str) -> Map<String, Value> {
+    match toml::from_str(s) {
+        Ok(v) => v,
+        Err(_) => {
+            let mut m = Map::new();
+            m.insert("version".to_owned(), s.into());
+            m
+        }
+    }
+}
+
 pub struct OptionalDependencyValue<'a>(pub &'a str);
 
 impl Serialize for OptionalDependencyValue<'_> {
@@ -102,15 +115,21 @@ impl Serialize for OptionalDependencyValue<'_> {
     where
         S: serde::Serializer,
     {
-        let mut map: Map<_, _> = match toml::from_str(self.0) {
-            Ok(v) => v,
-            Err(_) => {
-                let mut m = Map::new();
-                m.insert("version".to_owned(), self.0.into());
-                m
-            }
-        };
+        let mut map = version_str_to_dep_map(self.0);
         map.insert("optional".to_owned(), true.into());
+        map.serialize(serializer)
+    }
+}
+
+pub struct BytemuckDependencyValue<'a>(pub &'a str);
+
+impl Serialize for BytemuckDependencyValue<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = version_str_to_dep_map(self.0);
+        map.insert("features".to_owned(), vec!["derive"].into());
         map.serialize(serializer)
     }
 }

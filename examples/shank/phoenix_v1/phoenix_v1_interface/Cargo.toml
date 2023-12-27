@@ -23,4 +23,5 @@ workspace = true
 workspace = true
 
 [dependencies.bytemuck]
+features = ["derive"]
 workspace = true
