@@ -122,14 +122,14 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
 
         if has_accounts {
             res.extend(quote! {
-                pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+                fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
                     ix: &Instruction,
                     accounts: A,
                 ) -> ProgramResult {
                     let account_info: [AccountInfo<'info>; N] = accounts.into();
                     invoke(ix, &account_info)
                 }
-                pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+                fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
                     ix: &Instruction,
                     accounts: A,
                     seeds: &[&[&[u8]]],
