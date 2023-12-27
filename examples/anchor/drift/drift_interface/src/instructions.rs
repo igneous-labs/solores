@@ -1144,34 +1144,34 @@ impl InitializeUserIxData {
         Ok(data)
     }
 }
-pub fn initialize_user_ix<K: Into<InitializeUserKeys>, A: Into<InitializeUserIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn initialize_user_ix(
+    keys: InitializeUserKeys,
+    args: InitializeUserIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializeUserKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_USER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeUserIxArgs = args.into();
-    let data: InitializeUserIxData = args_full.into();
+    let data: InitializeUserIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_user_invoke<'info, A: Into<InitializeUserIxArgs>>(
+pub fn initialize_user_invoke<'info>(
     accounts: InitializeUserAccounts<'_, 'info>,
-    args: A,
+    args: InitializeUserIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_user_ix(accounts, args)?;
+    let keys: InitializeUserKeys = accounts.into();
+    let ix = initialize_user_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_user_invoke_signed<'info, A: Into<InitializeUserIxArgs>>(
+pub fn initialize_user_invoke_signed<'info>(
     accounts: InitializeUserAccounts<'_, 'info>,
-    args: A,
+    args: InitializeUserIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_user_ix(accounts, args)?;
+    let keys: InitializeUserKeys = accounts.into();
+    let ix = initialize_user_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1194,7 +1194,7 @@ pub fn initialize_user_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_user_verify_account_privileges<'me, 'info>(
+pub fn initialize_user_verify_writable_privileges<'me, 'info>(
     accounts: InitializeUserAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1207,11 +1207,23 @@ pub fn initialize_user_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_user_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeUserAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_user_verify_account_privileges<'me, 'info>(
+    accounts: InitializeUserAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_user_verify_writable_privileges(accounts)?;
+    initialize_user_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN: usize = 6;
@@ -1349,10 +1361,7 @@ impl InitializeUserStatsIxData {
         Ok(data)
     }
 }
-pub fn initialize_user_stats_ix<K: Into<InitializeUserStatsKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: InitializeUserStatsKeys = accounts.into();
+pub fn initialize_user_stats_ix(keys: InitializeUserStatsKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -1363,7 +1372,8 @@ pub fn initialize_user_stats_ix<K: Into<InitializeUserStatsKeys>>(
 pub fn initialize_user_stats_invoke<'info>(
     accounts: InitializeUserStatsAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = initialize_user_stats_ix(accounts)?;
+    let keys: InitializeUserStatsKeys = accounts.into();
+    let ix = initialize_user_stats_ix(keys)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -1371,7 +1381,8 @@ pub fn initialize_user_stats_invoke_signed<'info>(
     accounts: InitializeUserStatsAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_user_stats_ix(accounts)?;
+    let keys: InitializeUserStatsKeys = accounts.into();
+    let ix = initialize_user_stats_ix(keys)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_USER_STATS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1393,7 +1404,7 @@ pub fn initialize_user_stats_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_user_stats_verify_account_privileges<'me, 'info>(
+pub fn initialize_user_stats_verify_writable_privileges<'me, 'info>(
     accounts: InitializeUserStatsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user_stats, accounts.state, accounts.payer] {
@@ -1401,11 +1412,23 @@ pub fn initialize_user_stats_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_user_stats_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeUserStatsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_user_stats_verify_account_privileges<'me, 'info>(
+    accounts: InitializeUserStatsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_user_stats_verify_writable_privileges(accounts)?;
+    initialize_user_stats_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN: usize = 7;
@@ -1567,38 +1590,35 @@ impl InitializeReferrerNameIxData {
         Ok(data)
     }
 }
-pub fn initialize_referrer_name_ix<
-    K: Into<InitializeReferrerNameKeys>,
-    A: Into<InitializeReferrerNameIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_referrer_name_ix(
+    keys: InitializeReferrerNameKeys,
+    args: InitializeReferrerNameIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializeReferrerNameKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeReferrerNameIxArgs = args.into();
-    let data: InitializeReferrerNameIxData = args_full.into();
+    let data: InitializeReferrerNameIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_referrer_name_invoke<'info, A: Into<InitializeReferrerNameIxArgs>>(
+pub fn initialize_referrer_name_invoke<'info>(
     accounts: InitializeReferrerNameAccounts<'_, 'info>,
-    args: A,
+    args: InitializeReferrerNameIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_referrer_name_ix(accounts, args)?;
+    let keys: InitializeReferrerNameKeys = accounts.into();
+    let ix = initialize_referrer_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_referrer_name_invoke_signed<'info, A: Into<InitializeReferrerNameIxArgs>>(
+pub fn initialize_referrer_name_invoke_signed<'info>(
     accounts: InitializeReferrerNameAccounts<'_, 'info>,
-    args: A,
+    args: InitializeReferrerNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_referrer_name_ix(accounts, args)?;
+    let keys: InitializeReferrerNameKeys = accounts.into();
+    let ix = initialize_referrer_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_REFERRER_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -1622,7 +1642,7 @@ pub fn initialize_referrer_name_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_referrer_name_verify_account_privileges<'me, 'info>(
+pub fn initialize_referrer_name_verify_writable_privileges<'me, 'info>(
     accounts: InitializeReferrerNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1635,11 +1655,23 @@ pub fn initialize_referrer_name_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_referrer_name_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeReferrerNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_referrer_name_verify_account_privileges<'me, 'info>(
+    accounts: InitializeReferrerNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_referrer_name_verify_writable_privileges(accounts)?;
+    initialize_referrer_name_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 7;
@@ -1799,34 +1831,31 @@ impl DepositIxData {
         Ok(data)
     }
 }
-pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: DepositKeys = accounts.into();
+pub fn deposit_ix(keys: DepositKeys, args: DepositIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DepositIxArgs = args.into();
-    let data: DepositIxData = args_full.into();
+    let data: DepositIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_invoke<'info, A: Into<DepositIxArgs>>(
+pub fn deposit_invoke<'info>(
     accounts: DepositAccounts<'_, 'info>,
-    args: A,
+    args: DepositIxArgs,
 ) -> ProgramResult {
-    let ix = deposit_ix(accounts, args)?;
+    let keys: DepositKeys = accounts.into();
+    let ix = deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
+pub fn deposit_invoke_signed<'info>(
     accounts: DepositAccounts<'_, 'info>,
-    args: A,
+    args: DepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deposit_ix(accounts, args)?;
+    let keys: DepositKeys = accounts.into();
+    let ix = deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1849,7 +1878,7 @@ pub fn deposit_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_verify_account_privileges<'me, 'info>(
+pub fn deposit_verify_writable_privileges<'me, 'info>(
     accounts: DepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1862,11 +1891,23 @@ pub fn deposit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_signer_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_account_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_verify_writable_privileges(accounts)?;
+    deposit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const WITHDRAW_IX_ACCOUNTS_LEN: usize = 8;
@@ -2037,34 +2078,31 @@ impl WithdrawIxData {
         Ok(data)
     }
 }
-pub fn withdraw_ix<K: Into<WithdrawKeys>, A: Into<WithdrawIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: WithdrawKeys = accounts.into();
+pub fn withdraw_ix(keys: WithdrawKeys, args: WithdrawIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; WITHDRAW_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: WithdrawIxArgs = args.into();
-    let data: WithdrawIxData = args_full.into();
+    let data: WithdrawIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn withdraw_invoke<'info, A: Into<WithdrawIxArgs>>(
+pub fn withdraw_invoke<'info>(
     accounts: WithdrawAccounts<'_, 'info>,
-    args: A,
+    args: WithdrawIxArgs,
 ) -> ProgramResult {
-    let ix = withdraw_ix(accounts, args)?;
+    let keys: WithdrawKeys = accounts.into();
+    let ix = withdraw_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn withdraw_invoke_signed<'info, A: Into<WithdrawIxArgs>>(
+pub fn withdraw_invoke_signed<'info>(
     accounts: WithdrawAccounts<'_, 'info>,
-    args: A,
+    args: WithdrawIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = withdraw_ix(accounts, args)?;
+    let keys: WithdrawKeys = accounts.into();
+    let ix = withdraw_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; WITHDRAW_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2088,7 +2126,7 @@ pub fn withdraw_verify_account_keys(
     }
     Ok(())
 }
-pub fn withdraw_verify_account_privileges<'me, 'info>(
+pub fn withdraw_verify_writable_privileges<'me, 'info>(
     accounts: WithdrawAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2101,11 +2139,23 @@ pub fn withdraw_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn withdraw_verify_signer_privileges<'me, 'info>(
+    accounts: WithdrawAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn withdraw_verify_account_privileges<'me, 'info>(
+    accounts: WithdrawAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    withdraw_verify_writable_privileges(accounts)?;
+    withdraw_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
@@ -2255,34 +2305,34 @@ impl TransferDepositIxData {
         Ok(data)
     }
 }
-pub fn transfer_deposit_ix<K: Into<TransferDepositKeys>, A: Into<TransferDepositIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn transfer_deposit_ix(
+    keys: TransferDepositKeys,
+    args: TransferDepositIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: TransferDepositKeys = accounts.into();
     let metas: [AccountMeta; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: TransferDepositIxArgs = args.into();
-    let data: TransferDepositIxData = args_full.into();
+    let data: TransferDepositIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn transfer_deposit_invoke<'info, A: Into<TransferDepositIxArgs>>(
+pub fn transfer_deposit_invoke<'info>(
     accounts: TransferDepositAccounts<'_, 'info>,
-    args: A,
+    args: TransferDepositIxArgs,
 ) -> ProgramResult {
-    let ix = transfer_deposit_ix(accounts, args)?;
+    let keys: TransferDepositKeys = accounts.into();
+    let ix = transfer_deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn transfer_deposit_invoke_signed<'info, A: Into<TransferDepositIxArgs>>(
+pub fn transfer_deposit_invoke_signed<'info>(
     accounts: TransferDepositAccounts<'_, 'info>,
-    args: A,
+    args: TransferDepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = transfer_deposit_ix(accounts, args)?;
+    let keys: TransferDepositKeys = accounts.into();
+    let ix = transfer_deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; TRANSFER_DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2304,7 +2354,7 @@ pub fn transfer_deposit_verify_account_keys(
     }
     Ok(())
 }
-pub fn transfer_deposit_verify_account_privileges<'me, 'info>(
+pub fn transfer_deposit_verify_writable_privileges<'me, 'info>(
     accounts: TransferDepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.from_user, accounts.to_user, accounts.user_stats] {
@@ -2312,11 +2362,23 @@ pub fn transfer_deposit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn transfer_deposit_verify_signer_privileges<'me, 'info>(
+    accounts: TransferDepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn transfer_deposit_verify_account_privileges<'me, 'info>(
+    accounts: TransferDepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    transfer_deposit_verify_writable_privileges(accounts)?;
+    transfer_deposit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 3;
@@ -2432,34 +2494,34 @@ impl PlacePerpOrderIxData {
         Ok(data)
     }
 }
-pub fn place_perp_order_ix<K: Into<PlacePerpOrderKeys>, A: Into<PlacePerpOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn place_perp_order_ix(
+    keys: PlacePerpOrderKeys,
+    args: PlacePerpOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlacePerpOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlacePerpOrderIxArgs = args.into();
-    let data: PlacePerpOrderIxData = args_full.into();
+    let data: PlacePerpOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_perp_order_invoke<'info, A: Into<PlacePerpOrderIxArgs>>(
+pub fn place_perp_order_invoke<'info>(
     accounts: PlacePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlacePerpOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_perp_order_ix(accounts, args)?;
+    let keys: PlacePerpOrderKeys = accounts.into();
+    let ix = place_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_perp_order_invoke_signed<'info, A: Into<PlacePerpOrderIxArgs>>(
+pub fn place_perp_order_invoke_signed<'info>(
     accounts: PlacePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlacePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_perp_order_ix(accounts, args)?;
+    let keys: PlacePerpOrderKeys = accounts.into();
+    let ix = place_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2478,7 +2540,7 @@ pub fn place_perp_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_perp_order_verify_account_privileges<'me, 'info>(
+pub fn place_perp_order_verify_writable_privileges<'me, 'info>(
     accounts: PlacePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -2486,11 +2548,23 @@ pub fn place_perp_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_perp_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlacePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_perp_order_verify_account_privileges<'me, 'info>(
+    accounts: PlacePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_perp_order_verify_writable_privileges(accounts)?;
+    place_perp_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CANCEL_ORDER_IX_ACCOUNTS_LEN: usize = 3;
@@ -2606,34 +2680,34 @@ impl CancelOrderIxData {
         Ok(data)
     }
 }
-pub fn cancel_order_ix<K: Into<CancelOrderKeys>, A: Into<CancelOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn cancel_order_ix(
+    keys: CancelOrderKeys,
+    args: CancelOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CancelOrderKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CancelOrderIxArgs = args.into();
-    let data: CancelOrderIxData = args_full.into();
+    let data: CancelOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_order_invoke<'info, A: Into<CancelOrderIxArgs>>(
+pub fn cancel_order_invoke<'info>(
     accounts: CancelOrderAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrderIxArgs,
 ) -> ProgramResult {
-    let ix = cancel_order_ix(accounts, args)?;
+    let keys: CancelOrderKeys = accounts.into();
+    let ix = cancel_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_order_invoke_signed<'info, A: Into<CancelOrderIxArgs>>(
+pub fn cancel_order_invoke_signed<'info>(
     accounts: CancelOrderAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_order_ix(accounts, args)?;
+    let keys: CancelOrderKeys = accounts.into();
+    let ix = cancel_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2652,7 +2726,7 @@ pub fn cancel_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_order_verify_account_privileges<'me, 'info>(
+pub fn cancel_order_verify_writable_privileges<'me, 'info>(
     accounts: CancelOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -2660,11 +2734,23 @@ pub fn cancel_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn cancel_order_verify_signer_privileges<'me, 'info>(
+    accounts: CancelOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn cancel_order_verify_account_privileges<'me, 'info>(
+    accounts: CancelOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    cancel_order_verify_writable_privileges(accounts)?;
+    cancel_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
@@ -2780,38 +2866,35 @@ impl CancelOrderByUserIdIxData {
         Ok(data)
     }
 }
-pub fn cancel_order_by_user_id_ix<
-    K: Into<CancelOrderByUserIdKeys>,
-    A: Into<CancelOrderByUserIdIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn cancel_order_by_user_id_ix(
+    keys: CancelOrderByUserIdKeys,
+    args: CancelOrderByUserIdIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CancelOrderByUserIdKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CancelOrderByUserIdIxArgs = args.into();
-    let data: CancelOrderByUserIdIxData = args_full.into();
+    let data: CancelOrderByUserIdIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_order_by_user_id_invoke<'info, A: Into<CancelOrderByUserIdIxArgs>>(
+pub fn cancel_order_by_user_id_invoke<'info>(
     accounts: CancelOrderByUserIdAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrderByUserIdIxArgs,
 ) -> ProgramResult {
-    let ix = cancel_order_by_user_id_ix(accounts, args)?;
+    let keys: CancelOrderByUserIdKeys = accounts.into();
+    let ix = cancel_order_by_user_id_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_order_by_user_id_invoke_signed<'info, A: Into<CancelOrderByUserIdIxArgs>>(
+pub fn cancel_order_by_user_id_invoke_signed<'info>(
     accounts: CancelOrderByUserIdAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrderByUserIdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_order_by_user_id_ix(accounts, args)?;
+    let keys: CancelOrderByUserIdKeys = accounts.into();
+    let ix = cancel_order_by_user_id_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2831,7 +2914,7 @@ pub fn cancel_order_by_user_id_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_order_by_user_id_verify_account_privileges<'me, 'info>(
+pub fn cancel_order_by_user_id_verify_writable_privileges<'me, 'info>(
     accounts: CancelOrderByUserIdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -2839,11 +2922,23 @@ pub fn cancel_order_by_user_id_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn cancel_order_by_user_id_verify_signer_privileges<'me, 'info>(
+    accounts: CancelOrderByUserIdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn cancel_order_by_user_id_verify_account_privileges<'me, 'info>(
+    accounts: CancelOrderByUserIdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    cancel_order_by_user_id_verify_writable_privileges(accounts)?;
+    cancel_order_by_user_id_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 3;
@@ -2961,34 +3056,34 @@ impl CancelOrdersIxData {
         Ok(data)
     }
 }
-pub fn cancel_orders_ix<K: Into<CancelOrdersKeys>, A: Into<CancelOrdersIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn cancel_orders_ix(
+    keys: CancelOrdersKeys,
+    args: CancelOrdersIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CancelOrdersKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CancelOrdersIxArgs = args.into();
-    let data: CancelOrdersIxData = args_full.into();
+    let data: CancelOrdersIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_orders_invoke<'info, A: Into<CancelOrdersIxArgs>>(
+pub fn cancel_orders_invoke<'info>(
     accounts: CancelOrdersAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrdersIxArgs,
 ) -> ProgramResult {
-    let ix = cancel_orders_ix(accounts, args)?;
+    let keys: CancelOrdersKeys = accounts.into();
+    let ix = cancel_orders_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_orders_invoke_signed<'info, A: Into<CancelOrdersIxArgs>>(
+pub fn cancel_orders_invoke_signed<'info>(
     accounts: CancelOrdersAccounts<'_, 'info>,
-    args: A,
+    args: CancelOrdersIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_orders_ix(accounts, args)?;
+    let keys: CancelOrdersKeys = accounts.into();
+    let ix = cancel_orders_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3007,7 +3102,7 @@ pub fn cancel_orders_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_orders_verify_account_privileges<'me, 'info>(
+pub fn cancel_orders_verify_writable_privileges<'me, 'info>(
     accounts: CancelOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -3015,11 +3110,23 @@ pub fn cancel_orders_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn cancel_orders_verify_signer_privileges<'me, 'info>(
+    accounts: CancelOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn cancel_orders_verify_account_privileges<'me, 'info>(
+    accounts: CancelOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    cancel_orders_verify_writable_privileges(accounts)?;
+    cancel_orders_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MODIFY_ORDER_IX_ACCOUNTS_LEN: usize = 3;
@@ -3136,34 +3243,34 @@ impl ModifyOrderIxData {
         Ok(data)
     }
 }
-pub fn modify_order_ix<K: Into<ModifyOrderKeys>, A: Into<ModifyOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn modify_order_ix(
+    keys: ModifyOrderKeys,
+    args: ModifyOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ModifyOrderKeys = accounts.into();
     let metas: [AccountMeta; MODIFY_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ModifyOrderIxArgs = args.into();
-    let data: ModifyOrderIxData = args_full.into();
+    let data: ModifyOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn modify_order_invoke<'info, A: Into<ModifyOrderIxArgs>>(
+pub fn modify_order_invoke<'info>(
     accounts: ModifyOrderAccounts<'_, 'info>,
-    args: A,
+    args: ModifyOrderIxArgs,
 ) -> ProgramResult {
-    let ix = modify_order_ix(accounts, args)?;
+    let keys: ModifyOrderKeys = accounts.into();
+    let ix = modify_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn modify_order_invoke_signed<'info, A: Into<ModifyOrderIxArgs>>(
+pub fn modify_order_invoke_signed<'info>(
     accounts: ModifyOrderAccounts<'_, 'info>,
-    args: A,
+    args: ModifyOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = modify_order_ix(accounts, args)?;
+    let keys: ModifyOrderKeys = accounts.into();
+    let ix = modify_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3182,7 +3289,7 @@ pub fn modify_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn modify_order_verify_account_privileges<'me, 'info>(
+pub fn modify_order_verify_writable_privileges<'me, 'info>(
     accounts: ModifyOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -3190,11 +3297,23 @@ pub fn modify_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn modify_order_verify_signer_privileges<'me, 'info>(
+    accounts: ModifyOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn modify_order_verify_account_privileges<'me, 'info>(
+    accounts: ModifyOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    modify_order_verify_writable_privileges(accounts)?;
+    modify_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN: usize = 3;
@@ -3311,38 +3430,35 @@ impl ModifyOrderByUserIdIxData {
         Ok(data)
     }
 }
-pub fn modify_order_by_user_id_ix<
-    K: Into<ModifyOrderByUserIdKeys>,
-    A: Into<ModifyOrderByUserIdIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn modify_order_by_user_id_ix(
+    keys: ModifyOrderByUserIdKeys,
+    args: ModifyOrderByUserIdIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ModifyOrderByUserIdKeys = accounts.into();
     let metas: [AccountMeta; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ModifyOrderByUserIdIxArgs = args.into();
-    let data: ModifyOrderByUserIdIxData = args_full.into();
+    let data: ModifyOrderByUserIdIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn modify_order_by_user_id_invoke<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
+pub fn modify_order_by_user_id_invoke<'info>(
     accounts: ModifyOrderByUserIdAccounts<'_, 'info>,
-    args: A,
+    args: ModifyOrderByUserIdIxArgs,
 ) -> ProgramResult {
-    let ix = modify_order_by_user_id_ix(accounts, args)?;
+    let keys: ModifyOrderByUserIdKeys = accounts.into();
+    let ix = modify_order_by_user_id_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn modify_order_by_user_id_invoke_signed<'info, A: Into<ModifyOrderByUserIdIxArgs>>(
+pub fn modify_order_by_user_id_invoke_signed<'info>(
     accounts: ModifyOrderByUserIdAccounts<'_, 'info>,
-    args: A,
+    args: ModifyOrderByUserIdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = modify_order_by_user_id_ix(accounts, args)?;
+    let keys: ModifyOrderByUserIdKeys = accounts.into();
+    let ix = modify_order_by_user_id_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MODIFY_ORDER_BY_USER_ID_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3362,7 +3478,7 @@ pub fn modify_order_by_user_id_verify_account_keys(
     }
     Ok(())
 }
-pub fn modify_order_by_user_id_verify_account_privileges<'me, 'info>(
+pub fn modify_order_by_user_id_verify_writable_privileges<'me, 'info>(
     accounts: ModifyOrderByUserIdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -3370,11 +3486,23 @@ pub fn modify_order_by_user_id_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn modify_order_by_user_id_verify_signer_privileges<'me, 'info>(
+    accounts: ModifyOrderByUserIdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn modify_order_by_user_id_verify_account_privileges<'me, 'info>(
+    accounts: ModifyOrderByUserIdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    modify_order_by_user_id_verify_writable_privileges(accounts)?;
+    modify_order_by_user_id_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 4;
@@ -3502,38 +3630,35 @@ impl PlaceAndTakePerpOrderIxData {
         Ok(data)
     }
 }
-pub fn place_and_take_perp_order_ix<
-    K: Into<PlaceAndTakePerpOrderKeys>,
-    A: Into<PlaceAndTakePerpOrderIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn place_and_take_perp_order_ix(
+    keys: PlaceAndTakePerpOrderKeys,
+    args: PlaceAndTakePerpOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlaceAndTakePerpOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlaceAndTakePerpOrderIxArgs = args.into();
-    let data: PlaceAndTakePerpOrderIxData = args_full.into();
+    let data: PlaceAndTakePerpOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_take_perp_order_invoke<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
+pub fn place_and_take_perp_order_invoke<'info>(
     accounts: PlaceAndTakePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndTakePerpOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_and_take_perp_order_ix(accounts, args)?;
+    let keys: PlaceAndTakePerpOrderKeys = accounts.into();
+    let ix = place_and_take_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_take_perp_order_invoke_signed<'info, A: Into<PlaceAndTakePerpOrderIxArgs>>(
+pub fn place_and_take_perp_order_invoke_signed<'info>(
     accounts: PlaceAndTakePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndTakePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_and_take_perp_order_ix(accounts, args)?;
+    let keys: PlaceAndTakePerpOrderKeys = accounts.into();
+    let ix = place_and_take_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3554,7 +3679,7 @@ pub fn place_and_take_perp_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_and_take_perp_order_verify_account_privileges<'me, 'info>(
+pub fn place_and_take_perp_order_verify_writable_privileges<'me, 'info>(
     accounts: PlaceAndTakePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats] {
@@ -3562,11 +3687,23 @@ pub fn place_and_take_perp_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_and_take_perp_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlaceAndTakePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_and_take_perp_order_verify_account_privileges<'me, 'info>(
+    accounts: PlaceAndTakePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_and_take_perp_order_verify_writable_privileges(accounts)?;
+    place_and_take_perp_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
@@ -3716,38 +3853,35 @@ impl PlaceAndMakePerpOrderIxData {
         Ok(data)
     }
 }
-pub fn place_and_make_perp_order_ix<
-    K: Into<PlaceAndMakePerpOrderKeys>,
-    A: Into<PlaceAndMakePerpOrderIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn place_and_make_perp_order_ix(
+    keys: PlaceAndMakePerpOrderKeys,
+    args: PlaceAndMakePerpOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlaceAndMakePerpOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlaceAndMakePerpOrderIxArgs = args.into();
-    let data: PlaceAndMakePerpOrderIxData = args_full.into();
+    let data: PlaceAndMakePerpOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_make_perp_order_invoke<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
+pub fn place_and_make_perp_order_invoke<'info>(
     accounts: PlaceAndMakePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndMakePerpOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_and_make_perp_order_ix(accounts, args)?;
+    let keys: PlaceAndMakePerpOrderKeys = accounts.into();
+    let ix = place_and_make_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_make_perp_order_invoke_signed<'info, A: Into<PlaceAndMakePerpOrderIxArgs>>(
+pub fn place_and_make_perp_order_invoke_signed<'info>(
     accounts: PlaceAndMakePerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndMakePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_and_make_perp_order_ix(accounts, args)?;
+    let keys: PlaceAndMakePerpOrderKeys = accounts.into();
+    let ix = place_and_make_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_PERP_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3770,7 +3904,7 @@ pub fn place_and_make_perp_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_and_make_perp_order_verify_account_privileges<'me, 'info>(
+pub fn place_and_make_perp_order_verify_writable_privileges<'me, 'info>(
     accounts: PlaceAndMakePerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3783,11 +3917,23 @@ pub fn place_and_make_perp_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_and_make_perp_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlaceAndMakePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_and_make_perp_order_verify_account_privileges<'me, 'info>(
+    accounts: PlaceAndMakePerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_and_make_perp_order_verify_writable_privileges(accounts)?;
+    place_and_make_perp_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 3;
@@ -3903,34 +4049,34 @@ impl PlaceSpotOrderIxData {
         Ok(data)
     }
 }
-pub fn place_spot_order_ix<K: Into<PlaceSpotOrderKeys>, A: Into<PlaceSpotOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn place_spot_order_ix(
+    keys: PlaceSpotOrderKeys,
+    args: PlaceSpotOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlaceSpotOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlaceSpotOrderIxArgs = args.into();
-    let data: PlaceSpotOrderIxData = args_full.into();
+    let data: PlaceSpotOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_spot_order_invoke<'info, A: Into<PlaceSpotOrderIxArgs>>(
+pub fn place_spot_order_invoke<'info>(
     accounts: PlaceSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceSpotOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_spot_order_ix(accounts, args)?;
+    let keys: PlaceSpotOrderKeys = accounts.into();
+    let ix = place_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_spot_order_invoke_signed<'info, A: Into<PlaceSpotOrderIxArgs>>(
+pub fn place_spot_order_invoke_signed<'info>(
     accounts: PlaceSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_spot_order_ix(accounts, args)?;
+    let keys: PlaceSpotOrderKeys = accounts.into();
+    let ix = place_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3949,7 +4095,7 @@ pub fn place_spot_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_spot_order_verify_account_privileges<'me, 'info>(
+pub fn place_spot_order_verify_writable_privileges<'me, 'info>(
     accounts: PlaceSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -3957,11 +4103,23 @@ pub fn place_spot_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_spot_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlaceSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_spot_order_verify_account_privileges<'me, 'info>(
+    accounts: PlaceSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_spot_order_verify_writable_privileges(accounts)?;
+    place_spot_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 4;
@@ -4090,38 +4248,35 @@ impl PlaceAndTakeSpotOrderIxData {
         Ok(data)
     }
 }
-pub fn place_and_take_spot_order_ix<
-    K: Into<PlaceAndTakeSpotOrderKeys>,
-    A: Into<PlaceAndTakeSpotOrderIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn place_and_take_spot_order_ix(
+    keys: PlaceAndTakeSpotOrderKeys,
+    args: PlaceAndTakeSpotOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlaceAndTakeSpotOrderIxArgs = args.into();
-    let data: PlaceAndTakeSpotOrderIxData = args_full.into();
+    let data: PlaceAndTakeSpotOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_take_spot_order_invoke<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
+pub fn place_and_take_spot_order_invoke<'info>(
     accounts: PlaceAndTakeSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndTakeSpotOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_and_take_spot_order_ix(accounts, args)?;
+    let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
+    let ix = place_and_take_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_take_spot_order_invoke_signed<'info, A: Into<PlaceAndTakeSpotOrderIxArgs>>(
+pub fn place_and_take_spot_order_invoke_signed<'info>(
     accounts: PlaceAndTakeSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndTakeSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_and_take_spot_order_ix(accounts, args)?;
+    let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
+    let ix = place_and_take_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_TAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4142,7 +4297,7 @@ pub fn place_and_take_spot_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_and_take_spot_order_verify_account_privileges<'me, 'info>(
+pub fn place_and_take_spot_order_verify_writable_privileges<'me, 'info>(
     accounts: PlaceAndTakeSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats] {
@@ -4150,11 +4305,23 @@ pub fn place_and_take_spot_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_and_take_spot_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlaceAndTakeSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_and_take_spot_order_verify_account_privileges<'me, 'info>(
+    accounts: PlaceAndTakeSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_and_take_spot_order_verify_writable_privileges(accounts)?;
+    place_and_take_spot_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
@@ -4305,38 +4472,35 @@ impl PlaceAndMakeSpotOrderIxData {
         Ok(data)
     }
 }
-pub fn place_and_make_spot_order_ix<
-    K: Into<PlaceAndMakeSpotOrderKeys>,
-    A: Into<PlaceAndMakeSpotOrderIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn place_and_make_spot_order_ix(
+    keys: PlaceAndMakeSpotOrderKeys,
+    args: PlaceAndMakeSpotOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
     let metas: [AccountMeta; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PlaceAndMakeSpotOrderIxArgs = args.into();
-    let data: PlaceAndMakeSpotOrderIxData = args_full.into();
+    let data: PlaceAndMakeSpotOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn place_and_make_spot_order_invoke<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
+pub fn place_and_make_spot_order_invoke<'info>(
     accounts: PlaceAndMakeSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndMakeSpotOrderIxArgs,
 ) -> ProgramResult {
-    let ix = place_and_make_spot_order_ix(accounts, args)?;
+    let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
+    let ix = place_and_make_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn place_and_make_spot_order_invoke_signed<'info, A: Into<PlaceAndMakeSpotOrderIxArgs>>(
+pub fn place_and_make_spot_order_invoke_signed<'info>(
     accounts: PlaceAndMakeSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: PlaceAndMakeSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = place_and_make_spot_order_ix(accounts, args)?;
+    let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
+    let ix = place_and_make_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PLACE_AND_MAKE_SPOT_ORDER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4359,7 +4523,7 @@ pub fn place_and_make_spot_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn place_and_make_spot_order_verify_account_privileges<'me, 'info>(
+pub fn place_and_make_spot_order_verify_writable_privileges<'me, 'info>(
     accounts: PlaceAndMakeSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4372,11 +4536,23 @@ pub fn place_and_make_spot_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn place_and_make_spot_order_verify_signer_privileges<'me, 'info>(
+    accounts: PlaceAndMakeSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn place_and_make_spot_order_verify_account_privileges<'me, 'info>(
+    accounts: PlaceAndMakeSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    place_and_make_spot_order_verify_writable_privileges(accounts)?;
+    place_and_make_spot_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const BEGIN_SWAP_IX_ACCOUNTS_LEN: usize = 11;
@@ -4582,34 +4758,31 @@ impl BeginSwapIxData {
         Ok(data)
     }
 }
-pub fn begin_swap_ix<K: Into<BeginSwapKeys>, A: Into<BeginSwapIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: BeginSwapKeys = accounts.into();
+pub fn begin_swap_ix(keys: BeginSwapKeys, args: BeginSwapIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; BEGIN_SWAP_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: BeginSwapIxArgs = args.into();
-    let data: BeginSwapIxData = args_full.into();
+    let data: BeginSwapIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn begin_swap_invoke<'info, A: Into<BeginSwapIxArgs>>(
+pub fn begin_swap_invoke<'info>(
     accounts: BeginSwapAccounts<'_, 'info>,
-    args: A,
+    args: BeginSwapIxArgs,
 ) -> ProgramResult {
-    let ix = begin_swap_ix(accounts, args)?;
+    let keys: BeginSwapKeys = accounts.into();
+    let ix = begin_swap_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn begin_swap_invoke_signed<'info, A: Into<BeginSwapIxArgs>>(
+pub fn begin_swap_invoke_signed<'info>(
     accounts: BeginSwapAccounts<'_, 'info>,
-    args: A,
+    args: BeginSwapIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = begin_swap_ix(accounts, args)?;
+    let keys: BeginSwapKeys = accounts.into();
+    let ix = begin_swap_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; BEGIN_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4642,7 +4815,7 @@ pub fn begin_swap_verify_account_keys(
     }
     Ok(())
 }
-pub fn begin_swap_verify_account_privileges<'me, 'info>(
+pub fn begin_swap_verify_writable_privileges<'me, 'info>(
     accounts: BeginSwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4657,11 +4830,23 @@ pub fn begin_swap_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn begin_swap_verify_signer_privileges<'me, 'info>(
+    accounts: BeginSwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn begin_swap_verify_account_privileges<'me, 'info>(
+    accounts: BeginSwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    begin_swap_verify_writable_privileges(accounts)?;
+    begin_swap_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const END_SWAP_IX_ACCOUNTS_LEN: usize = 11;
@@ -4866,34 +5051,31 @@ impl EndSwapIxData {
         Ok(data)
     }
 }
-pub fn end_swap_ix<K: Into<EndSwapKeys>, A: Into<EndSwapIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: EndSwapKeys = accounts.into();
+pub fn end_swap_ix(keys: EndSwapKeys, args: EndSwapIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; END_SWAP_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: EndSwapIxArgs = args.into();
-    let data: EndSwapIxData = args_full.into();
+    let data: EndSwapIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn end_swap_invoke<'info, A: Into<EndSwapIxArgs>>(
+pub fn end_swap_invoke<'info>(
     accounts: EndSwapAccounts<'_, 'info>,
-    args: A,
+    args: EndSwapIxArgs,
 ) -> ProgramResult {
-    let ix = end_swap_ix(accounts, args)?;
+    let keys: EndSwapKeys = accounts.into();
+    let ix = end_swap_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn end_swap_invoke_signed<'info, A: Into<EndSwapIxArgs>>(
+pub fn end_swap_invoke_signed<'info>(
     accounts: EndSwapAccounts<'_, 'info>,
-    args: A,
+    args: EndSwapIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = end_swap_ix(accounts, args)?;
+    let keys: EndSwapKeys = accounts.into();
+    let ix = end_swap_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; END_SWAP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4926,7 +5108,7 @@ pub fn end_swap_verify_account_keys(
     }
     Ok(())
 }
-pub fn end_swap_verify_account_privileges<'me, 'info>(
+pub fn end_swap_verify_writable_privileges<'me, 'info>(
     accounts: EndSwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4941,11 +5123,23 @@ pub fn end_swap_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn end_swap_verify_signer_privileges<'me, 'info>(
+    accounts: EndSwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn end_swap_verify_account_privileges<'me, 'info>(
+    accounts: EndSwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    end_swap_verify_writable_privileges(accounts)?;
+    end_swap_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
@@ -5062,34 +5256,34 @@ impl AddPerpLpSharesIxData {
         Ok(data)
     }
 }
-pub fn add_perp_lp_shares_ix<K: Into<AddPerpLpSharesKeys>, A: Into<AddPerpLpSharesIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn add_perp_lp_shares_ix(
+    keys: AddPerpLpSharesKeys,
+    args: AddPerpLpSharesIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: AddPerpLpSharesKeys = accounts.into();
     let metas: [AccountMeta; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: AddPerpLpSharesIxArgs = args.into();
-    let data: AddPerpLpSharesIxData = args_full.into();
+    let data: AddPerpLpSharesIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn add_perp_lp_shares_invoke<'info, A: Into<AddPerpLpSharesIxArgs>>(
+pub fn add_perp_lp_shares_invoke<'info>(
     accounts: AddPerpLpSharesAccounts<'_, 'info>,
-    args: A,
+    args: AddPerpLpSharesIxArgs,
 ) -> ProgramResult {
-    let ix = add_perp_lp_shares_ix(accounts, args)?;
+    let keys: AddPerpLpSharesKeys = accounts.into();
+    let ix = add_perp_lp_shares_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_perp_lp_shares_invoke_signed<'info, A: Into<AddPerpLpSharesIxArgs>>(
+pub fn add_perp_lp_shares_invoke_signed<'info>(
     accounts: AddPerpLpSharesAccounts<'_, 'info>,
-    args: A,
+    args: AddPerpLpSharesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = add_perp_lp_shares_ix(accounts, args)?;
+    let keys: AddPerpLpSharesKeys = accounts.into();
+    let ix = add_perp_lp_shares_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5108,7 +5302,7 @@ pub fn add_perp_lp_shares_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_perp_lp_shares_verify_account_privileges<'me, 'info>(
+pub fn add_perp_lp_shares_verify_writable_privileges<'me, 'info>(
     accounts: AddPerpLpSharesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5116,11 +5310,23 @@ pub fn add_perp_lp_shares_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_perp_lp_shares_verify_signer_privileges<'me, 'info>(
+    accounts: AddPerpLpSharesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_perp_lp_shares_verify_account_privileges<'me, 'info>(
+    accounts: AddPerpLpSharesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_perp_lp_shares_verify_writable_privileges(accounts)?;
+    add_perp_lp_shares_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN: usize = 3;
@@ -5237,37 +5443,34 @@ impl RemovePerpLpSharesIxData {
         Ok(data)
     }
 }
-pub fn remove_perp_lp_shares_ix<
-    K: Into<RemovePerpLpSharesKeys>,
-    A: Into<RemovePerpLpSharesIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn remove_perp_lp_shares_ix(
+    keys: RemovePerpLpSharesKeys,
+    args: RemovePerpLpSharesIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RemovePerpLpSharesKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RemovePerpLpSharesIxArgs = args.into();
-    let data: RemovePerpLpSharesIxData = args_full.into();
+    let data: RemovePerpLpSharesIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_perp_lp_shares_invoke<'info, A: Into<RemovePerpLpSharesIxArgs>>(
+pub fn remove_perp_lp_shares_invoke<'info>(
     accounts: RemovePerpLpSharesAccounts<'_, 'info>,
-    args: A,
+    args: RemovePerpLpSharesIxArgs,
 ) -> ProgramResult {
-    let ix = remove_perp_lp_shares_ix(accounts, args)?;
+    let keys: RemovePerpLpSharesKeys = accounts.into();
+    let ix = remove_perp_lp_shares_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_perp_lp_shares_invoke_signed<'info, A: Into<RemovePerpLpSharesIxArgs>>(
+pub fn remove_perp_lp_shares_invoke_signed<'info>(
     accounts: RemovePerpLpSharesAccounts<'_, 'info>,
-    args: A,
+    args: RemovePerpLpSharesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_perp_lp_shares_ix(accounts, args)?;
+    let keys: RemovePerpLpSharesKeys = accounts.into();
+    let ix = remove_perp_lp_shares_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_PERP_LP_SHARES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5286,7 +5489,7 @@ pub fn remove_perp_lp_shares_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_perp_lp_shares_verify_account_privileges<'me, 'info>(
+pub fn remove_perp_lp_shares_verify_writable_privileges<'me, 'info>(
     accounts: RemovePerpLpSharesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5294,11 +5497,23 @@ pub fn remove_perp_lp_shares_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_perp_lp_shares_verify_signer_privileges<'me, 'info>(
+    accounts: RemovePerpLpSharesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_perp_lp_shares_verify_account_privileges<'me, 'info>(
+    accounts: RemovePerpLpSharesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_perp_lp_shares_verify_writable_privileges(accounts)?;
+    remove_perp_lp_shares_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN: usize = 2;
@@ -5413,45 +5628,36 @@ impl RemovePerpLpSharesInExpiringMarketIxData {
         Ok(data)
     }
 }
-pub fn remove_perp_lp_shares_in_expiring_market_ix<
-    K: Into<RemovePerpLpSharesInExpiringMarketKeys>,
-    A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn remove_perp_lp_shares_in_expiring_market_ix(
+    keys: RemovePerpLpSharesInExpiringMarketKeys,
+    args: RemovePerpLpSharesInExpiringMarketIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: RemovePerpLpSharesInExpiringMarketIxArgs = args.into();
-    let data: RemovePerpLpSharesInExpiringMarketIxData = args_full.into();
+    let data: RemovePerpLpSharesInExpiringMarketIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_perp_lp_shares_in_expiring_market_invoke<
-    'info,
-    A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
->(
+pub fn remove_perp_lp_shares_in_expiring_market_invoke<'info>(
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
-    args: A,
+    args: RemovePerpLpSharesInExpiringMarketIxArgs,
 ) -> ProgramResult {
-    let ix = remove_perp_lp_shares_in_expiring_market_ix(accounts, args)?;
+    let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
+    let ix = remove_perp_lp_shares_in_expiring_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<
-    'info,
-    A: Into<RemovePerpLpSharesInExpiringMarketIxArgs>,
->(
+pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed<'info>(
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, 'info>,
-    args: A,
+    args: RemovePerpLpSharesInExpiringMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_perp_lp_shares_in_expiring_market_ix(accounts, args)?;
+    let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
+    let ix = remove_perp_lp_shares_in_expiring_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         REMOVE_PERP_LP_SHARES_IN_EXPIRING_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -5470,7 +5676,7 @@ pub fn remove_perp_lp_shares_in_expiring_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_perp_lp_shares_in_expiring_market_verify_account_privileges<'me, 'info>(
+pub fn remove_perp_lp_shares_in_expiring_market_verify_writable_privileges<'me, 'info>(
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5478,6 +5684,12 @@ pub fn remove_perp_lp_shares_in_expiring_market_verify_account_privileges<'me, '
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_perp_lp_shares_in_expiring_market_verify_account_privileges<'me, 'info>(
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_perp_lp_shares_in_expiring_market_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_NAME_IX_ACCOUNTS_LEN: usize = 2;
@@ -5580,34 +5792,34 @@ impl UpdateUserNameIxData {
         Ok(data)
     }
 }
-pub fn update_user_name_ix<K: Into<UpdateUserNameKeys>, A: Into<UpdateUserNameIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_user_name_ix(
+    keys: UpdateUserNameKeys,
+    args: UpdateUserNameIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserNameKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateUserNameIxArgs = args.into();
-    let data: UpdateUserNameIxData = args_full.into();
+    let data: UpdateUserNameIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_name_invoke<'info, A: Into<UpdateUserNameIxArgs>>(
+pub fn update_user_name_invoke<'info>(
     accounts: UpdateUserNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserNameIxArgs,
 ) -> ProgramResult {
-    let ix = update_user_name_ix(accounts, args)?;
+    let keys: UpdateUserNameKeys = accounts.into();
+    let ix = update_user_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_name_invoke_signed<'info, A: Into<UpdateUserNameIxArgs>>(
+pub fn update_user_name_invoke_signed<'info>(
     accounts: UpdateUserNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_name_ix(accounts, args)?;
+    let keys: UpdateUserNameKeys = accounts.into();
+    let ix = update_user_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_NAME_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5625,7 +5837,7 @@ pub fn update_user_name_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_name_verify_account_privileges<'me, 'info>(
+pub fn update_user_name_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5633,11 +5845,23 @@ pub fn update_user_name_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_name_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_name_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_name_verify_writable_privileges(accounts)?;
+    update_user_name_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 2;
@@ -5748,41 +5972,35 @@ impl UpdateUserCustomMarginRatioIxData {
         Ok(data)
     }
 }
-pub fn update_user_custom_margin_ratio_ix<
-    K: Into<UpdateUserCustomMarginRatioKeys>,
-    A: Into<UpdateUserCustomMarginRatioIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_user_custom_margin_ratio_ix(
+    keys: UpdateUserCustomMarginRatioKeys,
+    args: UpdateUserCustomMarginRatioIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateUserCustomMarginRatioIxArgs = args.into();
-    let data: UpdateUserCustomMarginRatioIxData = args_full.into();
+    let data: UpdateUserCustomMarginRatioIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_custom_margin_ratio_invoke<'info, A: Into<UpdateUserCustomMarginRatioIxArgs>>(
+pub fn update_user_custom_margin_ratio_invoke<'info>(
     accounts: UpdateUserCustomMarginRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserCustomMarginRatioIxArgs,
 ) -> ProgramResult {
-    let ix = update_user_custom_margin_ratio_ix(accounts, args)?;
+    let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
+    let ix = update_user_custom_margin_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_custom_margin_ratio_invoke_signed<
-    'info,
-    A: Into<UpdateUserCustomMarginRatioIxArgs>,
->(
+pub fn update_user_custom_margin_ratio_invoke_signed<'info>(
     accounts: UpdateUserCustomMarginRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserCustomMarginRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_custom_margin_ratio_ix(accounts, args)?;
+    let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
+    let ix = update_user_custom_margin_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_CUSTOM_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -5801,7 +6019,7 @@ pub fn update_user_custom_margin_ratio_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_custom_margin_ratio_verify_account_privileges<'me, 'info>(
+pub fn update_user_custom_margin_ratio_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserCustomMarginRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5809,11 +6027,23 @@ pub fn update_user_custom_margin_ratio_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_custom_margin_ratio_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserCustomMarginRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_custom_margin_ratio_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserCustomMarginRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_custom_margin_ratio_verify_writable_privileges(accounts)?;
+    update_user_custom_margin_ratio_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN: usize = 2;
@@ -5925,44 +6155,35 @@ impl UpdateUserMarginTradingEnabledIxData {
         Ok(data)
     }
 }
-pub fn update_user_margin_trading_enabled_ix<
-    K: Into<UpdateUserMarginTradingEnabledKeys>,
-    A: Into<UpdateUserMarginTradingEnabledIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_user_margin_trading_enabled_ix(
+    keys: UpdateUserMarginTradingEnabledKeys,
+    args: UpdateUserMarginTradingEnabledIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateUserMarginTradingEnabledIxArgs = args.into();
-    let data: UpdateUserMarginTradingEnabledIxData = args_full.into();
+    let data: UpdateUserMarginTradingEnabledIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_margin_trading_enabled_invoke<
-    'info,
-    A: Into<UpdateUserMarginTradingEnabledIxArgs>,
->(
+pub fn update_user_margin_trading_enabled_invoke<'info>(
     accounts: UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserMarginTradingEnabledIxArgs,
 ) -> ProgramResult {
-    let ix = update_user_margin_trading_enabled_ix(accounts, args)?;
+    let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
+    let ix = update_user_margin_trading_enabled_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_margin_trading_enabled_invoke_signed<
-    'info,
-    A: Into<UpdateUserMarginTradingEnabledIxArgs>,
->(
+pub fn update_user_margin_trading_enabled_invoke_signed<'info>(
     accounts: UpdateUserMarginTradingEnabledAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserMarginTradingEnabledIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_margin_trading_enabled_ix(accounts, args)?;
+    let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
+    let ix = update_user_margin_trading_enabled_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_MARGIN_TRADING_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -5981,7 +6202,7 @@ pub fn update_user_margin_trading_enabled_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_margin_trading_enabled_verify_account_privileges<'me, 'info>(
+pub fn update_user_margin_trading_enabled_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserMarginTradingEnabledAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -5989,11 +6210,23 @@ pub fn update_user_margin_trading_enabled_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_margin_trading_enabled_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserMarginTradingEnabledAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_margin_trading_enabled_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserMarginTradingEnabledAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_margin_trading_enabled_verify_writable_privileges(accounts)?;
+    update_user_margin_trading_enabled_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN: usize = 2;
@@ -6096,37 +6329,34 @@ impl UpdateUserDelegateIxData {
         Ok(data)
     }
 }
-pub fn update_user_delegate_ix<
-    K: Into<UpdateUserDelegateKeys>,
-    A: Into<UpdateUserDelegateIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_user_delegate_ix(
+    keys: UpdateUserDelegateKeys,
+    args: UpdateUserDelegateIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserDelegateKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateUserDelegateIxArgs = args.into();
-    let data: UpdateUserDelegateIxData = args_full.into();
+    let data: UpdateUserDelegateIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_user_delegate_invoke<'info, A: Into<UpdateUserDelegateIxArgs>>(
+pub fn update_user_delegate_invoke<'info>(
     accounts: UpdateUserDelegateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserDelegateIxArgs,
 ) -> ProgramResult {
-    let ix = update_user_delegate_ix(accounts, args)?;
+    let keys: UpdateUserDelegateKeys = accounts.into();
+    let ix = update_user_delegate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_user_delegate_invoke_signed<'info, A: Into<UpdateUserDelegateIxArgs>>(
+pub fn update_user_delegate_invoke_signed<'info>(
     accounts: UpdateUserDelegateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateUserDelegateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_delegate_ix(accounts, args)?;
+    let keys: UpdateUserDelegateKeys = accounts.into();
+    let ix = update_user_delegate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_DELEGATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6144,7 +6374,7 @@ pub fn update_user_delegate_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_delegate_verify_account_privileges<'me, 'info>(
+pub fn update_user_delegate_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserDelegateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -6152,11 +6382,23 @@ pub fn update_user_delegate_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_delegate_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserDelegateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_delegate_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserDelegateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_delegate_verify_writable_privileges(accounts)?;
+    update_user_delegate_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DELETE_USER_IX_ACCOUNTS_LEN: usize = 4;
@@ -6272,8 +6514,7 @@ impl DeleteUserIxData {
         Ok(data)
     }
 }
-pub fn delete_user_ix<K: Into<DeleteUserKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: DeleteUserKeys = accounts.into();
+pub fn delete_user_ix(keys: DeleteUserKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DELETE_USER_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6282,7 +6523,8 @@ pub fn delete_user_ix<K: Into<DeleteUserKeys>>(accounts: K) -> std::io::Result<I
     })
 }
 pub fn delete_user_invoke<'info>(accounts: DeleteUserAccounts<'_, 'info>) -> ProgramResult {
-    let ix = delete_user_ix(accounts)?;
+    let keys: DeleteUserKeys = accounts.into();
+    let ix = delete_user_ix(keys)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -6290,7 +6532,8 @@ pub fn delete_user_invoke_signed<'info>(
     accounts: DeleteUserAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = delete_user_ix(accounts)?;
+    let keys: DeleteUserKeys = accounts.into();
+    let ix = delete_user_ix(keys)?;
     let account_info: [AccountInfo<'info>; DELETE_USER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6310,7 +6553,7 @@ pub fn delete_user_verify_account_keys(
     }
     Ok(())
 }
-pub fn delete_user_verify_account_privileges<'me, 'info>(
+pub fn delete_user_verify_writable_privileges<'me, 'info>(
     accounts: DeleteUserAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user, accounts.user_stats, accounts.state] {
@@ -6318,11 +6561,23 @@ pub fn delete_user_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn delete_user_verify_signer_privileges<'me, 'info>(
+    accounts: DeleteUserAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn delete_user_verify_account_privileges<'me, 'info>(
+    accounts: DeleteUserAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    delete_user_verify_writable_privileges(accounts)?;
+    delete_user_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const FILL_PERP_ORDER_IX_ACCOUNTS_LEN: usize = 6;
@@ -6472,34 +6727,34 @@ impl FillPerpOrderIxData {
         Ok(data)
     }
 }
-pub fn fill_perp_order_ix<K: Into<FillPerpOrderKeys>, A: Into<FillPerpOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn fill_perp_order_ix(
+    keys: FillPerpOrderKeys,
+    args: FillPerpOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: FillPerpOrderKeys = accounts.into();
     let metas: [AccountMeta; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: FillPerpOrderIxArgs = args.into();
-    let data: FillPerpOrderIxData = args_full.into();
+    let data: FillPerpOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn fill_perp_order_invoke<'info, A: Into<FillPerpOrderIxArgs>>(
+pub fn fill_perp_order_invoke<'info>(
     accounts: FillPerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: FillPerpOrderIxArgs,
 ) -> ProgramResult {
-    let ix = fill_perp_order_ix(accounts, args)?;
+    let keys: FillPerpOrderKeys = accounts.into();
+    let ix = fill_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn fill_perp_order_invoke_signed<'info, A: Into<FillPerpOrderIxArgs>>(
+pub fn fill_perp_order_invoke_signed<'info>(
     accounts: FillPerpOrderAccounts<'_, 'info>,
-    args: A,
+    args: FillPerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = fill_perp_order_ix(accounts, args)?;
+    let keys: FillPerpOrderKeys = accounts.into();
+    let ix = fill_perp_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; FILL_PERP_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6521,7 +6776,7 @@ pub fn fill_perp_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn fill_perp_order_verify_account_privileges<'me, 'info>(
+pub fn fill_perp_order_verify_writable_privileges<'me, 'info>(
     accounts: FillPerpOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -6534,11 +6789,23 @@ pub fn fill_perp_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn fill_perp_order_verify_signer_privileges<'me, 'info>(
+    accounts: FillPerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn fill_perp_order_verify_account_privileges<'me, 'info>(
+    accounts: FillPerpOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    fill_perp_order_verify_writable_privileges(accounts)?;
+    fill_perp_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REVERT_FILL_IX_ACCOUNTS_LEN: usize = 4;
@@ -6654,8 +6921,7 @@ impl RevertFillIxData {
         Ok(data)
     }
 }
-pub fn revert_fill_ix<K: Into<RevertFillKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: RevertFillKeys = accounts.into();
+pub fn revert_fill_ix(keys: RevertFillKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REVERT_FILL_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6664,7 +6930,8 @@ pub fn revert_fill_ix<K: Into<RevertFillKeys>>(accounts: K) -> std::io::Result<I
     })
 }
 pub fn revert_fill_invoke<'info>(accounts: RevertFillAccounts<'_, 'info>) -> ProgramResult {
-    let ix = revert_fill_ix(accounts)?;
+    let keys: RevertFillKeys = accounts.into();
+    let ix = revert_fill_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -6672,7 +6939,8 @@ pub fn revert_fill_invoke_signed<'info>(
     accounts: RevertFillAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revert_fill_ix(accounts)?;
+    let keys: RevertFillKeys = accounts.into();
+    let ix = revert_fill_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVERT_FILL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6692,7 +6960,7 @@ pub fn revert_fill_verify_account_keys(
     }
     Ok(())
 }
-pub fn revert_fill_verify_account_privileges<'me, 'info>(
+pub fn revert_fill_verify_writable_privileges<'me, 'info>(
     accounts: RevertFillAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.filler_stats] {
@@ -6700,11 +6968,23 @@ pub fn revert_fill_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn revert_fill_verify_signer_privileges<'me, 'info>(
+    accounts: RevertFillAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn revert_fill_verify_account_privileges<'me, 'info>(
+    accounts: RevertFillAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    revert_fill_verify_writable_privileges(accounts)?;
+    revert_fill_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const FILL_SPOT_ORDER_IX_ACCOUNTS_LEN: usize = 6;
@@ -6855,34 +7135,34 @@ impl FillSpotOrderIxData {
         Ok(data)
     }
 }
-pub fn fill_spot_order_ix<K: Into<FillSpotOrderKeys>, A: Into<FillSpotOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn fill_spot_order_ix(
+    keys: FillSpotOrderKeys,
+    args: FillSpotOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: FillSpotOrderKeys = accounts.into();
     let metas: [AccountMeta; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: FillSpotOrderIxArgs = args.into();
-    let data: FillSpotOrderIxData = args_full.into();
+    let data: FillSpotOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn fill_spot_order_invoke<'info, A: Into<FillSpotOrderIxArgs>>(
+pub fn fill_spot_order_invoke<'info>(
     accounts: FillSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: FillSpotOrderIxArgs,
 ) -> ProgramResult {
-    let ix = fill_spot_order_ix(accounts, args)?;
+    let keys: FillSpotOrderKeys = accounts.into();
+    let ix = fill_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn fill_spot_order_invoke_signed<'info, A: Into<FillSpotOrderIxArgs>>(
+pub fn fill_spot_order_invoke_signed<'info>(
     accounts: FillSpotOrderAccounts<'_, 'info>,
-    args: A,
+    args: FillSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = fill_spot_order_ix(accounts, args)?;
+    let keys: FillSpotOrderKeys = accounts.into();
+    let ix = fill_spot_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; FILL_SPOT_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6904,7 +7184,7 @@ pub fn fill_spot_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn fill_spot_order_verify_account_privileges<'me, 'info>(
+pub fn fill_spot_order_verify_writable_privileges<'me, 'info>(
     accounts: FillSpotOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -6917,11 +7197,23 @@ pub fn fill_spot_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn fill_spot_order_verify_signer_privileges<'me, 'info>(
+    accounts: FillSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn fill_spot_order_verify_account_privileges<'me, 'info>(
+    accounts: FillSpotOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    fill_spot_order_verify_writable_privileges(accounts)?;
+    fill_spot_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const TRIGGER_ORDER_IX_ACCOUNTS_LEN: usize = 4;
@@ -7048,34 +7340,34 @@ impl TriggerOrderIxData {
         Ok(data)
     }
 }
-pub fn trigger_order_ix<K: Into<TriggerOrderKeys>, A: Into<TriggerOrderIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn trigger_order_ix(
+    keys: TriggerOrderKeys,
+    args: TriggerOrderIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: TriggerOrderKeys = accounts.into();
     let metas: [AccountMeta; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: TriggerOrderIxArgs = args.into();
-    let data: TriggerOrderIxData = args_full.into();
+    let data: TriggerOrderIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn trigger_order_invoke<'info, A: Into<TriggerOrderIxArgs>>(
+pub fn trigger_order_invoke<'info>(
     accounts: TriggerOrderAccounts<'_, 'info>,
-    args: A,
+    args: TriggerOrderIxArgs,
 ) -> ProgramResult {
-    let ix = trigger_order_ix(accounts, args)?;
+    let keys: TriggerOrderKeys = accounts.into();
+    let ix = trigger_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn trigger_order_invoke_signed<'info, A: Into<TriggerOrderIxArgs>>(
+pub fn trigger_order_invoke_signed<'info>(
     accounts: TriggerOrderAccounts<'_, 'info>,
-    args: A,
+    args: TriggerOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = trigger_order_ix(accounts, args)?;
+    let keys: TriggerOrderKeys = accounts.into();
+    let ix = trigger_order_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; TRIGGER_ORDER_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7095,7 +7387,7 @@ pub fn trigger_order_verify_account_keys(
     }
     Ok(())
 }
-pub fn trigger_order_verify_account_privileges<'me, 'info>(
+pub fn trigger_order_verify_writable_privileges<'me, 'info>(
     accounts: TriggerOrderAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
@@ -7103,11 +7395,23 @@ pub fn trigger_order_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn trigger_order_verify_signer_privileges<'me, 'info>(
+    accounts: TriggerOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn trigger_order_verify_account_privileges<'me, 'info>(
+    accounts: TriggerOrderAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    trigger_order_verify_writable_privileges(accounts)?;
+    trigger_order_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN: usize = 4;
@@ -7223,10 +7527,7 @@ impl ForceCancelOrdersIxData {
         Ok(data)
     }
 }
-pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: ForceCancelOrdersKeys = accounts.into();
+pub fn force_cancel_orders_ix(keys: ForceCancelOrdersKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7237,7 +7538,8 @@ pub fn force_cancel_orders_ix<K: Into<ForceCancelOrdersKeys>>(
 pub fn force_cancel_orders_invoke<'info>(
     accounts: ForceCancelOrdersAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = force_cancel_orders_ix(accounts)?;
+    let keys: ForceCancelOrdersKeys = accounts.into();
+    let ix = force_cancel_orders_ix(keys)?;
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -7245,7 +7547,8 @@ pub fn force_cancel_orders_invoke_signed<'info>(
     accounts: ForceCancelOrdersAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = force_cancel_orders_ix(accounts)?;
+    let keys: ForceCancelOrdersKeys = accounts.into();
+    let ix = force_cancel_orders_ix(keys)?;
     let account_info: [AccountInfo<'info>; FORCE_CANCEL_ORDERS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7265,7 +7568,7 @@ pub fn force_cancel_orders_verify_account_keys(
     }
     Ok(())
 }
-pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
+pub fn force_cancel_orders_verify_writable_privileges<'me, 'info>(
     accounts: ForceCancelOrdersAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
@@ -7273,11 +7576,23 @@ pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn force_cancel_orders_verify_signer_privileges<'me, 'info>(
+    accounts: ForceCancelOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn force_cancel_orders_verify_account_privileges<'me, 'info>(
+    accounts: ForceCancelOrdersAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    force_cancel_orders_verify_writable_privileges(accounts)?;
+    force_cancel_orders_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_IDLE_IX_ACCOUNTS_LEN: usize = 4;
@@ -7393,10 +7708,7 @@ impl UpdateUserIdleIxData {
         Ok(data)
     }
 }
-pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: UpdateUserIdleKeys = accounts.into();
+pub fn update_user_idle_ix(keys: UpdateUserIdleKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7407,7 +7719,8 @@ pub fn update_user_idle_ix<K: Into<UpdateUserIdleKeys>>(
 pub fn update_user_idle_invoke<'info>(
     accounts: UpdateUserIdleAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_user_idle_ix(accounts)?;
+    let keys: UpdateUserIdleKeys = accounts.into();
+    let ix = update_user_idle_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -7415,7 +7728,8 @@ pub fn update_user_idle_invoke_signed<'info>(
     accounts: UpdateUserIdleAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_idle_ix(accounts)?;
+    let keys: UpdateUserIdleKeys = accounts.into();
+    let ix = update_user_idle_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_IDLE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7435,7 +7749,7 @@ pub fn update_user_idle_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_idle_verify_account_privileges<'me, 'info>(
+pub fn update_user_idle_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserIdleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
@@ -7443,11 +7757,23 @@ pub fn update_user_idle_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_idle_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserIdleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_idle_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserIdleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_idle_verify_writable_privileges(accounts)?;
+    update_user_idle_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN: usize = 4;
@@ -7567,10 +7893,9 @@ impl UpdateUserOpenOrdersCountIxData {
         Ok(data)
     }
 }
-pub fn update_user_open_orders_count_ix<K: Into<UpdateUserOpenOrdersCountKeys>>(
-    accounts: K,
+pub fn update_user_open_orders_count_ix(
+    keys: UpdateUserOpenOrdersCountKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7581,7 +7906,8 @@ pub fn update_user_open_orders_count_ix<K: Into<UpdateUserOpenOrdersCountKeys>>(
 pub fn update_user_open_orders_count_invoke<'info>(
     accounts: UpdateUserOpenOrdersCountAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_user_open_orders_count_ix(accounts)?;
+    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
+    let ix = update_user_open_orders_count_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -7590,7 +7916,8 @@ pub fn update_user_open_orders_count_invoke_signed<'info>(
     accounts: UpdateUserOpenOrdersCountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_open_orders_count_ix(accounts)?;
+    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
+    let ix = update_user_open_orders_count_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_USER_OPEN_ORDERS_COUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7611,7 +7938,7 @@ pub fn update_user_open_orders_count_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_open_orders_count_verify_account_privileges<'me, 'info>(
+pub fn update_user_open_orders_count_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserOpenOrdersCountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.filler, accounts.user] {
@@ -7619,11 +7946,23 @@ pub fn update_user_open_orders_count_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_open_orders_count_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserOpenOrdersCountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_open_orders_count_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserOpenOrdersCountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_open_orders_count_verify_writable_privileges(accounts)?;
+    update_user_open_orders_count_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_PNL_IX_ACCOUNTS_LEN: usize = 4;
@@ -7750,34 +8089,31 @@ impl SettlePnlIxData {
         Ok(data)
     }
 }
-pub fn settle_pnl_ix<K: Into<SettlePnlKeys>, A: Into<SettlePnlIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: SettlePnlKeys = accounts.into();
+pub fn settle_pnl_ix(keys: SettlePnlKeys, args: SettlePnlIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SETTLE_PNL_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SettlePnlIxArgs = args.into();
-    let data: SettlePnlIxData = args_full.into();
+    let data: SettlePnlIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_pnl_invoke<'info, A: Into<SettlePnlIxArgs>>(
+pub fn settle_pnl_invoke<'info>(
     accounts: SettlePnlAccounts<'_, 'info>,
-    args: A,
+    args: SettlePnlIxArgs,
 ) -> ProgramResult {
-    let ix = settle_pnl_ix(accounts, args)?;
+    let keys: SettlePnlKeys = accounts.into();
+    let ix = settle_pnl_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_pnl_invoke_signed<'info, A: Into<SettlePnlIxArgs>>(
+pub fn settle_pnl_invoke_signed<'info>(
     accounts: SettlePnlAccounts<'_, 'info>,
-    args: A,
+    args: SettlePnlIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_pnl_ix(accounts, args)?;
+    let keys: SettlePnlKeys = accounts.into();
+    let ix = settle_pnl_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_PNL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -7797,7 +8133,7 @@ pub fn settle_pnl_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_pnl_verify_account_privileges<'me, 'info>(
+pub fn settle_pnl_verify_writable_privileges<'me, 'info>(
     accounts: SettlePnlAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -7805,11 +8141,23 @@ pub fn settle_pnl_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn settle_pnl_verify_signer_privileges<'me, 'info>(
+    accounts: SettlePnlAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn settle_pnl_verify_account_privileges<'me, 'info>(
+    accounts: SettlePnlAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_pnl_verify_writable_privileges(accounts)?;
+    settle_pnl_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN: usize = 2;
@@ -7900,10 +8248,7 @@ impl SettleFundingPaymentIxData {
         Ok(data)
     }
 }
-pub fn settle_funding_payment_ix<K: Into<SettleFundingPaymentKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: SettleFundingPaymentKeys = accounts.into();
+pub fn settle_funding_payment_ix(keys: SettleFundingPaymentKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7914,7 +8259,8 @@ pub fn settle_funding_payment_ix<K: Into<SettleFundingPaymentKeys>>(
 pub fn settle_funding_payment_invoke<'info>(
     accounts: SettleFundingPaymentAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = settle_funding_payment_ix(accounts)?;
+    let keys: SettleFundingPaymentKeys = accounts.into();
+    let ix = settle_funding_payment_ix(keys)?;
     let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -7923,7 +8269,8 @@ pub fn settle_funding_payment_invoke_signed<'info>(
     accounts: SettleFundingPaymentAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_funding_payment_ix(accounts)?;
+    let keys: SettleFundingPaymentKeys = accounts.into();
+    let ix = settle_funding_payment_ix(keys)?;
     let account_info: [AccountInfo<'info>; SETTLE_FUNDING_PAYMENT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7942,7 +8289,7 @@ pub fn settle_funding_payment_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_funding_payment_verify_account_privileges<'me, 'info>(
+pub fn settle_funding_payment_verify_writable_privileges<'me, 'info>(
     accounts: SettleFundingPaymentAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -7950,6 +8297,12 @@ pub fn settle_funding_payment_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn settle_funding_payment_verify_account_privileges<'me, 'info>(
+    accounts: SettleFundingPaymentAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_funding_payment_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_LP_IX_ACCOUNTS_LEN: usize = 2;
@@ -8049,34 +8402,31 @@ impl SettleLpIxData {
         Ok(data)
     }
 }
-pub fn settle_lp_ix<K: Into<SettleLpKeys>, A: Into<SettleLpIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: SettleLpKeys = accounts.into();
+pub fn settle_lp_ix(keys: SettleLpKeys, args: SettleLpIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SETTLE_LP_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SettleLpIxArgs = args.into();
-    let data: SettleLpIxData = args_full.into();
+    let data: SettleLpIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_lp_invoke<'info, A: Into<SettleLpIxArgs>>(
+pub fn settle_lp_invoke<'info>(
     accounts: SettleLpAccounts<'_, 'info>,
-    args: A,
+    args: SettleLpIxArgs,
 ) -> ProgramResult {
-    let ix = settle_lp_ix(accounts, args)?;
+    let keys: SettleLpKeys = accounts.into();
+    let ix = settle_lp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_lp_invoke_signed<'info, A: Into<SettleLpIxArgs>>(
+pub fn settle_lp_invoke_signed<'info>(
     accounts: SettleLpAccounts<'_, 'info>,
-    args: A,
+    args: SettleLpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_lp_ix(accounts, args)?;
+    let keys: SettleLpKeys = accounts.into();
+    let ix = settle_lp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -8094,7 +8444,7 @@ pub fn settle_lp_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_lp_verify_account_privileges<'me, 'info>(
+pub fn settle_lp_verify_writable_privileges<'me, 'info>(
     accounts: SettleLpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.user] {
@@ -8102,6 +8452,12 @@ pub fn settle_lp_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn settle_lp_verify_account_privileges<'me, 'info>(
+    accounts: SettleLpAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_lp_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN: usize = 2;
@@ -8203,37 +8559,34 @@ impl SettleExpiredMarketIxData {
         Ok(data)
     }
 }
-pub fn settle_expired_market_ix<
-    K: Into<SettleExpiredMarketKeys>,
-    A: Into<SettleExpiredMarketIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn settle_expired_market_ix(
+    keys: SettleExpiredMarketKeys,
+    args: SettleExpiredMarketIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: SettleExpiredMarketKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SettleExpiredMarketIxArgs = args.into();
-    let data: SettleExpiredMarketIxData = args_full.into();
+    let data: SettleExpiredMarketIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_expired_market_invoke<'info, A: Into<SettleExpiredMarketIxArgs>>(
+pub fn settle_expired_market_invoke<'info>(
     accounts: SettleExpiredMarketAccounts<'_, 'info>,
-    args: A,
+    args: SettleExpiredMarketIxArgs,
 ) -> ProgramResult {
-    let ix = settle_expired_market_ix(accounts, args)?;
+    let keys: SettleExpiredMarketKeys = accounts.into();
+    let ix = settle_expired_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_expired_market_invoke_signed<'info, A: Into<SettleExpiredMarketIxArgs>>(
+pub fn settle_expired_market_invoke_signed<'info>(
     accounts: SettleExpiredMarketAccounts<'_, 'info>,
-    args: A,
+    args: SettleExpiredMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_expired_market_ix(accounts, args)?;
+    let keys: SettleExpiredMarketKeys = accounts.into();
+    let ix = settle_expired_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_EXPIRED_MARKET_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -8251,7 +8604,7 @@ pub fn settle_expired_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_expired_market_verify_account_privileges<'me, 'info>(
+pub fn settle_expired_market_verify_signer_privileges<'me, 'info>(
     accounts: SettleExpiredMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
@@ -8259,6 +8612,12 @@ pub fn settle_expired_market_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn settle_expired_market_verify_account_privileges<'me, 'info>(
+    accounts: SettleExpiredMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_expired_market_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUIDATE_PERP_IX_ACCOUNTS_LEN: usize = 6;
@@ -8409,34 +8768,34 @@ impl LiquidatePerpIxData {
         Ok(data)
     }
 }
-pub fn liquidate_perp_ix<K: Into<LiquidatePerpKeys>, A: Into<LiquidatePerpIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn liquidate_perp_ix(
+    keys: LiquidatePerpKeys,
+    args: LiquidatePerpIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: LiquidatePerpKeys = accounts.into();
     let metas: [AccountMeta; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: LiquidatePerpIxArgs = args.into();
-    let data: LiquidatePerpIxData = args_full.into();
+    let data: LiquidatePerpIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_perp_invoke<'info, A: Into<LiquidatePerpIxArgs>>(
+pub fn liquidate_perp_invoke<'info>(
     accounts: LiquidatePerpAccounts<'_, 'info>,
-    args: A,
+    args: LiquidatePerpIxArgs,
 ) -> ProgramResult {
-    let ix = liquidate_perp_ix(accounts, args)?;
+    let keys: LiquidatePerpKeys = accounts.into();
+    let ix = liquidate_perp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_perp_invoke_signed<'info, A: Into<LiquidatePerpIxArgs>>(
+pub fn liquidate_perp_invoke_signed<'info>(
     accounts: LiquidatePerpAccounts<'_, 'info>,
-    args: A,
+    args: LiquidatePerpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = liquidate_perp_ix(accounts, args)?;
+    let keys: LiquidatePerpKeys = accounts.into();
+    let ix = liquidate_perp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -8458,7 +8817,7 @@ pub fn liquidate_perp_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquidate_perp_verify_account_privileges<'me, 'info>(
+pub fn liquidate_perp_verify_writable_privileges<'me, 'info>(
     accounts: LiquidatePerpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -8471,11 +8830,23 @@ pub fn liquidate_perp_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquidate_perp_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidatePerpAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquidate_perp_verify_account_privileges<'me, 'info>(
+    accounts: LiquidatePerpAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquidate_perp_verify_writable_privileges(accounts)?;
+    liquidate_perp_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUIDATE_SPOT_IX_ACCOUNTS_LEN: usize = 6;
@@ -8627,34 +8998,34 @@ impl LiquidateSpotIxData {
         Ok(data)
     }
 }
-pub fn liquidate_spot_ix<K: Into<LiquidateSpotKeys>, A: Into<LiquidateSpotIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn liquidate_spot_ix(
+    keys: LiquidateSpotKeys,
+    args: LiquidateSpotIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: LiquidateSpotKeys = accounts.into();
     let metas: [AccountMeta; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: LiquidateSpotIxArgs = args.into();
-    let data: LiquidateSpotIxData = args_full.into();
+    let data: LiquidateSpotIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_spot_invoke<'info, A: Into<LiquidateSpotIxArgs>>(
+pub fn liquidate_spot_invoke<'info>(
     accounts: LiquidateSpotAccounts<'_, 'info>,
-    args: A,
+    args: LiquidateSpotIxArgs,
 ) -> ProgramResult {
-    let ix = liquidate_spot_ix(accounts, args)?;
+    let keys: LiquidateSpotKeys = accounts.into();
+    let ix = liquidate_spot_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_spot_invoke_signed<'info, A: Into<LiquidateSpotIxArgs>>(
+pub fn liquidate_spot_invoke_signed<'info>(
     accounts: LiquidateSpotAccounts<'_, 'info>,
-    args: A,
+    args: LiquidateSpotIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = liquidate_spot_ix(accounts, args)?;
+    let keys: LiquidateSpotKeys = accounts.into();
+    let ix = liquidate_spot_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_SPOT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -8676,7 +9047,7 @@ pub fn liquidate_spot_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquidate_spot_verify_account_privileges<'me, 'info>(
+pub fn liquidate_spot_verify_writable_privileges<'me, 'info>(
     accounts: LiquidateSpotAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -8689,11 +9060,23 @@ pub fn liquidate_spot_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquidate_spot_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidateSpotAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquidate_spot_verify_account_privileges<'me, 'info>(
+    accounts: LiquidateSpotAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquidate_spot_verify_writable_privileges(accounts)?;
+    liquidate_spot_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN: usize = 6;
@@ -8851,41 +9234,35 @@ impl LiquidateBorrowForPerpPnlIxData {
         Ok(data)
     }
 }
-pub fn liquidate_borrow_for_perp_pnl_ix<
-    K: Into<LiquidateBorrowForPerpPnlKeys>,
-    A: Into<LiquidateBorrowForPerpPnlIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn liquidate_borrow_for_perp_pnl_ix(
+    keys: LiquidateBorrowForPerpPnlKeys,
+    args: LiquidateBorrowForPerpPnlIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
     let metas: [AccountMeta; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: LiquidateBorrowForPerpPnlIxArgs = args.into();
-    let data: LiquidateBorrowForPerpPnlIxData = args_full.into();
+    let data: LiquidateBorrowForPerpPnlIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_borrow_for_perp_pnl_invoke<'info, A: Into<LiquidateBorrowForPerpPnlIxArgs>>(
+pub fn liquidate_borrow_for_perp_pnl_invoke<'info>(
     accounts: LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
-    args: A,
+    args: LiquidateBorrowForPerpPnlIxArgs,
 ) -> ProgramResult {
-    let ix = liquidate_borrow_for_perp_pnl_ix(accounts, args)?;
+    let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
+    let ix = liquidate_borrow_for_perp_pnl_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_borrow_for_perp_pnl_invoke_signed<
-    'info,
-    A: Into<LiquidateBorrowForPerpPnlIxArgs>,
->(
+pub fn liquidate_borrow_for_perp_pnl_invoke_signed<'info>(
     accounts: LiquidateBorrowForPerpPnlAccounts<'_, 'info>,
-    args: A,
+    args: LiquidateBorrowForPerpPnlIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = liquidate_borrow_for_perp_pnl_ix(accounts, args)?;
+    let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
+    let ix = liquidate_borrow_for_perp_pnl_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_BORROW_FOR_PERP_PNL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -8908,7 +9285,7 @@ pub fn liquidate_borrow_for_perp_pnl_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquidate_borrow_for_perp_pnl_verify_account_privileges<'me, 'info>(
+pub fn liquidate_borrow_for_perp_pnl_verify_writable_privileges<'me, 'info>(
     accounts: LiquidateBorrowForPerpPnlAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -8921,11 +9298,23 @@ pub fn liquidate_borrow_for_perp_pnl_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquidate_borrow_for_perp_pnl_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidateBorrowForPerpPnlAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquidate_borrow_for_perp_pnl_verify_account_privileges<'me, 'info>(
+    accounts: LiquidateBorrowForPerpPnlAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquidate_borrow_for_perp_pnl_verify_writable_privileges(accounts)?;
+    liquidate_borrow_for_perp_pnl_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN: usize = 6;
@@ -9085,41 +9474,35 @@ impl LiquidatePerpPnlForDepositIxData {
         Ok(data)
     }
 }
-pub fn liquidate_perp_pnl_for_deposit_ix<
-    K: Into<LiquidatePerpPnlForDepositKeys>,
-    A: Into<LiquidatePerpPnlForDepositIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn liquidate_perp_pnl_for_deposit_ix(
+    keys: LiquidatePerpPnlForDepositKeys,
+    args: LiquidatePerpPnlForDepositIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
     let metas: [AccountMeta; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: LiquidatePerpPnlForDepositIxArgs = args.into();
-    let data: LiquidatePerpPnlForDepositIxData = args_full.into();
+    let data: LiquidatePerpPnlForDepositIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn liquidate_perp_pnl_for_deposit_invoke<'info, A: Into<LiquidatePerpPnlForDepositIxArgs>>(
+pub fn liquidate_perp_pnl_for_deposit_invoke<'info>(
     accounts: LiquidatePerpPnlForDepositAccounts<'_, 'info>,
-    args: A,
+    args: LiquidatePerpPnlForDepositIxArgs,
 ) -> ProgramResult {
-    let ix = liquidate_perp_pnl_for_deposit_ix(accounts, args)?;
+    let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
+    let ix = liquidate_perp_pnl_for_deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquidate_perp_pnl_for_deposit_invoke_signed<
-    'info,
-    A: Into<LiquidatePerpPnlForDepositIxArgs>,
->(
+pub fn liquidate_perp_pnl_for_deposit_invoke_signed<'info>(
     accounts: LiquidatePerpPnlForDepositAccounts<'_, 'info>,
-    args: A,
+    args: LiquidatePerpPnlForDepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = liquidate_perp_pnl_for_deposit_ix(accounts, args)?;
+    let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
+    let ix = liquidate_perp_pnl_for_deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUIDATE_PERP_PNL_FOR_DEPOSIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -9142,7 +9525,7 @@ pub fn liquidate_perp_pnl_for_deposit_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquidate_perp_pnl_for_deposit_verify_account_privileges<'me, 'info>(
+pub fn liquidate_perp_pnl_for_deposit_verify_writable_privileges<'me, 'info>(
     accounts: LiquidatePerpPnlForDepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -9155,11 +9538,23 @@ pub fn liquidate_perp_pnl_for_deposit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquidate_perp_pnl_for_deposit_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidatePerpPnlForDepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquidate_perp_pnl_for_deposit_verify_account_privileges<'me, 'info>(
+    accounts: LiquidatePerpPnlForDepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquidate_perp_pnl_for_deposit_verify_writable_privileges(accounts)?;
+    liquidate_perp_pnl_for_deposit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN: usize = 6;
@@ -9309,38 +9704,35 @@ impl ResolvePerpPnlDeficitIxData {
         Ok(data)
     }
 }
-pub fn resolve_perp_pnl_deficit_ix<
-    K: Into<ResolvePerpPnlDeficitKeys>,
-    A: Into<ResolvePerpPnlDeficitIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn resolve_perp_pnl_deficit_ix(
+    keys: ResolvePerpPnlDeficitKeys,
+    args: ResolvePerpPnlDeficitIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ResolvePerpPnlDeficitKeys = accounts.into();
     let metas: [AccountMeta; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ResolvePerpPnlDeficitIxArgs = args.into();
-    let data: ResolvePerpPnlDeficitIxData = args_full.into();
+    let data: ResolvePerpPnlDeficitIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_perp_pnl_deficit_invoke<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
+pub fn resolve_perp_pnl_deficit_invoke<'info>(
     accounts: ResolvePerpPnlDeficitAccounts<'_, 'info>,
-    args: A,
+    args: ResolvePerpPnlDeficitIxArgs,
 ) -> ProgramResult {
-    let ix = resolve_perp_pnl_deficit_ix(accounts, args)?;
+    let keys: ResolvePerpPnlDeficitKeys = accounts.into();
+    let ix = resolve_perp_pnl_deficit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_perp_pnl_deficit_invoke_signed<'info, A: Into<ResolvePerpPnlDeficitIxArgs>>(
+pub fn resolve_perp_pnl_deficit_invoke_signed<'info>(
     accounts: ResolvePerpPnlDeficitAccounts<'_, 'info>,
-    args: A,
+    args: ResolvePerpPnlDeficitIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = resolve_perp_pnl_deficit_ix(accounts, args)?;
+    let keys: ResolvePerpPnlDeficitKeys = accounts.into();
+    let ix = resolve_perp_pnl_deficit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_PERP_PNL_DEFICIT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -9366,7 +9758,7 @@ pub fn resolve_perp_pnl_deficit_verify_account_keys(
     }
     Ok(())
 }
-pub fn resolve_perp_pnl_deficit_verify_account_privileges<'me, 'info>(
+pub fn resolve_perp_pnl_deficit_verify_writable_privileges<'me, 'info>(
     accounts: ResolvePerpPnlDeficitAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market_vault, accounts.insurance_fund_vault] {
@@ -9374,11 +9766,23 @@ pub fn resolve_perp_pnl_deficit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn resolve_perp_pnl_deficit_verify_signer_privileges<'me, 'info>(
+    accounts: ResolvePerpPnlDeficitAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn resolve_perp_pnl_deficit_verify_account_privileges<'me, 'info>(
+    accounts: ResolvePerpPnlDeficitAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    resolve_perp_pnl_deficit_verify_writable_privileges(accounts)?;
+    resolve_perp_pnl_deficit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
@@ -9572,38 +9976,35 @@ impl ResolvePerpBankruptcyIxData {
         Ok(data)
     }
 }
-pub fn resolve_perp_bankruptcy_ix<
-    K: Into<ResolvePerpBankruptcyKeys>,
-    A: Into<ResolvePerpBankruptcyIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn resolve_perp_bankruptcy_ix(
+    keys: ResolvePerpBankruptcyKeys,
+    args: ResolvePerpBankruptcyIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ResolvePerpBankruptcyKeys = accounts.into();
     let metas: [AccountMeta; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ResolvePerpBankruptcyIxArgs = args.into();
-    let data: ResolvePerpBankruptcyIxData = args_full.into();
+    let data: ResolvePerpBankruptcyIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_perp_bankruptcy_invoke<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
+pub fn resolve_perp_bankruptcy_invoke<'info>(
     accounts: ResolvePerpBankruptcyAccounts<'_, 'info>,
-    args: A,
+    args: ResolvePerpBankruptcyIxArgs,
 ) -> ProgramResult {
-    let ix = resolve_perp_bankruptcy_ix(accounts, args)?;
+    let keys: ResolvePerpBankruptcyKeys = accounts.into();
+    let ix = resolve_perp_bankruptcy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_perp_bankruptcy_invoke_signed<'info, A: Into<ResolvePerpBankruptcyIxArgs>>(
+pub fn resolve_perp_bankruptcy_invoke_signed<'info>(
     accounts: ResolvePerpBankruptcyAccounts<'_, 'info>,
-    args: A,
+    args: ResolvePerpBankruptcyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = resolve_perp_bankruptcy_ix(accounts, args)?;
+    let keys: ResolvePerpBankruptcyKeys = accounts.into();
+    let ix = resolve_perp_bankruptcy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_PERP_BANKRUPTCY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -9633,7 +10034,7 @@ pub fn resolve_perp_bankruptcy_verify_account_keys(
     }
     Ok(())
 }
-pub fn resolve_perp_bankruptcy_verify_account_privileges<'me, 'info>(
+pub fn resolve_perp_bankruptcy_verify_writable_privileges<'me, 'info>(
     accounts: ResolvePerpBankruptcyAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -9648,11 +10049,23 @@ pub fn resolve_perp_bankruptcy_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn resolve_perp_bankruptcy_verify_signer_privileges<'me, 'info>(
+    accounts: ResolvePerpBankruptcyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn resolve_perp_bankruptcy_verify_account_privileges<'me, 'info>(
+    accounts: ResolvePerpBankruptcyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    resolve_perp_bankruptcy_verify_writable_privileges(accounts)?;
+    resolve_perp_bankruptcy_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN: usize = 10;
@@ -9845,38 +10258,35 @@ impl ResolveSpotBankruptcyIxData {
         Ok(data)
     }
 }
-pub fn resolve_spot_bankruptcy_ix<
-    K: Into<ResolveSpotBankruptcyKeys>,
-    A: Into<ResolveSpotBankruptcyIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn resolve_spot_bankruptcy_ix(
+    keys: ResolveSpotBankruptcyKeys,
+    args: ResolveSpotBankruptcyIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ResolveSpotBankruptcyKeys = accounts.into();
     let metas: [AccountMeta; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ResolveSpotBankruptcyIxArgs = args.into();
-    let data: ResolveSpotBankruptcyIxData = args_full.into();
+    let data: ResolveSpotBankruptcyIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn resolve_spot_bankruptcy_invoke<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
+pub fn resolve_spot_bankruptcy_invoke<'info>(
     accounts: ResolveSpotBankruptcyAccounts<'_, 'info>,
-    args: A,
+    args: ResolveSpotBankruptcyIxArgs,
 ) -> ProgramResult {
-    let ix = resolve_spot_bankruptcy_ix(accounts, args)?;
+    let keys: ResolveSpotBankruptcyKeys = accounts.into();
+    let ix = resolve_spot_bankruptcy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn resolve_spot_bankruptcy_invoke_signed<'info, A: Into<ResolveSpotBankruptcyIxArgs>>(
+pub fn resolve_spot_bankruptcy_invoke_signed<'info>(
     accounts: ResolveSpotBankruptcyAccounts<'_, 'info>,
-    args: A,
+    args: ResolveSpotBankruptcyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = resolve_spot_bankruptcy_ix(accounts, args)?;
+    let keys: ResolveSpotBankruptcyKeys = accounts.into();
+    let ix = resolve_spot_bankruptcy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; RESOLVE_SPOT_BANKRUPTCY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -9906,7 +10316,7 @@ pub fn resolve_spot_bankruptcy_verify_account_keys(
     }
     Ok(())
 }
-pub fn resolve_spot_bankruptcy_verify_account_privileges<'me, 'info>(
+pub fn resolve_spot_bankruptcy_verify_writable_privileges<'me, 'info>(
     accounts: ResolveSpotBankruptcyAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -9921,11 +10331,23 @@ pub fn resolve_spot_bankruptcy_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn resolve_spot_bankruptcy_verify_signer_privileges<'me, 'info>(
+    accounts: ResolveSpotBankruptcyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn resolve_spot_bankruptcy_verify_account_privileges<'me, 'info>(
+    accounts: ResolveSpotBankruptcyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    resolve_spot_bankruptcy_verify_writable_privileges(accounts)?;
+    resolve_spot_bankruptcy_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN: usize = 6;
@@ -10083,44 +10505,35 @@ impl SettleRevenueToInsuranceFundIxData {
         Ok(data)
     }
 }
-pub fn settle_revenue_to_insurance_fund_ix<
-    K: Into<SettleRevenueToInsuranceFundKeys>,
-    A: Into<SettleRevenueToInsuranceFundIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn settle_revenue_to_insurance_fund_ix(
+    keys: SettleRevenueToInsuranceFundKeys,
+    args: SettleRevenueToInsuranceFundIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SettleRevenueToInsuranceFundIxArgs = args.into();
-    let data: SettleRevenueToInsuranceFundIxData = args_full.into();
+    let data: SettleRevenueToInsuranceFundIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn settle_revenue_to_insurance_fund_invoke<
-    'info,
-    A: Into<SettleRevenueToInsuranceFundIxArgs>,
->(
+pub fn settle_revenue_to_insurance_fund_invoke<'info>(
     accounts: SettleRevenueToInsuranceFundAccounts<'_, 'info>,
-    args: A,
+    args: SettleRevenueToInsuranceFundIxArgs,
 ) -> ProgramResult {
-    let ix = settle_revenue_to_insurance_fund_ix(accounts, args)?;
+    let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
+    let ix = settle_revenue_to_insurance_fund_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn settle_revenue_to_insurance_fund_invoke_signed<
-    'info,
-    A: Into<SettleRevenueToInsuranceFundIxArgs>,
->(
+pub fn settle_revenue_to_insurance_fund_invoke_signed<'info>(
     accounts: SettleRevenueToInsuranceFundAccounts<'_, 'info>,
-    args: A,
+    args: SettleRevenueToInsuranceFundIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_revenue_to_insurance_fund_ix(accounts, args)?;
+    let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
+    let ix = settle_revenue_to_insurance_fund_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SETTLE_REVENUE_TO_INSURANCE_FUND_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -10146,7 +10559,7 @@ pub fn settle_revenue_to_insurance_fund_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_revenue_to_insurance_fund_verify_account_privileges<'me, 'info>(
+pub fn settle_revenue_to_insurance_fund_verify_writable_privileges<'me, 'info>(
     accounts: SettleRevenueToInsuranceFundAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -10158,6 +10571,12 @@ pub fn settle_revenue_to_insurance_fund_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn settle_revenue_to_insurance_fund_verify_account_privileges<'me, 'info>(
+    accounts: SettleRevenueToInsuranceFundAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_revenue_to_insurance_fund_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN: usize = 3;
@@ -10273,34 +10692,34 @@ impl UpdateFundingRateIxData {
         Ok(data)
     }
 }
-pub fn update_funding_rate_ix<K: Into<UpdateFundingRateKeys>, A: Into<UpdateFundingRateIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_funding_rate_ix(
+    keys: UpdateFundingRateKeys,
+    args: UpdateFundingRateIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateFundingRateKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateFundingRateIxArgs = args.into();
-    let data: UpdateFundingRateIxData = args_full.into();
+    let data: UpdateFundingRateIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_funding_rate_invoke<'info, A: Into<UpdateFundingRateIxArgs>>(
+pub fn update_funding_rate_invoke<'info>(
     accounts: UpdateFundingRateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateFundingRateIxArgs,
 ) -> ProgramResult {
-    let ix = update_funding_rate_ix(accounts, args)?;
+    let keys: UpdateFundingRateKeys = accounts.into();
+    let ix = update_funding_rate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_funding_rate_invoke_signed<'info, A: Into<UpdateFundingRateIxArgs>>(
+pub fn update_funding_rate_invoke_signed<'info>(
     accounts: UpdateFundingRateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateFundingRateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_funding_rate_ix(accounts, args)?;
+    let keys: UpdateFundingRateKeys = accounts.into();
+    let ix = update_funding_rate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_FUNDING_RATE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -10319,7 +10738,7 @@ pub fn update_funding_rate_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_funding_rate_verify_account_privileges<'me, 'info>(
+pub fn update_funding_rate_verify_writable_privileges<'me, 'info>(
     accounts: UpdateFundingRateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -10327,6 +10746,12 @@ pub fn update_funding_rate_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_funding_rate_verify_account_privileges<'me, 'info>(
+    accounts: UpdateFundingRateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_funding_rate_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
@@ -10441,12 +10866,9 @@ impl UpdateSpotMarketCumulativeInterestIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_cumulative_interest_ix<
-    K: Into<UpdateSpotMarketCumulativeInterestKeys>,
->(
-    accounts: K,
+pub fn update_spot_market_cumulative_interest_ix(
+    keys: UpdateSpotMarketCumulativeInterestKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -10457,7 +10879,8 @@ pub fn update_spot_market_cumulative_interest_ix<
 pub fn update_spot_market_cumulative_interest_invoke<'info>(
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_spot_market_cumulative_interest_ix(accounts)?;
+    let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
+    let ix = update_spot_market_cumulative_interest_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -10466,7 +10889,8 @@ pub fn update_spot_market_cumulative_interest_invoke_signed<'info>(
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_cumulative_interest_ix(accounts)?;
+    let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
+    let ix = update_spot_market_cumulative_interest_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_CUMULATIVE_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -10486,7 +10910,7 @@ pub fn update_spot_market_cumulative_interest_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_cumulative_interest_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_cumulative_interest_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -10494,6 +10918,12 @@ pub fn update_spot_market_cumulative_interest_verify_account_privileges<'me, 'in
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_cumulative_interest_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_cumulative_interest_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_AMMS_IX_ACCOUNTS_LEN: usize = 2;
@@ -10595,34 +11025,34 @@ impl UpdateAmmsIxData {
         Ok(data)
     }
 }
-pub fn update_amms_ix<K: Into<UpdateAmmsKeys>, A: Into<UpdateAmmsIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_amms_ix(
+    keys: UpdateAmmsKeys,
+    args: UpdateAmmsIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateAmmsKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_AMMS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateAmmsIxArgs = args.into();
-    let data: UpdateAmmsIxData = args_full.into();
+    let data: UpdateAmmsIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_amms_invoke<'info, A: Into<UpdateAmmsIxArgs>>(
+pub fn update_amms_invoke<'info>(
     accounts: UpdateAmmsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAmmsIxArgs,
 ) -> ProgramResult {
-    let ix = update_amms_ix(accounts, args)?;
+    let keys: UpdateAmmsKeys = accounts.into();
+    let ix = update_amms_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_amms_invoke_signed<'info, A: Into<UpdateAmmsIxArgs>>(
+pub fn update_amms_invoke_signed<'info>(
     accounts: UpdateAmmsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAmmsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_amms_ix(accounts, args)?;
+    let keys: UpdateAmmsKeys = accounts.into();
+    let ix = update_amms_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_AMMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -10640,7 +11070,7 @@ pub fn update_amms_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_amms_verify_account_privileges<'me, 'info>(
+pub fn update_amms_verify_signer_privileges<'me, 'info>(
     accounts: UpdateAmmsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
@@ -10648,6 +11078,12 @@ pub fn update_amms_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_amms_verify_account_privileges<'me, 'info>(
+    accounts: UpdateAmmsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_amms_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
@@ -10765,38 +11201,35 @@ impl UpdateSpotMarketExpiryIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_expiry_ix<
-    K: Into<UpdateSpotMarketExpiryKeys>,
-    A: Into<UpdateSpotMarketExpiryIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_expiry_ix(
+    keys: UpdateSpotMarketExpiryKeys,
+    args: UpdateSpotMarketExpiryIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketExpiryKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketExpiryIxArgs = args.into();
-    let data: UpdateSpotMarketExpiryIxData = args_full.into();
+    let data: UpdateSpotMarketExpiryIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_expiry_invoke<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
+pub fn update_spot_market_expiry_invoke<'info>(
     accounts: UpdateSpotMarketExpiryAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketExpiryIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_expiry_ix(accounts, args)?;
+    let keys: UpdateSpotMarketExpiryKeys = accounts.into();
+    let ix = update_spot_market_expiry_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_expiry_invoke_signed<'info, A: Into<UpdateSpotMarketExpiryIxArgs>>(
+pub fn update_spot_market_expiry_invoke_signed<'info>(
     accounts: UpdateSpotMarketExpiryAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketExpiryIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_expiry_ix(accounts, args)?;
+    let keys: UpdateSpotMarketExpiryKeys = accounts.into();
+    let ix = update_spot_market_expiry_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -10816,7 +11249,7 @@ pub fn update_spot_market_expiry_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_expiry_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_expiry_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketExpiryAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -10824,11 +11257,23 @@ pub fn update_spot_market_expiry_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_expiry_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketExpiryAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_expiry_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketExpiryAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_expiry_verify_writable_privileges(accounts)?;
+    update_spot_market_expiry_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN: usize = 6;
@@ -10976,12 +11421,9 @@ impl UpdateUserQuoteAssetInsuranceStakeIxData {
         Ok(data)
     }
 }
-pub fn update_user_quote_asset_insurance_stake_ix<
-    K: Into<UpdateUserQuoteAssetInsuranceStakeKeys>,
->(
-    accounts: K,
+pub fn update_user_quote_asset_insurance_stake_ix(
+    keys: UpdateUserQuoteAssetInsuranceStakeKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -10992,7 +11434,8 @@ pub fn update_user_quote_asset_insurance_stake_ix<
 pub fn update_user_quote_asset_insurance_stake_invoke<'info>(
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
+    let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
+    let ix = update_user_quote_asset_insurance_stake_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
@@ -11001,7 +11444,8 @@ pub fn update_user_quote_asset_insurance_stake_invoke_signed<'info>(
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_user_quote_asset_insurance_stake_ix(accounts)?;
+    let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
+    let ix = update_user_quote_asset_insurance_stake_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_USER_QUOTE_ASSET_INSURANCE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -11030,7 +11474,7 @@ pub fn update_user_quote_asset_insurance_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_user_quote_asset_insurance_stake_verify_account_privileges<'me, 'info>(
+pub fn update_user_quote_asset_insurance_stake_verify_writable_privileges<'me, 'info>(
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -11042,11 +11486,23 @@ pub fn update_user_quote_asset_insurance_stake_verify_account_privileges<'me, 'i
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_user_quote_asset_insurance_stake_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_user_quote_asset_insurance_stake_verify_account_privileges<'me, 'info>(
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_user_quote_asset_insurance_stake_verify_writable_privileges(accounts)?;
+    update_user_quote_asset_insurance_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 8;
@@ -11225,44 +11681,35 @@ impl InitializeInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn initialize_insurance_fund_stake_ix<
-    K: Into<InitializeInsuranceFundStakeKeys>,
-    A: Into<InitializeInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_insurance_fund_stake_ix(
+    keys: InitializeInsuranceFundStakeKeys,
+    args: InitializeInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializeInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeInsuranceFundStakeIxArgs = args.into();
-    let data: InitializeInsuranceFundStakeIxData = args_full.into();
+    let data: InitializeInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_insurance_fund_stake_invoke<
-    'info,
-    A: Into<InitializeInsuranceFundStakeIxArgs>,
->(
+pub fn initialize_insurance_fund_stake_invoke<'info>(
     accounts: InitializeInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: InitializeInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_insurance_fund_stake_ix(accounts, args)?;
+    let keys: InitializeInsuranceFundStakeKeys = accounts.into();
+    let ix = initialize_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_insurance_fund_stake_invoke_signed<
-    'info,
-    A: Into<InitializeInsuranceFundStakeIxArgs>,
->(
+pub fn initialize_insurance_fund_stake_invoke_signed<'info>(
     accounts: InitializeInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: InitializeInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_insurance_fund_stake_ix(accounts, args)?;
+    let keys: InitializeInsuranceFundStakeKeys = accounts.into();
+    let ix = initialize_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -11290,7 +11737,7 @@ pub fn initialize_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn initialize_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: InitializeInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -11302,11 +11749,23 @@ pub fn initialize_insurance_fund_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: InitializeInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    initialize_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 10;
@@ -11500,38 +11959,35 @@ impl AddInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn add_insurance_fund_stake_ix<
-    K: Into<AddInsuranceFundStakeKeys>,
-    A: Into<AddInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn add_insurance_fund_stake_ix(
+    keys: AddInsuranceFundStakeKeys,
+    args: AddInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: AddInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: AddInsuranceFundStakeIxArgs = args.into();
-    let data: AddInsuranceFundStakeIxData = args_full.into();
+    let data: AddInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn add_insurance_fund_stake_invoke<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
+pub fn add_insurance_fund_stake_invoke<'info>(
     accounts: AddInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: AddInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = add_insurance_fund_stake_ix(accounts, args)?;
+    let keys: AddInsuranceFundStakeKeys = accounts.into();
+    let ix = add_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_insurance_fund_stake_invoke_signed<'info, A: Into<AddInsuranceFundStakeIxArgs>>(
+pub fn add_insurance_fund_stake_invoke_signed<'info>(
     accounts: AddInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: AddInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = add_insurance_fund_stake_ix(accounts, args)?;
+    let keys: AddInsuranceFundStakeKeys = accounts.into();
+    let ix = add_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -11564,7 +12020,7 @@ pub fn add_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn add_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: AddInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -11578,11 +12034,23 @@ pub fn add_insurance_fund_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: AddInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: AddInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    add_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
@@ -11731,44 +12199,35 @@ impl RequestRemoveInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn request_remove_insurance_fund_stake_ix<
-    K: Into<RequestRemoveInsuranceFundStakeKeys>,
-    A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn request_remove_insurance_fund_stake_ix(
+    keys: RequestRemoveInsuranceFundStakeKeys,
+    args: RequestRemoveInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RequestRemoveInsuranceFundStakeIxArgs = args.into();
-    let data: RequestRemoveInsuranceFundStakeIxData = args_full.into();
+    let data: RequestRemoveInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn request_remove_insurance_fund_stake_invoke<
-    'info,
-    A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn request_remove_insurance_fund_stake_invoke<'info>(
     accounts: RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: RequestRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = request_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = request_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn request_remove_insurance_fund_stake_invoke_signed<
-    'info,
-    A: Into<RequestRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn request_remove_insurance_fund_stake_invoke_signed<'info>(
     accounts: RequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: RequestRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = request_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = request_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -11796,7 +12255,7 @@ pub fn request_remove_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn request_remove_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: RequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -11808,11 +12267,23 @@ pub fn request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn request_remove_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    request_remove_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    request_remove_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 5;
@@ -11966,45 +12437,36 @@ impl CancelRequestRemoveInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn cancel_request_remove_insurance_fund_stake_ix<
-    K: Into<CancelRequestRemoveInsuranceFundStakeKeys>,
-    A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn cancel_request_remove_insurance_fund_stake_ix(
+    keys: CancelRequestRemoveInsuranceFundStakeKeys,
+    args: CancelRequestRemoveInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: CancelRequestRemoveInsuranceFundStakeIxArgs = args.into();
-    let data: CancelRequestRemoveInsuranceFundStakeIxData = args_full.into();
+    let data: CancelRequestRemoveInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn cancel_request_remove_insurance_fund_stake_invoke<
-    'info,
-    A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn cancel_request_remove_insurance_fund_stake_invoke<'info>(
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: CancelRequestRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = cancel_request_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = cancel_request_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<
-    'info,
-    A: Into<CancelRequestRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn cancel_request_remove_insurance_fund_stake_invoke_signed<'info>(
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: CancelRequestRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = cancel_request_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = cancel_request_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         CANCEL_REQUEST_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -12032,7 +12494,7 @@ pub fn cancel_request_remove_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn cancel_request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn cancel_request_remove_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -12044,11 +12506,23 @@ pub fn cancel_request_remove_insurance_fund_stake_verify_account_privileges<'me,
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn cancel_request_remove_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn cancel_request_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    cancel_request_remove_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    cancel_request_remove_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 9;
@@ -12234,38 +12708,35 @@ impl RemoveInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn remove_insurance_fund_stake_ix<
-    K: Into<RemoveInsuranceFundStakeKeys>,
-    A: Into<RemoveInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn remove_insurance_fund_stake_ix(
+    keys: RemoveInsuranceFundStakeKeys,
+    args: RemoveInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RemoveInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RemoveInsuranceFundStakeIxArgs = args.into();
-    let data: RemoveInsuranceFundStakeIxData = args_full.into();
+    let data: RemoveInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_insurance_fund_stake_invoke<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
+pub fn remove_insurance_fund_stake_invoke<'info>(
     accounts: RemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: RemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: RemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_insurance_fund_stake_invoke_signed<'info, A: Into<RemoveInsuranceFundStakeIxArgs>>(
+pub fn remove_insurance_fund_stake_invoke_signed<'info>(
     accounts: RemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: RemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: RemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -12297,7 +12768,7 @@ pub fn remove_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn remove_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: RemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -12310,11 +12781,23 @@ pub fn remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: RemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    remove_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_IX_ACCOUNTS_LEN: usize = 7;
@@ -12463,8 +12946,7 @@ impl InitializeIxData {
         Ok(data)
     }
 }
-pub fn initialize_ix<K: Into<InitializeKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: InitializeKeys = accounts.into();
+pub fn initialize_ix(keys: InitializeKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -12473,7 +12955,8 @@ pub fn initialize_ix<K: Into<InitializeKeys>>(accounts: K) -> std::io::Result<In
     })
 }
 pub fn initialize_invoke<'info>(accounts: InitializeAccounts<'_, 'info>) -> ProgramResult {
-    let ix = initialize_ix(accounts)?;
+    let keys: InitializeKeys = accounts.into();
+    let ix = initialize_ix(keys)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -12481,7 +12964,8 @@ pub fn initialize_invoke_signed<'info>(
     accounts: InitializeAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_ix(accounts)?;
+    let keys: InitializeKeys = accounts.into();
+    let ix = initialize_ix(keys)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -12504,7 +12988,7 @@ pub fn initialize_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_verify_account_privileges<'me, 'info>(
+pub fn initialize_verify_writable_privileges<'me, 'info>(
     accounts: InitializeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state] {
@@ -12512,11 +12996,23 @@ pub fn initialize_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_account_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_verify_writable_privileges(accounts)?;
+    initialize_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN: usize = 11;
@@ -12731,38 +13227,35 @@ impl InitializeSpotMarketIxData {
         Ok(data)
     }
 }
-pub fn initialize_spot_market_ix<
-    K: Into<InitializeSpotMarketKeys>,
-    A: Into<InitializeSpotMarketIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_spot_market_ix(
+    keys: InitializeSpotMarketKeys,
+    args: InitializeSpotMarketIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializeSpotMarketKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeSpotMarketIxArgs = args.into();
-    let data: InitializeSpotMarketIxData = args_full.into();
+    let data: InitializeSpotMarketIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_spot_market_invoke<'info, A: Into<InitializeSpotMarketIxArgs>>(
+pub fn initialize_spot_market_invoke<'info>(
     accounts: InitializeSpotMarketAccounts<'_, 'info>,
-    args: A,
+    args: InitializeSpotMarketIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_spot_market_ix(accounts, args)?;
+    let keys: InitializeSpotMarketKeys = accounts.into();
+    let ix = initialize_spot_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_spot_market_invoke_signed<'info, A: Into<InitializeSpotMarketIxArgs>>(
+pub fn initialize_spot_market_invoke_signed<'info>(
     accounts: InitializeSpotMarketAccounts<'_, 'info>,
-    args: A,
+    args: InitializeSpotMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_spot_market_ix(accounts, args)?;
+    let keys: InitializeSpotMarketKeys = accounts.into();
+    let ix = initialize_spot_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_SPOT_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -12793,7 +13286,7 @@ pub fn initialize_spot_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_spot_market_verify_account_privileges<'me, 'info>(
+pub fn initialize_spot_market_verify_writable_privileges<'me, 'info>(
     accounts: InitializeSpotMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -12807,11 +13300,23 @@ pub fn initialize_spot_market_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_spot_market_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeSpotMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_spot_market_verify_account_privileges<'me, 'info>(
+    accounts: InitializeSpotMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_spot_market_verify_writable_privileges(accounts)?;
+    initialize_spot_market_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 11;
@@ -13027,44 +13532,35 @@ impl InitializeSerumFulfillmentConfigIxData {
         Ok(data)
     }
 }
-pub fn initialize_serum_fulfillment_config_ix<
-    K: Into<InitializeSerumFulfillmentConfigKeys>,
-    A: Into<InitializeSerumFulfillmentConfigIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_serum_fulfillment_config_ix(
+    keys: InitializeSerumFulfillmentConfigKeys,
+    args: InitializeSerumFulfillmentConfigIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeSerumFulfillmentConfigIxArgs = args.into();
-    let data: InitializeSerumFulfillmentConfigIxData = args_full.into();
+    let data: InitializeSerumFulfillmentConfigIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_serum_fulfillment_config_invoke<
-    'info,
-    A: Into<InitializeSerumFulfillmentConfigIxArgs>,
->(
+pub fn initialize_serum_fulfillment_config_invoke<'info>(
     accounts: InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
-    args: A,
+    args: InitializeSerumFulfillmentConfigIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_serum_fulfillment_config_ix(accounts, args)?;
+    let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_serum_fulfillment_config_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_serum_fulfillment_config_invoke_signed<
-    'info,
-    A: Into<InitializeSerumFulfillmentConfigIxArgs>,
->(
+pub fn initialize_serum_fulfillment_config_invoke_signed<'info>(
     accounts: InitializeSerumFulfillmentConfigAccounts<'_, 'info>,
-    args: A,
+    args: InitializeSerumFulfillmentConfigIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_serum_fulfillment_config_ix(accounts, args)?;
+    let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_serum_fulfillment_config_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_SERUM_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -13095,7 +13591,7 @@ pub fn initialize_serum_fulfillment_config_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_serum_fulfillment_config_verify_account_privileges<'me, 'info>(
+pub fn initialize_serum_fulfillment_config_verify_writable_privileges<'me, 'info>(
     accounts: InitializeSerumFulfillmentConfigAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -13108,11 +13604,23 @@ pub fn initialize_serum_fulfillment_config_verify_account_privileges<'me, 'info>
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_serum_fulfillment_config_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeSerumFulfillmentConfigAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_serum_fulfillment_config_verify_account_privileges<'me, 'info>(
+    accounts: InitializeSerumFulfillmentConfigAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_serum_fulfillment_config_verify_writable_privileges(accounts)?;
+    initialize_serum_fulfillment_config_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
@@ -13240,44 +13748,35 @@ impl UpdateSerumFulfillmentConfigStatusIxData {
         Ok(data)
     }
 }
-pub fn update_serum_fulfillment_config_status_ix<
-    K: Into<UpdateSerumFulfillmentConfigStatusKeys>,
-    A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_serum_fulfillment_config_status_ix(
+    keys: UpdateSerumFulfillmentConfigStatusKeys,
+    args: UpdateSerumFulfillmentConfigStatusIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSerumFulfillmentConfigStatusIxArgs = args.into();
-    let data: UpdateSerumFulfillmentConfigStatusIxData = args_full.into();
+    let data: UpdateSerumFulfillmentConfigStatusIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_serum_fulfillment_config_status_invoke<
-    'info,
-    A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
->(
+pub fn update_serum_fulfillment_config_status_invoke<'info>(
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSerumFulfillmentConfigStatusIxArgs,
 ) -> ProgramResult {
-    let ix = update_serum_fulfillment_config_status_ix(accounts, args)?;
+    let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
+    let ix = update_serum_fulfillment_config_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_serum_fulfillment_config_status_invoke_signed<
-    'info,
-    A: Into<UpdateSerumFulfillmentConfigStatusIxArgs>,
->(
+pub fn update_serum_fulfillment_config_status_invoke_signed<'info>(
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSerumFulfillmentConfigStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_serum_fulfillment_config_status_ix(accounts, args)?;
+    let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
+    let ix = update_serum_fulfillment_config_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -13300,7 +13799,7 @@ pub fn update_serum_fulfillment_config_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_serum_fulfillment_config_status_verify_account_privileges<'me, 'info>(
+pub fn update_serum_fulfillment_config_status_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.serum_fulfillment_config, accounts.admin] {
@@ -13308,11 +13807,23 @@ pub fn update_serum_fulfillment_config_status_verify_account_privileges<'me, 'in
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_serum_fulfillment_config_status_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_serum_fulfillment_config_status_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_serum_fulfillment_config_status_verify_writable_privileges(accounts)?;
+    update_serum_fulfillment_config_status_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN: usize = 10;
@@ -13517,44 +14028,35 @@ impl InitializePhoenixFulfillmentConfigIxData {
         Ok(data)
     }
 }
-pub fn initialize_phoenix_fulfillment_config_ix<
-    K: Into<InitializePhoenixFulfillmentConfigKeys>,
-    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_phoenix_fulfillment_config_ix(
+    keys: InitializePhoenixFulfillmentConfigKeys,
+    args: InitializePhoenixFulfillmentConfigIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializePhoenixFulfillmentConfigIxArgs = args.into();
-    let data: InitializePhoenixFulfillmentConfigIxData = args_full.into();
+    let data: InitializePhoenixFulfillmentConfigIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_phoenix_fulfillment_config_invoke<
-    'info,
-    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
->(
+pub fn initialize_phoenix_fulfillment_config_invoke<'info>(
     accounts: InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
-    args: A,
+    args: InitializePhoenixFulfillmentConfigIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
+    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_phoenix_fulfillment_config_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_phoenix_fulfillment_config_invoke_signed<
-    'info,
-    A: Into<InitializePhoenixFulfillmentConfigIxArgs>,
->(
+pub fn initialize_phoenix_fulfillment_config_invoke_signed<'info>(
     accounts: InitializePhoenixFulfillmentConfigAccounts<'_, 'info>,
-    args: A,
+    args: InitializePhoenixFulfillmentConfigIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_phoenix_fulfillment_config_ix(accounts, args)?;
+    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_phoenix_fulfillment_config_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_PHOENIX_FULFILLMENT_CONFIG_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -13584,7 +14086,7 @@ pub fn initialize_phoenix_fulfillment_config_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_phoenix_fulfillment_config_verify_account_privileges<'me, 'info>(
+pub fn initialize_phoenix_fulfillment_config_verify_writable_privileges<'me, 'info>(
     accounts: InitializePhoenixFulfillmentConfigAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -13596,11 +14098,23 @@ pub fn initialize_phoenix_fulfillment_config_verify_account_privileges<'me, 'inf
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_phoenix_fulfillment_config_verify_signer_privileges<'me, 'info>(
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_phoenix_fulfillment_config_verify_account_privileges<'me, 'info>(
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_phoenix_fulfillment_config_verify_writable_privileges(accounts)?;
+    initialize_phoenix_fulfillment_config_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN: usize = 3;
@@ -13724,44 +14238,35 @@ impl PhoenixFulfillmentConfigStatusIxData {
         Ok(data)
     }
 }
-pub fn phoenix_fulfillment_config_status_ix<
-    K: Into<PhoenixFulfillmentConfigStatusKeys>,
-    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn phoenix_fulfillment_config_status_ix(
+    keys: PhoenixFulfillmentConfigStatusKeys,
+    args: PhoenixFulfillmentConfigStatusIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
     let metas: [AccountMeta; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: PhoenixFulfillmentConfigStatusIxArgs = args.into();
-    let data: PhoenixFulfillmentConfigStatusIxData = args_full.into();
+    let data: PhoenixFulfillmentConfigStatusIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn phoenix_fulfillment_config_status_invoke<
-    'info,
-    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
->(
+pub fn phoenix_fulfillment_config_status_invoke<'info>(
     accounts: PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
-    args: A,
+    args: PhoenixFulfillmentConfigStatusIxArgs,
 ) -> ProgramResult {
-    let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
+    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
+    let ix = phoenix_fulfillment_config_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn phoenix_fulfillment_config_status_invoke_signed<
-    'info,
-    A: Into<PhoenixFulfillmentConfigStatusIxArgs>,
->(
+pub fn phoenix_fulfillment_config_status_invoke_signed<'info>(
     accounts: PhoenixFulfillmentConfigStatusAccounts<'_, 'info>,
-    args: A,
+    args: PhoenixFulfillmentConfigStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = phoenix_fulfillment_config_status_ix(accounts, args)?;
+    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
+    let ix = phoenix_fulfillment_config_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; PHOENIX_FULFILLMENT_CONFIG_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -13784,7 +14289,7 @@ pub fn phoenix_fulfillment_config_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn phoenix_fulfillment_config_status_verify_account_privileges<'me, 'info>(
+pub fn phoenix_fulfillment_config_status_verify_writable_privileges<'me, 'info>(
     accounts: PhoenixFulfillmentConfigStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.phoenix_fulfillment_config, accounts.admin] {
@@ -13792,11 +14297,23 @@ pub fn phoenix_fulfillment_config_status_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn phoenix_fulfillment_config_status_verify_signer_privileges<'me, 'info>(
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn phoenix_fulfillment_config_status_verify_account_privileges<'me, 'info>(
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    phoenix_fulfillment_config_status_verify_writable_privileges(accounts)?;
+    phoenix_fulfillment_config_status_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN: usize = 3;
@@ -13901,10 +14418,7 @@ impl UpdateSerumVaultIxData {
         Ok(data)
     }
 }
-pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: UpdateSerumVaultKeys = accounts.into();
+pub fn update_serum_vault_ix(keys: UpdateSerumVaultKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -13915,7 +14429,8 @@ pub fn update_serum_vault_ix<K: Into<UpdateSerumVaultKeys>>(
 pub fn update_serum_vault_invoke<'info>(
     accounts: UpdateSerumVaultAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_serum_vault_ix(accounts)?;
+    let keys: UpdateSerumVaultKeys = accounts.into();
+    let ix = update_serum_vault_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -13923,7 +14438,8 @@ pub fn update_serum_vault_invoke_signed<'info>(
     accounts: UpdateSerumVaultAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_serum_vault_ix(accounts)?;
+    let keys: UpdateSerumVaultKeys = accounts.into();
+    let ix = update_serum_vault_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_SERUM_VAULT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -13942,7 +14458,7 @@ pub fn update_serum_vault_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_serum_vault_verify_account_privileges<'me, 'info>(
+pub fn update_serum_vault_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSerumVaultAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.admin] {
@@ -13950,11 +14466,23 @@ pub fn update_serum_vault_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_serum_vault_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSerumVaultAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_serum_vault_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSerumVaultAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_serum_vault_verify_writable_privileges(accounts)?;
+    update_serum_vault_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 6;
@@ -14113,38 +14641,35 @@ impl InitializePerpMarketIxData {
         Ok(data)
     }
 }
-pub fn initialize_perp_market_ix<
-    K: Into<InitializePerpMarketKeys>,
-    A: Into<InitializePerpMarketIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn initialize_perp_market_ix(
+    keys: InitializePerpMarketKeys,
+    args: InitializePerpMarketIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: InitializePerpMarketKeys = accounts.into();
     let metas: [AccountMeta; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializePerpMarketIxArgs = args.into();
-    let data: InitializePerpMarketIxData = args_full.into();
+    let data: InitializePerpMarketIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_perp_market_invoke<'info, A: Into<InitializePerpMarketIxArgs>>(
+pub fn initialize_perp_market_invoke<'info>(
     accounts: InitializePerpMarketAccounts<'_, 'info>,
-    args: A,
+    args: InitializePerpMarketIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_perp_market_ix(accounts, args)?;
+    let keys: InitializePerpMarketKeys = accounts.into();
+    let ix = initialize_perp_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_perp_market_invoke_signed<'info, A: Into<InitializePerpMarketIxArgs>>(
+pub fn initialize_perp_market_invoke_signed<'info>(
     accounts: InitializePerpMarketAccounts<'_, 'info>,
-    args: A,
+    args: InitializePerpMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_perp_market_ix(accounts, args)?;
+    let keys: InitializePerpMarketKeys = accounts.into();
+    let ix = initialize_perp_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -14167,7 +14692,7 @@ pub fn initialize_perp_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_perp_market_verify_account_privileges<'me, 'info>(
+pub fn initialize_perp_market_verify_writable_privileges<'me, 'info>(
     accounts: InitializePerpMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
@@ -14175,11 +14700,23 @@ pub fn initialize_perp_market_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_perp_market_verify_signer_privileges<'me, 'info>(
+    accounts: InitializePerpMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_perp_market_verify_account_privileges<'me, 'info>(
+    accounts: InitializePerpMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_perp_market_verify_writable_privileges(accounts)?;
+    initialize_perp_market_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN: usize = 3;
@@ -14303,41 +14840,35 @@ impl DeleteInitializedPerpMarketIxData {
         Ok(data)
     }
 }
-pub fn delete_initialized_perp_market_ix<
-    K: Into<DeleteInitializedPerpMarketKeys>,
-    A: Into<DeleteInitializedPerpMarketIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn delete_initialized_perp_market_ix(
+    keys: DeleteInitializedPerpMarketKeys,
+    args: DeleteInitializedPerpMarketIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
     let metas: [AccountMeta; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DeleteInitializedPerpMarketIxArgs = args.into();
-    let data: DeleteInitializedPerpMarketIxData = args_full.into();
+    let data: DeleteInitializedPerpMarketIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn delete_initialized_perp_market_invoke<'info, A: Into<DeleteInitializedPerpMarketIxArgs>>(
+pub fn delete_initialized_perp_market_invoke<'info>(
     accounts: DeleteInitializedPerpMarketAccounts<'_, 'info>,
-    args: A,
+    args: DeleteInitializedPerpMarketIxArgs,
 ) -> ProgramResult {
-    let ix = delete_initialized_perp_market_ix(accounts, args)?;
+    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
+    let ix = delete_initialized_perp_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn delete_initialized_perp_market_invoke_signed<
-    'info,
-    A: Into<DeleteInitializedPerpMarketIxArgs>,
->(
+pub fn delete_initialized_perp_market_invoke_signed<'info>(
     accounts: DeleteInitializedPerpMarketAccounts<'_, 'info>,
-    args: A,
+    args: DeleteInitializedPerpMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = delete_initialized_perp_market_ix(accounts, args)?;
+    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
+    let ix = delete_initialized_perp_market_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DELETE_INITIALIZED_PERP_MARKET_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -14357,7 +14888,7 @@ pub fn delete_initialized_perp_market_verify_account_keys(
     }
     Ok(())
 }
-pub fn delete_initialized_perp_market_verify_account_privileges<'me, 'info>(
+pub fn delete_initialized_perp_market_verify_writable_privileges<'me, 'info>(
     accounts: DeleteInitializedPerpMarketAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.admin, accounts.state, accounts.perp_market] {
@@ -14365,11 +14896,23 @@ pub fn delete_initialized_perp_market_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn delete_initialized_perp_market_verify_signer_privileges<'me, 'info>(
+    accounts: DeleteInitializedPerpMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn delete_initialized_perp_market_verify_account_privileges<'me, 'info>(
+    accounts: DeleteInitializedPerpMarketAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    delete_initialized_perp_market_verify_writable_privileges(accounts)?;
+    delete_initialized_perp_market_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MOVE_AMM_PRICE_IX_ACCOUNTS_LEN: usize = 3;
@@ -14487,34 +15030,34 @@ impl MoveAmmPriceIxData {
         Ok(data)
     }
 }
-pub fn move_amm_price_ix<K: Into<MoveAmmPriceKeys>, A: Into<MoveAmmPriceIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn move_amm_price_ix(
+    keys: MoveAmmPriceKeys,
+    args: MoveAmmPriceIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: MoveAmmPriceKeys = accounts.into();
     let metas: [AccountMeta; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: MoveAmmPriceIxArgs = args.into();
-    let data: MoveAmmPriceIxData = args_full.into();
+    let data: MoveAmmPriceIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn move_amm_price_invoke<'info, A: Into<MoveAmmPriceIxArgs>>(
+pub fn move_amm_price_invoke<'info>(
     accounts: MoveAmmPriceAccounts<'_, 'info>,
-    args: A,
+    args: MoveAmmPriceIxArgs,
 ) -> ProgramResult {
-    let ix = move_amm_price_ix(accounts, args)?;
+    let keys: MoveAmmPriceKeys = accounts.into();
+    let ix = move_amm_price_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn move_amm_price_invoke_signed<'info, A: Into<MoveAmmPriceIxArgs>>(
+pub fn move_amm_price_invoke_signed<'info>(
     accounts: MoveAmmPriceAccounts<'_, 'info>,
-    args: A,
+    args: MoveAmmPriceIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = move_amm_price_ix(accounts, args)?;
+    let keys: MoveAmmPriceKeys = accounts.into();
+    let ix = move_amm_price_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MOVE_AMM_PRICE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -14533,7 +15076,7 @@ pub fn move_amm_price_verify_account_keys(
     }
     Ok(())
 }
-pub fn move_amm_price_verify_account_privileges<'me, 'info>(
+pub fn move_amm_price_verify_writable_privileges<'me, 'info>(
     accounts: MoveAmmPriceAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -14541,11 +15084,23 @@ pub fn move_amm_price_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn move_amm_price_verify_signer_privileges<'me, 'info>(
+    accounts: MoveAmmPriceAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn move_amm_price_verify_account_privileges<'me, 'info>(
+    accounts: MoveAmmPriceAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    move_amm_price_verify_writable_privileges(accounts)?;
+    move_amm_price_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN: usize = 3;
@@ -14663,38 +15218,35 @@ impl UpdatePerpMarketExpiryIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_expiry_ix<
-    K: Into<UpdatePerpMarketExpiryKeys>,
-    A: Into<UpdatePerpMarketExpiryIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_expiry_ix(
+    keys: UpdatePerpMarketExpiryKeys,
+    args: UpdatePerpMarketExpiryIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketExpiryKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketExpiryIxArgs = args.into();
-    let data: UpdatePerpMarketExpiryIxData = args_full.into();
+    let data: UpdatePerpMarketExpiryIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_expiry_invoke<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
+pub fn update_perp_market_expiry_invoke<'info>(
     accounts: UpdatePerpMarketExpiryAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketExpiryIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_expiry_ix(accounts, args)?;
+    let keys: UpdatePerpMarketExpiryKeys = accounts.into();
+    let ix = update_perp_market_expiry_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_expiry_invoke_signed<'info, A: Into<UpdatePerpMarketExpiryIxArgs>>(
+pub fn update_perp_market_expiry_invoke_signed<'info>(
     accounts: UpdatePerpMarketExpiryAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketExpiryIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_expiry_ix(accounts, args)?;
+    let keys: UpdatePerpMarketExpiryKeys = accounts.into();
+    let ix = update_perp_market_expiry_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_EXPIRY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -14714,7 +15266,7 @@ pub fn update_perp_market_expiry_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_expiry_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_expiry_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketExpiryAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -14722,11 +15274,23 @@ pub fn update_perp_market_expiry_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_expiry_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketExpiryAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_expiry_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketExpiryAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_expiry_verify_writable_privileges(accounts)?;
+    update_perp_market_expiry_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN: usize = 4;
@@ -14854,12 +15418,9 @@ impl SettleExpiredMarketPoolsToRevenuePoolIxData {
         Ok(data)
     }
 }
-pub fn settle_expired_market_pools_to_revenue_pool_ix<
-    K: Into<SettleExpiredMarketPoolsToRevenuePoolKeys>,
->(
-    accounts: K,
+pub fn settle_expired_market_pools_to_revenue_pool_ix(
+    keys: SettleExpiredMarketPoolsToRevenuePoolKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
     let metas: [AccountMeta; SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] =
         keys.into();
     Ok(Instruction {
@@ -14871,7 +15432,8 @@ pub fn settle_expired_market_pools_to_revenue_pool_ix<
 pub fn settle_expired_market_pools_to_revenue_pool_invoke<'info>(
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
+    let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
+    let ix = settle_expired_market_pools_to_revenue_pool_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
@@ -14880,7 +15442,8 @@ pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed<'info>(
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(accounts)?;
+    let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
+    let ix = settle_expired_market_pools_to_revenue_pool_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         SETTLE_EXPIRED_MARKET_POOLS_TO_REVENUE_POOL_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -14901,7 +15464,7 @@ pub fn settle_expired_market_pools_to_revenue_pool_verify_account_keys(
     }
     Ok(())
 }
-pub fn settle_expired_market_pools_to_revenue_pool_verify_account_privileges<'me, 'info>(
+pub fn settle_expired_market_pools_to_revenue_pool_verify_writable_privileges<'me, 'info>(
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market, accounts.perp_market] {
@@ -14909,11 +15472,23 @@ pub fn settle_expired_market_pools_to_revenue_pool_verify_account_privileges<'me
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn settle_expired_market_pools_to_revenue_pool_verify_signer_privileges<'me, 'info>(
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn settle_expired_market_pools_to_revenue_pool_verify_account_privileges<'me, 'info>(
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    settle_expired_market_pools_to_revenue_pool_verify_writable_privileges(accounts)?;
+    settle_expired_market_pools_to_revenue_pool_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN: usize = 8;
@@ -15092,44 +15667,35 @@ impl DepositIntoPerpMarketFeePoolIxData {
         Ok(data)
     }
 }
-pub fn deposit_into_perp_market_fee_pool_ix<
-    K: Into<DepositIntoPerpMarketFeePoolKeys>,
-    A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deposit_into_perp_market_fee_pool_ix(
+    keys: DepositIntoPerpMarketFeePoolKeys,
+    args: DepositIntoPerpMarketFeePoolIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
     let metas: [AccountMeta; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DepositIntoPerpMarketFeePoolIxArgs = args.into();
-    let data: DepositIntoPerpMarketFeePoolIxData = args_full.into();
+    let data: DepositIntoPerpMarketFeePoolIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_into_perp_market_fee_pool_invoke<
-    'info,
-    A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
->(
+pub fn deposit_into_perp_market_fee_pool_invoke<'info>(
     accounts: DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
-    args: A,
+    args: DepositIntoPerpMarketFeePoolIxArgs,
 ) -> ProgramResult {
-    let ix = deposit_into_perp_market_fee_pool_ix(accounts, args)?;
+    let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
+    let ix = deposit_into_perp_market_fee_pool_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deposit_into_perp_market_fee_pool_invoke_signed<
-    'info,
-    A: Into<DepositIntoPerpMarketFeePoolIxArgs>,
->(
+pub fn deposit_into_perp_market_fee_pool_invoke_signed<'info>(
     accounts: DepositIntoPerpMarketFeePoolAccounts<'_, 'info>,
-    args: A,
+    args: DepositIntoPerpMarketFeePoolIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deposit_into_perp_market_fee_pool_ix(accounts, args)?;
+    let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
+    let ix = deposit_into_perp_market_fee_pool_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_INTO_PERP_MARKET_FEE_POOL_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -15154,7 +15720,7 @@ pub fn deposit_into_perp_market_fee_pool_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_into_perp_market_fee_pool_verify_account_privileges<'me, 'info>(
+pub fn deposit_into_perp_market_fee_pool_verify_writable_privileges<'me, 'info>(
     accounts: DepositIntoPerpMarketFeePoolAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -15168,11 +15734,23 @@ pub fn deposit_into_perp_market_fee_pool_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_into_perp_market_fee_pool_verify_signer_privileges<'me, 'info>(
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_into_perp_market_fee_pool_verify_account_privileges<'me, 'info>(
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_into_perp_market_fee_pool_verify_writable_privileges(accounts)?;
+    deposit_into_perp_market_fee_pool_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REPEG_AMM_CURVE_IX_ACCOUNTS_LEN: usize = 4;
@@ -15299,34 +15877,34 @@ impl RepegAmmCurveIxData {
         Ok(data)
     }
 }
-pub fn repeg_amm_curve_ix<K: Into<RepegAmmCurveKeys>, A: Into<RepegAmmCurveIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn repeg_amm_curve_ix(
+    keys: RepegAmmCurveKeys,
+    args: RepegAmmCurveIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RepegAmmCurveKeys = accounts.into();
     let metas: [AccountMeta; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RepegAmmCurveIxArgs = args.into();
-    let data: RepegAmmCurveIxData = args_full.into();
+    let data: RepegAmmCurveIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn repeg_amm_curve_invoke<'info, A: Into<RepegAmmCurveIxArgs>>(
+pub fn repeg_amm_curve_invoke<'info>(
     accounts: RepegAmmCurveAccounts<'_, 'info>,
-    args: A,
+    args: RepegAmmCurveIxArgs,
 ) -> ProgramResult {
-    let ix = repeg_amm_curve_ix(accounts, args)?;
+    let keys: RepegAmmCurveKeys = accounts.into();
+    let ix = repeg_amm_curve_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn repeg_amm_curve_invoke_signed<'info, A: Into<RepegAmmCurveIxArgs>>(
+pub fn repeg_amm_curve_invoke_signed<'info>(
     accounts: RepegAmmCurveAccounts<'_, 'info>,
-    args: A,
+    args: RepegAmmCurveIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = repeg_amm_curve_ix(accounts, args)?;
+    let keys: RepegAmmCurveKeys = accounts.into();
+    let ix = repeg_amm_curve_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REPEG_AMM_CURVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -15346,7 +15924,7 @@ pub fn repeg_amm_curve_verify_account_keys(
     }
     Ok(())
 }
-pub fn repeg_amm_curve_verify_account_privileges<'me, 'info>(
+pub fn repeg_amm_curve_verify_writable_privileges<'me, 'info>(
     accounts: RepegAmmCurveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -15354,11 +15932,23 @@ pub fn repeg_amm_curve_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn repeg_amm_curve_verify_signer_privileges<'me, 'info>(
+    accounts: RepegAmmCurveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn repeg_amm_curve_verify_account_privileges<'me, 'info>(
+    accounts: RepegAmmCurveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    repeg_amm_curve_verify_writable_privileges(accounts)?;
+    repeg_amm_curve_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
@@ -15481,10 +16071,9 @@ impl UpdatePerpMarketAmmOracleTwapIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_amm_oracle_twap_ix<K: Into<UpdatePerpMarketAmmOracleTwapKeys>>(
-    accounts: K,
+pub fn update_perp_market_amm_oracle_twap_ix(
+    keys: UpdatePerpMarketAmmOracleTwapKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -15495,7 +16084,8 @@ pub fn update_perp_market_amm_oracle_twap_ix<K: Into<UpdatePerpMarketAmmOracleTw
 pub fn update_perp_market_amm_oracle_twap_invoke<'info>(
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
+    let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = update_perp_market_amm_oracle_twap_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -15504,7 +16094,8 @@ pub fn update_perp_market_amm_oracle_twap_invoke_signed<'info>(
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_amm_oracle_twap_ix(accounts)?;
+    let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = update_perp_market_amm_oracle_twap_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -15525,7 +16116,7 @@ pub fn update_perp_market_amm_oracle_twap_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_amm_oracle_twap_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -15533,11 +16124,23 @@ pub fn update_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_amm_oracle_twap_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_amm_oracle_twap_verify_writable_privileges(accounts)?;
+    update_perp_market_amm_oracle_twap_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN: usize = 4;
@@ -15660,10 +16263,9 @@ impl ResetPerpMarketAmmOracleTwapIxData {
         Ok(data)
     }
 }
-pub fn reset_perp_market_amm_oracle_twap_ix<K: Into<ResetPerpMarketAmmOracleTwapKeys>>(
-    accounts: K,
+pub fn reset_perp_market_amm_oracle_twap_ix(
+    keys: ResetPerpMarketAmmOracleTwapKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
     let metas: [AccountMeta; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -15674,7 +16276,8 @@ pub fn reset_perp_market_amm_oracle_twap_ix<K: Into<ResetPerpMarketAmmOracleTwap
 pub fn reset_perp_market_amm_oracle_twap_invoke<'info>(
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
+    let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = reset_perp_market_amm_oracle_twap_ix(keys)?;
     let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -15683,7 +16286,8 @@ pub fn reset_perp_market_amm_oracle_twap_invoke_signed<'info>(
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = reset_perp_market_amm_oracle_twap_ix(accounts)?;
+    let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = reset_perp_market_amm_oracle_twap_ix(keys)?;
     let account_info: [AccountInfo<'info>; RESET_PERP_MARKET_AMM_ORACLE_TWAP_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -15704,7 +16308,7 @@ pub fn reset_perp_market_amm_oracle_twap_verify_account_keys(
     }
     Ok(())
 }
-pub fn reset_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
+pub fn reset_perp_market_amm_oracle_twap_verify_writable_privileges<'me, 'info>(
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -15712,11 +16316,23 @@ pub fn reset_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn reset_perp_market_amm_oracle_twap_verify_signer_privileges<'me, 'info>(
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn reset_perp_market_amm_oracle_twap_verify_account_privileges<'me, 'info>(
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    reset_perp_market_amm_oracle_twap_verify_writable_privileges(accounts)?;
+    reset_perp_market_amm_oracle_twap_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_K_IX_ACCOUNTS_LEN: usize = 4;
@@ -15841,34 +16457,31 @@ impl UpdateKIxData {
         Ok(data)
     }
 }
-pub fn update_k_ix<K: Into<UpdateKKeys>, A: Into<UpdateKIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: UpdateKKeys = accounts.into();
+pub fn update_k_ix(keys: UpdateKKeys, args: UpdateKIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UPDATE_K_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateKIxArgs = args.into();
-    let data: UpdateKIxData = args_full.into();
+    let data: UpdateKIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_k_invoke<'info, A: Into<UpdateKIxArgs>>(
+pub fn update_k_invoke<'info>(
     accounts: UpdateKAccounts<'_, 'info>,
-    args: A,
+    args: UpdateKIxArgs,
 ) -> ProgramResult {
-    let ix = update_k_ix(accounts, args)?;
+    let keys: UpdateKKeys = accounts.into();
+    let ix = update_k_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_k_invoke_signed<'info, A: Into<UpdateKIxArgs>>(
+pub fn update_k_invoke_signed<'info>(
     accounts: UpdateKAccounts<'_, 'info>,
-    args: A,
+    args: UpdateKIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_k_ix(accounts, args)?;
+    let keys: UpdateKKeys = accounts.into();
+    let ix = update_k_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_K_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -15888,7 +16501,7 @@ pub fn update_k_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_k_verify_account_privileges<'me, 'info>(
+pub fn update_k_verify_writable_privileges<'me, 'info>(
     accounts: UpdateKAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -15896,11 +16509,23 @@ pub fn update_k_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_k_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateKAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_k_verify_account_privileges<'me, 'info>(
+    accounts: UpdateKAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_k_verify_writable_privileges(accounts)?;
+    update_k_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN: usize = 3;
@@ -16026,41 +16651,35 @@ impl UpdatePerpMarketMarginRatioIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_margin_ratio_ix<
-    K: Into<UpdatePerpMarketMarginRatioKeys>,
-    A: Into<UpdatePerpMarketMarginRatioIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_margin_ratio_ix(
+    keys: UpdatePerpMarketMarginRatioKeys,
+    args: UpdatePerpMarketMarginRatioIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMarginRatioIxArgs = args.into();
-    let data: UpdatePerpMarketMarginRatioIxData = args_full.into();
+    let data: UpdatePerpMarketMarginRatioIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_margin_ratio_invoke<'info, A: Into<UpdatePerpMarketMarginRatioIxArgs>>(
+pub fn update_perp_market_margin_ratio_invoke<'info>(
     accounts: UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMarginRatioIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_margin_ratio_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
+    let ix = update_perp_market_margin_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_margin_ratio_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMarginRatioIxArgs>,
->(
+pub fn update_perp_market_margin_ratio_invoke_signed<'info>(
     accounts: UpdatePerpMarketMarginRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMarginRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_margin_ratio_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
+    let ix = update_perp_market_margin_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MARGIN_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16080,7 +16699,7 @@ pub fn update_perp_market_margin_ratio_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_margin_ratio_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_margin_ratio_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMarginRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -16088,11 +16707,23 @@ pub fn update_perp_market_margin_ratio_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_margin_ratio_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMarginRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_margin_ratio_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMarginRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_margin_ratio_verify_writable_privileges(accounts)?;
+    update_perp_market_margin_ratio_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN: usize = 3;
@@ -16218,44 +16849,35 @@ impl UpdatePerpMarketMaxImbalancesIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_max_imbalances_ix<
-    K: Into<UpdatePerpMarketMaxImbalancesKeys>,
-    A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_max_imbalances_ix(
+    keys: UpdatePerpMarketMaxImbalancesKeys,
+    args: UpdatePerpMarketMaxImbalancesIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMaxImbalancesIxArgs = args.into();
-    let data: UpdatePerpMarketMaxImbalancesIxData = args_full.into();
+    let data: UpdatePerpMarketMaxImbalancesIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_imbalances_invoke<
-    'info,
-    A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
->(
+pub fn update_perp_market_max_imbalances_invoke<'info>(
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxImbalancesIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_max_imbalances_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
+    let ix = update_perp_market_max_imbalances_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_imbalances_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMaxImbalancesIxArgs>,
->(
+pub fn update_perp_market_max_imbalances_invoke_signed<'info>(
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxImbalancesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_max_imbalances_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
+    let ix = update_perp_market_max_imbalances_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_IMBALANCES_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16275,7 +16897,7 @@ pub fn update_perp_market_max_imbalances_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_max_imbalances_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_max_imbalances_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -16283,11 +16905,23 @@ pub fn update_perp_market_max_imbalances_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_imbalances_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_imbalances_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_max_imbalances_verify_writable_privileges(accounts)?;
+    update_perp_market_max_imbalances_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
@@ -16412,44 +17046,35 @@ impl UpdatePerpMarketLiquidationFeeIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_liquidation_fee_ix<
-    K: Into<UpdatePerpMarketLiquidationFeeKeys>,
-    A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_liquidation_fee_ix(
+    keys: UpdatePerpMarketLiquidationFeeKeys,
+    args: UpdatePerpMarketLiquidationFeeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketLiquidationFeeIxArgs = args.into();
-    let data: UpdatePerpMarketLiquidationFeeIxData = args_full.into();
+    let data: UpdatePerpMarketLiquidationFeeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_liquidation_fee_invoke<
-    'info,
-    A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
->(
+pub fn update_perp_market_liquidation_fee_invoke<'info>(
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketLiquidationFeeIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_liquidation_fee_ix(accounts, args)?;
+    let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_perp_market_liquidation_fee_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_liquidation_fee_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketLiquidationFeeIxArgs>,
->(
+pub fn update_perp_market_liquidation_fee_invoke_signed<'info>(
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketLiquidationFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_liquidation_fee_ix(accounts, args)?;
+    let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_perp_market_liquidation_fee_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16469,7 +17094,7 @@ pub fn update_perp_market_liquidation_fee_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_liquidation_fee_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_liquidation_fee_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -16477,11 +17102,23 @@ pub fn update_perp_market_liquidation_fee_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_liquidation_fee_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_liquidation_fee_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_liquidation_fee_verify_writable_privileges(accounts)?;
+    update_perp_market_liquidation_fee_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
@@ -16609,44 +17246,35 @@ impl UpdateInsuranceFundUnstakingPeriodIxData {
         Ok(data)
     }
 }
-pub fn update_insurance_fund_unstaking_period_ix<
-    K: Into<UpdateInsuranceFundUnstakingPeriodKeys>,
-    A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_insurance_fund_unstaking_period_ix(
+    keys: UpdateInsuranceFundUnstakingPeriodKeys,
+    args: UpdateInsuranceFundUnstakingPeriodIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateInsuranceFundUnstakingPeriodIxArgs = args.into();
-    let data: UpdateInsuranceFundUnstakingPeriodIxData = args_full.into();
+    let data: UpdateInsuranceFundUnstakingPeriodIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_insurance_fund_unstaking_period_invoke<
-    'info,
-    A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
->(
+pub fn update_insurance_fund_unstaking_period_invoke<'info>(
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
-    args: A,
+    args: UpdateInsuranceFundUnstakingPeriodIxArgs,
 ) -> ProgramResult {
-    let ix = update_insurance_fund_unstaking_period_ix(accounts, args)?;
+    let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
+    let ix = update_insurance_fund_unstaking_period_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_insurance_fund_unstaking_period_invoke_signed<
-    'info,
-    A: Into<UpdateInsuranceFundUnstakingPeriodIxArgs>,
->(
+pub fn update_insurance_fund_unstaking_period_invoke_signed<'info>(
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, 'info>,
-    args: A,
+    args: UpdateInsuranceFundUnstakingPeriodIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_insurance_fund_unstaking_period_ix(accounts, args)?;
+    let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
+    let ix = update_insurance_fund_unstaking_period_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_INSURANCE_FUND_UNSTAKING_PERIOD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16666,7 +17294,7 @@ pub fn update_insurance_fund_unstaking_period_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_insurance_fund_unstaking_period_verify_account_privileges<'me, 'info>(
+pub fn update_insurance_fund_unstaking_period_verify_writable_privileges<'me, 'info>(
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -16674,11 +17302,23 @@ pub fn update_insurance_fund_unstaking_period_verify_account_privileges<'me, 'in
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_insurance_fund_unstaking_period_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_insurance_fund_unstaking_period_verify_account_privileges<'me, 'info>(
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_insurance_fund_unstaking_period_verify_writable_privileges(accounts)?;
+    update_insurance_fund_unstaking_period_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN: usize = 3;
@@ -16804,44 +17444,35 @@ impl UpdateSpotMarketLiquidationFeeIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_liquidation_fee_ix<
-    K: Into<UpdateSpotMarketLiquidationFeeKeys>,
-    A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_liquidation_fee_ix(
+    keys: UpdateSpotMarketLiquidationFeeKeys,
+    args: UpdateSpotMarketLiquidationFeeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketLiquidationFeeIxArgs = args.into();
-    let data: UpdateSpotMarketLiquidationFeeIxData = args_full.into();
+    let data: UpdateSpotMarketLiquidationFeeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_liquidation_fee_invoke<
-    'info,
-    A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
->(
+pub fn update_spot_market_liquidation_fee_invoke<'info>(
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketLiquidationFeeIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_liquidation_fee_ix(accounts, args)?;
+    let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_spot_market_liquidation_fee_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_liquidation_fee_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketLiquidationFeeIxArgs>,
->(
+pub fn update_spot_market_liquidation_fee_invoke_signed<'info>(
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketLiquidationFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_liquidation_fee_ix(accounts, args)?;
+    let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_spot_market_liquidation_fee_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_LIQUIDATION_FEE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -16861,7 +17492,7 @@ pub fn update_spot_market_liquidation_fee_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_liquidation_fee_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_liquidation_fee_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -16869,11 +17500,23 @@ pub fn update_spot_market_liquidation_fee_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_liquidation_fee_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_liquidation_fee_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_liquidation_fee_verify_writable_privileges(accounts)?;
+    update_spot_market_liquidation_fee_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN: usize = 3;
@@ -16997,44 +17640,35 @@ impl UpdateWithdrawGuardThresholdIxData {
         Ok(data)
     }
 }
-pub fn update_withdraw_guard_threshold_ix<
-    K: Into<UpdateWithdrawGuardThresholdKeys>,
-    A: Into<UpdateWithdrawGuardThresholdIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_withdraw_guard_threshold_ix(
+    keys: UpdateWithdrawGuardThresholdKeys,
+    args: UpdateWithdrawGuardThresholdIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateWithdrawGuardThresholdIxArgs = args.into();
-    let data: UpdateWithdrawGuardThresholdIxData = args_full.into();
+    let data: UpdateWithdrawGuardThresholdIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_withdraw_guard_threshold_invoke<
-    'info,
-    A: Into<UpdateWithdrawGuardThresholdIxArgs>,
->(
+pub fn update_withdraw_guard_threshold_invoke<'info>(
     accounts: UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
-    args: A,
+    args: UpdateWithdrawGuardThresholdIxArgs,
 ) -> ProgramResult {
-    let ix = update_withdraw_guard_threshold_ix(accounts, args)?;
+    let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
+    let ix = update_withdraw_guard_threshold_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_withdraw_guard_threshold_invoke_signed<
-    'info,
-    A: Into<UpdateWithdrawGuardThresholdIxArgs>,
->(
+pub fn update_withdraw_guard_threshold_invoke_signed<'info>(
     accounts: UpdateWithdrawGuardThresholdAccounts<'_, 'info>,
-    args: A,
+    args: UpdateWithdrawGuardThresholdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_withdraw_guard_threshold_ix(accounts, args)?;
+    let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
+    let ix = update_withdraw_guard_threshold_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_WITHDRAW_GUARD_THRESHOLD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -17054,7 +17688,7 @@ pub fn update_withdraw_guard_threshold_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_withdraw_guard_threshold_verify_account_privileges<'me, 'info>(
+pub fn update_withdraw_guard_threshold_verify_writable_privileges<'me, 'info>(
     accounts: UpdateWithdrawGuardThresholdAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -17062,11 +17696,23 @@ pub fn update_withdraw_guard_threshold_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_withdraw_guard_threshold_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateWithdrawGuardThresholdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_withdraw_guard_threshold_verify_account_privileges<'me, 'info>(
+    accounts: UpdateWithdrawGuardThresholdAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_withdraw_guard_threshold_verify_writable_privileges(accounts)?;
+    update_withdraw_guard_threshold_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
@@ -17188,41 +17834,35 @@ impl UpdateSpotMarketIfFactorIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_if_factor_ix<
-    K: Into<UpdateSpotMarketIfFactorKeys>,
-    A: Into<UpdateSpotMarketIfFactorIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_if_factor_ix(
+    keys: UpdateSpotMarketIfFactorKeys,
+    args: UpdateSpotMarketIfFactorIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketIfFactorIxArgs = args.into();
-    let data: UpdateSpotMarketIfFactorIxData = args_full.into();
+    let data: UpdateSpotMarketIfFactorIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_if_factor_invoke<'info, A: Into<UpdateSpotMarketIfFactorIxArgs>>(
+pub fn update_spot_market_if_factor_invoke<'info>(
     accounts: UpdateSpotMarketIfFactorAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketIfFactorIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_if_factor_ix(accounts, args)?;
+    let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
+    let ix = update_spot_market_if_factor_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_if_factor_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketIfFactorIxArgs>,
->(
+pub fn update_spot_market_if_factor_invoke_signed<'info>(
     accounts: UpdateSpotMarketIfFactorAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketIfFactorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_if_factor_ix(accounts, args)?;
+    let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
+    let ix = update_spot_market_if_factor_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_IF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -17242,7 +17882,7 @@ pub fn update_spot_market_if_factor_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_if_factor_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_if_factor_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketIfFactorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -17250,11 +17890,23 @@ pub fn update_spot_market_if_factor_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_if_factor_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketIfFactorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_if_factor_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketIfFactorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_if_factor_verify_writable_privileges(accounts)?;
+    update_spot_market_if_factor_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN: usize = 3;
@@ -17382,45 +18034,36 @@ impl UpdateSpotMarketRevenueSettlePeriodIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_revenue_settle_period_ix<
-    K: Into<UpdateSpotMarketRevenueSettlePeriodKeys>,
-    A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_revenue_settle_period_ix(
+    keys: UpdateSpotMarketRevenueSettlePeriodKeys,
+    args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdateSpotMarketRevenueSettlePeriodIxArgs = args.into();
-    let data: UpdateSpotMarketRevenueSettlePeriodIxData = args_full.into();
+    let data: UpdateSpotMarketRevenueSettlePeriodIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_revenue_settle_period_invoke<
-    'info,
-    A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
->(
+pub fn update_spot_market_revenue_settle_period_invoke<'info>(
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_revenue_settle_period_ix(accounts, args)?;
+    let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
+    let ix = update_spot_market_revenue_settle_period_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_revenue_settle_period_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketRevenueSettlePeriodIxArgs>,
->(
+pub fn update_spot_market_revenue_settle_period_invoke_signed<'info>(
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_revenue_settle_period_ix(accounts, args)?;
+    let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
+    let ix = update_spot_market_revenue_settle_period_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_REVENUE_SETTLE_PERIOD_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -17440,7 +18083,7 @@ pub fn update_spot_market_revenue_settle_period_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_revenue_settle_period_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_revenue_settle_period_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -17448,11 +18091,23 @@ pub fn update_spot_market_revenue_settle_period_verify_account_privileges<'me, '
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_revenue_settle_period_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_revenue_settle_period_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_revenue_settle_period_verify_writable_privileges(accounts)?;
+    update_spot_market_revenue_settle_period_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
@@ -17570,38 +18225,35 @@ impl UpdateSpotMarketStatusIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_status_ix<
-    K: Into<UpdateSpotMarketStatusKeys>,
-    A: Into<UpdateSpotMarketStatusIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_status_ix(
+    keys: UpdateSpotMarketStatusKeys,
+    args: UpdateSpotMarketStatusIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketStatusKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketStatusIxArgs = args.into();
-    let data: UpdateSpotMarketStatusIxData = args_full.into();
+    let data: UpdateSpotMarketStatusIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_status_invoke<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
+pub fn update_spot_market_status_invoke<'info>(
     accounts: UpdateSpotMarketStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketStatusIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_status_ix(accounts, args)?;
+    let keys: UpdateSpotMarketStatusKeys = accounts.into();
+    let ix = update_spot_market_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_status_invoke_signed<'info, A: Into<UpdateSpotMarketStatusIxArgs>>(
+pub fn update_spot_market_status_invoke_signed<'info>(
     accounts: UpdateSpotMarketStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_status_ix(accounts, args)?;
+    let keys: UpdateSpotMarketStatusKeys = accounts.into();
+    let ix = update_spot_market_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -17621,7 +18273,7 @@ pub fn update_spot_market_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_status_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_status_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -17629,11 +18281,23 @@ pub fn update_spot_market_status_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_status_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_status_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_status_verify_writable_privileges(accounts)?;
+    update_spot_market_status_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN: usize = 3;
@@ -17755,41 +18419,35 @@ impl UpdateSpotMarketAssetTierIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_asset_tier_ix<
-    K: Into<UpdateSpotMarketAssetTierKeys>,
-    A: Into<UpdateSpotMarketAssetTierIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_asset_tier_ix(
+    keys: UpdateSpotMarketAssetTierKeys,
+    args: UpdateSpotMarketAssetTierIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketAssetTierIxArgs = args.into();
-    let data: UpdateSpotMarketAssetTierIxData = args_full.into();
+    let data: UpdateSpotMarketAssetTierIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_asset_tier_invoke<'info, A: Into<UpdateSpotMarketAssetTierIxArgs>>(
+pub fn update_spot_market_asset_tier_invoke<'info>(
     accounts: UpdateSpotMarketAssetTierAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketAssetTierIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_asset_tier_ix(accounts, args)?;
+    let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
+    let ix = update_spot_market_asset_tier_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_asset_tier_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketAssetTierIxArgs>,
->(
+pub fn update_spot_market_asset_tier_invoke_signed<'info>(
     accounts: UpdateSpotMarketAssetTierAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketAssetTierIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_asset_tier_ix(accounts, args)?;
+    let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
+    let ix = update_spot_market_asset_tier_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ASSET_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -17809,7 +18467,7 @@ pub fn update_spot_market_asset_tier_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_asset_tier_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_asset_tier_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketAssetTierAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -17817,11 +18475,23 @@ pub fn update_spot_market_asset_tier_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_asset_tier_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketAssetTierAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_asset_tier_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketAssetTierAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_asset_tier_verify_writable_privileges(accounts)?;
+    update_spot_market_asset_tier_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN: usize = 3;
@@ -17949,44 +18619,35 @@ impl UpdateSpotMarketMarginWeightsIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_margin_weights_ix<
-    K: Into<UpdateSpotMarketMarginWeightsKeys>,
-    A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_margin_weights_ix(
+    keys: UpdateSpotMarketMarginWeightsKeys,
+    args: UpdateSpotMarketMarginWeightsIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketMarginWeightsIxArgs = args.into();
-    let data: UpdateSpotMarketMarginWeightsIxData = args_full.into();
+    let data: UpdateSpotMarketMarginWeightsIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_margin_weights_invoke<
-    'info,
-    A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
->(
+pub fn update_spot_market_margin_weights_invoke<'info>(
     accounts: UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMarginWeightsIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_margin_weights_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
+    let ix = update_spot_market_margin_weights_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_margin_weights_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketMarginWeightsIxArgs>,
->(
+pub fn update_spot_market_margin_weights_invoke_signed<'info>(
     accounts: UpdateSpotMarketMarginWeightsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMarginWeightsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_margin_weights_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
+    let ix = update_spot_market_margin_weights_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MARGIN_WEIGHTS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18006,7 +18667,7 @@ pub fn update_spot_market_margin_weights_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_margin_weights_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_margin_weights_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketMarginWeightsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18014,11 +18675,23 @@ pub fn update_spot_market_margin_weights_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_margin_weights_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_margin_weights_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_margin_weights_verify_writable_privileges(accounts)?;
+    update_spot_market_margin_weights_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN: usize = 3;
@@ -18144,41 +18817,35 @@ impl UpdateSpotMarketBorrowRateIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_borrow_rate_ix<
-    K: Into<UpdateSpotMarketBorrowRateKeys>,
-    A: Into<UpdateSpotMarketBorrowRateIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_borrow_rate_ix(
+    keys: UpdateSpotMarketBorrowRateKeys,
+    args: UpdateSpotMarketBorrowRateIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketBorrowRateIxArgs = args.into();
-    let data: UpdateSpotMarketBorrowRateIxData = args_full.into();
+    let data: UpdateSpotMarketBorrowRateIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_borrow_rate_invoke<'info, A: Into<UpdateSpotMarketBorrowRateIxArgs>>(
+pub fn update_spot_market_borrow_rate_invoke<'info>(
     accounts: UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketBorrowRateIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_borrow_rate_ix(accounts, args)?;
+    let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
+    let ix = update_spot_market_borrow_rate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_borrow_rate_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketBorrowRateIxArgs>,
->(
+pub fn update_spot_market_borrow_rate_invoke_signed<'info>(
     accounts: UpdateSpotMarketBorrowRateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketBorrowRateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_borrow_rate_ix(accounts, args)?;
+    let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
+    let ix = update_spot_market_borrow_rate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_BORROW_RATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18198,7 +18865,7 @@ pub fn update_spot_market_borrow_rate_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_borrow_rate_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_borrow_rate_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketBorrowRateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18206,11 +18873,23 @@ pub fn update_spot_market_borrow_rate_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_borrow_rate_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketBorrowRateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_borrow_rate_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketBorrowRateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_borrow_rate_verify_writable_privileges(accounts)?;
+    update_spot_market_borrow_rate_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN: usize = 3;
@@ -18338,44 +19017,35 @@ impl UpdateSpotMarketMaxTokenDepositsIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_max_token_deposits_ix<
-    K: Into<UpdateSpotMarketMaxTokenDepositsKeys>,
-    A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_max_token_deposits_ix(
+    keys: UpdateSpotMarketMaxTokenDepositsKeys,
+    args: UpdateSpotMarketMaxTokenDepositsIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketMaxTokenDepositsIxArgs = args.into();
-    let data: UpdateSpotMarketMaxTokenDepositsIxData = args_full.into();
+    let data: UpdateSpotMarketMaxTokenDepositsIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_max_token_deposits_invoke<
-    'info,
-    A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
->(
+pub fn update_spot_market_max_token_deposits_invoke<'info>(
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMaxTokenDepositsIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_max_token_deposits_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
+    let ix = update_spot_market_max_token_deposits_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_max_token_deposits_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketMaxTokenDepositsIxArgs>,
->(
+pub fn update_spot_market_max_token_deposits_invoke_signed<'info>(
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMaxTokenDepositsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_max_token_deposits_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
+    let ix = update_spot_market_max_token_deposits_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MAX_TOKEN_DEPOSITS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18395,7 +19065,7 @@ pub fn update_spot_market_max_token_deposits_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_max_token_deposits_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_max_token_deposits_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18403,11 +19073,23 @@ pub fn update_spot_market_max_token_deposits_verify_account_privileges<'me, 'inf
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_max_token_deposits_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_max_token_deposits_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_max_token_deposits_verify_writable_privileges(accounts)?;
+    update_spot_market_max_token_deposits_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
@@ -18537,38 +19219,35 @@ impl UpdateSpotMarketOracleIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_oracle_ix<
-    K: Into<UpdateSpotMarketOracleKeys>,
-    A: Into<UpdateSpotMarketOracleIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_oracle_ix(
+    keys: UpdateSpotMarketOracleKeys,
+    args: UpdateSpotMarketOracleIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketOracleKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketOracleIxArgs = args.into();
-    let data: UpdateSpotMarketOracleIxData = args_full.into();
+    let data: UpdateSpotMarketOracleIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_oracle_invoke<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
+pub fn update_spot_market_oracle_invoke<'info>(
     accounts: UpdateSpotMarketOracleAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketOracleIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_oracle_ix(accounts, args)?;
+    let keys: UpdateSpotMarketOracleKeys = accounts.into();
+    let ix = update_spot_market_oracle_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_oracle_invoke_signed<'info, A: Into<UpdateSpotMarketOracleIxArgs>>(
+pub fn update_spot_market_oracle_invoke_signed<'info>(
     accounts: UpdateSpotMarketOracleAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketOracleIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_oracle_ix(accounts, args)?;
+    let keys: UpdateSpotMarketOracleKeys = accounts.into();
+    let ix = update_spot_market_oracle_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18589,7 +19268,7 @@ pub fn update_spot_market_oracle_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_oracle_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_oracle_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketOracleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18597,11 +19276,23 @@ pub fn update_spot_market_oracle_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_oracle_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketOracleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_oracle_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketOracleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_oracle_verify_writable_privileges(accounts)?;
+    update_spot_market_oracle_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
@@ -18730,45 +19421,36 @@ impl UpdateSpotMarketStepSizeAndTickSizeIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_step_size_and_tick_size_ix<
-    K: Into<UpdateSpotMarketStepSizeAndTickSizeKeys>,
-    A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_step_size_and_tick_size_ix(
+    keys: UpdateSpotMarketStepSizeAndTickSizeKeys,
+    args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdateSpotMarketStepSizeAndTickSizeIxArgs = args.into();
-    let data: UpdateSpotMarketStepSizeAndTickSizeIxData = args_full.into();
+    let data: UpdateSpotMarketStepSizeAndTickSizeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_step_size_and_tick_size_invoke<
-    'info,
-    A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
->(
+pub fn update_spot_market_step_size_and_tick_size_invoke<'info>(
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_step_size_and_tick_size_ix(accounts, args)?;
+    let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_spot_market_step_size_and_tick_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_step_size_and_tick_size_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketStepSizeAndTickSizeIxArgs>,
->(
+pub fn update_spot_market_step_size_and_tick_size_invoke_signed<'info>(
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_step_size_and_tick_size_ix(accounts, args)?;
+    let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_spot_market_step_size_and_tick_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_SPOT_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18788,7 +19470,7 @@ pub fn update_spot_market_step_size_and_tick_size_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_step_size_and_tick_size_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18796,11 +19478,23 @@ pub fn update_spot_market_step_size_and_tick_size_verify_account_privileges<'me,
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_step_size_and_tick_size_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_step_size_and_tick_size_verify_writable_privileges(accounts)?;
+    update_spot_market_step_size_and_tick_size_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
@@ -18924,44 +19618,35 @@ impl UpdateSpotMarketMinOrderSizeIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_min_order_size_ix<
-    K: Into<UpdateSpotMarketMinOrderSizeKeys>,
-    A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_min_order_size_ix(
+    keys: UpdateSpotMarketMinOrderSizeKeys,
+    args: UpdateSpotMarketMinOrderSizeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketMinOrderSizeIxArgs = args.into();
-    let data: UpdateSpotMarketMinOrderSizeIxData = args_full.into();
+    let data: UpdateSpotMarketMinOrderSizeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_min_order_size_invoke<
-    'info,
-    A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
->(
+pub fn update_spot_market_min_order_size_invoke<'info>(
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMinOrderSizeIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_min_order_size_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_spot_market_min_order_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_min_order_size_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketMinOrderSizeIxArgs>,
->(
+pub fn update_spot_market_min_order_size_invoke_signed<'info>(
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketMinOrderSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_min_order_size_ix(accounts, args)?;
+    let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_spot_market_min_order_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -18981,7 +19666,7 @@ pub fn update_spot_market_min_order_size_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_min_order_size_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_min_order_size_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -18989,11 +19674,23 @@ pub fn update_spot_market_min_order_size_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_min_order_size_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_min_order_size_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_min_order_size_verify_writable_privileges(accounts)?;
+    update_spot_market_min_order_size_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN: usize = 3;
@@ -19118,44 +19815,35 @@ impl UpdateSpotMarketOrdersEnabledIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_orders_enabled_ix<
-    K: Into<UpdateSpotMarketOrdersEnabledKeys>,
-    A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_orders_enabled_ix(
+    keys: UpdateSpotMarketOrdersEnabledKeys,
+    args: UpdateSpotMarketOrdersEnabledIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketOrdersEnabledIxArgs = args.into();
-    let data: UpdateSpotMarketOrdersEnabledIxData = args_full.into();
+    let data: UpdateSpotMarketOrdersEnabledIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_orders_enabled_invoke<
-    'info,
-    A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
->(
+pub fn update_spot_market_orders_enabled_invoke<'info>(
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketOrdersEnabledIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_orders_enabled_ix(accounts, args)?;
+    let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
+    let ix = update_spot_market_orders_enabled_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_orders_enabled_invoke_signed<
-    'info,
-    A: Into<UpdateSpotMarketOrdersEnabledIxArgs>,
->(
+pub fn update_spot_market_orders_enabled_invoke_signed<'info>(
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketOrdersEnabledIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_orders_enabled_ix(accounts, args)?;
+    let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
+    let ix = update_spot_market_orders_enabled_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_ORDERS_ENABLED_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -19175,7 +19863,7 @@ pub fn update_spot_market_orders_enabled_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_orders_enabled_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_orders_enabled_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -19183,11 +19871,23 @@ pub fn update_spot_market_orders_enabled_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_orders_enabled_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_orders_enabled_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_orders_enabled_verify_writable_privileges(accounts)?;
+    update_spot_market_orders_enabled_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
@@ -19303,38 +20003,35 @@ impl UpdateSpotMarketNameIxData {
         Ok(data)
     }
 }
-pub fn update_spot_market_name_ix<
-    K: Into<UpdateSpotMarketNameKeys>,
-    A: Into<UpdateSpotMarketNameIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_market_name_ix(
+    keys: UpdateSpotMarketNameKeys,
+    args: UpdateSpotMarketNameIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotMarketNameKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotMarketNameIxArgs = args.into();
-    let data: UpdateSpotMarketNameIxData = args_full.into();
+    let data: UpdateSpotMarketNameIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_market_name_invoke<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
+pub fn update_spot_market_name_invoke<'info>(
     accounts: UpdateSpotMarketNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketNameIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_market_name_ix(accounts, args)?;
+    let keys: UpdateSpotMarketNameKeys = accounts.into();
+    let ix = update_spot_market_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_market_name_invoke_signed<'info, A: Into<UpdateSpotMarketNameIxArgs>>(
+pub fn update_spot_market_name_invoke_signed<'info>(
     accounts: UpdateSpotMarketNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotMarketNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_market_name_ix(accounts, args)?;
+    let keys: UpdateSpotMarketNameKeys = accounts.into();
+    let ix = update_spot_market_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -19354,7 +20051,7 @@ pub fn update_spot_market_name_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_market_name_verify_account_privileges<'me, 'info>(
+pub fn update_spot_market_name_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotMarketNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.spot_market] {
@@ -19362,11 +20059,23 @@ pub fn update_spot_market_name_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_name_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_market_name_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotMarketNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_market_name_verify_writable_privileges(accounts)?;
+    update_spot_market_name_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN: usize = 3;
@@ -19484,38 +20193,35 @@ impl UpdatePerpMarketStatusIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_status_ix<
-    K: Into<UpdatePerpMarketStatusKeys>,
-    A: Into<UpdatePerpMarketStatusIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_status_ix(
+    keys: UpdatePerpMarketStatusKeys,
+    args: UpdatePerpMarketStatusIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketStatusKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketStatusIxArgs = args.into();
-    let data: UpdatePerpMarketStatusIxData = args_full.into();
+    let data: UpdatePerpMarketStatusIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_status_invoke<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
+pub fn update_perp_market_status_invoke<'info>(
     accounts: UpdatePerpMarketStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketStatusIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_status_ix(accounts, args)?;
+    let keys: UpdatePerpMarketStatusKeys = accounts.into();
+    let ix = update_perp_market_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_status_invoke_signed<'info, A: Into<UpdatePerpMarketStatusIxArgs>>(
+pub fn update_perp_market_status_invoke_signed<'info>(
     accounts: UpdatePerpMarketStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_status_ix(accounts, args)?;
+    let keys: UpdatePerpMarketStatusKeys = accounts.into();
+    let ix = update_perp_market_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -19535,7 +20241,7 @@ pub fn update_perp_market_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_status_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_status_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -19543,11 +20249,23 @@ pub fn update_perp_market_status_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_status_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_status_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_status_verify_writable_privileges(accounts)?;
+    update_perp_market_status_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN: usize = 3;
@@ -19672,44 +20390,35 @@ impl UpdatePerpMarketContractTierIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_contract_tier_ix<
-    K: Into<UpdatePerpMarketContractTierKeys>,
-    A: Into<UpdatePerpMarketContractTierIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_contract_tier_ix(
+    keys: UpdatePerpMarketContractTierKeys,
+    args: UpdatePerpMarketContractTierIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketContractTierKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketContractTierIxArgs = args.into();
-    let data: UpdatePerpMarketContractTierIxData = args_full.into();
+    let data: UpdatePerpMarketContractTierIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_contract_tier_invoke<
-    'info,
-    A: Into<UpdatePerpMarketContractTierIxArgs>,
->(
+pub fn update_perp_market_contract_tier_invoke<'info>(
     accounts: UpdatePerpMarketContractTierAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketContractTierIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_contract_tier_ix(accounts, args)?;
+    let keys: UpdatePerpMarketContractTierKeys = accounts.into();
+    let ix = update_perp_market_contract_tier_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_contract_tier_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketContractTierIxArgs>,
->(
+pub fn update_perp_market_contract_tier_invoke_signed<'info>(
     accounts: UpdatePerpMarketContractTierAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketContractTierIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_contract_tier_ix(accounts, args)?;
+    let keys: UpdatePerpMarketContractTierKeys = accounts.into();
+    let ix = update_perp_market_contract_tier_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONTRACT_TIER_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -19729,7 +20438,7 @@ pub fn update_perp_market_contract_tier_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_contract_tier_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_contract_tier_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketContractTierAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -19737,11 +20446,23 @@ pub fn update_perp_market_contract_tier_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_contract_tier_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketContractTierAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_contract_tier_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketContractTierAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_contract_tier_verify_writable_privileges(accounts)?;
+    update_perp_market_contract_tier_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN: usize = 3;
@@ -19864,41 +20585,35 @@ impl UpdatePerpMarketImfFactorIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_imf_factor_ix<
-    K: Into<UpdatePerpMarketImfFactorKeys>,
-    A: Into<UpdatePerpMarketImfFactorIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_imf_factor_ix(
+    keys: UpdatePerpMarketImfFactorKeys,
+    args: UpdatePerpMarketImfFactorIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketImfFactorIxArgs = args.into();
-    let data: UpdatePerpMarketImfFactorIxData = args_full.into();
+    let data: UpdatePerpMarketImfFactorIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_imf_factor_invoke<'info, A: Into<UpdatePerpMarketImfFactorIxArgs>>(
+pub fn update_perp_market_imf_factor_invoke<'info>(
     accounts: UpdatePerpMarketImfFactorAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketImfFactorIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_imf_factor_ix(accounts, args)?;
+    let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
+    let ix = update_perp_market_imf_factor_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_imf_factor_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketImfFactorIxArgs>,
->(
+pub fn update_perp_market_imf_factor_invoke_signed<'info>(
     accounts: UpdatePerpMarketImfFactorAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketImfFactorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_imf_factor_ix(accounts, args)?;
+    let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
+    let ix = update_perp_market_imf_factor_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_IMF_FACTOR_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -19918,7 +20633,7 @@ pub fn update_perp_market_imf_factor_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_imf_factor_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_imf_factor_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketImfFactorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -19926,11 +20641,23 @@ pub fn update_perp_market_imf_factor_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_imf_factor_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketImfFactorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_imf_factor_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketImfFactorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_imf_factor_verify_writable_privileges(accounts)?;
+    update_perp_market_imf_factor_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN: usize = 3;
@@ -20063,45 +20790,36 @@ impl UpdatePerpMarketUnrealizedAssetWeightIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_unrealized_asset_weight_ix<
-    K: Into<UpdatePerpMarketUnrealizedAssetWeightKeys>,
-    A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_unrealized_asset_weight_ix(
+    keys: UpdatePerpMarketUnrealizedAssetWeightKeys,
+    args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdatePerpMarketUnrealizedAssetWeightIxArgs = args.into();
-    let data: UpdatePerpMarketUnrealizedAssetWeightIxData = args_full.into();
+    let data: UpdatePerpMarketUnrealizedAssetWeightIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_unrealized_asset_weight_invoke<
-    'info,
-    A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
->(
+pub fn update_perp_market_unrealized_asset_weight_invoke<'info>(
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_unrealized_asset_weight_ix(accounts, args)?;
+    let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
+    let ix = update_perp_market_unrealized_asset_weight_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_unrealized_asset_weight_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketUnrealizedAssetWeightIxArgs>,
->(
+pub fn update_perp_market_unrealized_asset_weight_invoke_signed<'info>(
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_unrealized_asset_weight_ix(accounts, args)?;
+    let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
+    let ix = update_perp_market_unrealized_asset_weight_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_UNREALIZED_ASSET_WEIGHT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -20121,7 +20839,7 @@ pub fn update_perp_market_unrealized_asset_weight_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_unrealized_asset_weight_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_unrealized_asset_weight_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -20129,11 +20847,23 @@ pub fn update_perp_market_unrealized_asset_weight_verify_account_privileges<'me,
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_unrealized_asset_weight_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_unrealized_asset_weight_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_unrealized_asset_weight_verify_writable_privileges(accounts)?;
+    update_perp_market_unrealized_asset_weight_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN: usize = 3;
@@ -20261,44 +20991,35 @@ impl UpdatePerpMarketConcentrationCoefIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_concentration_coef_ix<
-    K: Into<UpdatePerpMarketConcentrationCoefKeys>,
-    A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_concentration_coef_ix(
+    keys: UpdatePerpMarketConcentrationCoefKeys,
+    args: UpdatePerpMarketConcentrationCoefIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketConcentrationCoefIxArgs = args.into();
-    let data: UpdatePerpMarketConcentrationCoefIxData = args_full.into();
+    let data: UpdatePerpMarketConcentrationCoefIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_concentration_coef_invoke<
-    'info,
-    A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
->(
+pub fn update_perp_market_concentration_coef_invoke<'info>(
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketConcentrationCoefIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_concentration_coef_ix(accounts, args)?;
+    let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
+    let ix = update_perp_market_concentration_coef_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_concentration_coef_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketConcentrationCoefIxArgs>,
->(
+pub fn update_perp_market_concentration_coef_invoke_signed<'info>(
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketConcentrationCoefIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_concentration_coef_ix(accounts, args)?;
+    let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
+    let ix = update_perp_market_concentration_coef_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_CONCENTRATION_COEF_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -20318,7 +21039,7 @@ pub fn update_perp_market_concentration_coef_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_concentration_coef_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_concentration_coef_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -20326,11 +21047,23 @@ pub fn update_perp_market_concentration_coef_verify_account_privileges<'me, 'inf
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_concentration_coef_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_concentration_coef_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_concentration_coef_verify_writable_privileges(accounts)?;
+    update_perp_market_concentration_coef_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
@@ -20462,45 +21195,36 @@ impl UpdatePerpMarketCurveUpdateIntensityIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_curve_update_intensity_ix<
-    K: Into<UpdatePerpMarketCurveUpdateIntensityKeys>,
-    A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_curve_update_intensity_ix(
+    keys: UpdatePerpMarketCurveUpdateIntensityKeys,
+    args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdatePerpMarketCurveUpdateIntensityIxArgs = args.into();
-    let data: UpdatePerpMarketCurveUpdateIntensityIxData = args_full.into();
+    let data: UpdatePerpMarketCurveUpdateIntensityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_curve_update_intensity_invoke<
-    'info,
-    A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
->(
+pub fn update_perp_market_curve_update_intensity_invoke<'info>(
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_curve_update_intensity_ix(accounts, args)?;
+    let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
+    let ix = update_perp_market_curve_update_intensity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_curve_update_intensity_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketCurveUpdateIntensityIxArgs>,
->(
+pub fn update_perp_market_curve_update_intensity_invoke_signed<'info>(
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_curve_update_intensity_ix(accounts, args)?;
+    let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
+    let ix = update_perp_market_curve_update_intensity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_CURVE_UPDATE_INTENSITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -20520,7 +21244,7 @@ pub fn update_perp_market_curve_update_intensity_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_curve_update_intensity_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_curve_update_intensity_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -20528,11 +21252,23 @@ pub fn update_perp_market_curve_update_intensity_verify_account_privileges<'me, 
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_curve_update_intensity_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_curve_update_intensity_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_curve_update_intensity_verify_writable_privileges(accounts)?;
+    update_perp_market_curve_update_intensity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN: usize = 3;
@@ -20669,45 +21405,36 @@ impl UpdatePerpMarketTargetBaseAssetAmountPerLpIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_target_base_asset_amount_per_lp_ix<
-    K: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpKeys>,
-    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_target_base_asset_amount_per_lp_ix(
+    keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys,
+    args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs = args.into();
-    let data: UpdatePerpMarketTargetBaseAssetAmountPerLpIxData = args_full.into();
+    let data: UpdatePerpMarketTargetBaseAssetAmountPerLpIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_target_base_asset_amount_per_lp_invoke<
-    'info,
-    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
->(
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke<'info>(
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
+    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs>,
->(
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed<'info>(
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(accounts, args)?;
+    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_TARGET_BASE_ASSET_AMOUNT_PER_LP_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -20727,7 +21454,7 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_target_base_asset_amount_per_lp_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -20735,11 +21462,23 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_privile
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_target_base_asset_amount_per_lp_verify_writable_privileges(accounts)?;
+    update_perp_market_target_base_asset_amount_per_lp_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN: usize = 2;
@@ -20841,38 +21580,35 @@ impl UpdateLpCooldownTimeIxData {
         Ok(data)
     }
 }
-pub fn update_lp_cooldown_time_ix<
-    K: Into<UpdateLpCooldownTimeKeys>,
-    A: Into<UpdateLpCooldownTimeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_lp_cooldown_time_ix(
+    keys: UpdateLpCooldownTimeKeys,
+    args: UpdateLpCooldownTimeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateLpCooldownTimeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateLpCooldownTimeIxArgs = args.into();
-    let data: UpdateLpCooldownTimeIxData = args_full.into();
+    let data: UpdateLpCooldownTimeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_lp_cooldown_time_invoke<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
+pub fn update_lp_cooldown_time_invoke<'info>(
     accounts: UpdateLpCooldownTimeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateLpCooldownTimeIxArgs,
 ) -> ProgramResult {
-    let ix = update_lp_cooldown_time_ix(accounts, args)?;
+    let keys: UpdateLpCooldownTimeKeys = accounts.into();
+    let ix = update_lp_cooldown_time_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_lp_cooldown_time_invoke_signed<'info, A: Into<UpdateLpCooldownTimeIxArgs>>(
+pub fn update_lp_cooldown_time_invoke_signed<'info>(
     accounts: UpdateLpCooldownTimeAccounts<'_, 'info>,
-    args: A,
+    args: UpdateLpCooldownTimeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_lp_cooldown_time_ix(accounts, args)?;
+    let keys: UpdateLpCooldownTimeKeys = accounts.into();
+    let ix = update_lp_cooldown_time_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_LP_COOLDOWN_TIME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -20891,7 +21627,7 @@ pub fn update_lp_cooldown_time_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_lp_cooldown_time_verify_account_privileges<'me, 'info>(
+pub fn update_lp_cooldown_time_verify_writable_privileges<'me, 'info>(
     accounts: UpdateLpCooldownTimeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -20899,11 +21635,23 @@ pub fn update_lp_cooldown_time_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_lp_cooldown_time_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateLpCooldownTimeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_lp_cooldown_time_verify_account_privileges<'me, 'info>(
+    accounts: UpdateLpCooldownTimeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_lp_cooldown_time_verify_writable_privileges(accounts)?;
+    update_lp_cooldown_time_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
@@ -21007,38 +21755,35 @@ impl UpdatePerpFeeStructureIxData {
         Ok(data)
     }
 }
-pub fn update_perp_fee_structure_ix<
-    K: Into<UpdatePerpFeeStructureKeys>,
-    A: Into<UpdatePerpFeeStructureIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_fee_structure_ix(
+    keys: UpdatePerpFeeStructureKeys,
+    args: UpdatePerpFeeStructureIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpFeeStructureKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpFeeStructureIxArgs = args.into();
-    let data: UpdatePerpFeeStructureIxData = args_full.into();
+    let data: UpdatePerpFeeStructureIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_fee_structure_invoke<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
+pub fn update_perp_fee_structure_invoke<'info>(
     accounts: UpdatePerpFeeStructureAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpFeeStructureIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_fee_structure_ix(accounts, args)?;
+    let keys: UpdatePerpFeeStructureKeys = accounts.into();
+    let ix = update_perp_fee_structure_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_fee_structure_invoke_signed<'info, A: Into<UpdatePerpFeeStructureIxArgs>>(
+pub fn update_perp_fee_structure_invoke_signed<'info>(
     accounts: UpdatePerpFeeStructureAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpFeeStructureIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_fee_structure_ix(accounts, args)?;
+    let keys: UpdatePerpFeeStructureKeys = accounts.into();
+    let ix = update_perp_fee_structure_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21057,7 +21802,7 @@ pub fn update_perp_fee_structure_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_fee_structure_verify_account_privileges<'me, 'info>(
+pub fn update_perp_fee_structure_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpFeeStructureAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21065,11 +21810,23 @@ pub fn update_perp_fee_structure_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_fee_structure_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpFeeStructureAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_fee_structure_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpFeeStructureAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_fee_structure_verify_writable_privileges(accounts)?;
+    update_perp_fee_structure_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN: usize = 2;
@@ -21173,38 +21930,35 @@ impl UpdateSpotFeeStructureIxData {
         Ok(data)
     }
 }
-pub fn update_spot_fee_structure_ix<
-    K: Into<UpdateSpotFeeStructureKeys>,
-    A: Into<UpdateSpotFeeStructureIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_fee_structure_ix(
+    keys: UpdateSpotFeeStructureKeys,
+    args: UpdateSpotFeeStructureIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotFeeStructureKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotFeeStructureIxArgs = args.into();
-    let data: UpdateSpotFeeStructureIxData = args_full.into();
+    let data: UpdateSpotFeeStructureIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_fee_structure_invoke<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
+pub fn update_spot_fee_structure_invoke<'info>(
     accounts: UpdateSpotFeeStructureAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotFeeStructureIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_fee_structure_ix(accounts, args)?;
+    let keys: UpdateSpotFeeStructureKeys = accounts.into();
+    let ix = update_spot_fee_structure_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_fee_structure_invoke_signed<'info, A: Into<UpdateSpotFeeStructureIxArgs>>(
+pub fn update_spot_fee_structure_invoke_signed<'info>(
     accounts: UpdateSpotFeeStructureAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotFeeStructureIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_fee_structure_ix(accounts, args)?;
+    let keys: UpdateSpotFeeStructureKeys = accounts.into();
+    let ix = update_spot_fee_structure_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_FEE_STRUCTURE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21223,7 +21977,7 @@ pub fn update_spot_fee_structure_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_fee_structure_verify_account_privileges<'me, 'info>(
+pub fn update_spot_fee_structure_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotFeeStructureAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21231,11 +21985,23 @@ pub fn update_spot_fee_structure_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_fee_structure_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotFeeStructureAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_fee_structure_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotFeeStructureAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_fee_structure_verify_writable_privileges(accounts)?;
+    update_spot_fee_structure_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN: usize = 2;
@@ -21346,41 +22112,35 @@ impl UpdateInitialPctToLiquidateIxData {
         Ok(data)
     }
 }
-pub fn update_initial_pct_to_liquidate_ix<
-    K: Into<UpdateInitialPctToLiquidateKeys>,
-    A: Into<UpdateInitialPctToLiquidateIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_initial_pct_to_liquidate_ix(
+    keys: UpdateInitialPctToLiquidateKeys,
+    args: UpdateInitialPctToLiquidateIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateInitialPctToLiquidateIxArgs = args.into();
-    let data: UpdateInitialPctToLiquidateIxData = args_full.into();
+    let data: UpdateInitialPctToLiquidateIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_initial_pct_to_liquidate_invoke<'info, A: Into<UpdateInitialPctToLiquidateIxArgs>>(
+pub fn update_initial_pct_to_liquidate_invoke<'info>(
     accounts: UpdateInitialPctToLiquidateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateInitialPctToLiquidateIxArgs,
 ) -> ProgramResult {
-    let ix = update_initial_pct_to_liquidate_ix(accounts, args)?;
+    let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
+    let ix = update_initial_pct_to_liquidate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_initial_pct_to_liquidate_invoke_signed<
-    'info,
-    A: Into<UpdateInitialPctToLiquidateIxArgs>,
->(
+pub fn update_initial_pct_to_liquidate_invoke_signed<'info>(
     accounts: UpdateInitialPctToLiquidateAccounts<'_, 'info>,
-    args: A,
+    args: UpdateInitialPctToLiquidateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_initial_pct_to_liquidate_ix(accounts, args)?;
+    let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
+    let ix = update_initial_pct_to_liquidate_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_INITIAL_PCT_TO_LIQUIDATE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21399,7 +22159,7 @@ pub fn update_initial_pct_to_liquidate_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_initial_pct_to_liquidate_verify_account_privileges<'me, 'info>(
+pub fn update_initial_pct_to_liquidate_verify_writable_privileges<'me, 'info>(
     accounts: UpdateInitialPctToLiquidateAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21407,11 +22167,23 @@ pub fn update_initial_pct_to_liquidate_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_initial_pct_to_liquidate_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateInitialPctToLiquidateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_initial_pct_to_liquidate_verify_account_privileges<'me, 'info>(
+    accounts: UpdateInitialPctToLiquidateAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_initial_pct_to_liquidate_verify_writable_privileges(accounts)?;
+    update_initial_pct_to_liquidate_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
@@ -21517,41 +22289,35 @@ impl UpdateLiquidationDurationIxData {
         Ok(data)
     }
 }
-pub fn update_liquidation_duration_ix<
-    K: Into<UpdateLiquidationDurationKeys>,
-    A: Into<UpdateLiquidationDurationIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_liquidation_duration_ix(
+    keys: UpdateLiquidationDurationKeys,
+    args: UpdateLiquidationDurationIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateLiquidationDurationKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateLiquidationDurationIxArgs = args.into();
-    let data: UpdateLiquidationDurationIxData = args_full.into();
+    let data: UpdateLiquidationDurationIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_liquidation_duration_invoke<'info, A: Into<UpdateLiquidationDurationIxArgs>>(
+pub fn update_liquidation_duration_invoke<'info>(
     accounts: UpdateLiquidationDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateLiquidationDurationIxArgs,
 ) -> ProgramResult {
-    let ix = update_liquidation_duration_ix(accounts, args)?;
+    let keys: UpdateLiquidationDurationKeys = accounts.into();
+    let ix = update_liquidation_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_liquidation_duration_invoke_signed<
-    'info,
-    A: Into<UpdateLiquidationDurationIxArgs>,
->(
+pub fn update_liquidation_duration_invoke_signed<'info>(
     accounts: UpdateLiquidationDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateLiquidationDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_liquidation_duration_ix(accounts, args)?;
+    let keys: UpdateLiquidationDurationKeys = accounts.into();
+    let ix = update_liquidation_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_LIQUIDATION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21570,7 +22336,7 @@ pub fn update_liquidation_duration_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_liquidation_duration_verify_account_privileges<'me, 'info>(
+pub fn update_liquidation_duration_verify_writable_privileges<'me, 'info>(
     accounts: UpdateLiquidationDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21578,11 +22344,23 @@ pub fn update_liquidation_duration_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_liquidation_duration_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateLiquidationDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_liquidation_duration_verify_account_privileges<'me, 'info>(
+    accounts: UpdateLiquidationDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_liquidation_duration_verify_writable_privileges(accounts)?;
+    update_liquidation_duration_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN: usize = 2;
@@ -21686,38 +22464,35 @@ impl UpdateOracleGuardRailsIxData {
         Ok(data)
     }
 }
-pub fn update_oracle_guard_rails_ix<
-    K: Into<UpdateOracleGuardRailsKeys>,
-    A: Into<UpdateOracleGuardRailsIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_oracle_guard_rails_ix(
+    keys: UpdateOracleGuardRailsKeys,
+    args: UpdateOracleGuardRailsIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateOracleGuardRailsKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateOracleGuardRailsIxArgs = args.into();
-    let data: UpdateOracleGuardRailsIxData = args_full.into();
+    let data: UpdateOracleGuardRailsIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_oracle_guard_rails_invoke<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
+pub fn update_oracle_guard_rails_invoke<'info>(
     accounts: UpdateOracleGuardRailsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateOracleGuardRailsIxArgs,
 ) -> ProgramResult {
-    let ix = update_oracle_guard_rails_ix(accounts, args)?;
+    let keys: UpdateOracleGuardRailsKeys = accounts.into();
+    let ix = update_oracle_guard_rails_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_oracle_guard_rails_invoke_signed<'info, A: Into<UpdateOracleGuardRailsIxArgs>>(
+pub fn update_oracle_guard_rails_invoke_signed<'info>(
     accounts: UpdateOracleGuardRailsAccounts<'_, 'info>,
-    args: A,
+    args: UpdateOracleGuardRailsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_oracle_guard_rails_ix(accounts, args)?;
+    let keys: UpdateOracleGuardRailsKeys = accounts.into();
+    let ix = update_oracle_guard_rails_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ORACLE_GUARD_RAILS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21736,7 +22511,7 @@ pub fn update_oracle_guard_rails_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_oracle_guard_rails_verify_account_privileges<'me, 'info>(
+pub fn update_oracle_guard_rails_verify_writable_privileges<'me, 'info>(
     accounts: UpdateOracleGuardRailsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21744,11 +22519,23 @@ pub fn update_oracle_guard_rails_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_oracle_guard_rails_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateOracleGuardRailsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_oracle_guard_rails_verify_account_privileges<'me, 'info>(
+    accounts: UpdateOracleGuardRailsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_oracle_guard_rails_verify_writable_privileges(accounts)?;
+    update_oracle_guard_rails_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN: usize = 2;
@@ -21858,44 +22645,35 @@ impl UpdateStateSettlementDurationIxData {
         Ok(data)
     }
 }
-pub fn update_state_settlement_duration_ix<
-    K: Into<UpdateStateSettlementDurationKeys>,
-    A: Into<UpdateStateSettlementDurationIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_state_settlement_duration_ix(
+    keys: UpdateStateSettlementDurationKeys,
+    args: UpdateStateSettlementDurationIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateStateSettlementDurationKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateStateSettlementDurationIxArgs = args.into();
-    let data: UpdateStateSettlementDurationIxData = args_full.into();
+    let data: UpdateStateSettlementDurationIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_state_settlement_duration_invoke<
-    'info,
-    A: Into<UpdateStateSettlementDurationIxArgs>,
->(
+pub fn update_state_settlement_duration_invoke<'info>(
     accounts: UpdateStateSettlementDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateStateSettlementDurationIxArgs,
 ) -> ProgramResult {
-    let ix = update_state_settlement_duration_ix(accounts, args)?;
+    let keys: UpdateStateSettlementDurationKeys = accounts.into();
+    let ix = update_state_settlement_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_state_settlement_duration_invoke_signed<
-    'info,
-    A: Into<UpdateStateSettlementDurationIxArgs>,
->(
+pub fn update_state_settlement_duration_invoke_signed<'info>(
     accounts: UpdateStateSettlementDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateStateSettlementDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_state_settlement_duration_ix(accounts, args)?;
+    let keys: UpdateStateSettlementDurationKeys = accounts.into();
+    let ix = update_state_settlement_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_STATE_SETTLEMENT_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -21914,7 +22692,7 @@ pub fn update_state_settlement_duration_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_state_settlement_duration_verify_account_privileges<'me, 'info>(
+pub fn update_state_settlement_duration_verify_writable_privileges<'me, 'info>(
     accounts: UpdateStateSettlementDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -21922,11 +22700,23 @@ pub fn update_state_settlement_duration_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_state_settlement_duration_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateStateSettlementDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_state_settlement_duration_verify_account_privileges<'me, 'info>(
+    accounts: UpdateStateSettlementDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_state_settlement_duration_verify_writable_privileges(accounts)?;
+    update_state_settlement_duration_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN: usize = 4;
@@ -22056,38 +22846,35 @@ impl UpdatePerpMarketOracleIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_oracle_ix<
-    K: Into<UpdatePerpMarketOracleKeys>,
-    A: Into<UpdatePerpMarketOracleIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_oracle_ix(
+    keys: UpdatePerpMarketOracleKeys,
+    args: UpdatePerpMarketOracleIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketOracleKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketOracleIxArgs = args.into();
-    let data: UpdatePerpMarketOracleIxData = args_full.into();
+    let data: UpdatePerpMarketOracleIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_oracle_invoke<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
+pub fn update_perp_market_oracle_invoke<'info>(
     accounts: UpdatePerpMarketOracleAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketOracleIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_oracle_ix(accounts, args)?;
+    let keys: UpdatePerpMarketOracleKeys = accounts.into();
+    let ix = update_perp_market_oracle_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_oracle_invoke_signed<'info, A: Into<UpdatePerpMarketOracleIxArgs>>(
+pub fn update_perp_market_oracle_invoke_signed<'info>(
     accounts: UpdatePerpMarketOracleAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketOracleIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_oracle_ix(accounts, args)?;
+    let keys: UpdatePerpMarketOracleKeys = accounts.into();
+    let ix = update_perp_market_oracle_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_ORACLE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -22108,7 +22895,7 @@ pub fn update_perp_market_oracle_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_oracle_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_oracle_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketOracleAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -22116,11 +22903,23 @@ pub fn update_perp_market_oracle_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_oracle_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketOracleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_oracle_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketOracleAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_oracle_verify_writable_privileges(accounts)?;
+    update_perp_market_oracle_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
@@ -22244,41 +23043,35 @@ impl UpdatePerpMarketBaseSpreadIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_base_spread_ix<
-    K: Into<UpdatePerpMarketBaseSpreadKeys>,
-    A: Into<UpdatePerpMarketBaseSpreadIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_base_spread_ix(
+    keys: UpdatePerpMarketBaseSpreadKeys,
+    args: UpdatePerpMarketBaseSpreadIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketBaseSpreadIxArgs = args.into();
-    let data: UpdatePerpMarketBaseSpreadIxData = args_full.into();
+    let data: UpdatePerpMarketBaseSpreadIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_base_spread_invoke<'info, A: Into<UpdatePerpMarketBaseSpreadIxArgs>>(
+pub fn update_perp_market_base_spread_invoke<'info>(
     accounts: UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketBaseSpreadIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_base_spread_ix(accounts, args)?;
+    let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
+    let ix = update_perp_market_base_spread_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_base_spread_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketBaseSpreadIxArgs>,
->(
+pub fn update_perp_market_base_spread_invoke_signed<'info>(
     accounts: UpdatePerpMarketBaseSpreadAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketBaseSpreadIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_base_spread_ix(accounts, args)?;
+    let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
+    let ix = update_perp_market_base_spread_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_BASE_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -22298,7 +23091,7 @@ pub fn update_perp_market_base_spread_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_base_spread_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_base_spread_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketBaseSpreadAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -22306,11 +23099,23 @@ pub fn update_perp_market_base_spread_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_base_spread_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_base_spread_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_base_spread_verify_writable_privileges(accounts)?;
+    update_perp_market_base_spread_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN: usize = 3;
@@ -22426,38 +23231,35 @@ impl UpdateAmmJitIntensityIxData {
         Ok(data)
     }
 }
-pub fn update_amm_jit_intensity_ix<
-    K: Into<UpdateAmmJitIntensityKeys>,
-    A: Into<UpdateAmmJitIntensityIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_amm_jit_intensity_ix(
+    keys: UpdateAmmJitIntensityKeys,
+    args: UpdateAmmJitIntensityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateAmmJitIntensityKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateAmmJitIntensityIxArgs = args.into();
-    let data: UpdateAmmJitIntensityIxData = args_full.into();
+    let data: UpdateAmmJitIntensityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_amm_jit_intensity_invoke<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
+pub fn update_amm_jit_intensity_invoke<'info>(
     accounts: UpdateAmmJitIntensityAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAmmJitIntensityIxArgs,
 ) -> ProgramResult {
-    let ix = update_amm_jit_intensity_ix(accounts, args)?;
+    let keys: UpdateAmmJitIntensityKeys = accounts.into();
+    let ix = update_amm_jit_intensity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_amm_jit_intensity_invoke_signed<'info, A: Into<UpdateAmmJitIntensityIxArgs>>(
+pub fn update_amm_jit_intensity_invoke_signed<'info>(
     accounts: UpdateAmmJitIntensityAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAmmJitIntensityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_amm_jit_intensity_ix(accounts, args)?;
+    let keys: UpdateAmmJitIntensityKeys = accounts.into();
+    let ix = update_amm_jit_intensity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_AMM_JIT_INTENSITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -22477,7 +23279,7 @@ pub fn update_amm_jit_intensity_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_amm_jit_intensity_verify_account_privileges<'me, 'info>(
+pub fn update_amm_jit_intensity_verify_writable_privileges<'me, 'info>(
     accounts: UpdateAmmJitIntensityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -22485,11 +23287,23 @@ pub fn update_amm_jit_intensity_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_amm_jit_intensity_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateAmmJitIntensityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_amm_jit_intensity_verify_account_privileges<'me, 'info>(
+    accounts: UpdateAmmJitIntensityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_amm_jit_intensity_verify_writable_privileges(accounts)?;
+    update_amm_jit_intensity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN: usize = 3;
@@ -22611,41 +23425,35 @@ impl UpdatePerpMarketMaxSpreadIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_max_spread_ix<
-    K: Into<UpdatePerpMarketMaxSpreadKeys>,
-    A: Into<UpdatePerpMarketMaxSpreadIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_max_spread_ix(
+    keys: UpdatePerpMarketMaxSpreadKeys,
+    args: UpdatePerpMarketMaxSpreadIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMaxSpreadIxArgs = args.into();
-    let data: UpdatePerpMarketMaxSpreadIxData = args_full.into();
+    let data: UpdatePerpMarketMaxSpreadIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_spread_invoke<'info, A: Into<UpdatePerpMarketMaxSpreadIxArgs>>(
+pub fn update_perp_market_max_spread_invoke<'info>(
     accounts: UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxSpreadIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_max_spread_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
+    let ix = update_perp_market_max_spread_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_spread_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMaxSpreadIxArgs>,
->(
+pub fn update_perp_market_max_spread_invoke_signed<'info>(
     accounts: UpdatePerpMarketMaxSpreadAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxSpreadIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_max_spread_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
+    let ix = update_perp_market_max_spread_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SPREAD_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -22665,7 +23473,7 @@ pub fn update_perp_market_max_spread_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_max_spread_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_max_spread_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMaxSpreadAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -22673,11 +23481,23 @@ pub fn update_perp_market_max_spread_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_spread_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_spread_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_max_spread_verify_writable_privileges(accounts)?;
+    update_perp_market_max_spread_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN: usize = 3;
@@ -22806,45 +23626,36 @@ impl UpdatePerpMarketStepSizeAndTickSizeIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_step_size_and_tick_size_ix<
-    K: Into<UpdatePerpMarketStepSizeAndTickSizeKeys>,
-    A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_step_size_and_tick_size_ix(
+    keys: UpdatePerpMarketStepSizeAndTickSizeKeys,
+    args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdatePerpMarketStepSizeAndTickSizeIxArgs = args.into();
-    let data: UpdatePerpMarketStepSizeAndTickSizeIxData = args_full.into();
+    let data: UpdatePerpMarketStepSizeAndTickSizeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_step_size_and_tick_size_invoke<
-    'info,
-    A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
->(
+pub fn update_perp_market_step_size_and_tick_size_invoke<'info>(
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_step_size_and_tick_size_ix(accounts, args)?;
+    let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_perp_market_step_size_and_tick_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_step_size_and_tick_size_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketStepSizeAndTickSizeIxArgs>,
->(
+pub fn update_perp_market_step_size_and_tick_size_invoke_signed<'info>(
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_step_size_and_tick_size_ix(accounts, args)?;
+    let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_perp_market_step_size_and_tick_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_STEP_SIZE_AND_TICK_SIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -22864,7 +23675,7 @@ pub fn update_perp_market_step_size_and_tick_size_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_step_size_and_tick_size_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -22872,11 +23683,23 @@ pub fn update_perp_market_step_size_and_tick_size_verify_account_privileges<'me,
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_step_size_and_tick_size_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_step_size_and_tick_size_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_step_size_and_tick_size_verify_writable_privileges(accounts)?;
+    update_perp_market_step_size_and_tick_size_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN: usize = 3;
@@ -22992,38 +23815,35 @@ impl UpdatePerpMarketNameIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_name_ix<
-    K: Into<UpdatePerpMarketNameKeys>,
-    A: Into<UpdatePerpMarketNameIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_name_ix(
+    keys: UpdatePerpMarketNameKeys,
+    args: UpdatePerpMarketNameIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketNameKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketNameIxArgs = args.into();
-    let data: UpdatePerpMarketNameIxData = args_full.into();
+    let data: UpdatePerpMarketNameIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_name_invoke<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
+pub fn update_perp_market_name_invoke<'info>(
     accounts: UpdatePerpMarketNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketNameIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_name_ix(accounts, args)?;
+    let keys: UpdatePerpMarketNameKeys = accounts.into();
+    let ix = update_perp_market_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_name_invoke_signed<'info, A: Into<UpdatePerpMarketNameIxArgs>>(
+pub fn update_perp_market_name_invoke_signed<'info>(
     accounts: UpdatePerpMarketNameAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_name_ix(accounts, args)?;
+    let keys: UpdatePerpMarketNameKeys = accounts.into();
+    let ix = update_perp_market_name_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_NAME_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -23043,7 +23863,7 @@ pub fn update_perp_market_name_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_name_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_name_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketNameAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -23051,11 +23871,23 @@ pub fn update_perp_market_name_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_name_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_name_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketNameAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_name_verify_writable_privileges(accounts)?;
+    update_perp_market_name_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN: usize = 3;
@@ -23179,44 +24011,35 @@ impl UpdatePerpMarketMinOrderSizeIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_min_order_size_ix<
-    K: Into<UpdatePerpMarketMinOrderSizeKeys>,
-    A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_min_order_size_ix(
+    keys: UpdatePerpMarketMinOrderSizeKeys,
+    args: UpdatePerpMarketMinOrderSizeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMinOrderSizeIxArgs = args.into();
-    let data: UpdatePerpMarketMinOrderSizeIxData = args_full.into();
+    let data: UpdatePerpMarketMinOrderSizeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_min_order_size_invoke<
-    'info,
-    A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
->(
+pub fn update_perp_market_min_order_size_invoke<'info>(
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMinOrderSizeIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_min_order_size_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_perp_market_min_order_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_min_order_size_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMinOrderSizeIxArgs>,
->(
+pub fn update_perp_market_min_order_size_invoke_signed<'info>(
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMinOrderSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_min_order_size_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_perp_market_min_order_size_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MIN_ORDER_SIZE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -23236,7 +24059,7 @@ pub fn update_perp_market_min_order_size_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_min_order_size_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_min_order_size_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -23244,11 +24067,23 @@ pub fn update_perp_market_min_order_size_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_min_order_size_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_min_order_size_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_min_order_size_verify_writable_privileges(accounts)?;
+    update_perp_market_min_order_size_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN: usize = 3;
@@ -23376,44 +24211,35 @@ impl UpdatePerpMarketMaxSlippageRatioIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_max_slippage_ratio_ix<
-    K: Into<UpdatePerpMarketMaxSlippageRatioKeys>,
-    A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_max_slippage_ratio_ix(
+    keys: UpdatePerpMarketMaxSlippageRatioKeys,
+    args: UpdatePerpMarketMaxSlippageRatioIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMaxSlippageRatioIxArgs = args.into();
-    let data: UpdatePerpMarketMaxSlippageRatioIxData = args_full.into();
+    let data: UpdatePerpMarketMaxSlippageRatioIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_slippage_ratio_invoke<
-    'info,
-    A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
->(
+pub fn update_perp_market_max_slippage_ratio_invoke<'info>(
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxSlippageRatioIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_max_slippage_ratio_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
+    let ix = update_perp_market_max_slippage_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_slippage_ratio_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMaxSlippageRatioIxArgs>,
->(
+pub fn update_perp_market_max_slippage_ratio_invoke_signed<'info>(
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxSlippageRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_max_slippage_ratio_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
+    let ix = update_perp_market_max_slippage_ratio_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_SLIPPAGE_RATIO_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -23433,7 +24259,7 @@ pub fn update_perp_market_max_slippage_ratio_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_max_slippage_ratio_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_max_slippage_ratio_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -23441,11 +24267,23 @@ pub fn update_perp_market_max_slippage_ratio_verify_account_privileges<'me, 'inf
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_slippage_ratio_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_slippage_ratio_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_max_slippage_ratio_verify_writable_privileges(accounts)?;
+    update_perp_market_max_slippage_ratio_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN: usize = 3;
@@ -23580,45 +24418,36 @@ impl UpdatePerpMarketMaxFillReserveFractionIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_max_fill_reserve_fraction_ix<
-    K: Into<UpdatePerpMarketMaxFillReserveFractionKeys>,
-    A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_max_fill_reserve_fraction_ix(
+    keys: UpdatePerpMarketMaxFillReserveFractionKeys,
+    args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: UpdatePerpMarketMaxFillReserveFractionIxArgs = args.into();
-    let data: UpdatePerpMarketMaxFillReserveFractionIxData = args_full.into();
+    let data: UpdatePerpMarketMaxFillReserveFractionIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_fill_reserve_fraction_invoke<
-    'info,
-    A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
->(
+pub fn update_perp_market_max_fill_reserve_fraction_invoke<'info>(
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_max_fill_reserve_fraction_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
+    let ix = update_perp_market_max_fill_reserve_fraction_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMaxFillReserveFractionIxArgs>,
->(
+pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed<'info>(
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_max_fill_reserve_fraction_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
+    let ix = update_perp_market_max_fill_reserve_fraction_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         UPDATE_PERP_MARKET_MAX_FILL_RESERVE_FRACTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -23638,7 +24467,7 @@ pub fn update_perp_market_max_fill_reserve_fraction_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_max_fill_reserve_fraction_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_max_fill_reserve_fraction_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -23646,11 +24475,23 @@ pub fn update_perp_market_max_fill_reserve_fraction_verify_account_privileges<'m
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_fill_reserve_fraction_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_fill_reserve_fraction_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_max_fill_reserve_fraction_verify_writable_privileges(accounts)?;
+    update_perp_market_max_fill_reserve_fraction_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN: usize = 3;
@@ -23776,44 +24617,35 @@ impl UpdatePerpMarketMaxOpenInterestIxData {
         Ok(data)
     }
 }
-pub fn update_perp_market_max_open_interest_ix<
-    K: Into<UpdatePerpMarketMaxOpenInterestKeys>,
-    A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_market_max_open_interest_ix(
+    keys: UpdatePerpMarketMaxOpenInterestKeys,
+    args: UpdatePerpMarketMaxOpenInterestIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpMarketMaxOpenInterestIxArgs = args.into();
-    let data: UpdatePerpMarketMaxOpenInterestIxData = args_full.into();
+    let data: UpdatePerpMarketMaxOpenInterestIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_market_max_open_interest_invoke<
-    'info,
-    A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
->(
+pub fn update_perp_market_max_open_interest_invoke<'info>(
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxOpenInterestIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_market_max_open_interest_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
+    let ix = update_perp_market_max_open_interest_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_market_max_open_interest_invoke_signed<
-    'info,
-    A: Into<UpdatePerpMarketMaxOpenInterestIxArgs>,
->(
+pub fn update_perp_market_max_open_interest_invoke_signed<'info>(
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpMarketMaxOpenInterestIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_market_max_open_interest_ix(accounts, args)?;
+    let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
+    let ix = update_perp_market_max_open_interest_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_MARKET_MAX_OPEN_INTEREST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -23833,7 +24665,7 @@ pub fn update_perp_market_max_open_interest_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_market_max_open_interest_verify_account_privileges<'me, 'info>(
+pub fn update_perp_market_max_open_interest_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.perp_market] {
@@ -23841,11 +24673,23 @@ pub fn update_perp_market_max_open_interest_verify_account_privileges<'me, 'info
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_open_interest_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_market_max_open_interest_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_market_max_open_interest_verify_writable_privileges(accounts)?;
+    update_perp_market_max_open_interest_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_ADMIN_IX_ACCOUNTS_LEN: usize = 2;
@@ -23947,34 +24791,34 @@ impl UpdateAdminIxData {
         Ok(data)
     }
 }
-pub fn update_admin_ix<K: Into<UpdateAdminKeys>, A: Into<UpdateAdminIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_admin_ix(
+    keys: UpdateAdminKeys,
+    args: UpdateAdminIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateAdminKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateAdminIxArgs = args.into();
-    let data: UpdateAdminIxData = args_full.into();
+    let data: UpdateAdminIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_admin_invoke<'info, A: Into<UpdateAdminIxArgs>>(
+pub fn update_admin_invoke<'info>(
     accounts: UpdateAdminAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAdminIxArgs,
 ) -> ProgramResult {
-    let ix = update_admin_ix(accounts, args)?;
+    let keys: UpdateAdminKeys = accounts.into();
+    let ix = update_admin_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_admin_invoke_signed<'info, A: Into<UpdateAdminIxArgs>>(
+pub fn update_admin_invoke_signed<'info>(
     accounts: UpdateAdminAccounts<'_, 'info>,
-    args: A,
+    args: UpdateAdminIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_admin_ix(accounts, args)?;
+    let keys: UpdateAdminKeys = accounts.into();
+    let ix = update_admin_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ADMIN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -23992,7 +24836,7 @@ pub fn update_admin_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_admin_verify_account_privileges<'me, 'info>(
+pub fn update_admin_verify_writable_privileges<'me, 'info>(
     accounts: UpdateAdminAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24000,11 +24844,23 @@ pub fn update_admin_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_admin_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateAdminAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_admin_verify_account_privileges<'me, 'info>(
+    accounts: UpdateAdminAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_admin_verify_writable_privileges(accounts)?;
+    update_admin_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN: usize = 2;
@@ -24106,37 +24962,34 @@ impl UpdateWhitelistMintIxData {
         Ok(data)
     }
 }
-pub fn update_whitelist_mint_ix<
-    K: Into<UpdateWhitelistMintKeys>,
-    A: Into<UpdateWhitelistMintIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_whitelist_mint_ix(
+    keys: UpdateWhitelistMintKeys,
+    args: UpdateWhitelistMintIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateWhitelistMintKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateWhitelistMintIxArgs = args.into();
-    let data: UpdateWhitelistMintIxData = args_full.into();
+    let data: UpdateWhitelistMintIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_whitelist_mint_invoke<'info, A: Into<UpdateWhitelistMintIxArgs>>(
+pub fn update_whitelist_mint_invoke<'info>(
     accounts: UpdateWhitelistMintAccounts<'_, 'info>,
-    args: A,
+    args: UpdateWhitelistMintIxArgs,
 ) -> ProgramResult {
-    let ix = update_whitelist_mint_ix(accounts, args)?;
+    let keys: UpdateWhitelistMintKeys = accounts.into();
+    let ix = update_whitelist_mint_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_whitelist_mint_invoke_signed<'info, A: Into<UpdateWhitelistMintIxArgs>>(
+pub fn update_whitelist_mint_invoke_signed<'info>(
     accounts: UpdateWhitelistMintAccounts<'_, 'info>,
-    args: A,
+    args: UpdateWhitelistMintIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_whitelist_mint_ix(accounts, args)?;
+    let keys: UpdateWhitelistMintKeys = accounts.into();
+    let ix = update_whitelist_mint_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_WHITELIST_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -24154,7 +25007,7 @@ pub fn update_whitelist_mint_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_whitelist_mint_verify_account_privileges<'me, 'info>(
+pub fn update_whitelist_mint_verify_writable_privileges<'me, 'info>(
     accounts: UpdateWhitelistMintAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24162,11 +25015,23 @@ pub fn update_whitelist_mint_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_whitelist_mint_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateWhitelistMintAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_whitelist_mint_verify_account_privileges<'me, 'info>(
+    accounts: UpdateWhitelistMintAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_whitelist_mint_verify_writable_privileges(accounts)?;
+    update_whitelist_mint_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN: usize = 2;
@@ -24268,37 +25133,34 @@ impl UpdateDiscountMintIxData {
         Ok(data)
     }
 }
-pub fn update_discount_mint_ix<
-    K: Into<UpdateDiscountMintKeys>,
-    A: Into<UpdateDiscountMintIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_discount_mint_ix(
+    keys: UpdateDiscountMintKeys,
+    args: UpdateDiscountMintIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateDiscountMintKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateDiscountMintIxArgs = args.into();
-    let data: UpdateDiscountMintIxData = args_full.into();
+    let data: UpdateDiscountMintIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_discount_mint_invoke<'info, A: Into<UpdateDiscountMintIxArgs>>(
+pub fn update_discount_mint_invoke<'info>(
     accounts: UpdateDiscountMintAccounts<'_, 'info>,
-    args: A,
+    args: UpdateDiscountMintIxArgs,
 ) -> ProgramResult {
-    let ix = update_discount_mint_ix(accounts, args)?;
+    let keys: UpdateDiscountMintKeys = accounts.into();
+    let ix = update_discount_mint_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_discount_mint_invoke_signed<'info, A: Into<UpdateDiscountMintIxArgs>>(
+pub fn update_discount_mint_invoke_signed<'info>(
     accounts: UpdateDiscountMintAccounts<'_, 'info>,
-    args: A,
+    args: UpdateDiscountMintIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_discount_mint_ix(accounts, args)?;
+    let keys: UpdateDiscountMintKeys = accounts.into();
+    let ix = update_discount_mint_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DISCOUNT_MINT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -24316,7 +25178,7 @@ pub fn update_discount_mint_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_discount_mint_verify_account_privileges<'me, 'info>(
+pub fn update_discount_mint_verify_writable_privileges<'me, 'info>(
     accounts: UpdateDiscountMintAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24324,11 +25186,23 @@ pub fn update_discount_mint_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_discount_mint_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateDiscountMintAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_discount_mint_verify_account_privileges<'me, 'info>(
+    accounts: UpdateDiscountMintAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_discount_mint_verify_writable_privileges(accounts)?;
+    update_discount_mint_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN: usize = 2;
@@ -24430,38 +25304,35 @@ impl UpdateExchangeStatusIxData {
         Ok(data)
     }
 }
-pub fn update_exchange_status_ix<
-    K: Into<UpdateExchangeStatusKeys>,
-    A: Into<UpdateExchangeStatusIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_exchange_status_ix(
+    keys: UpdateExchangeStatusKeys,
+    args: UpdateExchangeStatusIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateExchangeStatusKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateExchangeStatusIxArgs = args.into();
-    let data: UpdateExchangeStatusIxData = args_full.into();
+    let data: UpdateExchangeStatusIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_exchange_status_invoke<'info, A: Into<UpdateExchangeStatusIxArgs>>(
+pub fn update_exchange_status_invoke<'info>(
     accounts: UpdateExchangeStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateExchangeStatusIxArgs,
 ) -> ProgramResult {
-    let ix = update_exchange_status_ix(accounts, args)?;
+    let keys: UpdateExchangeStatusKeys = accounts.into();
+    let ix = update_exchange_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_exchange_status_invoke_signed<'info, A: Into<UpdateExchangeStatusIxArgs>>(
+pub fn update_exchange_status_invoke_signed<'info>(
     accounts: UpdateExchangeStatusAccounts<'_, 'info>,
-    args: A,
+    args: UpdateExchangeStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_exchange_status_ix(accounts, args)?;
+    let keys: UpdateExchangeStatusKeys = accounts.into();
+    let ix = update_exchange_status_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_EXCHANGE_STATUS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -24480,7 +25351,7 @@ pub fn update_exchange_status_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_exchange_status_verify_account_privileges<'me, 'info>(
+pub fn update_exchange_status_verify_writable_privileges<'me, 'info>(
     accounts: UpdateExchangeStatusAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24488,11 +25359,23 @@ pub fn update_exchange_status_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_exchange_status_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateExchangeStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_exchange_status_verify_account_privileges<'me, 'info>(
+    accounts: UpdateExchangeStatusAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_exchange_status_verify_writable_privileges(accounts)?;
+    update_exchange_status_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
@@ -24600,41 +25483,35 @@ impl UpdatePerpAuctionDurationIxData {
         Ok(data)
     }
 }
-pub fn update_perp_auction_duration_ix<
-    K: Into<UpdatePerpAuctionDurationKeys>,
-    A: Into<UpdatePerpAuctionDurationIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_perp_auction_duration_ix(
+    keys: UpdatePerpAuctionDurationKeys,
+    args: UpdatePerpAuctionDurationIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePerpAuctionDurationKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdatePerpAuctionDurationIxArgs = args.into();
-    let data: UpdatePerpAuctionDurationIxData = args_full.into();
+    let data: UpdatePerpAuctionDurationIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_perp_auction_duration_invoke<'info, A: Into<UpdatePerpAuctionDurationIxArgs>>(
+pub fn update_perp_auction_duration_invoke<'info>(
     accounts: UpdatePerpAuctionDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpAuctionDurationIxArgs,
 ) -> ProgramResult {
-    let ix = update_perp_auction_duration_ix(accounts, args)?;
+    let keys: UpdatePerpAuctionDurationKeys = accounts.into();
+    let ix = update_perp_auction_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_perp_auction_duration_invoke_signed<
-    'info,
-    A: Into<UpdatePerpAuctionDurationIxArgs>,
->(
+pub fn update_perp_auction_duration_invoke_signed<'info>(
     accounts: UpdatePerpAuctionDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdatePerpAuctionDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_perp_auction_duration_ix(accounts, args)?;
+    let keys: UpdatePerpAuctionDurationKeys = accounts.into();
+    let ix = update_perp_auction_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_PERP_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -24653,7 +25530,7 @@ pub fn update_perp_auction_duration_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_perp_auction_duration_verify_account_privileges<'me, 'info>(
+pub fn update_perp_auction_duration_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePerpAuctionDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24661,11 +25538,23 @@ pub fn update_perp_auction_duration_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_perp_auction_duration_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePerpAuctionDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_perp_auction_duration_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePerpAuctionDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_perp_auction_duration_verify_writable_privileges(accounts)?;
+    update_perp_auction_duration_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN: usize = 2;
@@ -24773,41 +25662,35 @@ impl UpdateSpotAuctionDurationIxData {
         Ok(data)
     }
 }
-pub fn update_spot_auction_duration_ix<
-    K: Into<UpdateSpotAuctionDurationKeys>,
-    A: Into<UpdateSpotAuctionDurationIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_spot_auction_duration_ix(
+    keys: UpdateSpotAuctionDurationKeys,
+    args: UpdateSpotAuctionDurationIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateSpotAuctionDurationKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateSpotAuctionDurationIxArgs = args.into();
-    let data: UpdateSpotAuctionDurationIxData = args_full.into();
+    let data: UpdateSpotAuctionDurationIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_spot_auction_duration_invoke<'info, A: Into<UpdateSpotAuctionDurationIxArgs>>(
+pub fn update_spot_auction_duration_invoke<'info>(
     accounts: UpdateSpotAuctionDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotAuctionDurationIxArgs,
 ) -> ProgramResult {
-    let ix = update_spot_auction_duration_ix(accounts, args)?;
+    let keys: UpdateSpotAuctionDurationKeys = accounts.into();
+    let ix = update_spot_auction_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_spot_auction_duration_invoke_signed<
-    'info,
-    A: Into<UpdateSpotAuctionDurationIxArgs>,
->(
+pub fn update_spot_auction_duration_invoke_signed<'info>(
     accounts: UpdateSpotAuctionDurationAccounts<'_, 'info>,
-    args: A,
+    args: UpdateSpotAuctionDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_spot_auction_duration_ix(accounts, args)?;
+    let keys: UpdateSpotAuctionDurationKeys = accounts.into();
+    let ix = update_spot_auction_duration_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_SPOT_AUCTION_DURATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -24826,7 +25709,7 @@ pub fn update_spot_auction_duration_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_spot_auction_duration_verify_account_privileges<'me, 'info>(
+pub fn update_spot_auction_duration_verify_writable_privileges<'me, 'info>(
     accounts: UpdateSpotAuctionDurationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -24834,11 +25717,23 @@ pub fn update_spot_auction_duration_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_spot_auction_duration_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateSpotAuctionDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_spot_auction_duration_verify_account_privileges<'me, 'info>(
+    accounts: UpdateSpotAuctionDurationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_spot_auction_duration_verify_writable_privileges(accounts)?;
+    update_spot_auction_duration_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN: usize = 7;
@@ -25008,44 +25903,35 @@ impl AdminRemoveInsuranceFundStakeIxData {
         Ok(data)
     }
 }
-pub fn admin_remove_insurance_fund_stake_ix<
-    K: Into<AdminRemoveInsuranceFundStakeKeys>,
-    A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn admin_remove_insurance_fund_stake_ix(
+    keys: AdminRemoveInsuranceFundStakeKeys,
+    args: AdminRemoveInsuranceFundStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
     let metas: [AccountMeta; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: AdminRemoveInsuranceFundStakeIxArgs = args.into();
-    let data: AdminRemoveInsuranceFundStakeIxData = args_full.into();
+    let data: AdminRemoveInsuranceFundStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn admin_remove_insurance_fund_stake_invoke<
-    'info,
-    A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn admin_remove_insurance_fund_stake_invoke<'info>(
     accounts: AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: AdminRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
-    let ix = admin_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = admin_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn admin_remove_insurance_fund_stake_invoke_signed<
-    'info,
-    A: Into<AdminRemoveInsuranceFundStakeIxArgs>,
->(
+pub fn admin_remove_insurance_fund_stake_invoke_signed<'info>(
     accounts: AdminRemoveInsuranceFundStakeAccounts<'_, 'info>,
-    args: A,
+    args: AdminRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = admin_remove_insurance_fund_stake_ix(accounts, args)?;
+    let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = admin_remove_insurance_fund_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADMIN_REMOVE_INSURANCE_FUND_STAKE_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -25072,7 +25958,7 @@ pub fn admin_remove_insurance_fund_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn admin_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+pub fn admin_remove_insurance_fund_stake_verify_writable_privileges<'me, 'info>(
     accounts: AdminRemoveInsuranceFundStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.insurance_fund_vault, accounts.admin_token_account] {
@@ -25080,10 +25966,22 @@ pub fn admin_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn admin_remove_insurance_fund_stake_verify_signer_privileges<'me, 'info>(
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn admin_remove_insurance_fund_stake_verify_account_privileges<'me, 'info>(
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    admin_remove_insurance_fund_stake_verify_writable_privileges(accounts)?;
+    admin_remove_insurance_fund_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }

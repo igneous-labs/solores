@@ -392,31 +392,17 @@ impl NamedInstruction {
         let accounts_len_ident = self.accounts_len_ident();
         let ix_data_ident = self.ix_data_ident();
 
-        let fn_generics = if !self.has_accounts() && !self.has_ix_args() {
-            quote! {}
-        } else {
-            let mut g = quote! {};
-            if self.has_accounts() {
-                g.extend(quote! { K: Into<#keys_ident>, });
-            }
-            if self.has_ix_args() {
-                g.extend(quote! {  A: Into<#ix_args_ident> });
-            }
-            g
-        };
-
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! { accounts: K, });
+            fn_params.extend(quote! { keys: #keys_ident, });
         }
         if self.has_ix_args() {
-            fn_params.extend(quote! { args: A,  });
+            fn_params.extend(quote! { args: #ix_args_ident, });
         }
 
         let (mut fn_body, accounts_expr) = if self.has_accounts() {
             (
                 quote! {
-                    let keys: #keys_ident = accounts.into();
                     let metas: [AccountMeta; #accounts_len_ident] = keys.into();
                 },
                 quote! {
@@ -433,8 +419,7 @@ impl NamedInstruction {
         };
         if self.has_ix_args() {
             fn_body.extend(quote! {
-                let args_full: #ix_args_ident = args.into();
-                let data: #ix_data_ident = args_full.into();
+                let data: #ix_data_ident = args.into();
             })
         }
         let data_expr = if self.has_ix_args() {
@@ -443,14 +428,8 @@ impl NamedInstruction {
             quote! { #ix_data_ident.try_to_vec()? }
         };
 
-        let fn_decl = if fn_generics.is_empty() {
-            quote! { #ix_fn_ident(#fn_params) }
-        } else {
-            quote! { #ix_fn_ident<#fn_generics>(#fn_params) }
-        };
-
         tokens.extend(quote! {
-            pub fn #fn_decl -> std::io::Result<Instruction> {
+            pub fn #ix_fn_ident(#fn_params) -> std::io::Result<Instruction> {
                 #fn_body
                 Ok(Instruction {
                     program_id: crate::ID,
@@ -462,44 +441,44 @@ impl NamedInstruction {
     }
 
     fn invoke_fn_generics(&self) -> TokenStream {
-        if !self.has_accounts() && !self.has_ix_args() {
-            return quote! {};
-        }
-        let mut res = quote! {};
         if self.has_accounts() {
-            res.extend(quote! {'info,})
+            quote! { 'info }
+        } else {
+            quote! {}
         }
-        if self.has_ix_args() {
-            let ix_args_ident = self.ix_args_ident();
-            res.extend(quote! { A: Into<#ix_args_ident> });
-        }
-        res
     }
 
     fn invoke_fn_params_prefix(&self) -> TokenStream {
         let accounts_ident = self.accounts_ident();
+        let ix_args_ident = self.ix_args_ident();
         let mut fn_params = quote! {};
         if self.has_accounts() {
-            fn_params.extend(quote! {accounts: #accounts_ident<'_, 'info>,});
+            fn_params.extend(quote! { accounts: #accounts_ident<'_, 'info>, });
         }
         if self.has_ix_args() {
-            fn_params.extend(quote! { args: A, })
+            fn_params.extend(quote! { args: #ix_args_ident, })
         }
         fn_params
     }
 
     fn ix_fn_call_assign(&self) -> TokenStream {
         let ix_fn_ident = self.ix_fn_ident();
+        let keys_ident = self.keys_ident();
+        let mut res = quote! {};
         let mut args = quote! {};
         if self.has_accounts() {
-            args.extend(quote! { accounts, });
+            res.extend(quote! {
+                let keys: #keys_ident = accounts.into();
+            });
+            args.extend(quote! { keys, });
         }
         if self.has_ix_args() {
             args.extend(quote! { args });
         }
-        quote! {
+        res.extend(quote! {
             let ix = #ix_fn_ident(#args)?;
-        }
+        });
+        res
     }
 
     /// _invoke()
@@ -604,8 +583,10 @@ impl NamedInstruction {
         });
     }
 
-    // _verify_account_privileges
-    pub fn write_verify_account_privileges_fn(
+    // _verify_account_privileges()
+    // _verify_writable_privileges()
+    // _verify_signer_privileges()
+    pub fn write_verify_account_privileges_fns(
         &self,
         tokens: &mut TokenStream,
         unique_accounts: &[&IxAccount],
@@ -615,6 +596,14 @@ impl NamedInstruction {
         }
         let verify_account_privileges_fn_ident =
             format_ident!("{}_verify_account_privileges", self.name.to_snake_case());
+        let verify_writable_privileges_fn_ident =
+            format_ident!("{}_verify_writable_privileges", self.name.to_snake_case());
+        let verify_signer_privileges_fn_ident =
+            format_ident!("{}_verify_signer_privileges", self.name.to_snake_case());
+        let accounts_ident = self.accounts_ident();
+
+        let mut verify_fn_body = quote! {};
+
         let mut writables = unique_accounts
             .iter()
             .filter_map(|a| {
@@ -628,19 +617,27 @@ impl NamedInstruction {
                 }
             })
             .peekable();
-        let writables_loop_check = if writables.peek().is_none() {
-            quote! {}
-        } else {
-            quote! {
-                for should_be_writable in [
-                    #(#writables),*
-                ] {
-                    if !should_be_writable.is_writable {
-                        return Err((should_be_writable, ProgramError::InvalidAccountData));
+        let has_writables = writables.peek().is_some();
+        if has_writables {
+            tokens.extend(quote! {
+                pub fn #verify_writable_privileges_fn_ident<'me, 'info>(
+                    accounts: #accounts_ident<'me, 'info>,
+                ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+                    for should_be_writable in [
+                        #(#writables),*
+                    ] {
+                        if !should_be_writable.is_writable {
+                            return Err((should_be_writable, ProgramError::InvalidAccountData));
+                        }
                     }
+                    Ok(())
                 }
-            }
-        };
+            });
+            verify_fn_body.extend(quote! {
+                #verify_writable_privileges_fn_ident(accounts)?;
+            });
+        }
+
         let mut signers = unique_accounts
             .iter()
             .filter_map(|a| {
@@ -654,26 +651,32 @@ impl NamedInstruction {
                 }
             })
             .peekable();
-        let signers_loop_check = if signers.peek().is_none() {
-            quote! {}
-        } else {
-            quote! {
-                for should_be_signer in [
-                    #(#signers),*
-                ] {
-                    if !should_be_signer.is_signer {
-                        return Err((should_be_signer, ProgramError::MissingRequiredSignature));
+        let has_signers = signers.peek().is_some();
+        if has_signers {
+            tokens.extend(quote! {
+                pub fn #verify_signer_privileges_fn_ident<'me, 'info>(
+                    accounts: #accounts_ident<'me, 'info>,
+                ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+                    for should_be_signer in [
+                        #(#signers),*
+                    ] {
+                        if !should_be_signer.is_signer {
+                            return Err((should_be_signer, ProgramError::MissingRequiredSignature));
+                        }
                     }
+                    Ok(())
                 }
-            }
-        };
-        let accounts_ident = self.accounts_ident();
+            });
+            verify_fn_body.extend(quote! {
+                #verify_signer_privileges_fn_ident(accounts)?;
+            });
+        }
+
         tokens.extend(quote! {
             pub fn #verify_account_privileges_fn_ident<'me, 'info>(
                 accounts: #accounts_ident<'me, 'info>,
             ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
-                #writables_loop_check
-                #signers_loop_check
+                #verify_fn_body
                 Ok(())
             }
         });
@@ -718,7 +721,7 @@ impl ToTokens for NamedInstruction {
         self.write_invoke_signed_fn(tokens);
 
         self.write_verify_account_keys_fn(tokens, unique_accounts);
-        self.write_verify_account_privileges_fn(tokens, unique_accounts);
+        self.write_verify_account_privileges_fns(tokens, unique_accounts);
     }
 }
 

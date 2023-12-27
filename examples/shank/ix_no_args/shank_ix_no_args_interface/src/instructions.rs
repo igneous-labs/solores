@@ -105,8 +105,7 @@ impl NoArgsIxIxData {
         Ok(data)
     }
 }
-pub fn no_args_ix_ix<K: Into<NoArgsIxKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: NoArgsIxKeys = accounts.into();
+pub fn no_args_ix_ix(keys: NoArgsIxKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; NO_ARGS_IX_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -115,7 +114,8 @@ pub fn no_args_ix_ix<K: Into<NoArgsIxKeys>>(accounts: K) -> std::io::Result<Inst
     })
 }
 pub fn no_args_ix_invoke<'info>(accounts: NoArgsIxAccounts<'_, 'info>) -> ProgramResult {
-    let ix = no_args_ix_ix(accounts)?;
+    let keys: NoArgsIxKeys = accounts.into();
+    let ix = no_args_ix_ix(keys)?;
     let account_info: [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -123,7 +123,8 @@ pub fn no_args_ix_invoke_signed<'info>(
     accounts: NoArgsIxAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = no_args_ix_ix(accounts)?;
+    let keys: NoArgsIxKeys = accounts.into();
+    let ix = no_args_ix_ix(keys)?;
     let account_info: [AccountInfo<'info>; NO_ARGS_IX_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -138,7 +139,7 @@ pub fn no_args_ix_verify_account_keys(
     }
     Ok(())
 }
-pub fn no_args_ix_verify_account_privileges<'me, 'info>(
+pub fn no_args_ix_verify_writable_privileges<'me, 'info>(
     accounts: NoArgsIxAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.b] {
@@ -146,5 +147,11 @@ pub fn no_args_ix_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn no_args_ix_verify_account_privileges<'me, 'info>(
+    accounts: NoArgsIxAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    no_args_ix_verify_writable_privileges(accounts)?;
     Ok(())
 }

@@ -418,34 +418,31 @@ impl InitializeIxData {
         Ok(data)
     }
 }
-pub fn initialize_ix<K: Into<InitializeKeys>, A: Into<InitializeIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: InitializeKeys = accounts.into();
+pub fn initialize_ix(keys: InitializeKeys, args: InitializeIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; INITIALIZE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: InitializeIxArgs = args.into();
-    let data: InitializeIxData = args_full.into();
+    let data: InitializeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn initialize_invoke<'info, A: Into<InitializeIxArgs>>(
+pub fn initialize_invoke<'info>(
     accounts: InitializeAccounts<'_, 'info>,
-    args: A,
+    args: InitializeIxArgs,
 ) -> ProgramResult {
-    let ix = initialize_ix(accounts, args)?;
+    let keys: InitializeKeys = accounts.into();
+    let ix = initialize_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn initialize_invoke_signed<'info, A: Into<InitializeIxArgs>>(
+pub fn initialize_invoke_signed<'info>(
     accounts: InitializeAccounts<'_, 'info>,
-    args: A,
+    args: InitializeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = initialize_ix(accounts, args)?;
+    let keys: InitializeKeys = accounts.into();
+    let ix = initialize_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; INITIALIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -483,7 +480,7 @@ pub fn initialize_verify_account_keys(
     }
     Ok(())
 }
-pub fn initialize_verify_account_privileges<'me, 'info>(
+pub fn initialize_verify_writable_privileges<'me, 'info>(
     accounts: InitializeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.stake_list, accounts.validator_list] {
@@ -491,11 +488,23 @@ pub fn initialize_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_signer_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.creator_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn initialize_verify_account_privileges<'me, 'info>(
+    accounts: InitializeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    initialize_verify_writable_privileges(accounts)?;
+    initialize_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CHANGE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 2;
@@ -597,34 +606,34 @@ impl ChangeAuthorityIxData {
         Ok(data)
     }
 }
-pub fn change_authority_ix<K: Into<ChangeAuthorityKeys>, A: Into<ChangeAuthorityIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn change_authority_ix(
+    keys: ChangeAuthorityKeys,
+    args: ChangeAuthorityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ChangeAuthorityKeys = accounts.into();
     let metas: [AccountMeta; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ChangeAuthorityIxArgs = args.into();
-    let data: ChangeAuthorityIxData = args_full.into();
+    let data: ChangeAuthorityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn change_authority_invoke<'info, A: Into<ChangeAuthorityIxArgs>>(
+pub fn change_authority_invoke<'info>(
     accounts: ChangeAuthorityAccounts<'_, 'info>,
-    args: A,
+    args: ChangeAuthorityIxArgs,
 ) -> ProgramResult {
-    let ix = change_authority_ix(accounts, args)?;
+    let keys: ChangeAuthorityKeys = accounts.into();
+    let ix = change_authority_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn change_authority_invoke_signed<'info, A: Into<ChangeAuthorityIxArgs>>(
+pub fn change_authority_invoke_signed<'info>(
     accounts: ChangeAuthorityAccounts<'_, 'info>,
-    args: A,
+    args: ChangeAuthorityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = change_authority_ix(accounts, args)?;
+    let keys: ChangeAuthorityKeys = accounts.into();
+    let ix = change_authority_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CHANGE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -642,7 +651,7 @@ pub fn change_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn change_authority_verify_account_privileges<'me, 'info>(
+pub fn change_authority_verify_writable_privileges<'me, 'info>(
     accounts: ChangeAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -650,11 +659,23 @@ pub fn change_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn change_authority_verify_signer_privileges<'me, 'info>(
+    accounts: ChangeAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn change_authority_verify_account_privileges<'me, 'info>(
+    accounts: ChangeAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    change_authority_verify_writable_privileges(accounts)?;
+    change_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_VALIDATOR_IX_ACCOUNTS_LEN: usize = 9;
@@ -836,34 +857,34 @@ impl AddValidatorIxData {
         Ok(data)
     }
 }
-pub fn add_validator_ix<K: Into<AddValidatorKeys>, A: Into<AddValidatorIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn add_validator_ix(
+    keys: AddValidatorKeys,
+    args: AddValidatorIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: AddValidatorKeys = accounts.into();
     let metas: [AccountMeta; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: AddValidatorIxArgs = args.into();
-    let data: AddValidatorIxData = args_full.into();
+    let data: AddValidatorIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn add_validator_invoke<'info, A: Into<AddValidatorIxArgs>>(
+pub fn add_validator_invoke<'info>(
     accounts: AddValidatorAccounts<'_, 'info>,
-    args: A,
+    args: AddValidatorIxArgs,
 ) -> ProgramResult {
-    let ix = add_validator_ix(accounts, args)?;
+    let keys: AddValidatorKeys = accounts.into();
+    let ix = add_validator_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_validator_invoke_signed<'info, A: Into<AddValidatorIxArgs>>(
+pub fn add_validator_invoke_signed<'info>(
     accounts: AddValidatorAccounts<'_, 'info>,
-    args: A,
+    args: AddValidatorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = add_validator_ix(accounts, args)?;
+    let keys: AddValidatorKeys = accounts.into();
+    let ix = add_validator_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -888,7 +909,7 @@ pub fn add_validator_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_validator_verify_account_privileges<'me, 'info>(
+pub fn add_validator_verify_writable_privileges<'me, 'info>(
     accounts: AddValidatorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -901,11 +922,23 @@ pub fn add_validator_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_validator_verify_signer_privileges<'me, 'info>(
+    accounts: AddValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority, accounts.rent_payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_validator_verify_account_privileges<'me, 'info>(
+    accounts: AddValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_validator_verify_writable_privileges(accounts)?;
+    add_validator_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_VALIDATOR_IX_ACCOUNTS_LEN: usize = 5;
@@ -1044,34 +1077,34 @@ impl RemoveValidatorIxData {
         Ok(data)
     }
 }
-pub fn remove_validator_ix<K: Into<RemoveValidatorKeys>, A: Into<RemoveValidatorIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn remove_validator_ix(
+    keys: RemoveValidatorKeys,
+    args: RemoveValidatorIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RemoveValidatorKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RemoveValidatorIxArgs = args.into();
-    let data: RemoveValidatorIxData = args_full.into();
+    let data: RemoveValidatorIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_validator_invoke<'info, A: Into<RemoveValidatorIxArgs>>(
+pub fn remove_validator_invoke<'info>(
     accounts: RemoveValidatorAccounts<'_, 'info>,
-    args: A,
+    args: RemoveValidatorIxArgs,
 ) -> ProgramResult {
-    let ix = remove_validator_ix(accounts, args)?;
+    let keys: RemoveValidatorKeys = accounts.into();
+    let ix = remove_validator_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_validator_invoke_signed<'info, A: Into<RemoveValidatorIxArgs>>(
+pub fn remove_validator_invoke_signed<'info>(
     accounts: RemoveValidatorAccounts<'_, 'info>,
-    args: A,
+    args: RemoveValidatorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_validator_ix(accounts, args)?;
+    let keys: RemoveValidatorKeys = accounts.into();
+    let ix = remove_validator_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_VALIDATOR_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1095,7 +1128,7 @@ pub fn remove_validator_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_validator_verify_account_privileges<'me, 'info>(
+pub fn remove_validator_verify_writable_privileges<'me, 'info>(
     accounts: RemoveValidatorAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1108,11 +1141,23 @@ pub fn remove_validator_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_validator_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_validator_verify_account_privileges<'me, 'info>(
+    accounts: RemoveValidatorAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_validator_verify_writable_privileges(accounts)?;
+    remove_validator_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN: usize = 3;
@@ -1230,34 +1275,34 @@ impl SetValidatorScoreIxData {
         Ok(data)
     }
 }
-pub fn set_validator_score_ix<K: Into<SetValidatorScoreKeys>, A: Into<SetValidatorScoreIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn set_validator_score_ix(
+    keys: SetValidatorScoreKeys,
+    args: SetValidatorScoreIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: SetValidatorScoreKeys = accounts.into();
     let metas: [AccountMeta; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SetValidatorScoreIxArgs = args.into();
-    let data: SetValidatorScoreIxData = args_full.into();
+    let data: SetValidatorScoreIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn set_validator_score_invoke<'info, A: Into<SetValidatorScoreIxArgs>>(
+pub fn set_validator_score_invoke<'info>(
     accounts: SetValidatorScoreAccounts<'_, 'info>,
-    args: A,
+    args: SetValidatorScoreIxArgs,
 ) -> ProgramResult {
-    let ix = set_validator_score_ix(accounts, args)?;
+    let keys: SetValidatorScoreKeys = accounts.into();
+    let ix = set_validator_score_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn set_validator_score_invoke_signed<'info, A: Into<SetValidatorScoreIxArgs>>(
+pub fn set_validator_score_invoke_signed<'info>(
     accounts: SetValidatorScoreAccounts<'_, 'info>,
-    args: A,
+    args: SetValidatorScoreIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = set_validator_score_ix(accounts, args)?;
+    let keys: SetValidatorScoreKeys = accounts.into();
+    let ix = set_validator_score_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SET_VALIDATOR_SCORE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1276,7 +1321,7 @@ pub fn set_validator_score_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_validator_score_verify_account_privileges<'me, 'info>(
+pub fn set_validator_score_verify_writable_privileges<'me, 'info>(
     accounts: SetValidatorScoreAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state, accounts.validator_list] {
@@ -1284,11 +1329,23 @@ pub fn set_validator_score_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn set_validator_score_verify_signer_privileges<'me, 'info>(
+    accounts: SetValidatorScoreAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn set_validator_score_verify_account_privileges<'me, 'info>(
+    accounts: SetValidatorScoreAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    set_validator_score_verify_writable_privileges(accounts)?;
+    set_validator_score_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN: usize = 2;
@@ -1390,38 +1447,35 @@ impl ConfigValidatorSystemIxData {
         Ok(data)
     }
 }
-pub fn config_validator_system_ix<
-    K: Into<ConfigValidatorSystemKeys>,
-    A: Into<ConfigValidatorSystemIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn config_validator_system_ix(
+    keys: ConfigValidatorSystemKeys,
+    args: ConfigValidatorSystemIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ConfigValidatorSystemKeys = accounts.into();
     let metas: [AccountMeta; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ConfigValidatorSystemIxArgs = args.into();
-    let data: ConfigValidatorSystemIxData = args_full.into();
+    let data: ConfigValidatorSystemIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn config_validator_system_invoke<'info, A: Into<ConfigValidatorSystemIxArgs>>(
+pub fn config_validator_system_invoke<'info>(
     accounts: ConfigValidatorSystemAccounts<'_, 'info>,
-    args: A,
+    args: ConfigValidatorSystemIxArgs,
 ) -> ProgramResult {
-    let ix = config_validator_system_ix(accounts, args)?;
+    let keys: ConfigValidatorSystemKeys = accounts.into();
+    let ix = config_validator_system_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn config_validator_system_invoke_signed<'info, A: Into<ConfigValidatorSystemIxArgs>>(
+pub fn config_validator_system_invoke_signed<'info>(
     accounts: ConfigValidatorSystemAccounts<'_, 'info>,
-    args: A,
+    args: ConfigValidatorSystemIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = config_validator_system_ix(accounts, args)?;
+    let keys: ConfigValidatorSystemKeys = accounts.into();
+    let ix = config_validator_system_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CONFIG_VALIDATOR_SYSTEM_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -1440,7 +1494,7 @@ pub fn config_validator_system_verify_account_keys(
     }
     Ok(())
 }
-pub fn config_validator_system_verify_account_privileges<'me, 'info>(
+pub fn config_validator_system_verify_writable_privileges<'me, 'info>(
     accounts: ConfigValidatorSystemAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -1448,11 +1502,23 @@ pub fn config_validator_system_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn config_validator_system_verify_signer_privileges<'me, 'info>(
+    accounts: ConfigValidatorSystemAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn config_validator_system_verify_account_privileges<'me, 'info>(
+    accounts: ConfigValidatorSystemAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    config_validator_system_verify_writable_privileges(accounts)?;
+    config_validator_system_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_IX_ACCOUNTS_LEN: usize = 11;
@@ -1654,34 +1720,31 @@ impl DepositIxData {
         Ok(data)
     }
 }
-pub fn deposit_ix<K: Into<DepositKeys>, A: Into<DepositIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: DepositKeys = accounts.into();
+pub fn deposit_ix(keys: DepositKeys, args: DepositIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; DEPOSIT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DepositIxArgs = args.into();
-    let data: DepositIxData = args_full.into();
+    let data: DepositIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_invoke<'info, A: Into<DepositIxArgs>>(
+pub fn deposit_invoke<'info>(
     accounts: DepositAccounts<'_, 'info>,
-    args: A,
+    args: DepositIxArgs,
 ) -> ProgramResult {
-    let ix = deposit_ix(accounts, args)?;
+    let keys: DepositKeys = accounts.into();
+    let ix = deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deposit_invoke_signed<'info, A: Into<DepositIxArgs>>(
+pub fn deposit_invoke_signed<'info>(
     accounts: DepositAccounts<'_, 'info>,
-    args: A,
+    args: DepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deposit_ix(accounts, args)?;
+    let keys: DepositKeys = accounts.into();
+    let ix = deposit_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -1714,7 +1777,7 @@ pub fn deposit_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_verify_account_privileges<'me, 'info>(
+pub fn deposit_verify_writable_privileges<'me, 'info>(
     accounts: DepositAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -1730,11 +1793,23 @@ pub fn deposit_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_signer_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.transfer_from] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_verify_account_privileges<'me, 'info>(
+    accounts: DepositAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_verify_writable_privileges(accounts)?;
+    deposit_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN: usize = 15;
@@ -1982,37 +2057,34 @@ impl DepositStakeAccountIxData {
         Ok(data)
     }
 }
-pub fn deposit_stake_account_ix<
-    K: Into<DepositStakeAccountKeys>,
-    A: Into<DepositStakeAccountIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deposit_stake_account_ix(
+    keys: DepositStakeAccountKeys,
+    args: DepositStakeAccountIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DepositStakeAccountKeys = accounts.into();
     let metas: [AccountMeta; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DepositStakeAccountIxArgs = args.into();
-    let data: DepositStakeAccountIxData = args_full.into();
+    let data: DepositStakeAccountIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deposit_stake_account_invoke<'info, A: Into<DepositStakeAccountIxArgs>>(
+pub fn deposit_stake_account_invoke<'info>(
     accounts: DepositStakeAccountAccounts<'_, 'info>,
-    args: A,
+    args: DepositStakeAccountIxArgs,
 ) -> ProgramResult {
-    let ix = deposit_stake_account_ix(accounts, args)?;
+    let keys: DepositStakeAccountKeys = accounts.into();
+    let ix = deposit_stake_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deposit_stake_account_invoke_signed<'info, A: Into<DepositStakeAccountIxArgs>>(
+pub fn deposit_stake_account_invoke_signed<'info>(
     accounts: DepositStakeAccountAccounts<'_, 'info>,
-    args: A,
+    args: DepositStakeAccountIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deposit_stake_account_ix(accounts, args)?;
+    let keys: DepositStakeAccountKeys = accounts.into();
+    let ix = deposit_stake_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPOSIT_STAKE_ACCOUNT_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2043,7 +2115,7 @@ pub fn deposit_stake_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
+pub fn deposit_stake_account_verify_writable_privileges<'me, 'info>(
     accounts: DepositStakeAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2060,11 +2132,23 @@ pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deposit_stake_account_verify_signer_privileges<'me, 'info>(
+    accounts: DepositStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.stake_authority, accounts.rent_payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deposit_stake_account_verify_account_privileges<'me, 'info>(
+    accounts: DepositStakeAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deposit_stake_account_verify_writable_privileges(accounts)?;
+    deposit_stake_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const LIQUID_UNSTAKE_IX_ACCOUNTS_LEN: usize = 10;
@@ -2257,34 +2341,34 @@ impl LiquidUnstakeIxData {
         Ok(data)
     }
 }
-pub fn liquid_unstake_ix<K: Into<LiquidUnstakeKeys>, A: Into<LiquidUnstakeIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn liquid_unstake_ix(
+    keys: LiquidUnstakeKeys,
+    args: LiquidUnstakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: LiquidUnstakeKeys = accounts.into();
     let metas: [AccountMeta; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: LiquidUnstakeIxArgs = args.into();
-    let data: LiquidUnstakeIxData = args_full.into();
+    let data: LiquidUnstakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn liquid_unstake_invoke<'info, A: Into<LiquidUnstakeIxArgs>>(
+pub fn liquid_unstake_invoke<'info>(
     accounts: LiquidUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: LiquidUnstakeIxArgs,
 ) -> ProgramResult {
-    let ix = liquid_unstake_ix(accounts, args)?;
+    let keys: LiquidUnstakeKeys = accounts.into();
+    let ix = liquid_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn liquid_unstake_invoke_signed<'info, A: Into<LiquidUnstakeIxArgs>>(
+pub fn liquid_unstake_invoke_signed<'info>(
     accounts: LiquidUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: LiquidUnstakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = liquid_unstake_ix(accounts, args)?;
+    let keys: LiquidUnstakeKeys = accounts.into();
+    let ix = liquid_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; LIQUID_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2319,7 +2403,7 @@ pub fn liquid_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
+pub fn liquid_unstake_verify_writable_privileges<'me, 'info>(
     accounts: LiquidUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2335,11 +2419,23 @@ pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn liquid_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: LiquidUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.get_msol_from_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn liquid_unstake_verify_account_privileges<'me, 'info>(
+    accounts: LiquidUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    liquid_unstake_verify_writable_privileges(accounts)?;
+    liquid_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ADD_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 9;
@@ -2521,34 +2617,34 @@ impl AddLiquidityIxData {
         Ok(data)
     }
 }
-pub fn add_liquidity_ix<K: Into<AddLiquidityKeys>, A: Into<AddLiquidityIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn add_liquidity_ix(
+    keys: AddLiquidityKeys,
+    args: AddLiquidityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: AddLiquidityKeys = accounts.into();
     let metas: [AccountMeta; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: AddLiquidityIxArgs = args.into();
-    let data: AddLiquidityIxData = args_full.into();
+    let data: AddLiquidityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn add_liquidity_invoke<'info, A: Into<AddLiquidityIxArgs>>(
+pub fn add_liquidity_invoke<'info>(
     accounts: AddLiquidityAccounts<'_, 'info>,
-    args: A,
+    args: AddLiquidityIxArgs,
 ) -> ProgramResult {
-    let ix = add_liquidity_ix(accounts, args)?;
+    let keys: AddLiquidityKeys = accounts.into();
+    let ix = add_liquidity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn add_liquidity_invoke_signed<'info, A: Into<AddLiquidityIxArgs>>(
+pub fn add_liquidity_invoke_signed<'info>(
     accounts: AddLiquidityAccounts<'_, 'info>,
-    args: A,
+    args: AddLiquidityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = add_liquidity_ix(accounts, args)?;
+    let keys: AddLiquidityKeys = accounts.into();
+    let ix = add_liquidity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ADD_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2576,7 +2672,7 @@ pub fn add_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn add_liquidity_verify_account_privileges<'me, 'info>(
+pub fn add_liquidity_verify_writable_privileges<'me, 'info>(
     accounts: AddLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2590,11 +2686,23 @@ pub fn add_liquidity_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn add_liquidity_verify_signer_privileges<'me, 'info>(
+    accounts: AddLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.transfer_from] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn add_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: AddLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    add_liquidity_verify_writable_privileges(accounts)?;
+    add_liquidity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN: usize = 11;
@@ -2798,34 +2906,34 @@ impl RemoveLiquidityIxData {
         Ok(data)
     }
 }
-pub fn remove_liquidity_ix<K: Into<RemoveLiquidityKeys>, A: Into<RemoveLiquidityIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn remove_liquidity_ix(
+    keys: RemoveLiquidityKeys,
+    args: RemoveLiquidityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: RemoveLiquidityKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: RemoveLiquidityIxArgs = args.into();
-    let data: RemoveLiquidityIxData = args_full.into();
+    let data: RemoveLiquidityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn remove_liquidity_invoke<'info, A: Into<RemoveLiquidityIxArgs>>(
+pub fn remove_liquidity_invoke<'info>(
     accounts: RemoveLiquidityAccounts<'_, 'info>,
-    args: A,
+    args: RemoveLiquidityIxArgs,
 ) -> ProgramResult {
-    let ix = remove_liquidity_ix(accounts, args)?;
+    let keys: RemoveLiquidityKeys = accounts.into();
+    let ix = remove_liquidity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn remove_liquidity_invoke_signed<'info, A: Into<RemoveLiquidityIxArgs>>(
+pub fn remove_liquidity_invoke_signed<'info>(
     accounts: RemoveLiquidityAccounts<'_, 'info>,
-    args: A,
+    args: RemoveLiquidityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_liquidity_ix(accounts, args)?;
+    let keys: RemoveLiquidityKeys = accounts.into();
+    let ix = remove_liquidity_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; REMOVE_LIQUIDITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2858,7 +2966,7 @@ pub fn remove_liquidity_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
+pub fn remove_liquidity_verify_writable_privileges<'me, 'info>(
     accounts: RemoveLiquidityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2874,11 +2982,23 @@ pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_liquidity_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.burn_from_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_liquidity_verify_account_privileges<'me, 'info>(
+    accounts: RemoveLiquidityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_liquidity_verify_writable_privileges(accounts)?;
+    remove_liquidity_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SET_LP_PARAMS_IX_ACCOUNTS_LEN: usize = 2;
@@ -2982,34 +3102,34 @@ impl SetLpParamsIxData {
         Ok(data)
     }
 }
-pub fn set_lp_params_ix<K: Into<SetLpParamsKeys>, A: Into<SetLpParamsIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn set_lp_params_ix(
+    keys: SetLpParamsKeys,
+    args: SetLpParamsIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: SetLpParamsKeys = accounts.into();
     let metas: [AccountMeta; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: SetLpParamsIxArgs = args.into();
-    let data: SetLpParamsIxData = args_full.into();
+    let data: SetLpParamsIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn set_lp_params_invoke<'info, A: Into<SetLpParamsIxArgs>>(
+pub fn set_lp_params_invoke<'info>(
     accounts: SetLpParamsAccounts<'_, 'info>,
-    args: A,
+    args: SetLpParamsIxArgs,
 ) -> ProgramResult {
-    let ix = set_lp_params_ix(accounts, args)?;
+    let keys: SetLpParamsKeys = accounts.into();
+    let ix = set_lp_params_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn set_lp_params_invoke_signed<'info, A: Into<SetLpParamsIxArgs>>(
+pub fn set_lp_params_invoke_signed<'info>(
     accounts: SetLpParamsAccounts<'_, 'info>,
-    args: A,
+    args: SetLpParamsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = set_lp_params_ix(accounts, args)?;
+    let keys: SetLpParamsKeys = accounts.into();
+    let ix = set_lp_params_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; SET_LP_PARAMS_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3027,7 +3147,7 @@ pub fn set_lp_params_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_lp_params_verify_account_privileges<'me, 'info>(
+pub fn set_lp_params_verify_writable_privileges<'me, 'info>(
     accounts: SetLpParamsAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -3035,11 +3155,23 @@ pub fn set_lp_params_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn set_lp_params_verify_signer_privileges<'me, 'info>(
+    accounts: SetLpParamsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn set_lp_params_verify_account_privileges<'me, 'info>(
+    accounts: SetLpParamsAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    set_lp_params_verify_writable_privileges(accounts)?;
+    set_lp_params_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CONFIG_MARINADE_IX_ACCOUNTS_LEN: usize = 2;
@@ -3141,34 +3273,34 @@ impl ConfigMarinadeIxData {
         Ok(data)
     }
 }
-pub fn config_marinade_ix<K: Into<ConfigMarinadeKeys>, A: Into<ConfigMarinadeIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn config_marinade_ix(
+    keys: ConfigMarinadeKeys,
+    args: ConfigMarinadeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ConfigMarinadeKeys = accounts.into();
     let metas: [AccountMeta; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ConfigMarinadeIxArgs = args.into();
-    let data: ConfigMarinadeIxData = args_full.into();
+    let data: ConfigMarinadeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn config_marinade_invoke<'info, A: Into<ConfigMarinadeIxArgs>>(
+pub fn config_marinade_invoke<'info>(
     accounts: ConfigMarinadeAccounts<'_, 'info>,
-    args: A,
+    args: ConfigMarinadeIxArgs,
 ) -> ProgramResult {
-    let ix = config_marinade_ix(accounts, args)?;
+    let keys: ConfigMarinadeKeys = accounts.into();
+    let ix = config_marinade_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn config_marinade_invoke_signed<'info, A: Into<ConfigMarinadeIxArgs>>(
+pub fn config_marinade_invoke_signed<'info>(
     accounts: ConfigMarinadeAccounts<'_, 'info>,
-    args: A,
+    args: ConfigMarinadeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = config_marinade_ix(accounts, args)?;
+    let keys: ConfigMarinadeKeys = accounts.into();
+    let ix = config_marinade_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CONFIG_MARINADE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3186,7 +3318,7 @@ pub fn config_marinade_verify_account_keys(
     }
     Ok(())
 }
-pub fn config_marinade_verify_account_privileges<'me, 'info>(
+pub fn config_marinade_verify_writable_privileges<'me, 'info>(
     accounts: ConfigMarinadeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.state] {
@@ -3194,11 +3326,23 @@ pub fn config_marinade_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn config_marinade_verify_signer_privileges<'me, 'info>(
+    accounts: ConfigMarinadeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.admin_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn config_marinade_verify_account_privileges<'me, 'info>(
+    accounts: ConfigMarinadeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    config_marinade_verify_writable_privileges(accounts)?;
+    config_marinade_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const ORDER_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
@@ -3369,34 +3513,34 @@ impl OrderUnstakeIxData {
         Ok(data)
     }
 }
-pub fn order_unstake_ix<K: Into<OrderUnstakeKeys>, A: Into<OrderUnstakeIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn order_unstake_ix(
+    keys: OrderUnstakeKeys,
+    args: OrderUnstakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: OrderUnstakeKeys = accounts.into();
     let metas: [AccountMeta; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: OrderUnstakeIxArgs = args.into();
-    let data: OrderUnstakeIxData = args_full.into();
+    let data: OrderUnstakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn order_unstake_invoke<'info, A: Into<OrderUnstakeIxArgs>>(
+pub fn order_unstake_invoke<'info>(
     accounts: OrderUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: OrderUnstakeIxArgs,
 ) -> ProgramResult {
-    let ix = order_unstake_ix(accounts, args)?;
+    let keys: OrderUnstakeKeys = accounts.into();
+    let ix = order_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn order_unstake_invoke_signed<'info, A: Into<OrderUnstakeIxArgs>>(
+pub fn order_unstake_invoke_signed<'info>(
     accounts: OrderUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: OrderUnstakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = order_unstake_ix(accounts, args)?;
+    let keys: OrderUnstakeKeys = accounts.into();
+    let ix = order_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; ORDER_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3420,7 +3564,7 @@ pub fn order_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn order_unstake_verify_account_privileges<'me, 'info>(
+pub fn order_unstake_verify_writable_privileges<'me, 'info>(
     accounts: OrderUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3433,11 +3577,23 @@ pub fn order_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn order_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: OrderUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.burn_msol_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn order_unstake_verify_account_privileges<'me, 'info>(
+    accounts: OrderUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    order_unstake_verify_writable_privileges(accounts)?;
+    order_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CLAIM_IX_ACCOUNTS_LEN: usize = 6;
@@ -3573,8 +3729,7 @@ impl ClaimIxData {
         Ok(data)
     }
 }
-pub fn claim_ix<K: Into<ClaimKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: ClaimKeys = accounts.into();
+pub fn claim_ix(keys: ClaimKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; CLAIM_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -3583,7 +3738,8 @@ pub fn claim_ix<K: Into<ClaimKeys>>(accounts: K) -> std::io::Result<Instruction>
     })
 }
 pub fn claim_invoke<'info>(accounts: ClaimAccounts<'_, 'info>) -> ProgramResult {
-    let ix = claim_ix(accounts)?;
+    let keys: ClaimKeys = accounts.into();
+    let ix = claim_ix(keys)?;
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -3591,7 +3747,8 @@ pub fn claim_invoke_signed<'info>(
     accounts: ClaimAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = claim_ix(accounts)?;
+    let keys: ClaimKeys = accounts.into();
+    let ix = claim_ix(keys)?;
     let account_info: [AccountInfo<'info>; CLAIM_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3613,7 +3770,7 @@ pub fn claim_verify_account_keys(
     }
     Ok(())
 }
-pub fn claim_verify_account_privileges<'me, 'info>(
+pub fn claim_verify_writable_privileges<'me, 'info>(
     accounts: ClaimAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3626,6 +3783,12 @@ pub fn claim_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn claim_verify_account_privileges<'me, 'info>(
+    accounts: ClaimAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    claim_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const STAKE_RESERVE_IX_ACCOUNTS_LEN: usize = 14;
@@ -3862,34 +4025,34 @@ impl StakeReserveIxData {
         Ok(data)
     }
 }
-pub fn stake_reserve_ix<K: Into<StakeReserveKeys>, A: Into<StakeReserveIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn stake_reserve_ix(
+    keys: StakeReserveKeys,
+    args: StakeReserveIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: StakeReserveKeys = accounts.into();
     let metas: [AccountMeta; STAKE_RESERVE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: StakeReserveIxArgs = args.into();
-    let data: StakeReserveIxData = args_full.into();
+    let data: StakeReserveIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn stake_reserve_invoke<'info, A: Into<StakeReserveIxArgs>>(
+pub fn stake_reserve_invoke<'info>(
     accounts: StakeReserveAccounts<'_, 'info>,
-    args: A,
+    args: StakeReserveIxArgs,
 ) -> ProgramResult {
-    let ix = stake_reserve_ix(accounts, args)?;
+    let keys: StakeReserveKeys = accounts.into();
+    let ix = stake_reserve_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn stake_reserve_invoke_signed<'info, A: Into<StakeReserveIxArgs>>(
+pub fn stake_reserve_invoke_signed<'info>(
     accounts: StakeReserveAccounts<'_, 'info>,
-    args: A,
+    args: StakeReserveIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = stake_reserve_ix(accounts, args)?;
+    let keys: StakeReserveKeys = accounts.into();
+    let ix = stake_reserve_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; STAKE_RESERVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -3922,7 +4085,7 @@ pub fn stake_reserve_verify_account_keys(
     }
     Ok(())
 }
-pub fn stake_reserve_verify_account_privileges<'me, 'info>(
+pub fn stake_reserve_verify_writable_privileges<'me, 'info>(
     accounts: StakeReserveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3937,6 +4100,12 @@ pub fn stake_reserve_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn stake_reserve_verify_account_privileges<'me, 'info>(
+    accounts: StakeReserveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    stake_reserve_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_ACTIVE_IX_ACCOUNTS_LEN: usize = 13;
@@ -4163,34 +4332,34 @@ impl UpdateActiveIxData {
         Ok(data)
     }
 }
-pub fn update_active_ix<K: Into<UpdateActiveKeys>, A: Into<UpdateActiveIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_active_ix(
+    keys: UpdateActiveKeys,
+    args: UpdateActiveIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateActiveKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateActiveIxArgs = args.into();
-    let data: UpdateActiveIxData = args_full.into();
+    let data: UpdateActiveIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_active_invoke<'info, A: Into<UpdateActiveIxArgs>>(
+pub fn update_active_invoke<'info>(
     accounts: UpdateActiveAccounts<'_, 'info>,
-    args: A,
+    args: UpdateActiveIxArgs,
 ) -> ProgramResult {
-    let ix = update_active_ix(accounts, args)?;
+    let keys: UpdateActiveKeys = accounts.into();
+    let ix = update_active_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_active_invoke_signed<'info, A: Into<UpdateActiveIxArgs>>(
+pub fn update_active_invoke_signed<'info>(
     accounts: UpdateActiveAccounts<'_, 'info>,
-    args: A,
+    args: UpdateActiveIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_active_ix(accounts, args)?;
+    let keys: UpdateActiveKeys = accounts.into();
+    let ix = update_active_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_ACTIVE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4240,7 +4409,7 @@ pub fn update_active_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_active_verify_account_privileges<'me, 'info>(
+pub fn update_active_verify_writable_privileges<'me, 'info>(
     accounts: UpdateActiveAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4256,6 +4425,12 @@ pub fn update_active_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_active_verify_account_privileges<'me, 'info>(
+    accounts: UpdateActiveAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_active_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN: usize = 14;
@@ -4492,34 +4667,34 @@ impl UpdateDeactivatedIxData {
         Ok(data)
     }
 }
-pub fn update_deactivated_ix<K: Into<UpdateDeactivatedKeys>, A: Into<UpdateDeactivatedIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn update_deactivated_ix(
+    keys: UpdateDeactivatedKeys,
+    args: UpdateDeactivatedIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateDeactivatedKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateDeactivatedIxArgs = args.into();
-    let data: UpdateDeactivatedIxData = args_full.into();
+    let data: UpdateDeactivatedIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_deactivated_invoke<'info, A: Into<UpdateDeactivatedIxArgs>>(
+pub fn update_deactivated_invoke<'info>(
     accounts: UpdateDeactivatedAccounts<'_, 'info>,
-    args: A,
+    args: UpdateDeactivatedIxArgs,
 ) -> ProgramResult {
-    let ix = update_deactivated_ix(accounts, args)?;
+    let keys: UpdateDeactivatedKeys = accounts.into();
+    let ix = update_deactivated_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_deactivated_invoke_signed<'info, A: Into<UpdateDeactivatedIxArgs>>(
+pub fn update_deactivated_invoke_signed<'info>(
     accounts: UpdateDeactivatedAccounts<'_, 'info>,
-    args: A,
+    args: UpdateDeactivatedIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_deactivated_ix(accounts, args)?;
+    let keys: UpdateDeactivatedKeys = accounts.into();
+    let ix = update_deactivated_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_DEACTIVATED_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4573,7 +4748,7 @@ pub fn update_deactivated_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_deactivated_verify_account_privileges<'me, 'info>(
+pub fn update_deactivated_verify_writable_privileges<'me, 'info>(
     accounts: UpdateDeactivatedAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4589,6 +4764,12 @@ pub fn update_deactivated_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_deactivated_verify_account_privileges<'me, 'info>(
+    accounts: UpdateDeactivatedAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_deactivated_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const DEACTIVATE_STAKE_IX_ACCOUNTS_LEN: usize = 14;
@@ -4826,34 +5007,34 @@ impl DeactivateStakeIxData {
         Ok(data)
     }
 }
-pub fn deactivate_stake_ix<K: Into<DeactivateStakeKeys>, A: Into<DeactivateStakeIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn deactivate_stake_ix(
+    keys: DeactivateStakeKeys,
+    args: DeactivateStakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeactivateStakeKeys = accounts.into();
     let metas: [AccountMeta; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DeactivateStakeIxArgs = args.into();
-    let data: DeactivateStakeIxData = args_full.into();
+    let data: DeactivateStakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deactivate_stake_invoke<'info, A: Into<DeactivateStakeIxArgs>>(
+pub fn deactivate_stake_invoke<'info>(
     accounts: DeactivateStakeAccounts<'_, 'info>,
-    args: A,
+    args: DeactivateStakeIxArgs,
 ) -> ProgramResult {
-    let ix = deactivate_stake_ix(accounts, args)?;
+    let keys: DeactivateStakeKeys = accounts.into();
+    let ix = deactivate_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deactivate_stake_invoke_signed<'info, A: Into<DeactivateStakeIxArgs>>(
+pub fn deactivate_stake_invoke_signed<'info>(
     accounts: DeactivateStakeAccounts<'_, 'info>,
-    args: A,
+    args: DeactivateStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deactivate_stake_ix(accounts, args)?;
+    let keys: DeactivateStakeKeys = accounts.into();
+    let ix = deactivate_stake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEACTIVATE_STAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4889,7 +5070,7 @@ pub fn deactivate_stake_verify_account_keys(
     }
     Ok(())
 }
-pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
+pub fn deactivate_stake_verify_writable_privileges<'me, 'info>(
     accounts: DeactivateStakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -4904,6 +5085,11 @@ pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deactivate_stake_verify_signer_privileges<'me, 'info>(
+    accounts: DeactivateStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.split_stake_account,
         accounts.split_stake_rent_payer,
@@ -4912,6 +5098,13 @@ pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deactivate_stake_verify_account_privileges<'me, 'info>(
+    accounts: DeactivateStakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deactivate_stake_verify_writable_privileges(accounts)?;
+    deactivate_stake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN: usize = 8;
@@ -5083,34 +5276,34 @@ impl EmergencyUnstakeIxData {
         Ok(data)
     }
 }
-pub fn emergency_unstake_ix<K: Into<EmergencyUnstakeKeys>, A: Into<EmergencyUnstakeIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn emergency_unstake_ix(
+    keys: EmergencyUnstakeKeys,
+    args: EmergencyUnstakeIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: EmergencyUnstakeKeys = accounts.into();
     let metas: [AccountMeta; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: EmergencyUnstakeIxArgs = args.into();
-    let data: EmergencyUnstakeIxData = args_full.into();
+    let data: EmergencyUnstakeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn emergency_unstake_invoke<'info, A: Into<EmergencyUnstakeIxArgs>>(
+pub fn emergency_unstake_invoke<'info>(
     accounts: EmergencyUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: EmergencyUnstakeIxArgs,
 ) -> ProgramResult {
-    let ix = emergency_unstake_ix(accounts, args)?;
+    let keys: EmergencyUnstakeKeys = accounts.into();
+    let ix = emergency_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn emergency_unstake_invoke_signed<'info, A: Into<EmergencyUnstakeIxArgs>>(
+pub fn emergency_unstake_invoke_signed<'info>(
     accounts: EmergencyUnstakeAccounts<'_, 'info>,
-    args: A,
+    args: EmergencyUnstakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = emergency_unstake_ix(accounts, args)?;
+    let keys: EmergencyUnstakeKeys = accounts.into();
+    let ix = emergency_unstake_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; EMERGENCY_UNSTAKE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5140,7 +5333,7 @@ pub fn emergency_unstake_verify_account_keys(
     }
     Ok(())
 }
-pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
+pub fn emergency_unstake_verify_writable_privileges<'me, 'info>(
     accounts: EmergencyUnstakeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -5153,11 +5346,23 @@ pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn emergency_unstake_verify_signer_privileges<'me, 'info>(
+    accounts: EmergencyUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.validator_manager_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn emergency_unstake_verify_account_privileges<'me, 'info>(
+    accounts: EmergencyUnstakeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    emergency_unstake_verify_writable_privileges(accounts)?;
+    emergency_unstake_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MERGE_STAKES_IX_ACCOUNTS_LEN: usize = 11;
@@ -5363,34 +5568,34 @@ impl MergeStakesIxData {
         Ok(data)
     }
 }
-pub fn merge_stakes_ix<K: Into<MergeStakesKeys>, A: Into<MergeStakesIxArgs>>(
-    accounts: K,
-    args: A,
+pub fn merge_stakes_ix(
+    keys: MergeStakesKeys,
+    args: MergeStakesIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: MergeStakesKeys = accounts.into();
     let metas: [AccountMeta; MERGE_STAKES_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: MergeStakesIxArgs = args.into();
-    let data: MergeStakesIxData = args_full.into();
+    let data: MergeStakesIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn merge_stakes_invoke<'info, A: Into<MergeStakesIxArgs>>(
+pub fn merge_stakes_invoke<'info>(
     accounts: MergeStakesAccounts<'_, 'info>,
-    args: A,
+    args: MergeStakesIxArgs,
 ) -> ProgramResult {
-    let ix = merge_stakes_ix(accounts, args)?;
+    let keys: MergeStakesKeys = accounts.into();
+    let ix = merge_stakes_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn merge_stakes_invoke_signed<'info, A: Into<MergeStakesIxArgs>>(
+pub fn merge_stakes_invoke_signed<'info>(
     accounts: MergeStakesAccounts<'_, 'info>,
-    args: A,
+    args: MergeStakesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = merge_stakes_ix(accounts, args)?;
+    let keys: MergeStakesKeys = accounts.into();
+    let ix = merge_stakes_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; MERGE_STAKES_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5426,7 +5631,7 @@ pub fn merge_stakes_verify_account_keys(
     }
     Ok(())
 }
-pub fn merge_stakes_verify_account_privileges<'me, 'info>(
+pub fn merge_stakes_verify_writable_privileges<'me, 'info>(
     accounts: MergeStakesAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -5441,5 +5646,11 @@ pub fn merge_stakes_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn merge_stakes_verify_account_privileges<'me, 'info>(
+    accounts: MergeStakesAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    merge_stakes_verify_writable_privileges(accounts)?;
     Ok(())
 }

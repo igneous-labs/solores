@@ -1,9 +1,5 @@
 #![cfg(feature = "test_gen_examples")]
 
-//! NB: Running these tests generate ~20GB of rust target/ output because
-//! we can't put the examples into the same workspace since they use
-//! different vers of borsh and solana
-
 use test_utils::{check_example, gen_example};
 
 const BASE_WORKSPACE_DEPS_ARGS: [&str; 14] = [

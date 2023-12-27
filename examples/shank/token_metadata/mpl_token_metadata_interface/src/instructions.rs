@@ -391,38 +391,35 @@ impl CreateMetadataAccountIxData {
         Ok(data)
     }
 }
-pub fn create_metadata_account_ix<
-    K: Into<CreateMetadataAccountKeys>,
-    A: Into<CreateMetadataAccountIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn create_metadata_account_ix(
+    keys: CreateMetadataAccountKeys,
+    args: CreateMetadataAccountIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CreateMetadataAccountKeys = accounts.into();
     let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CreateMetadataAccountIxArgs = args.into();
-    let data: CreateMetadataAccountIxData = args_full.into();
+    let data: CreateMetadataAccountIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_metadata_account_invoke<'info, A: Into<CreateMetadataAccountIxArgs>>(
+pub fn create_metadata_account_invoke<'info>(
     accounts: CreateMetadataAccountAccounts<'_, 'info>,
-    args: A,
+    args: CreateMetadataAccountIxArgs,
 ) -> ProgramResult {
-    let ix = create_metadata_account_ix(accounts, args)?;
+    let keys: CreateMetadataAccountKeys = accounts.into();
+    let ix = create_metadata_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn create_metadata_account_invoke_signed<'info, A: Into<CreateMetadataAccountIxArgs>>(
+pub fn create_metadata_account_invoke_signed<'info>(
     accounts: CreateMetadataAccountAccounts<'_, 'info>,
-    args: A,
+    args: CreateMetadataAccountIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = create_metadata_account_ix(accounts, args)?;
+    let keys: CreateMetadataAccountKeys = accounts.into();
+    let ix = create_metadata_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -446,7 +443,7 @@ pub fn create_metadata_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn create_metadata_account_verify_account_privileges<'me, 'info>(
+pub fn create_metadata_account_verify_writable_privileges<'me, 'info>(
     accounts: CreateMetadataAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -454,11 +451,23 @@ pub fn create_metadata_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn create_metadata_account_verify_signer_privileges<'me, 'info>(
+    accounts: CreateMetadataAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.mint_authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn create_metadata_account_verify_account_privileges<'me, 'info>(
+    accounts: CreateMetadataAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    create_metadata_account_verify_writable_privileges(accounts)?;
+    create_metadata_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN: usize = 2;
@@ -565,38 +574,35 @@ impl UpdateMetadataAccountIxData {
         Ok(data)
     }
 }
-pub fn update_metadata_account_ix<
-    K: Into<UpdateMetadataAccountKeys>,
-    A: Into<UpdateMetadataAccountIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_metadata_account_ix(
+    keys: UpdateMetadataAccountKeys,
+    args: UpdateMetadataAccountIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateMetadataAccountKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateMetadataAccountIxArgs = args.into();
-    let data: UpdateMetadataAccountIxData = args_full.into();
+    let data: UpdateMetadataAccountIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_metadata_account_invoke<'info, A: Into<UpdateMetadataAccountIxArgs>>(
+pub fn update_metadata_account_invoke<'info>(
     accounts: UpdateMetadataAccountAccounts<'_, 'info>,
-    args: A,
+    args: UpdateMetadataAccountIxArgs,
 ) -> ProgramResult {
-    let ix = update_metadata_account_ix(accounts, args)?;
+    let keys: UpdateMetadataAccountKeys = accounts.into();
+    let ix = update_metadata_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_metadata_account_invoke_signed<'info, A: Into<UpdateMetadataAccountIxArgs>>(
+pub fn update_metadata_account_invoke_signed<'info>(
     accounts: UpdateMetadataAccountAccounts<'_, 'info>,
-    args: A,
+    args: UpdateMetadataAccountIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_metadata_account_ix(accounts, args)?;
+    let keys: UpdateMetadataAccountKeys = accounts.into();
+    let ix = update_metadata_account_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -615,7 +621,7 @@ pub fn update_metadata_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_metadata_account_verify_account_privileges<'me, 'info>(
+pub fn update_metadata_account_verify_writable_privileges<'me, 'info>(
     accounts: UpdateMetadataAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -623,11 +629,23 @@ pub fn update_metadata_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_metadata_account_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateMetadataAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.update_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_metadata_account_verify_account_privileges<'me, 'info>(
+    accounts: UpdateMetadataAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_metadata_account_verify_writable_privileges(accounts)?;
+    update_metadata_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 13;
@@ -894,44 +912,35 @@ impl DeprecatedCreateMasterEditionIxData {
         Ok(data)
     }
 }
-pub fn deprecated_create_master_edition_ix<
-    K: Into<DeprecatedCreateMasterEditionKeys>,
-    A: Into<DeprecatedCreateMasterEditionIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deprecated_create_master_edition_ix(
+    keys: DeprecatedCreateMasterEditionKeys,
+    args: DeprecatedCreateMasterEditionIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DeprecatedCreateMasterEditionIxArgs = args.into();
-    let data: DeprecatedCreateMasterEditionIxData = args_full.into();
+    let data: DeprecatedCreateMasterEditionIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_create_master_edition_invoke<
-    'info,
-    A: Into<DeprecatedCreateMasterEditionIxArgs>,
->(
+pub fn deprecated_create_master_edition_invoke<'info>(
     accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedCreateMasterEditionIxArgs,
 ) -> ProgramResult {
-    let ix = deprecated_create_master_edition_ix(accounts, args)?;
+    let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
+    let ix = deprecated_create_master_edition_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_create_master_edition_invoke_signed<
-    'info,
-    A: Into<DeprecatedCreateMasterEditionIxArgs>,
->(
+pub fn deprecated_create_master_edition_invoke_signed<'info>(
     accounts: DeprecatedCreateMasterEditionAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedCreateMasterEditionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_create_master_edition_ix(accounts, args)?;
+    let keys: DeprecatedCreateMasterEditionKeys = accounts.into();
+    let ix = deprecated_create_master_edition_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -970,7 +979,7 @@ pub fn deprecated_create_master_edition_verify_account_keys(
     }
     Ok(())
 }
-pub fn deprecated_create_master_edition_verify_account_privileges<'me, 'info>(
+pub fn deprecated_create_master_edition_verify_writable_privileges<'me, 'info>(
     accounts: DeprecatedCreateMasterEditionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -983,6 +992,11 @@ pub fn deprecated_create_master_edition_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_create_master_edition_verify_signer_privileges<'me, 'info>(
+    accounts: DeprecatedCreateMasterEditionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.update_authority,
         accounts.printing_mint_authority,
@@ -994,6 +1008,13 @@ pub fn deprecated_create_master_edition_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_create_master_edition_verify_account_privileges<'me, 'info>(
+    accounts: DeprecatedCreateMasterEditionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_create_master_edition_verify_writable_privileges(accounts)?;
+    deprecated_create_master_edition_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN:
@@ -1302,12 +1323,9 @@ impl DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
-    K: Into<DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys>,
->(
-    accounts: K,
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(
+    keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
     let metas: [AccountMeta;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         keys.into();
@@ -1320,7 +1338,8 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_ix<
 pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke<'info>(
     accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
+    let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
@@ -1330,7 +1349,8 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_invoke
     accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(accounts)?;
+    let keys: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenKeys = accounts.into();
+    let ix = deprecated_mint_new_edition_from_master_edition_via_printing_token_ix(keys)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_PRINTING_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
@@ -1370,7 +1390,7 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify
     }
     Ok(())
 }
-pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_privileges<
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_writable_privileges<
     'me,
     'info,
 >(
@@ -1390,6 +1410,14 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_signer_privileges<
+    'me,
+    'info,
+>(
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.mint_authority,
         accounts.burn_authority,
@@ -1399,6 +1427,20 @@ pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_account_privileges<
+    'me,
+    'info,
+>(
+    accounts: DeprecatedMintNewEditionFromMasterEditionViaPrintingTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_writable_privileges(
+        accounts,
+    )?;
+    deprecated_mint_new_edition_from_master_edition_via_printing_token_verify_signer_privileges(
+        accounts,
+    )?;
     Ok(())
 }
 pub const UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 3;
@@ -1519,10 +1561,9 @@ impl UpdatePrimarySaleHappenedViaTokenIxData {
         Ok(data)
     }
 }
-pub fn update_primary_sale_happened_via_token_ix<K: Into<UpdatePrimarySaleHappenedViaTokenKeys>>(
-    accounts: K,
+pub fn update_primary_sale_happened_via_token_ix(
+    keys: UpdatePrimarySaleHappenedViaTokenKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
     let metas: [AccountMeta; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -1533,7 +1574,8 @@ pub fn update_primary_sale_happened_via_token_ix<K: Into<UpdatePrimarySaleHappen
 pub fn update_primary_sale_happened_via_token_invoke<'info>(
     accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = update_primary_sale_happened_via_token_ix(accounts)?;
+    let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
+    let ix = update_primary_sale_happened_via_token_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -1542,7 +1584,8 @@ pub fn update_primary_sale_happened_via_token_invoke_signed<'info>(
     accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_primary_sale_happened_via_token_ix(accounts)?;
+    let keys: UpdatePrimarySaleHappenedViaTokenKeys = accounts.into();
+    let ix = update_primary_sale_happened_via_token_ix(keys)?;
     let account_info: [AccountInfo<'info>; UPDATE_PRIMARY_SALE_HAPPENED_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -1562,7 +1605,7 @@ pub fn update_primary_sale_happened_via_token_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_primary_sale_happened_via_token_verify_account_privileges<'me, 'info>(
+pub fn update_primary_sale_happened_via_token_verify_writable_privileges<'me, 'info>(
     accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -1570,11 +1613,23 @@ pub fn update_primary_sale_happened_via_token_verify_account_privileges<'me, 'in
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_primary_sale_happened_via_token_verify_signer_privileges<'me, 'info>(
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.owner] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_primary_sale_happened_via_token_verify_account_privileges<'me, 'info>(
+    accounts: UpdatePrimarySaleHappenedViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_primary_sale_happened_via_token_verify_writable_privileges(accounts)?;
+    update_primary_sale_happened_via_token_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 3;
@@ -1705,44 +1760,35 @@ impl DeprecatedSetReservationListIxData {
         Ok(data)
     }
 }
-pub fn deprecated_set_reservation_list_ix<
-    K: Into<DeprecatedSetReservationListKeys>,
-    A: Into<DeprecatedSetReservationListIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deprecated_set_reservation_list_ix(
+    keys: DeprecatedSetReservationListKeys,
+    args: DeprecatedSetReservationListIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedSetReservationListKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DeprecatedSetReservationListIxArgs = args.into();
-    let data: DeprecatedSetReservationListIxData = args_full.into();
+    let data: DeprecatedSetReservationListIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_set_reservation_list_invoke<
-    'info,
-    A: Into<DeprecatedSetReservationListIxArgs>,
->(
+pub fn deprecated_set_reservation_list_invoke<'info>(
     accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedSetReservationListIxArgs,
 ) -> ProgramResult {
-    let ix = deprecated_set_reservation_list_ix(accounts, args)?;
+    let keys: DeprecatedSetReservationListKeys = accounts.into();
+    let ix = deprecated_set_reservation_list_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_set_reservation_list_invoke_signed<
-    'info,
-    A: Into<DeprecatedSetReservationListIxArgs>,
->(
+pub fn deprecated_set_reservation_list_invoke_signed<'info>(
     accounts: DeprecatedSetReservationListAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedSetReservationListIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_set_reservation_list_ix(accounts, args)?;
+    let keys: DeprecatedSetReservationListKeys = accounts.into();
+    let ix = deprecated_set_reservation_list_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_SET_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -1762,7 +1808,7 @@ pub fn deprecated_set_reservation_list_verify_account_keys(
     }
     Ok(())
 }
-pub fn deprecated_set_reservation_list_verify_account_privileges<'me, 'info>(
+pub fn deprecated_set_reservation_list_verify_writable_privileges<'me, 'info>(
     accounts: DeprecatedSetReservationListAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.master_edition, accounts.reservation_list] {
@@ -1770,11 +1816,23 @@ pub fn deprecated_set_reservation_list_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_set_reservation_list_verify_signer_privileges<'me, 'info>(
+    accounts: DeprecatedSetReservationListAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.resource] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_set_reservation_list_verify_account_privileges<'me, 'info>(
+    accounts: DeprecatedSetReservationListAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_set_reservation_list_verify_writable_privileges(accounts)?;
+    deprecated_set_reservation_list_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN: usize = 8;
@@ -1957,10 +2015,9 @@ impl DeprecatedCreateReservationListIxData {
         Ok(data)
     }
 }
-pub fn deprecated_create_reservation_list_ix<K: Into<DeprecatedCreateReservationListKeys>>(
-    accounts: K,
+pub fn deprecated_create_reservation_list_ix(
+    keys: DeprecatedCreateReservationListKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedCreateReservationListKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -1971,7 +2028,8 @@ pub fn deprecated_create_reservation_list_ix<K: Into<DeprecatedCreateReservation
 pub fn deprecated_create_reservation_list_invoke<'info>(
     accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = deprecated_create_reservation_list_ix(accounts)?;
+    let keys: DeprecatedCreateReservationListKeys = accounts.into();
+    let ix = deprecated_create_reservation_list_ix(keys)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -1980,7 +2038,8 @@ pub fn deprecated_create_reservation_list_invoke_signed<'info>(
     accounts: DeprecatedCreateReservationListAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_create_reservation_list_ix(accounts)?;
+    let keys: DeprecatedCreateReservationListKeys = accounts.into();
+    let ix = deprecated_create_reservation_list_ix(keys)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_CREATE_RESERVATION_LIST_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2005,7 +2064,7 @@ pub fn deprecated_create_reservation_list_verify_account_keys(
     }
     Ok(())
 }
-pub fn deprecated_create_reservation_list_verify_account_privileges<'me, 'info>(
+pub fn deprecated_create_reservation_list_verify_writable_privileges<'me, 'info>(
     accounts: DeprecatedCreateReservationListAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.reservation_list] {
@@ -2013,11 +2072,23 @@ pub fn deprecated_create_reservation_list_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_create_reservation_list_verify_signer_privileges<'me, 'info>(
+    accounts: DeprecatedCreateReservationListAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.payer, accounts.update_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_create_reservation_list_verify_account_privileges<'me, 'info>(
+    accounts: DeprecatedCreateReservationListAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_create_reservation_list_verify_writable_privileges(accounts)?;
+    deprecated_create_reservation_list_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SIGN_METADATA_IX_ACCOUNTS_LEN: usize = 2;
@@ -2113,8 +2184,7 @@ impl SignMetadataIxData {
         Ok(data)
     }
 }
-pub fn sign_metadata_ix<K: Into<SignMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: SignMetadataKeys = accounts.into();
+pub fn sign_metadata_ix(keys: SignMetadataKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; SIGN_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -2123,7 +2193,8 @@ pub fn sign_metadata_ix<K: Into<SignMetadataKeys>>(accounts: K) -> std::io::Resu
     })
 }
 pub fn sign_metadata_invoke<'info>(accounts: SignMetadataAccounts<'_, 'info>) -> ProgramResult {
-    let ix = sign_metadata_ix(accounts)?;
+    let keys: SignMetadataKeys = accounts.into();
+    let ix = sign_metadata_ix(keys)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -2131,7 +2202,8 @@ pub fn sign_metadata_invoke_signed<'info>(
     accounts: SignMetadataAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = sign_metadata_ix(accounts)?;
+    let keys: SignMetadataKeys = accounts.into();
+    let ix = sign_metadata_ix(keys)?;
     let account_info: [AccountInfo<'info>; SIGN_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2149,7 +2221,7 @@ pub fn sign_metadata_verify_account_keys(
     }
     Ok(())
 }
-pub fn sign_metadata_verify_account_privileges<'me, 'info>(
+pub fn sign_metadata_verify_writable_privileges<'me, 'info>(
     accounts: SignMetadataAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -2157,11 +2229,23 @@ pub fn sign_metadata_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn sign_metadata_verify_signer_privileges<'me, 'info>(
+    accounts: SignMetadataAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.creator] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn sign_metadata_verify_account_privileges<'me, 'info>(
+    accounts: SignMetadataAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    sign_metadata_verify_writable_privileges(accounts)?;
+    sign_metadata_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 9;
@@ -2379,45 +2463,36 @@ impl DeprecatedMintPrintingTokensViaTokenIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_printing_tokens_via_token_ix<
-    K: Into<DeprecatedMintPrintingTokensViaTokenKeys>,
-    A: Into<DeprecatedMintPrintingTokensViaTokenIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deprecated_mint_printing_tokens_via_token_ix(
+    keys: DeprecatedMintPrintingTokensViaTokenKeys,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: DeprecatedMintPrintingTokensViaTokenIxArgs = args.into();
-    let data: DeprecatedMintPrintingTokensViaTokenIxData = args_full.into();
+    let data: DeprecatedMintPrintingTokensViaTokenIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_printing_tokens_via_token_invoke<
-    'info,
-    A: Into<DeprecatedMintPrintingTokensViaTokenIxArgs>,
->(
+pub fn deprecated_mint_printing_tokens_via_token_invoke<'info>(
     accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
 ) -> ProgramResult {
-    let ix = deprecated_mint_printing_tokens_via_token_ix(accounts, args)?;
+    let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
+    let ix = deprecated_mint_printing_tokens_via_token_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<
-    'info,
-    A: Into<DeprecatedMintPrintingTokensViaTokenIxArgs>,
->(
+pub fn deprecated_mint_printing_tokens_via_token_invoke_signed<'info>(
     accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedMintPrintingTokensViaTokenIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_mint_printing_tokens_via_token_ix(accounts, args)?;
+    let keys: DeprecatedMintPrintingTokensViaTokenKeys = accounts.into();
+    let ix = deprecated_mint_printing_tokens_via_token_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         DEPRECATED_MINT_PRINTING_TOKENS_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2446,7 +2521,7 @@ pub fn deprecated_mint_printing_tokens_via_token_verify_account_keys(
     }
     Ok(())
 }
-pub fn deprecated_mint_printing_tokens_via_token_verify_account_privileges<'me, 'info>(
+pub fn deprecated_mint_printing_tokens_via_token_verify_writable_privileges<'me, 'info>(
     accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -2459,11 +2534,23 @@ pub fn deprecated_mint_printing_tokens_via_token_verify_account_privileges<'me, 
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_via_token_verify_signer_privileges<'me, 'info>(
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.burn_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_via_token_verify_account_privileges<'me, 'info>(
+    accounts: DeprecatedMintPrintingTokensViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_mint_printing_tokens_via_token_verify_writable_privileges(accounts)?;
+    deprecated_mint_printing_tokens_via_token_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN: usize = 7;
@@ -2646,44 +2733,35 @@ impl DeprecatedMintPrintingTokensIxData {
         Ok(data)
     }
 }
-pub fn deprecated_mint_printing_tokens_ix<
-    K: Into<DeprecatedMintPrintingTokensKeys>,
-    A: Into<DeprecatedMintPrintingTokensIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn deprecated_mint_printing_tokens_ix(
+    keys: DeprecatedMintPrintingTokensKeys,
+    args: DeprecatedMintPrintingTokensIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
     let metas: [AccountMeta; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: DeprecatedMintPrintingTokensIxArgs = args.into();
-    let data: DeprecatedMintPrintingTokensIxData = args_full.into();
+    let data: DeprecatedMintPrintingTokensIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn deprecated_mint_printing_tokens_invoke<
-    'info,
-    A: Into<DeprecatedMintPrintingTokensIxArgs>,
->(
+pub fn deprecated_mint_printing_tokens_invoke<'info>(
     accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedMintPrintingTokensIxArgs,
 ) -> ProgramResult {
-    let ix = deprecated_mint_printing_tokens_ix(accounts, args)?;
+    let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
+    let ix = deprecated_mint_printing_tokens_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn deprecated_mint_printing_tokens_invoke_signed<
-    'info,
-    A: Into<DeprecatedMintPrintingTokensIxArgs>,
->(
+pub fn deprecated_mint_printing_tokens_invoke_signed<'info>(
     accounts: DeprecatedMintPrintingTokensAccounts<'_, 'info>,
-    args: A,
+    args: DeprecatedMintPrintingTokensIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = deprecated_mint_printing_tokens_ix(accounts, args)?;
+    let keys: DeprecatedMintPrintingTokensKeys = accounts.into();
+    let ix = deprecated_mint_printing_tokens_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; DEPRECATED_MINT_PRINTING_TOKENS_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -2707,7 +2785,7 @@ pub fn deprecated_mint_printing_tokens_verify_account_keys(
     }
     Ok(())
 }
-pub fn deprecated_mint_printing_tokens_verify_account_privileges<'me, 'info>(
+pub fn deprecated_mint_printing_tokens_verify_writable_privileges<'me, 'info>(
     accounts: DeprecatedMintPrintingTokensAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.destination, accounts.printing_mint] {
@@ -2715,11 +2793,23 @@ pub fn deprecated_mint_printing_tokens_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_verify_signer_privileges<'me, 'info>(
+    accounts: DeprecatedMintPrintingTokensAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.update_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn deprecated_mint_printing_tokens_verify_account_privileges<'me, 'info>(
+    accounts: DeprecatedMintPrintingTokensAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    deprecated_mint_printing_tokens_verify_writable_privileges(accounts)?;
+    deprecated_mint_printing_tokens_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN: usize = 9;
@@ -2920,37 +3010,34 @@ impl CreateMasterEditionIxData {
         Ok(data)
     }
 }
-pub fn create_master_edition_ix<
-    K: Into<CreateMasterEditionKeys>,
-    A: Into<CreateMasterEditionIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn create_master_edition_ix(
+    keys: CreateMasterEditionKeys,
+    args: CreateMasterEditionIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CreateMasterEditionKeys = accounts.into();
     let metas: [AccountMeta; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CreateMasterEditionIxArgs = args.into();
-    let data: CreateMasterEditionIxData = args_full.into();
+    let data: CreateMasterEditionIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_master_edition_invoke<'info, A: Into<CreateMasterEditionIxArgs>>(
+pub fn create_master_edition_invoke<'info>(
     accounts: CreateMasterEditionAccounts<'_, 'info>,
-    args: A,
+    args: CreateMasterEditionIxArgs,
 ) -> ProgramResult {
-    let ix = create_master_edition_ix(accounts, args)?;
+    let keys: CreateMasterEditionKeys = accounts.into();
+    let ix = create_master_edition_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn create_master_edition_invoke_signed<'info, A: Into<CreateMasterEditionIxArgs>>(
+pub fn create_master_edition_invoke_signed<'info>(
     accounts: CreateMasterEditionAccounts<'_, 'info>,
-    args: A,
+    args: CreateMasterEditionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = create_master_edition_ix(accounts, args)?;
+    let keys: CreateMasterEditionKeys = accounts.into();
+    let ix = create_master_edition_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -2975,7 +3062,7 @@ pub fn create_master_edition_verify_account_keys(
     }
     Ok(())
 }
-pub fn create_master_edition_verify_account_privileges<'me, 'info>(
+pub fn create_master_edition_verify_writable_privileges<'me, 'info>(
     accounts: CreateMasterEditionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.edition, accounts.mint] {
@@ -2983,6 +3070,11 @@ pub fn create_master_edition_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn create_master_edition_verify_signer_privileges<'me, 'info>(
+    accounts: CreateMasterEditionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.update_authority,
         accounts.mint_authority,
@@ -2992,6 +3084,13 @@ pub fn create_master_edition_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn create_master_edition_verify_account_privileges<'me, 'info>(
+    accounts: CreateMasterEditionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    create_master_edition_verify_writable_privileges(accounts)?;
+    create_master_edition_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN: usize = 14;
@@ -3276,45 +3375,36 @@ impl MintNewEditionFromMasterEditionViaTokenIxData {
         Ok(data)
     }
 }
-pub fn mint_new_edition_from_master_edition_via_token_ix<
-    K: Into<MintNewEditionFromMasterEditionViaTokenKeys>,
-    A: Into<MintNewEditionFromMasterEditionViaTokenIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn mint_new_edition_from_master_edition_via_token_ix(
+    keys: MintNewEditionFromMasterEditionViaTokenKeys,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
     let metas: [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: MintNewEditionFromMasterEditionViaTokenIxArgs = args.into();
-    let data: MintNewEditionFromMasterEditionViaTokenIxData = args_full.into();
+    let data: MintNewEditionFromMasterEditionViaTokenIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn mint_new_edition_from_master_edition_via_token_invoke<
-    'info,
-    A: Into<MintNewEditionFromMasterEditionViaTokenIxArgs>,
->(
+pub fn mint_new_edition_from_master_edition_via_token_invoke<'info>(
     accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
-    args: A,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
 ) -> ProgramResult {
-    let ix = mint_new_edition_from_master_edition_via_token_ix(accounts, args)?;
+    let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
+    let ix = mint_new_edition_from_master_edition_via_token_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<
-    'info,
-    A: Into<MintNewEditionFromMasterEditionViaTokenIxArgs>,
->(
+pub fn mint_new_edition_from_master_edition_via_token_invoke_signed<'info>(
     accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'_, 'info>,
-    args: A,
+    args: MintNewEditionFromMasterEditionViaTokenIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = mint_new_edition_from_master_edition_via_token_ix(accounts, args)?;
+    let keys: MintNewEditionFromMasterEditionViaTokenKeys = accounts.into();
+    let ix = mint_new_edition_from_master_edition_via_token_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_TOKEN_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3348,7 +3438,7 @@ pub fn mint_new_edition_from_master_edition_via_token_verify_account_keys(
     }
     Ok(())
 }
-pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges<'me, 'info>(
+pub fn mint_new_edition_from_master_edition_via_token_verify_writable_privileges<'me, 'info>(
     accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3362,6 +3452,11 @@ pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges<
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_token_verify_signer_privileges<'me, 'info>(
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.new_mint_authority,
         accounts.payer,
@@ -3371,6 +3466,13 @@ pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges<
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_token_verify_account_privileges<'me, 'info>(
+    accounts: MintNewEditionFromMasterEditionViaTokenAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    mint_new_edition_from_master_edition_via_token_verify_writable_privileges(accounts)?;
+    mint_new_edition_from_master_edition_via_token_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN: usize = 3;
@@ -3488,10 +3590,9 @@ impl ConvertMasterEditionV1ToV2IxData {
         Ok(data)
     }
 }
-pub fn convert_master_edition_v1_to_v2_ix<K: Into<ConvertMasterEditionV1ToV2Keys>>(
-    accounts: K,
+pub fn convert_master_edition_v1_to_v2_ix(
+    keys: ConvertMasterEditionV1ToV2Keys,
 ) -> std::io::Result<Instruction> {
-    let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
     let metas: [AccountMeta; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -3502,7 +3603,8 @@ pub fn convert_master_edition_v1_to_v2_ix<K: Into<ConvertMasterEditionV1ToV2Keys
 pub fn convert_master_edition_v1_to_v2_invoke<'info>(
     accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
+    let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
+    let ix = convert_master_edition_v1_to_v2_ix(keys)?;
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -3511,7 +3613,8 @@ pub fn convert_master_edition_v1_to_v2_invoke_signed<'info>(
     accounts: ConvertMasterEditionV1ToV2Accounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = convert_master_edition_v1_to_v2_ix(accounts)?;
+    let keys: ConvertMasterEditionV1ToV2Keys = accounts.into();
+    let ix = convert_master_edition_v1_to_v2_ix(keys)?;
     let account_info: [AccountInfo<'info>; CONVERT_MASTER_EDITION_V1_TO_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3531,7 +3634,7 @@ pub fn convert_master_edition_v1_to_v2_verify_account_keys(
     }
     Ok(())
 }
-pub fn convert_master_edition_v1_to_v2_verify_account_privileges<'me, 'info>(
+pub fn convert_master_edition_v1_to_v2_verify_writable_privileges<'me, 'info>(
     accounts: ConvertMasterEditionV1ToV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -3543,6 +3646,12 @@ pub fn convert_master_edition_v1_to_v2_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn convert_master_edition_v1_to_v2_verify_account_privileges<'me, 'info>(
+    accounts: ConvertMasterEditionV1ToV2Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    convert_master_edition_v1_to_v2_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN: usize = 17;
@@ -3868,45 +3977,36 @@ impl MintNewEditionFromMasterEditionViaVaultProxyIxData {
         Ok(data)
     }
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix<
-    K: Into<MintNewEditionFromMasterEditionViaVaultProxyKeys>,
-    A: Into<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_ix(
+    keys: MintNewEditionFromMasterEditionViaVaultProxyKeys,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
     let metas: [AccountMeta; MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] =
         keys.into();
-    let args_full: MintNewEditionFromMasterEditionViaVaultProxyIxArgs = args.into();
-    let data: MintNewEditionFromMasterEditionViaVaultProxyIxData = args_full.into();
+    let data: MintNewEditionFromMasterEditionViaVaultProxyIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke<
-    'info,
-    A: Into<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>,
->(
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke<'info>(
     accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
-    args: A,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
 ) -> ProgramResult {
-    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(accounts, args)?;
+    let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
+    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<
-    'info,
-    A: Into<MintNewEditionFromMasterEditionViaVaultProxyIxArgs>,
->(
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_invoke_signed<'info>(
     accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'_, 'info>,
-    args: A,
+    args: MintNewEditionFromMasterEditionViaVaultProxyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(accounts, args)?;
+    let keys: MintNewEditionFromMasterEditionViaVaultProxyKeys = accounts.into();
+    let ix = mint_new_edition_from_master_edition_via_vault_proxy_ix(keys, args)?;
     let account_info: [AccountInfo<'info>;
         MINT_NEW_EDITION_FROM_MASTER_EDITION_VIA_VAULT_PROXY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -3946,7 +4046,7 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_keys(
     }
     Ok(())
 }
-pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privileges<
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_writable_privileges<
     'me,
     'info,
 >(
@@ -3963,6 +4063,11 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privi
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_signer_privileges<'me, 'info>(
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.new_mint_authority,
         accounts.payer,
@@ -3972,6 +4077,16 @@ pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privi
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn mint_new_edition_from_master_edition_via_vault_proxy_verify_account_privileges<
+    'me,
+    'info,
+>(
+    accounts: MintNewEditionFromMasterEditionViaVaultProxyAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    mint_new_edition_from_master_edition_via_vault_proxy_verify_writable_privileges(accounts)?;
+    mint_new_edition_from_master_edition_via_vault_proxy_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const PUFF_METADATA_IX_ACCOUNTS_LEN: usize = 1;
@@ -4051,8 +4166,7 @@ impl PuffMetadataIxData {
         Ok(data)
     }
 }
-pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>>(accounts: K) -> std::io::Result<Instruction> {
-    let keys: PuffMetadataKeys = accounts.into();
+pub fn puff_metadata_ix(keys: PuffMetadataKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; PUFF_METADATA_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -4061,7 +4175,8 @@ pub fn puff_metadata_ix<K: Into<PuffMetadataKeys>>(accounts: K) -> std::io::Resu
     })
 }
 pub fn puff_metadata_invoke<'info>(accounts: PuffMetadataAccounts<'_, 'info>) -> ProgramResult {
-    let ix = puff_metadata_ix(accounts)?;
+    let keys: PuffMetadataKeys = accounts.into();
+    let ix = puff_metadata_ix(keys)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -4069,7 +4184,8 @@ pub fn puff_metadata_invoke_signed<'info>(
     accounts: PuffMetadataAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = puff_metadata_ix(accounts)?;
+    let keys: PuffMetadataKeys = accounts.into();
+    let ix = puff_metadata_ix(keys)?;
     let account_info: [AccountInfo<'info>; PUFF_METADATA_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4084,7 +4200,7 @@ pub fn puff_metadata_verify_account_keys(
     }
     Ok(())
 }
-pub fn puff_metadata_verify_account_privileges<'me, 'info>(
+pub fn puff_metadata_verify_writable_privileges<'me, 'info>(
     accounts: PuffMetadataAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -4092,6 +4208,12 @@ pub fn puff_metadata_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn puff_metadata_verify_account_privileges<'me, 'info>(
+    accounts: PuffMetadataAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    puff_metadata_verify_writable_privileges(accounts)?;
     Ok(())
 }
 pub const UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 2;
@@ -4202,38 +4324,35 @@ impl UpdateMetadataAccountV2IxData {
         Ok(data)
     }
 }
-pub fn update_metadata_account_v2_ix<
-    K: Into<UpdateMetadataAccountV2Keys>,
-    A: Into<UpdateMetadataAccountV2IxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn update_metadata_account_v2_ix(
+    keys: UpdateMetadataAccountV2Keys,
+    args: UpdateMetadataAccountV2IxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: UpdateMetadataAccountV2Keys = accounts.into();
     let metas: [AccountMeta; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UpdateMetadataAccountV2IxArgs = args.into();
-    let data: UpdateMetadataAccountV2IxData = args_full.into();
+    let data: UpdateMetadataAccountV2IxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn update_metadata_account_v2_invoke<'info, A: Into<UpdateMetadataAccountV2IxArgs>>(
+pub fn update_metadata_account_v2_invoke<'info>(
     accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
-    args: A,
+    args: UpdateMetadataAccountV2IxArgs,
 ) -> ProgramResult {
-    let ix = update_metadata_account_v2_ix(accounts, args)?;
+    let keys: UpdateMetadataAccountV2Keys = accounts.into();
+    let ix = update_metadata_account_v2_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn update_metadata_account_v2_invoke_signed<'info, A: Into<UpdateMetadataAccountV2IxArgs>>(
+pub fn update_metadata_account_v2_invoke_signed<'info>(
     accounts: UpdateMetadataAccountV2Accounts<'_, 'info>,
-    args: A,
+    args: UpdateMetadataAccountV2IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = update_metadata_account_v2_ix(accounts, args)?;
+    let keys: UpdateMetadataAccountV2Keys = accounts.into();
+    let ix = update_metadata_account_v2_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UPDATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4252,7 +4371,7 @@ pub fn update_metadata_account_v2_verify_account_keys(
     }
     Ok(())
 }
-pub fn update_metadata_account_v2_verify_account_privileges<'me, 'info>(
+pub fn update_metadata_account_v2_verify_writable_privileges<'me, 'info>(
     accounts: UpdateMetadataAccountV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -4260,11 +4379,23 @@ pub fn update_metadata_account_v2_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn update_metadata_account_v2_verify_signer_privileges<'me, 'info>(
+    accounts: UpdateMetadataAccountV2Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.update_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn update_metadata_account_v2_verify_account_privileges<'me, 'info>(
+    accounts: UpdateMetadataAccountV2Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    update_metadata_account_v2_verify_writable_privileges(accounts)?;
+    update_metadata_account_v2_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN: usize = 7;
@@ -4443,38 +4574,35 @@ impl CreateMetadataAccountV2IxData {
         Ok(data)
     }
 }
-pub fn create_metadata_account_v2_ix<
-    K: Into<CreateMetadataAccountV2Keys>,
-    A: Into<CreateMetadataAccountV2IxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn create_metadata_account_v2_ix(
+    keys: CreateMetadataAccountV2Keys,
+    args: CreateMetadataAccountV2IxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CreateMetadataAccountV2Keys = accounts.into();
     let metas: [AccountMeta; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CreateMetadataAccountV2IxArgs = args.into();
-    let data: CreateMetadataAccountV2IxData = args_full.into();
+    let data: CreateMetadataAccountV2IxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_metadata_account_v2_invoke<'info, A: Into<CreateMetadataAccountV2IxArgs>>(
+pub fn create_metadata_account_v2_invoke<'info>(
     accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
-    args: A,
+    args: CreateMetadataAccountV2IxArgs,
 ) -> ProgramResult {
-    let ix = create_metadata_account_v2_ix(accounts, args)?;
+    let keys: CreateMetadataAccountV2Keys = accounts.into();
+    let ix = create_metadata_account_v2_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn create_metadata_account_v2_invoke_signed<'info, A: Into<CreateMetadataAccountV2IxArgs>>(
+pub fn create_metadata_account_v2_invoke_signed<'info>(
     accounts: CreateMetadataAccountV2Accounts<'_, 'info>,
-    args: A,
+    args: CreateMetadataAccountV2IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = create_metadata_account_v2_ix(accounts, args)?;
+    let keys: CreateMetadataAccountV2Keys = accounts.into();
+    let ix = create_metadata_account_v2_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_METADATA_ACCOUNT_V2_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4498,7 +4626,7 @@ pub fn create_metadata_account_v2_verify_account_keys(
     }
     Ok(())
 }
-pub fn create_metadata_account_v2_verify_account_privileges<'me, 'info>(
+pub fn create_metadata_account_v2_verify_writable_privileges<'me, 'info>(
     accounts: CreateMetadataAccountV2Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -4506,11 +4634,23 @@ pub fn create_metadata_account_v2_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn create_metadata_account_v2_verify_signer_privileges<'me, 'info>(
+    accounts: CreateMetadataAccountV2Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.mint_authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn create_metadata_account_v2_verify_account_privileges<'me, 'info>(
+    accounts: CreateMetadataAccountV2Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    create_metadata_account_v2_verify_writable_privileges(accounts)?;
+    create_metadata_account_v2_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN: usize = 9;
@@ -4711,38 +4851,35 @@ impl CreateMasterEditionV3IxData {
         Ok(data)
     }
 }
-pub fn create_master_edition_v3_ix<
-    K: Into<CreateMasterEditionV3Keys>,
-    A: Into<CreateMasterEditionV3IxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn create_master_edition_v3_ix(
+    keys: CreateMasterEditionV3Keys,
+    args: CreateMasterEditionV3IxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: CreateMasterEditionV3Keys = accounts.into();
     let metas: [AccountMeta; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: CreateMasterEditionV3IxArgs = args.into();
-    let data: CreateMasterEditionV3IxData = args_full.into();
+    let data: CreateMasterEditionV3IxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn create_master_edition_v3_invoke<'info, A: Into<CreateMasterEditionV3IxArgs>>(
+pub fn create_master_edition_v3_invoke<'info>(
     accounts: CreateMasterEditionV3Accounts<'_, 'info>,
-    args: A,
+    args: CreateMasterEditionV3IxArgs,
 ) -> ProgramResult {
-    let ix = create_master_edition_v3_ix(accounts, args)?;
+    let keys: CreateMasterEditionV3Keys = accounts.into();
+    let ix = create_master_edition_v3_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn create_master_edition_v3_invoke_signed<'info, A: Into<CreateMasterEditionV3IxArgs>>(
+pub fn create_master_edition_v3_invoke_signed<'info>(
     accounts: CreateMasterEditionV3Accounts<'_, 'info>,
-    args: A,
+    args: CreateMasterEditionV3IxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = create_master_edition_v3_ix(accounts, args)?;
+    let keys: CreateMasterEditionV3Keys = accounts.into();
+    let ix = create_master_edition_v3_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; CREATE_MASTER_EDITION_V3_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -4768,7 +4905,7 @@ pub fn create_master_edition_v3_verify_account_keys(
     }
     Ok(())
 }
-pub fn create_master_edition_v3_verify_account_privileges<'me, 'info>(
+pub fn create_master_edition_v3_verify_writable_privileges<'me, 'info>(
     accounts: CreateMasterEditionV3Accounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.edition, accounts.mint, accounts.metadata] {
@@ -4776,6 +4913,11 @@ pub fn create_master_edition_v3_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn create_master_edition_v3_verify_signer_privileges<'me, 'info>(
+    accounts: CreateMasterEditionV3Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [
         accounts.update_authority,
         accounts.mint_authority,
@@ -4785,6 +4927,13 @@ pub fn create_master_edition_v3_verify_account_privileges<'me, 'info>(
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn create_master_edition_v3_verify_account_privileges<'me, 'info>(
+    accounts: CreateMasterEditionV3Accounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    create_master_edition_v3_verify_writable_privileges(accounts)?;
+    create_master_edition_v3_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
@@ -4935,10 +5084,7 @@ impl VerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: VerifyCollectionKeys = accounts.into();
+pub fn verify_collection_ix(keys: VerifyCollectionKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -4949,7 +5095,8 @@ pub fn verify_collection_ix<K: Into<VerifyCollectionKeys>>(
 pub fn verify_collection_invoke<'info>(
     accounts: VerifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = verify_collection_ix(accounts)?;
+    let keys: VerifyCollectionKeys = accounts.into();
+    let ix = verify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -4957,7 +5104,8 @@ pub fn verify_collection_invoke_signed<'info>(
     accounts: VerifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = verify_collection_ix(accounts)?;
+    let keys: VerifyCollectionKeys = accounts.into();
+    let ix = verify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -4985,7 +5133,7 @@ pub fn verify_collection_verify_account_keys(
     }
     Ok(())
 }
-pub fn verify_collection_verify_account_privileges<'me, 'info>(
+pub fn verify_collection_verify_writable_privileges<'me, 'info>(
     accounts: VerifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -4993,11 +5141,23 @@ pub fn verify_collection_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn verify_collection_verify_signer_privileges<'me, 'info>(
+    accounts: VerifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.collection_authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn verify_collection_verify_account_privileges<'me, 'info>(
+    accounts: VerifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    verify_collection_verify_writable_privileges(accounts)?;
+    verify_collection_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UTILIZE_IX_ACCOUNTS_LEN: usize = 11;
@@ -5222,34 +5382,31 @@ impl UtilizeIxData {
         Ok(data)
     }
 }
-pub fn utilize_ix<K: Into<UtilizeKeys>, A: Into<UtilizeIxArgs>>(
-    accounts: K,
-    args: A,
-) -> std::io::Result<Instruction> {
-    let keys: UtilizeKeys = accounts.into();
+pub fn utilize_ix(keys: UtilizeKeys, args: UtilizeIxArgs) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UTILIZE_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: UtilizeIxArgs = args.into();
-    let data: UtilizeIxData = args_full.into();
+    let data: UtilizeIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn utilize_invoke<'info, A: Into<UtilizeIxArgs>>(
+pub fn utilize_invoke<'info>(
     accounts: UtilizeAccounts<'_, 'info>,
-    args: A,
+    args: UtilizeIxArgs,
 ) -> ProgramResult {
-    let ix = utilize_ix(accounts, args)?;
+    let keys: UtilizeKeys = accounts.into();
+    let ix = utilize_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn utilize_invoke_signed<'info, A: Into<UtilizeIxArgs>>(
+pub fn utilize_invoke_signed<'info>(
     accounts: UtilizeAccounts<'_, 'info>,
-    args: A,
+    args: UtilizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = utilize_ix(accounts, args)?;
+    let keys: UtilizeKeys = accounts.into();
+    let ix = utilize_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; UTILIZE_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5279,7 +5436,7 @@ pub fn utilize_verify_account_keys(
     }
     Ok(())
 }
-pub fn utilize_verify_account_privileges<'me, 'info>(
+pub fn utilize_verify_writable_privileges<'me, 'info>(
     accounts: UtilizeAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [
@@ -5292,11 +5449,23 @@ pub fn utilize_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn utilize_verify_signer_privileges<'me, 'info>(
+    accounts: UtilizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.use_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn utilize_verify_account_privileges<'me, 'info>(
+    accounts: UtilizeAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    utilize_verify_writable_privileges(accounts)?;
+    utilize_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 11;
@@ -5523,37 +5692,34 @@ impl ApproveUseAuthorityIxData {
         Ok(data)
     }
 }
-pub fn approve_use_authority_ix<
-    K: Into<ApproveUseAuthorityKeys>,
-    A: Into<ApproveUseAuthorityIxArgs>,
->(
-    accounts: K,
-    args: A,
+pub fn approve_use_authority_ix(
+    keys: ApproveUseAuthorityKeys,
+    args: ApproveUseAuthorityIxArgs,
 ) -> std::io::Result<Instruction> {
-    let keys: ApproveUseAuthorityKeys = accounts.into();
     let metas: [AccountMeta; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
-    let args_full: ApproveUseAuthorityIxArgs = args.into();
-    let data: ApproveUseAuthorityIxData = args_full.into();
+    let data: ApproveUseAuthorityIxData = args.into();
     Ok(Instruction {
         program_id: crate::ID,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn approve_use_authority_invoke<'info, A: Into<ApproveUseAuthorityIxArgs>>(
+pub fn approve_use_authority_invoke<'info>(
     accounts: ApproveUseAuthorityAccounts<'_, 'info>,
-    args: A,
+    args: ApproveUseAuthorityIxArgs,
 ) -> ProgramResult {
-    let ix = approve_use_authority_ix(accounts, args)?;
+    let keys: ApproveUseAuthorityKeys = accounts.into();
+    let ix = approve_use_authority_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
-pub fn approve_use_authority_invoke_signed<'info, A: Into<ApproveUseAuthorityIxArgs>>(
+pub fn approve_use_authority_invoke_signed<'info>(
     accounts: ApproveUseAuthorityAccounts<'_, 'info>,
-    args: A,
+    args: ApproveUseAuthorityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = approve_use_authority_ix(accounts, args)?;
+    let keys: ApproveUseAuthorityKeys = accounts.into();
+    let ix = approve_use_authority_ix(keys, args)?;
     let account_info: [AccountInfo<'info>; APPROVE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5583,7 +5749,7 @@ pub fn approve_use_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn approve_use_authority_verify_account_privileges<'me, 'info>(
+pub fn approve_use_authority_verify_writable_privileges<'me, 'info>(
     accounts: ApproveUseAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
@@ -5591,11 +5757,23 @@ pub fn approve_use_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn approve_use_authority_verify_signer_privileges<'me, 'info>(
+    accounts: ApproveUseAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.owner, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn approve_use_authority_verify_account_privileges<'me, 'info>(
+    accounts: ApproveUseAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    approve_use_authority_verify_writable_privileges(accounts)?;
+    approve_use_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN: usize = 9;
@@ -5785,10 +5963,7 @@ impl RevokeUseAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_use_authority_ix<K: Into<RevokeUseAuthorityKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: RevokeUseAuthorityKeys = accounts.into();
+pub fn revoke_use_authority_ix(keys: RevokeUseAuthorityKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -5799,7 +5974,8 @@ pub fn revoke_use_authority_ix<K: Into<RevokeUseAuthorityKeys>>(
 pub fn revoke_use_authority_invoke<'info>(
     accounts: RevokeUseAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = revoke_use_authority_ix(accounts)?;
+    let keys: RevokeUseAuthorityKeys = accounts.into();
+    let ix = revoke_use_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -5807,7 +5983,8 @@ pub fn revoke_use_authority_invoke_signed<'info>(
     accounts: RevokeUseAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revoke_use_authority_ix(accounts)?;
+    let keys: RevokeUseAuthorityKeys = accounts.into();
+    let ix = revoke_use_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVOKE_USE_AUTHORITY_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -5835,7 +6012,7 @@ pub fn revoke_use_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn revoke_use_authority_verify_account_privileges<'me, 'info>(
+pub fn revoke_use_authority_verify_writable_privileges<'me, 'info>(
     accounts: RevokeUseAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.use_authority_record, accounts.owner_token_account] {
@@ -5843,11 +6020,23 @@ pub fn revoke_use_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn revoke_use_authority_verify_signer_privileges<'me, 'info>(
+    accounts: RevokeUseAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.owner] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn revoke_use_authority_verify_account_privileges<'me, 'info>(
+    accounts: RevokeUseAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    revoke_use_authority_verify_writable_privileges(accounts)?;
+    revoke_use_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 6;
@@ -5998,10 +6187,7 @@ impl UnverifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn unverify_collection_ix<K: Into<UnverifyCollectionKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: UnverifyCollectionKeys = accounts.into();
+pub fn unverify_collection_ix(keys: UnverifyCollectionKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6012,7 +6198,8 @@ pub fn unverify_collection_ix<K: Into<UnverifyCollectionKeys>>(
 pub fn unverify_collection_invoke<'info>(
     accounts: UnverifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = unverify_collection_ix(accounts)?;
+    let keys: UnverifyCollectionKeys = accounts.into();
+    let ix = unverify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke(&ix, &account_info)
 }
@@ -6020,7 +6207,8 @@ pub fn unverify_collection_invoke_signed<'info>(
     accounts: UnverifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = unverify_collection_ix(accounts)?;
+    let keys: UnverifyCollectionKeys = accounts.into();
+    let ix = unverify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; UNVERIFY_COLLECTION_IX_ACCOUNTS_LEN] = accounts.into();
     invoke_signed(&ix, &account_info, seeds)
 }
@@ -6051,7 +6239,7 @@ pub fn unverify_collection_verify_account_keys(
     }
     Ok(())
 }
-pub fn unverify_collection_verify_account_privileges<'me, 'info>(
+pub fn unverify_collection_verify_writable_privileges<'me, 'info>(
     accounts: UnverifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -6059,11 +6247,23 @@ pub fn unverify_collection_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn unverify_collection_verify_signer_privileges<'me, 'info>(
+    accounts: UnverifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.collection_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn unverify_collection_verify_account_privileges<'me, 'info>(
+    accounts: UnverifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    unverify_collection_verify_writable_privileges(accounts)?;
+    unverify_collection_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 8;
@@ -6244,10 +6444,9 @@ impl ApproveCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn approve_collection_authority_ix<K: Into<ApproveCollectionAuthorityKeys>>(
-    accounts: K,
+pub fn approve_collection_authority_ix(
+    keys: ApproveCollectionAuthorityKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: ApproveCollectionAuthorityKeys = accounts.into();
     let metas: [AccountMeta; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6258,7 +6457,8 @@ pub fn approve_collection_authority_ix<K: Into<ApproveCollectionAuthorityKeys>>(
 pub fn approve_collection_authority_invoke<'info>(
     accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = approve_collection_authority_ix(accounts)?;
+    let keys: ApproveCollectionAuthorityKeys = accounts.into();
+    let ix = approve_collection_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -6267,7 +6467,8 @@ pub fn approve_collection_authority_invoke_signed<'info>(
     accounts: ApproveCollectionAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = approve_collection_authority_ix(accounts)?;
+    let keys: ApproveCollectionAuthorityKeys = accounts.into();
+    let ix = approve_collection_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; APPROVE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6298,7 +6499,7 @@ pub fn approve_collection_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn approve_collection_authority_verify_account_privileges<'me, 'info>(
+pub fn approve_collection_authority_verify_writable_privileges<'me, 'info>(
     accounts: ApproveCollectionAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.collection_authority_record] {
@@ -6306,11 +6507,23 @@ pub fn approve_collection_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn approve_collection_authority_verify_signer_privileges<'me, 'info>(
+    accounts: ApproveCollectionAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.update_authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn approve_collection_authority_verify_account_privileges<'me, 'info>(
+    accounts: ApproveCollectionAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    approve_collection_authority_verify_writable_privileges(accounts)?;
+    approve_collection_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN: usize = 4;
@@ -6437,10 +6650,9 @@ impl RevokeCollectionAuthorityIxData {
         Ok(data)
     }
 }
-pub fn revoke_collection_authority_ix<K: Into<RevokeCollectionAuthorityKeys>>(
-    accounts: K,
+pub fn revoke_collection_authority_ix(
+    keys: RevokeCollectionAuthorityKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: RevokeCollectionAuthorityKeys = accounts.into();
     let metas: [AccountMeta; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6451,7 +6663,8 @@ pub fn revoke_collection_authority_ix<K: Into<RevokeCollectionAuthorityKeys>>(
 pub fn revoke_collection_authority_invoke<'info>(
     accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = revoke_collection_authority_ix(accounts)?;
+    let keys: RevokeCollectionAuthorityKeys = accounts.into();
+    let ix = revoke_collection_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -6460,7 +6673,8 @@ pub fn revoke_collection_authority_invoke_signed<'info>(
     accounts: RevokeCollectionAuthorityAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = revoke_collection_authority_ix(accounts)?;
+    let keys: RevokeCollectionAuthorityKeys = accounts.into();
+    let ix = revoke_collection_authority_ix(keys)?;
     let account_info: [AccountInfo<'info>; REVOKE_COLLECTION_AUTHORITY_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6484,7 +6698,7 @@ pub fn revoke_collection_authority_verify_account_keys(
     }
     Ok(())
 }
-pub fn revoke_collection_authority_verify_account_privileges<'me, 'info>(
+pub fn revoke_collection_authority_verify_writable_privileges<'me, 'info>(
     accounts: RevokeCollectionAuthorityAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.collection_authority_record] {
@@ -6492,11 +6706,23 @@ pub fn revoke_collection_authority_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn revoke_collection_authority_verify_signer_privileges<'me, 'info>(
+    accounts: RevokeCollectionAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.update_authority] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn revoke_collection_authority_verify_account_privileges<'me, 'info>(
+    accounts: RevokeCollectionAuthorityAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    revoke_collection_authority_verify_writable_privileges(accounts)?;
+    revoke_collection_authority_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN: usize = 8;
@@ -6673,10 +6899,9 @@ impl SetAndVerifyCollectionIxData {
         Ok(data)
     }
 }
-pub fn set_and_verify_collection_ix<K: Into<SetAndVerifyCollectionKeys>>(
-    accounts: K,
+pub fn set_and_verify_collection_ix(
+    keys: SetAndVerifyCollectionKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: SetAndVerifyCollectionKeys = accounts.into();
     let metas: [AccountMeta; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6687,7 +6912,8 @@ pub fn set_and_verify_collection_ix<K: Into<SetAndVerifyCollectionKeys>>(
 pub fn set_and_verify_collection_invoke<'info>(
     accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = set_and_verify_collection_ix(accounts)?;
+    let keys: SetAndVerifyCollectionKeys = accounts.into();
+    let ix = set_and_verify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -6696,7 +6922,8 @@ pub fn set_and_verify_collection_invoke_signed<'info>(
     accounts: SetAndVerifyCollectionAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = set_and_verify_collection_ix(accounts)?;
+    let keys: SetAndVerifyCollectionKeys = accounts.into();
+    let ix = set_and_verify_collection_ix(keys)?;
     let account_info: [AccountInfo<'info>; SET_AND_VERIFY_COLLECTION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6730,7 +6957,7 @@ pub fn set_and_verify_collection_verify_account_keys(
     }
     Ok(())
 }
-pub fn set_and_verify_collection_verify_account_privileges<'me, 'info>(
+pub fn set_and_verify_collection_verify_writable_privileges<'me, 'info>(
     accounts: SetAndVerifyCollectionAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -6738,11 +6965,23 @@ pub fn set_and_verify_collection_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn set_and_verify_collection_verify_signer_privileges<'me, 'info>(
+    accounts: SetAndVerifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.collection_authority, accounts.payer] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn set_and_verify_collection_verify_account_privileges<'me, 'info>(
+    accounts: SetAndVerifyCollectionAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    set_and_verify_collection_verify_writable_privileges(accounts)?;
+    set_and_verify_collection_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
@@ -6880,10 +7119,9 @@ impl FreezeDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn freeze_delegated_account_ix<K: Into<FreezeDelegatedAccountKeys>>(
-    accounts: K,
+pub fn freeze_delegated_account_ix(
+    keys: FreezeDelegatedAccountKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: FreezeDelegatedAccountKeys = accounts.into();
     let metas: [AccountMeta; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -6894,7 +7132,8 @@ pub fn freeze_delegated_account_ix<K: Into<FreezeDelegatedAccountKeys>>(
 pub fn freeze_delegated_account_invoke<'info>(
     accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = freeze_delegated_account_ix(accounts)?;
+    let keys: FreezeDelegatedAccountKeys = accounts.into();
+    let ix = freeze_delegated_account_ix(keys)?;
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -6903,7 +7142,8 @@ pub fn freeze_delegated_account_invoke_signed<'info>(
     accounts: FreezeDelegatedAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = freeze_delegated_account_ix(accounts)?;
+    let keys: FreezeDelegatedAccountKeys = accounts.into();
+    let ix = freeze_delegated_account_ix(keys)?;
     let account_info: [AccountInfo<'info>; FREEZE_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -6925,7 +7165,7 @@ pub fn freeze_delegated_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn freeze_delegated_account_verify_account_privileges<'me, 'info>(
+pub fn freeze_delegated_account_verify_writable_privileges<'me, 'info>(
     accounts: FreezeDelegatedAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.token_account] {
@@ -6933,11 +7173,23 @@ pub fn freeze_delegated_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn freeze_delegated_account_verify_signer_privileges<'me, 'info>(
+    accounts: FreezeDelegatedAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.delegate] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn freeze_delegated_account_verify_account_privileges<'me, 'info>(
+    accounts: FreezeDelegatedAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    freeze_delegated_account_verify_writable_privileges(accounts)?;
+    freeze_delegated_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN: usize = 5;
@@ -7075,10 +7327,7 @@ impl ThawDelegatedAccountIxData {
         Ok(data)
     }
 }
-pub fn thaw_delegated_account_ix<K: Into<ThawDelegatedAccountKeys>>(
-    accounts: K,
-) -> std::io::Result<Instruction> {
-    let keys: ThawDelegatedAccountKeys = accounts.into();
+pub fn thaw_delegated_account_ix(keys: ThawDelegatedAccountKeys) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7089,7 +7338,8 @@ pub fn thaw_delegated_account_ix<K: Into<ThawDelegatedAccountKeys>>(
 pub fn thaw_delegated_account_invoke<'info>(
     accounts: ThawDelegatedAccountAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = thaw_delegated_account_ix(accounts)?;
+    let keys: ThawDelegatedAccountKeys = accounts.into();
+    let ix = thaw_delegated_account_ix(keys)?;
     let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -7098,7 +7348,8 @@ pub fn thaw_delegated_account_invoke_signed<'info>(
     accounts: ThawDelegatedAccountAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = thaw_delegated_account_ix(accounts)?;
+    let keys: ThawDelegatedAccountKeys = accounts.into();
+    let ix = thaw_delegated_account_ix(keys)?;
     let account_info: [AccountInfo<'info>; THAW_DELEGATED_ACCOUNT_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7120,7 +7371,7 @@ pub fn thaw_delegated_account_verify_account_keys(
     }
     Ok(())
 }
-pub fn thaw_delegated_account_verify_account_privileges<'me, 'info>(
+pub fn thaw_delegated_account_verify_writable_privileges<'me, 'info>(
     accounts: ThawDelegatedAccountAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.token_account] {
@@ -7128,11 +7379,23 @@ pub fn thaw_delegated_account_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn thaw_delegated_account_verify_signer_privileges<'me, 'info>(
+    accounts: ThawDelegatedAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.delegate] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn thaw_delegated_account_verify_account_privileges<'me, 'info>(
+    accounts: ThawDelegatedAccountAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    thaw_delegated_account_verify_writable_privileges(accounts)?;
+    thaw_delegated_account_verify_signer_privileges(accounts)?;
     Ok(())
 }
 pub const REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN: usize = 2;
@@ -7230,10 +7493,9 @@ impl RemoveCreatorVerificationIxData {
         Ok(data)
     }
 }
-pub fn remove_creator_verification_ix<K: Into<RemoveCreatorVerificationKeys>>(
-    accounts: K,
+pub fn remove_creator_verification_ix(
+    keys: RemoveCreatorVerificationKeys,
 ) -> std::io::Result<Instruction> {
-    let keys: RemoveCreatorVerificationKeys = accounts.into();
     let metas: [AccountMeta; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] = keys.into();
     Ok(Instruction {
         program_id: crate::ID,
@@ -7244,7 +7506,8 @@ pub fn remove_creator_verification_ix<K: Into<RemoveCreatorVerificationKeys>>(
 pub fn remove_creator_verification_invoke<'info>(
     accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
 ) -> ProgramResult {
-    let ix = remove_creator_verification_ix(accounts)?;
+    let keys: RemoveCreatorVerificationKeys = accounts.into();
+    let ix = remove_creator_verification_ix(keys)?;
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke(&ix, &account_info)
@@ -7253,7 +7516,8 @@ pub fn remove_creator_verification_invoke_signed<'info>(
     accounts: RemoveCreatorVerificationAccounts<'_, 'info>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let ix = remove_creator_verification_ix(accounts)?;
+    let keys: RemoveCreatorVerificationKeys = accounts.into();
+    let ix = remove_creator_verification_ix(keys)?;
     let account_info: [AccountInfo<'info>; REMOVE_CREATOR_VERIFICATION_IX_ACCOUNTS_LEN] =
         accounts.into();
     invoke_signed(&ix, &account_info, seeds)
@@ -7272,7 +7536,7 @@ pub fn remove_creator_verification_verify_account_keys(
     }
     Ok(())
 }
-pub fn remove_creator_verification_verify_account_privileges<'me, 'info>(
+pub fn remove_creator_verification_verify_writable_privileges<'me, 'info>(
     accounts: RemoveCreatorVerificationAccounts<'me, 'info>,
 ) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_writable in [accounts.metadata] {
@@ -7280,10 +7544,22 @@ pub fn remove_creator_verification_verify_account_privileges<'me, 'info>(
             return Err((should_be_writable, ProgramError::InvalidAccountData));
         }
     }
+    Ok(())
+}
+pub fn remove_creator_verification_verify_signer_privileges<'me, 'info>(
+    accounts: RemoveCreatorVerificationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
     for should_be_signer in [accounts.creator] {
         if !should_be_signer.is_signer {
             return Err((should_be_signer, ProgramError::MissingRequiredSignature));
         }
     }
+    Ok(())
+}
+pub fn remove_creator_verification_verify_account_privileges<'me, 'info>(
+    accounts: RemoveCreatorVerificationAccounts<'me, 'info>,
+) -> Result<(), (&'me AccountInfo<'info>, ProgramError)> {
+    remove_creator_verification_verify_writable_privileges(accounts)?;
+    remove_creator_verification_verify_signer_privileges(accounts)?;
     Ok(())
 }
