@@ -40,6 +40,21 @@ impl AnchorIxNoPrivilegeProgramIx {
         Ok(data)
     }
 }
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
 pub const NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN: usize = 1;
 #[derive(Copy, Clone, Debug)]
 pub struct NoPrivilegedAccountIxAccounts<'me, 'info> {
@@ -121,38 +136,41 @@ impl NoPrivilegedAccountIxIxData {
         Ok(data)
     }
 }
-pub fn no_privileged_account_ix_ix(
+pub fn no_privileged_account_ix_ix_with_program_id(
+    program_id: Pubkey,
     keys: NoPrivilegedAccountIxKeys,
     args: NoPrivilegedAccountIxIxArgs,
 ) -> std::io::Result<Instruction> {
     let metas: [AccountMeta; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] = keys.into();
     let data: NoPrivilegedAccountIxIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::from(metas),
         data: data.try_to_vec()?,
     })
 }
-pub fn no_privileged_account_ix_invoke<'info>(
-    accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
+pub fn no_privileged_account_ix_ix(
+    keys: NoPrivilegedAccountIxKeys,
+    args: NoPrivilegedAccountIxIxArgs,
+) -> std::io::Result<Instruction> {
+    no_privileged_account_ix_ix_with_program_id(crate::ID, keys, args)
+}
+pub fn no_privileged_account_ix_invoke(
+    accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
     args: NoPrivilegedAccountIxIxArgs,
 ) -> ProgramResult {
     let keys: NoPrivilegedAccountIxKeys = accounts.into();
     let ix = no_privileged_account_ix_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke(&ix, &account_info)
+    invoke_instruction(&ix, accounts)
 }
-pub fn no_privileged_account_ix_invoke_signed<'info>(
-    accounts: NoPrivilegedAccountIxAccounts<'_, 'info>,
+pub fn no_privileged_account_ix_invoke_signed(
+    accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
     args: NoPrivilegedAccountIxIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
     let keys: NoPrivilegedAccountIxKeys = accounts.into();
     let ix = no_privileged_account_ix_ix(keys, args)?;
-    let account_info: [AccountInfo<'info>; NO_PRIVILEGED_ACCOUNT_IX_IX_ACCOUNTS_LEN] =
-        accounts.into();
-    invoke_signed(&ix, &account_info, seeds)
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn no_privileged_account_ix_verify_account_keys(
     accounts: NoPrivilegedAccountIxAccounts<'_, '_>,

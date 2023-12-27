@@ -3,6 +3,7 @@ use solana_program::{
     entrypoint::ProgramResult,
     instruction::Instruction,
     program::{invoke, invoke_signed},
+    pubkey::Pubkey,
 };
 use std::io::Read;
 #[derive(Clone, Debug, PartialEq)]
@@ -79,13 +80,19 @@ impl NoAccountsIxIxData {
         Ok(data)
     }
 }
-pub fn no_accounts_ix_ix(args: NoAccountsIxIxArgs) -> std::io::Result<Instruction> {
+pub fn no_accounts_ix_ix_with_program_id(
+    program_id: Pubkey,
+    args: NoAccountsIxIxArgs,
+) -> std::io::Result<Instruction> {
     let data: NoAccountsIxIxData = args.into();
     Ok(Instruction {
-        program_id: crate::ID,
+        program_id,
         accounts: Vec::new(),
         data: data.try_to_vec()?,
     })
+}
+pub fn no_accounts_ix_ix(args: NoAccountsIxIxArgs) -> std::io::Result<Instruction> {
+    no_accounts_ix_ix_with_program_id(crate::ID, args)
 }
 pub fn no_accounts_ix_invoke(args: NoAccountsIxIxArgs) -> ProgramResult {
     let ix = no_accounts_ix_ix(args)?;

@@ -44,22 +44,12 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 pubkey::Pubkey,
             }
         } else {
-            let mut res = quote! {
+            quote! {
                 entrypoint::ProgramResult,
                 instruction::Instruction,
                 program::{invoke, invoke_signed},
-            };
-            let has_pubkey = self
-                .instructions
-                .iter()
-                .map(|ix| ix.args_has_pubkeys())
-                .any(|b| b);
-            if has_pubkey {
-                res.extend(quote! {
-                    pubkey::Pubkey,
-                });
+                pubkey::Pubkey,
             }
-            res
         };
         let has_privileged_accounts = self
             .instructions
@@ -130,6 +120,26 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
                 }
             }
         });
+
+        if has_accounts {
+            res.extend(quote! {
+                pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+                    ix: &Instruction,
+                    accounts: A,
+                ) -> ProgramResult {
+                    let account_info: [AccountInfo<'info>; N] = accounts.into();
+                    invoke(ix, &account_info)
+                }
+                pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+                    ix: &Instruction,
+                    accounts: A,
+                    seeds: &[&[&[u8]]],
+                ) -> ProgramResult {
+                    let account_info: [AccountInfo<'info>; N] = accounts.into();
+                    invoke_signed(ix, &account_info, seeds)
+                }
+            });
+        }
 
         res
     }

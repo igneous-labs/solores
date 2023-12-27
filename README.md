@@ -21,6 +21,8 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
     - [Accounts From Array](#accounts-from-array)
     - [Instruction Accounts Verification Functions](#instruction-accounts-verification-functions)
     - [Zero-copy/bytemuck support](#zero-copy-bytemuck-support)
+    - [`*_ix_with_program()`](#_ix_with_program_id)
+    - [`invoke_instruction()`](#invoke_instruction)
   - [Comparison To Similar Libs](#comparison-to-similar-libs)
     - [anchor-gen](#anchor-gen)
   - [Known Missing Features](#known-missing-features)
@@ -264,6 +266,52 @@ This function is not generated if the instruction has no privileged account inpu
 ### Zero-copy/bytemuck support
 
 Pass `-z <name-of-type-or-account-in-idl>` to additionally derive `Pod + Zeroable + Copy` for the generated types. Accepts multiple options. The correctness of the derive is not checked.
+
+### `*_ix_with_program_id()`
+
+A `*_ix_with_program_id()` instruction generation function that takes a program ID pubkey as argument is exported as well to allow creation of `Instruction`s to be invoked with a program of the same interface at a different program ID.
+
+### `invoke_instruction()`
+
+The CPI functions are built up from these 2 generic functions:
+
+```rust ignore
+pub fn invoke_instruction<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke(ix, &account_info)
+}
+
+pub fn invoke_instruction_signed<'info, A: Into<[AccountInfo<'info>; N]>, const N: usize>(
+    ix: &Instruction,
+    accounts: A,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let account_info: [AccountInfo<'info>; N] = accounts.into();
+    invoke_signed(ix, &account_info, seeds)
+}
+```
+
+These 2 functions are exported by the generated crate and, along with [\*\_ix_with_program_id()](#_ix_with_program_id), are useful for CPI-ing programs that have the same interface but different program ID:
+
+```rust ignore
+use my_token_interface::{invoke_instruction, TransferAccounts, TransferArgs};
+use solana_program::instruction::Instruction;
+
+let accounts: TransferAccounts = ...;
+let args: TransferArgs = ...;
+
+let mut ix: Instruction = transfer_ix_with_program_id(
+  another_program_id,
+  accounts.into(),
+  args,
+);
+invoke_instruction(ix, accounts)?;
+```
+
+These 2 functions are not generated if the program has no instructions that take account inputs.
 
 ## Comparison To Similar Libs
 
