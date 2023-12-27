@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed instruction codegen internals to support `*_with_program_id()`
 - Changed `IdlFormat` trait def to make dependency and `Cargo.toml` writing more dyn
+- Now panics instead of continuing if accounts with the same name are detected in the any IDL instruction.
 
 ### Added
 

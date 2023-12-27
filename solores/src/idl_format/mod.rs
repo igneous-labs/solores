@@ -4,6 +4,7 @@ use proc_macro2::TokenStream;
 use toml::{map::Map, Value};
 
 pub mod anchor;
+pub mod bincode;
 pub mod shank;
 
 pub trait IdlCodegenModule {

@@ -8,11 +8,24 @@ use std::{
     str::FromStr,
 };
 
+use heck::ToPascalCase;
 use serde::{
     de::{self, MapAccess, Visitor},
     Deserialize, Deserializer,
 };
 use void::Void;
+
+pub const PUBKEY_TOKEN: &str = "Pubkey";
+
+pub fn primitive_or_pubkey_to_token(s: &str) -> String {
+    if s == "publicKey" {
+        PUBKEY_TOKEN.to_owned()
+    } else if s == "string" {
+        s.to_pascal_case()
+    } else {
+        s.to_owned()
+    }
+}
 
 pub fn open_file_create_overwrite<P: AsRef<Path>>(path: P) -> std::io::Result<File> {
     OpenOptions::new()

@@ -94,21 +94,23 @@ impl IdlFormat for AnchorIdl {
     fn dependencies(&self, args: &crate::Args) -> Map<String, Value> {
         let mut map = Map::new();
         map.insert(BORSH_CRATE.into(), DependencyValue(&args.borsh_vers).into());
-        map.insert(
-            BYTEMUCK_CRATE.into(),
-            FeaturesDependencyValue {
-                dependency: DependencyValue(&args.borsh_vers),
-                features: vec!["derive".into()],
-            }
-            .into(),
-        );
+        if !args.zero_copy.is_empty() {
+            map.insert(
+                BYTEMUCK_CRATE.into(),
+                FeaturesDependencyValue {
+                    dependency: DependencyValue(&args.bytemuck_vers),
+                    features: vec!["derive".into()],
+                }
+                .into(),
+            );
+        }
         map.insert(
             SOLANA_PROGRAM_CRATE.into(),
             DependencyValue(&args.solana_program_vers).into(),
         );
         map.insert(
             SERDE_CRATE.into(),
-            OptionalDependencyValue(DependencyValue(&args.solana_program_vers)).into(),
+            OptionalDependencyValue(DependencyValue(&args.serde_vers)).into(),
         );
         if self.errors.is_some() {
             map.insert(

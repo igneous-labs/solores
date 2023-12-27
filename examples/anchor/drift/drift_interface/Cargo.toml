@@ -6,10 +6,6 @@ edition = "2021"
 [dependencies.borsh]
 workspace = true
 
-[dependencies.bytemuck]
-features = ["derive"]
-workspace = true
-
 [dependencies.num-derive]
 workspace = true
 

@@ -5,17 +5,14 @@ use quote::{format_ident, quote, ToTokens};
 use serde::Deserialize;
 use syn::{LitBool, LitInt};
 
-use crate::{
-    idl_format::shank::typedefs::TypedefField,
-    utils::{unique_by_report_dups, UniqueByReportDupsResult},
-};
+use crate::{idl_format::bincode::typedefs::TypedefField, utils::unique_by_report_dups};
 
 #[derive(Deserialize)]
 pub struct NamedInstruction {
     pub name: String,
     pub accounts: Option<Vec<IxAccount>>,
     pub args: Option<Vec<TypedefField>>,
-    pub discriminant: Discriminant,
+    pub discriminant: u32,
 }
 
 impl NamedInstruction {
@@ -23,6 +20,8 @@ impl NamedInstruction {
         format_ident!("{}IxArgs", self.name.to_pascal_case())
     }
 
+    // TODO: delete
+    // TODO: re-add write_discm
     pub fn ix_data_ident(&self) -> Ident {
         format_ident!("{}IxData", self.name.to_pascal_case())
     }
@@ -106,12 +105,12 @@ impl NamedInstruction {
         });
     }
 
-    pub fn write_accounts_struct(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+    pub fn write_accounts_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let accounts_ident = self.accounts_ident();
-        let accounts_fields = accounts.iter().map(|acc| {
+        let accounts_fields = unique_accounts.iter().map(|acc| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
             let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
                 quote! {
@@ -131,12 +130,12 @@ impl NamedInstruction {
         });
     }
 
-    pub fn write_keys_struct(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+    pub fn write_keys_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let keys_ident = self.keys_ident();
-        let keys_fields = accounts.iter().map(|acc| {
+        let keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             let maybe_doc_comment = acc.desc.as_ref().map_or(quote! {}, |desc| {
                 quote! {
@@ -157,13 +156,17 @@ impl NamedInstruction {
     }
 
     /// From<&XAccounts> for XKeys
-    pub fn write_from_accounts_for_keys(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+    pub fn write_from_accounts_for_keys(
+        &self,
+        tokens: &mut TokenStream,
+        unique_accounts: &[&IxAccount],
+    ) {
         if !self.has_accounts() {
             return;
         }
         let accounts_ident = self.accounts_ident();
         let keys_ident = self.keys_ident();
-        let from_keys_fields = accounts.iter().map(|acc| {
+        let from_keys_fields = unique_accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
                 #account_ident: *accounts.#account_ident.key
@@ -200,13 +203,17 @@ impl NamedInstruction {
     }
 
     /// From <[Pubkey]> for XKeys
-    pub fn write_from_pubkey_arr_for_keys(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+    pub fn write_from_pubkey_arr_for_keys(
+        &self,
+        tokens: &mut TokenStream,
+        unique_accounts: &[&IxAccount],
+    ) {
         if !self.has_accounts() {
             return;
         }
         let accounts_len_ident = self.accounts_len_ident();
         let keys_ident = self.keys_ident();
-        let from_pubkey_arr_fields = accounts.iter().enumerate().map(|(i, acc)| {
+        let from_pubkey_arr_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             let index_lit = LitInt::new(&i.to_string(), Span::call_site());
             quote! {
@@ -252,7 +259,7 @@ impl NamedInstruction {
         });
     }
 
-    /// From <&[AccountInfo]> for XAccounts
+    /// From <[AccountInfo]> for XAccounts
     pub fn write_from_account_info_arr_for_accounts(
         &self,
         tokens: &mut TokenStream,
@@ -298,27 +305,6 @@ impl NamedInstruction {
         });
     }
 
-    pub fn write_discm(&self, tokens: &mut TokenStream) {
-        let discm_ident = self.discm_ident();
-        let discm_value = self.discriminant.value;
-        tokens.extend(quote! {
-            pub const #discm_ident: u8 = #discm_value;
-        })
-    }
-    pub fn write_ix_data_struct(&self, tokens: &mut TokenStream) {
-        let ix_data_ident = self.ix_data_ident();
-        let struct_decl = if self.has_ix_args() {
-            let ix_args_ident = self.ix_args_ident();
-            quote! { pub struct #ix_data_ident(pub #ix_args_ident); }
-        } else {
-            quote! { pub struct #ix_data_ident; }
-        };
-        tokens.extend(quote! {
-            #[derive(Clone, Debug, PartialEq)]
-            #struct_decl
-        });
-    }
-
     pub fn write_from_ix_args_for_ix_data(&self, tokens: &mut TokenStream) {
         if !self.has_ix_args() {
             return;
@@ -329,61 +315,6 @@ impl NamedInstruction {
             impl From<#ix_args_ident> for #ix_data_ident {
                 fn from(args: #ix_args_ident) -> Self {
                     Self(args)
-                }
-            }
-        });
-    }
-
-    pub fn write_ix_data_impl(&self, tokens: &mut TokenStream) {
-        let discm_ident = self.discm_ident();
-        let ix_data_ident = self.ix_data_ident();
-        let mut deserialize_body = quote! {
-            let mut reader = buf;
-            let mut maybe_discm_buf = [0u8; 1];
-            reader.read_exact(&mut maybe_discm_buf)?;
-            let maybe_discm = maybe_discm_buf[0];
-            if maybe_discm != #discm_ident {
-                return Err(
-                    std::io::Error::new(
-                        std::io::ErrorKind::Other, format!("discm does not match. Expected: {:?}. Received: {:?}", #discm_ident, maybe_discm)
-                    )
-                );
-            }
-        };
-        if self.has_ix_args() {
-            let ix_args_ident = self.ix_args_ident();
-            deserialize_body.extend(quote! {
-                Ok(Self(#ix_args_ident::deserialize(&mut reader)?))
-            })
-        } else {
-            deserialize_body.extend(quote! {
-                Ok(Self)
-            })
-        }
-        let serialize_body = if self.has_ix_args() {
-            quote! {
-                writer.write_all(&[#discm_ident])?;
-                self.0.serialize(&mut writer)
-            }
-        } else {
-            quote! {
-                writer.write_all(&[#discm_ident])
-            }
-        };
-        tokens.extend(quote! {
-            impl #ix_data_ident {
-                pub fn deserialize(buf: &[u8]) -> std::io::Result<Self> {
-                    #deserialize_body
-                }
-
-                pub fn serialize<W: std::io::Write>(&self, mut writer: W) -> std::io::Result<()> {
-                    #serialize_body
-                }
-
-                pub fn try_to_vec(&self) -> std::io::Result<Vec<u8>> {
-                    let mut data = Vec::new();
-                    self.serialize(&mut data)?;
-                    Ok(data)
                 }
             }
         });
@@ -563,7 +494,11 @@ impl NamedInstruction {
     }
 
     /// _verify_account_keys()
-    pub fn write_verify_account_keys_fn(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
+    pub fn write_verify_account_keys_fn(
+        &self,
+        tokens: &mut TokenStream,
+        unique_accounts: &[&IxAccount],
+    ) {
         if !self.has_accounts() {
             return;
         }
@@ -571,9 +506,11 @@ impl NamedInstruction {
             format_ident!("{}_verify_account_keys", self.name.to_snake_case());
         let accounts_ident = self.accounts_ident();
         let keys_ident = self.keys_ident();
-        let key_tups = accounts.iter().map(IxAccount::to_verify_account_keys_tuple);
+        let key_tups = unique_accounts
+            .iter()
+            .map(|a| IxAccount::to_verify_account_keys_tuple(a));
         // edge-case of accounts and keys being empty
-        let pubkeys_loop_check = if accounts.is_empty() {
+        let pubkeys_loop_check = if unique_accounts.is_empty() {
             quote! {}
         } else {
             quote! {
@@ -603,7 +540,7 @@ impl NamedInstruction {
     pub fn write_verify_account_privileges_fns(
         &self,
         tokens: &mut TokenStream,
-        accounts: &[IxAccount],
+        unique_accounts: &[&IxAccount],
     ) {
         if !self.has_privileged_accounts() {
             return;
@@ -618,7 +555,7 @@ impl NamedInstruction {
 
         let mut verify_fn_body = quote! {};
 
-        let mut writables = accounts
+        let mut writables = unique_accounts
             .iter()
             .filter_map(|a| {
                 if a.is_mut {
@@ -652,7 +589,7 @@ impl NamedInstruction {
             });
         }
 
-        let mut signers = accounts
+        let mut signers = unique_accounts
             .iter()
             .filter_map(|a| {
                 if a.is_signer {
@@ -702,39 +639,34 @@ impl ToTokens for NamedInstruction {
         let accounts: &[IxAccount] = self.accounts.as_ref().map_or(&[], |v| v.as_slice());
         let n_accounts = accounts.len();
 
-        let UniqueByReportDupsResult { duplicates, .. } =
-            unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
+        let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
 
-        if !duplicates.is_empty() {
-            log::error!(
-                "Found duplicate accounts for instruction {}: {}",
-                &self.name,
-                duplicates.iter().map(|acc| &acc.name).format(", ")
+        if !accounts_dedup.duplicates.is_empty() {
+            log::warn!(
+                "Found duplicate accounts for instruction {}: {}. Assuming different indexes in generated AccountInfo/Meta arrays refer to the same account",
+                &self.name, accounts_dedup.duplicates.iter().map(|acc| &acc.name).format(", ")
             );
-            panic!();
         }
+        let unique_accounts = &accounts_dedup.unique;
 
         self.write_accounts_len(tokens, n_accounts);
-        self.write_accounts_struct(tokens, accounts);
-        self.write_keys_struct(tokens, accounts);
-        self.write_from_accounts_for_keys(tokens, accounts);
+        self.write_accounts_struct(tokens, unique_accounts);
+        self.write_keys_struct(tokens, unique_accounts);
+        self.write_from_accounts_for_keys(tokens, unique_accounts);
         self.write_from_keys_for_meta_arr(tokens, accounts);
-        self.write_from_pubkey_arr_for_keys(tokens, accounts);
+        self.write_from_pubkey_arr_for_keys(tokens, unique_accounts);
         self.write_from_accounts_for_account_info_arr(tokens, accounts);
         self.write_from_account_info_arr_for_accounts(tokens, accounts);
 
-        self.write_discm(tokens);
         self.write_ix_args_struct(tokens);
-        self.write_ix_data_struct(tokens);
         self.write_from_ix_args_for_ix_data(tokens);
-        self.write_ix_data_impl(tokens);
 
         self.write_ix_fn(tokens);
         self.write_invoke_fn(tokens);
         self.write_invoke_signed_fn(tokens);
 
-        self.write_verify_account_keys_fn(tokens, accounts);
-        self.write_verify_account_privileges_fns(tokens, accounts);
+        self.write_verify_account_keys_fn(tokens, unique_accounts);
+        self.write_verify_account_privileges_fns(tokens, unique_accounts);
     }
 }
 
@@ -775,10 +707,4 @@ impl IxAccount {
             (accounts.#name.key, &keys.#name)
         }
     }
-}
-
-#[derive(Deserialize)]
-pub struct Discriminant {
-    pub r#type: String,
-    pub value: u8,
 }

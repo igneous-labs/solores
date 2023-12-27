@@ -9,7 +9,10 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use syn::{LitBool, LitInt};
 
-use crate::{idl_format::anchor::typedefs::TypedefField, utils::unique_by_report_dups};
+use crate::{
+    idl_format::anchor::typedefs::TypedefField,
+    utils::{unique_by_report_dups, UniqueByReportDupsResult},
+};
 
 #[derive(Deserialize)]
 pub struct NamedInstruction {
@@ -109,12 +112,12 @@ impl NamedInstruction {
         });
     }
 
-    pub fn write_accounts_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
+    pub fn write_accounts_struct(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let accounts_ident = self.accounts_ident();
-        let accounts_fields = unique_accounts.iter().map(|acc| {
+        let accounts_fields = accounts.iter().map(|acc| {
             let account_name = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
                 pub #account_name: &'me AccountInfo<'info>
@@ -128,12 +131,12 @@ impl NamedInstruction {
         });
     }
 
-    pub fn write_keys_struct(&self, tokens: &mut TokenStream, unique_accounts: &[&IxAccount]) {
+    pub fn write_keys_struct(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let keys_ident = self.keys_ident();
-        let keys_fields = unique_accounts.iter().map(|acc| {
+        let keys_fields = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
                 pub #account_ident: Pubkey
@@ -148,17 +151,13 @@ impl NamedInstruction {
     }
 
     /// From<XAccounts> for XKeys
-    pub fn write_from_accounts_for_keys(
-        &self,
-        tokens: &mut TokenStream,
-        unique_accounts: &[&IxAccount],
-    ) {
+    pub fn write_from_accounts_for_keys(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let accounts_ident = self.accounts_ident();
         let keys_ident = self.keys_ident();
-        let from_keys_fields = unique_accounts.iter().map(|acc| {
+        let from_keys_fields = accounts.iter().map(|acc| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             quote! {
                 #account_ident: *accounts.#account_ident.key
@@ -195,17 +194,13 @@ impl NamedInstruction {
     }
 
     /// From <[Pubkey]> for XKeys
-    pub fn write_from_pubkey_arr_for_keys(
-        &self,
-        tokens: &mut TokenStream,
-        unique_accounts: &[&IxAccount],
-    ) {
+    pub fn write_from_pubkey_arr_for_keys(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;
         }
         let accounts_len_ident = self.accounts_len_ident();
         let keys_ident = self.keys_ident();
-        let from_pubkey_arr_fields = unique_accounts.iter().enumerate().map(|(i, acc)| {
+        let from_pubkey_arr_fields = accounts.iter().enumerate().map(|(i, acc)| {
             let account_ident = format_ident!("{}", &acc.name.to_snake_case());
             let index_lit = LitInt::new(&i.to_string(), Span::call_site());
             quote! {
@@ -251,7 +246,7 @@ impl NamedInstruction {
         });
     }
 
-    /// From <[AccountInfo]> for XAccounts
+    /// From <&[AccountInfo]> for XAccounts
     pub fn write_from_account_info_arr_for_accounts(
         &self,
         tokens: &mut TokenStream,
@@ -571,11 +566,7 @@ impl NamedInstruction {
     }
 
     /// _verify_account_keys()
-    pub fn write_verify_account_keys_fn(
-        &self,
-        tokens: &mut TokenStream,
-        unique_accounts: &[&IxAccount],
-    ) {
+    pub fn write_verify_account_keys_fn(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;
         }
@@ -583,11 +574,9 @@ impl NamedInstruction {
             format_ident!("{}_verify_account_keys", self.name.to_snake_case());
         let accounts_ident = self.accounts_ident();
         let keys_ident = self.keys_ident();
-        let key_tups = unique_accounts
-            .iter()
-            .map(|a| IxAccount::to_verify_account_keys_tuple(a));
+        let key_tups = accounts.iter().map(IxAccount::to_verify_account_keys_tuple);
         // edge-case of accounts and keys being empty
-        let pubkeys_loop_check = if unique_accounts.is_empty() {
+        let pubkeys_loop_check = if accounts.is_empty() {
             quote! {}
         } else {
             quote! {
@@ -617,7 +606,7 @@ impl NamedInstruction {
     pub fn write_verify_account_privileges_fns(
         &self,
         tokens: &mut TokenStream,
-        unique_accounts: &[&IxAccount],
+        accounts: &[IxAccount],
     ) {
         if !self.has_privileged_accounts() {
             return;
@@ -632,7 +621,7 @@ impl NamedInstruction {
 
         let mut verify_fn_body = quote! {};
 
-        let mut writables = unique_accounts
+        let mut writables = accounts
             .iter()
             .filter_map(|a| {
                 if a.is_mut {
@@ -666,7 +655,7 @@ impl NamedInstruction {
             });
         }
 
-        let mut signers = unique_accounts
+        let mut signers = accounts
             .iter()
             .filter_map(|a| {
                 if a.is_signer {
@@ -719,22 +708,24 @@ impl ToTokens for NamedInstruction {
             .map_or(Vec::new(), |v| to_ix_accounts(v));
         let n_accounts = accounts.len();
 
-        let accounts_dedup = unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
+        let UniqueByReportDupsResult { duplicates, .. } =
+            unique_by_report_dups(accounts.iter(), |acc| acc.name.clone());
 
-        if !accounts_dedup.duplicates.is_empty() {
-            log::warn!(
-                "Found duplicate accounts for instruction {}: {}. Assuming different indexes in generated AccountInfo/Meta arrays refer to the same account",
-                &self.name, accounts_dedup.duplicates.iter().map(|acc| &acc.name).format(", ")
+        if !duplicates.is_empty() {
+            log::error!(
+                "Found duplicate accounts for instruction {}: {}",
+                &self.name,
+                duplicates.iter().map(|acc| &acc.name).format(", ")
             );
+            panic!();
         }
-        let unique_accounts = &accounts_dedup.unique;
 
         self.write_accounts_len(tokens, n_accounts);
-        self.write_accounts_struct(tokens, unique_accounts);
-        self.write_keys_struct(tokens, unique_accounts);
-        self.write_from_accounts_for_keys(tokens, unique_accounts);
+        self.write_accounts_struct(tokens, &accounts);
+        self.write_keys_struct(tokens, &accounts);
+        self.write_from_accounts_for_keys(tokens, &accounts);
         self.write_from_keys_for_meta_arr(tokens, &accounts);
-        self.write_from_pubkey_arr_for_keys(tokens, unique_accounts);
+        self.write_from_pubkey_arr_for_keys(tokens, &accounts);
         self.write_from_accounts_for_account_info_arr(tokens, &accounts);
         self.write_from_account_info_arr_for_accounts(tokens, &accounts);
 
@@ -748,8 +739,8 @@ impl ToTokens for NamedInstruction {
         self.write_invoke_fn(tokens);
         self.write_invoke_signed_fn(tokens);
 
-        self.write_verify_account_keys_fn(tokens, unique_accounts);
-        self.write_verify_account_privileges_fns(tokens, unique_accounts);
+        self.write_verify_account_keys_fn(tokens, &accounts);
+        self.write_verify_account_privileges_fns(tokens, &accounts);
     }
 }
 
