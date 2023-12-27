@@ -155,22 +155,37 @@ pub fn no_privileged_account_ix_ix(
 ) -> std::io::Result<Instruction> {
     no_privileged_account_ix_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn no_privileged_account_ix_invoke(
+pub fn no_privileged_account_ix_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
     args: NoPrivilegedAccountIxIxArgs,
 ) -> ProgramResult {
     let keys: NoPrivilegedAccountIxKeys = accounts.into();
-    let ix = no_privileged_account_ix_ix(keys, args)?;
+    let ix = no_privileged_account_ix_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn no_privileged_account_ix_invoke(
+    accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
+    args: NoPrivilegedAccountIxIxArgs,
+) -> ProgramResult {
+    no_privileged_account_ix_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn no_privileged_account_ix_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
+    args: NoPrivilegedAccountIxIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: NoPrivilegedAccountIxKeys = accounts.into();
+    let ix = no_privileged_account_ix_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn no_privileged_account_ix_invoke_signed(
     accounts: NoPrivilegedAccountIxAccounts<'_, '_>,
     args: NoPrivilegedAccountIxIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: NoPrivilegedAccountIxKeys = accounts.into();
-    let ix = no_privileged_account_ix_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    no_privileged_account_ix_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn no_privileged_account_ix_verify_account_keys(
     accounts: NoPrivilegedAccountIxAccounts<'_, '_>,

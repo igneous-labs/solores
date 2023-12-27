@@ -28,6 +28,10 @@ impl NamedInstruction {
         format_ident!("{}_ix", self.name.to_snake_case())
     }
 
+    pub fn ix_fn_with_program_id_ident(&self) -> Ident {
+        format_ident!("{}_ix_with_program_id", self.name.to_snake_case())
+    }
+
     pub fn discm_ident(&self) -> Ident {
         format_ident!("{}_IX_DISCM", &self.name.to_shouty_snake_case())
     }
@@ -394,8 +398,7 @@ impl NamedInstruction {
     /// _ix_with_program_id()
     pub fn write_ix_fn(&self, tokens: &mut TokenStream) {
         let ix_fn_ident = self.ix_fn_ident();
-        let ix_with_program_id_fn_ident =
-            format_ident!("{}_ix_with_program_id", self.name.to_snake_case());
+        let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
         let keys_ident = self.keys_ident();
         let ix_args_ident = self.ix_args_ident();
         let accounts_len_ident = self.accounts_len_ident();
@@ -469,8 +472,19 @@ impl NamedInstruction {
         fn_params
     }
 
-    fn ix_fn_call_assign(&self) -> TokenStream {
-        let ix_fn_ident = self.ix_fn_ident();
+    fn invoke_fn_args_prefix(&self) -> TokenStream {
+        let mut fn_args = quote! {};
+        if self.has_accounts() {
+            fn_args.extend(quote! { accounts, });
+        }
+        if self.has_ix_args() {
+            fn_args.extend(quote! { args, })
+        }
+        fn_args
+    }
+
+    fn ix_call_assign(&self) -> TokenStream {
+        let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
         let keys_ident = self.keys_ident();
         let mut res = quote! {};
         let mut args = quote! {};
@@ -484,16 +498,20 @@ impl NamedInstruction {
             args.extend(quote! { args });
         }
         res.extend(quote! {
-            let ix = #ix_fn_ident(#args)?;
+            let ix = #ix_with_program_id_fn_ident(program_id, #args)?;
         });
         res
     }
 
     /// _invoke()
+    /// _invoke_with_program_id()
     pub fn write_invoke_fn(&self, tokens: &mut TokenStream) {
         let invoke_fn_ident = format_ident!("{}_invoke", self.name.to_snake_case());
+        let invoke_with_program_id_fn_ident =
+            format_ident!("{}_invoke_with_program_id", self.name.to_snake_case());
         let fn_params = self.invoke_fn_params_prefix();
-        let call_assign = self.ix_fn_call_assign();
+        let fn_args = self.invoke_fn_args_prefix();
+        let call_assign = self.ix_call_assign();
         let invoke = if self.has_accounts() {
             quote! {
                 invoke_instruction(&ix, accounts)
@@ -504,19 +522,30 @@ impl NamedInstruction {
             }
         };
         tokens.extend(quote! {
-            pub fn #invoke_fn_ident(#fn_params) -> ProgramResult {
+            pub fn #invoke_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> ProgramResult {
                 #call_assign
                 #invoke
+            }
+
+            pub fn #invoke_fn_ident(#fn_params) -> ProgramResult {
+                #invoke_with_program_id_fn_ident(crate::ID, #fn_args)
             }
         });
     }
 
     /// _invoke_signed()
+    /// _invoke_signed_with_program_id()
     pub fn write_invoke_signed_fn(&self, tokens: &mut TokenStream) {
         let invoke_signed_fn_ident = format_ident!("{}_invoke_signed", self.name.to_snake_case());
+        let invoke_signed_with_program_id_fn_ident = format_ident!(
+            "{}_invoke_signed_with_program_id",
+            self.name.to_snake_case()
+        );
         let mut fn_params = self.invoke_fn_params_prefix();
         fn_params.extend(quote! { seeds: &[&[&[u8]]], });
-        let call_assign = self.ix_fn_call_assign();
+        let mut fn_args = self.invoke_fn_args_prefix();
+        fn_args.extend(quote! { seeds, });
+        let call_assign = self.ix_call_assign();
         let invoke = if self.has_accounts() {
             quote! {
                 invoke_instruction_signed(&ix, accounts, seeds)
@@ -527,9 +556,13 @@ impl NamedInstruction {
             }
         };
         tokens.extend(quote! {
-            pub fn #invoke_signed_fn_ident(#fn_params) -> ProgramResult {
+            pub fn #invoke_signed_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> ProgramResult {
                 #call_assign
                 #invoke
+            }
+
+            pub fn #invoke_signed_fn_ident(#fn_params) -> ProgramResult {
+                #invoke_signed_with_program_id_fn_ident(crate::ID, #fn_args)
             }
         });
     }

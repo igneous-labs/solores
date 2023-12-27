@@ -94,11 +94,24 @@ pub fn no_accounts_ix_ix_with_program_id(
 pub fn no_accounts_ix_ix(args: NoAccountsIxIxArgs) -> std::io::Result<Instruction> {
     no_accounts_ix_ix_with_program_id(crate::ID, args)
 }
-pub fn no_accounts_ix_invoke(args: NoAccountsIxIxArgs) -> ProgramResult {
-    let ix = no_accounts_ix_ix(args)?;
+pub fn no_accounts_ix_invoke_with_program_id(
+    program_id: Pubkey,
+    args: NoAccountsIxIxArgs,
+) -> ProgramResult {
+    let ix = no_accounts_ix_ix_with_program_id(program_id, args)?;
     invoke(&ix, &[])
 }
-pub fn no_accounts_ix_invoke_signed(args: NoAccountsIxIxArgs, seeds: &[&[&[u8]]]) -> ProgramResult {
-    let ix = no_accounts_ix_ix(args)?;
+pub fn no_accounts_ix_invoke(args: NoAccountsIxIxArgs) -> ProgramResult {
+    no_accounts_ix_invoke_with_program_id(crate::ID, args)
+}
+pub fn no_accounts_ix_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    args: NoAccountsIxIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let ix = no_accounts_ix_ix_with_program_id(program_id, args)?;
     invoke_signed(&ix, &[], seeds)
+}
+pub fn no_accounts_ix_invoke_signed(args: NoAccountsIxIxArgs, seeds: &[&[&[u8]]]) -> ProgramResult {
+    no_accounts_ix_invoke_signed_with_program_id(crate::ID, args, seeds)
 }

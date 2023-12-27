@@ -132,18 +132,31 @@ pub fn no_args_ix_ix_with_program_id(
 pub fn no_args_ix_ix(keys: NoArgsIxKeys) -> std::io::Result<Instruction> {
     no_args_ix_ix_with_program_id(crate::ID, keys)
 }
-pub fn no_args_ix_invoke(accounts: NoArgsIxAccounts<'_, '_>) -> ProgramResult {
+pub fn no_args_ix_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: NoArgsIxAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: NoArgsIxKeys = accounts.into();
-    let ix = no_args_ix_ix(keys)?;
+    let ix = no_args_ix_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn no_args_ix_invoke(accounts: NoArgsIxAccounts<'_, '_>) -> ProgramResult {
+    no_args_ix_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn no_args_ix_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: NoArgsIxAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: NoArgsIxKeys = accounts.into();
+    let ix = no_args_ix_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn no_args_ix_invoke_signed(
     accounts: NoArgsIxAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: NoArgsIxKeys = accounts.into();
-    let ix = no_args_ix_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    no_args_ix_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn no_args_ix_verify_account_keys(
     accounts: NoArgsIxAccounts<'_, '_>,

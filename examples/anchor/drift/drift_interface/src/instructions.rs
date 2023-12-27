@@ -1178,22 +1178,37 @@ pub fn initialize_user_ix(
 ) -> std::io::Result<Instruction> {
     initialize_user_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_user_invoke(
+pub fn initialize_user_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeUserAccounts<'_, '_>,
     args: InitializeUserIxArgs,
 ) -> ProgramResult {
     let keys: InitializeUserKeys = accounts.into();
-    let ix = initialize_user_ix(keys, args)?;
+    let ix = initialize_user_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_user_invoke(
+    accounts: InitializeUserAccounts<'_, '_>,
+    args: InitializeUserIxArgs,
+) -> ProgramResult {
+    initialize_user_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_user_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeUserAccounts<'_, '_>,
+    args: InitializeUserIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeUserKeys = accounts.into();
+    let ix = initialize_user_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_user_invoke_signed(
     accounts: InitializeUserAccounts<'_, '_>,
     args: InitializeUserIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeUserKeys = accounts.into();
-    let ix = initialize_user_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_user_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_user_verify_account_keys(
     accounts: InitializeUserAccounts<'_, '_>,
@@ -1395,20 +1410,33 @@ pub fn initialize_user_stats_ix_with_program_id(
 pub fn initialize_user_stats_ix(keys: InitializeUserStatsKeys) -> std::io::Result<Instruction> {
     initialize_user_stats_ix_with_program_id(crate::ID, keys)
 }
-pub fn initialize_user_stats_invoke(
+pub fn initialize_user_stats_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeUserStatsAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: InitializeUserStatsKeys = accounts.into();
-    let ix = initialize_user_stats_ix(keys)?;
+    let ix = initialize_user_stats_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_user_stats_invoke(
+    accounts: InitializeUserStatsAccounts<'_, '_>,
+) -> ProgramResult {
+    initialize_user_stats_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn initialize_user_stats_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeUserStatsAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeUserStatsKeys = accounts.into();
+    let ix = initialize_user_stats_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_user_stats_invoke_signed(
     accounts: InitializeUserStatsAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeUserStatsKeys = accounts.into();
-    let ix = initialize_user_stats_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_user_stats_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn initialize_user_stats_verify_account_keys(
     accounts: InitializeUserStatsAccounts<'_, '_>,
@@ -1633,22 +1661,37 @@ pub fn initialize_referrer_name_ix(
 ) -> std::io::Result<Instruction> {
     initialize_referrer_name_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_referrer_name_invoke(
+pub fn initialize_referrer_name_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeReferrerNameAccounts<'_, '_>,
     args: InitializeReferrerNameIxArgs,
 ) -> ProgramResult {
     let keys: InitializeReferrerNameKeys = accounts.into();
-    let ix = initialize_referrer_name_ix(keys, args)?;
+    let ix = initialize_referrer_name_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_referrer_name_invoke(
+    accounts: InitializeReferrerNameAccounts<'_, '_>,
+    args: InitializeReferrerNameIxArgs,
+) -> ProgramResult {
+    initialize_referrer_name_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_referrer_name_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeReferrerNameAccounts<'_, '_>,
+    args: InitializeReferrerNameIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeReferrerNameKeys = accounts.into();
+    let ix = initialize_referrer_name_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_referrer_name_invoke_signed(
     accounts: InitializeReferrerNameAccounts<'_, '_>,
     args: InitializeReferrerNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeReferrerNameKeys = accounts.into();
-    let ix = initialize_referrer_name_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_referrer_name_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_referrer_name_verify_account_keys(
     accounts: InitializeReferrerNameAccounts<'_, '_>,
@@ -1874,19 +1917,34 @@ pub fn deposit_ix_with_program_id(
 pub fn deposit_ix(keys: DepositKeys, args: DepositIxArgs) -> std::io::Result<Instruction> {
     deposit_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn deposit_invoke(accounts: DepositAccounts<'_, '_>, args: DepositIxArgs) -> ProgramResult {
+pub fn deposit_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DepositAccounts<'_, '_>,
+    args: DepositIxArgs,
+) -> ProgramResult {
     let keys: DepositKeys = accounts.into();
-    let ix = deposit_ix(keys, args)?;
+    let ix = deposit_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn deposit_invoke(accounts: DepositAccounts<'_, '_>, args: DepositIxArgs) -> ProgramResult {
+    deposit_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deposit_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DepositAccounts<'_, '_>,
+    args: DepositIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: DepositKeys = accounts.into();
+    let ix = deposit_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn deposit_invoke_signed(
     accounts: DepositAccounts<'_, '_>,
     args: DepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: DepositKeys = accounts.into();
-    let ix = deposit_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    deposit_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn deposit_verify_account_keys(
     accounts: DepositAccounts<'_, '_>,
@@ -2123,19 +2181,34 @@ pub fn withdraw_ix_with_program_id(
 pub fn withdraw_ix(keys: WithdrawKeys, args: WithdrawIxArgs) -> std::io::Result<Instruction> {
     withdraw_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn withdraw_invoke(accounts: WithdrawAccounts<'_, '_>, args: WithdrawIxArgs) -> ProgramResult {
+pub fn withdraw_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: WithdrawAccounts<'_, '_>,
+    args: WithdrawIxArgs,
+) -> ProgramResult {
     let keys: WithdrawKeys = accounts.into();
-    let ix = withdraw_ix(keys, args)?;
+    let ix = withdraw_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn withdraw_invoke(accounts: WithdrawAccounts<'_, '_>, args: WithdrawIxArgs) -> ProgramResult {
+    withdraw_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn withdraw_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: WithdrawAccounts<'_, '_>,
+    args: WithdrawIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: WithdrawKeys = accounts.into();
+    let ix = withdraw_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn withdraw_invoke_signed(
     accounts: WithdrawAccounts<'_, '_>,
     args: WithdrawIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: WithdrawKeys = accounts.into();
-    let ix = withdraw_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    withdraw_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn withdraw_verify_account_keys(
     accounts: WithdrawAccounts<'_, '_>,
@@ -2355,22 +2428,37 @@ pub fn transfer_deposit_ix(
 ) -> std::io::Result<Instruction> {
     transfer_deposit_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn transfer_deposit_invoke(
+pub fn transfer_deposit_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: TransferDepositAccounts<'_, '_>,
     args: TransferDepositIxArgs,
 ) -> ProgramResult {
     let keys: TransferDepositKeys = accounts.into();
-    let ix = transfer_deposit_ix(keys, args)?;
+    let ix = transfer_deposit_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn transfer_deposit_invoke(
+    accounts: TransferDepositAccounts<'_, '_>,
+    args: TransferDepositIxArgs,
+) -> ProgramResult {
+    transfer_deposit_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn transfer_deposit_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: TransferDepositAccounts<'_, '_>,
+    args: TransferDepositIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: TransferDepositKeys = accounts.into();
+    let ix = transfer_deposit_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn transfer_deposit_invoke_signed(
     accounts: TransferDepositAccounts<'_, '_>,
     args: TransferDepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: TransferDepositKeys = accounts.into();
-    let ix = transfer_deposit_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    transfer_deposit_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn transfer_deposit_verify_account_keys(
     accounts: TransferDepositAccounts<'_, '_>,
@@ -2549,22 +2637,37 @@ pub fn place_perp_order_ix(
 ) -> std::io::Result<Instruction> {
     place_perp_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_perp_order_invoke(
+pub fn place_perp_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlacePerpOrderAccounts<'_, '_>,
     args: PlacePerpOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlacePerpOrderKeys = accounts.into();
-    let ix = place_perp_order_ix(keys, args)?;
+    let ix = place_perp_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_perp_order_invoke(
+    accounts: PlacePerpOrderAccounts<'_, '_>,
+    args: PlacePerpOrderIxArgs,
+) -> ProgramResult {
+    place_perp_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_perp_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlacePerpOrderAccounts<'_, '_>,
+    args: PlacePerpOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlacePerpOrderKeys = accounts.into();
+    let ix = place_perp_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_perp_order_invoke_signed(
     accounts: PlacePerpOrderAccounts<'_, '_>,
     args: PlacePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlacePerpOrderKeys = accounts.into();
-    let ix = place_perp_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_perp_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_perp_order_verify_account_keys(
     accounts: PlacePerpOrderAccounts<'_, '_>,
@@ -2740,22 +2843,37 @@ pub fn cancel_order_ix(
 ) -> std::io::Result<Instruction> {
     cancel_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn cancel_order_invoke(
+pub fn cancel_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: CancelOrderAccounts<'_, '_>,
     args: CancelOrderIxArgs,
 ) -> ProgramResult {
     let keys: CancelOrderKeys = accounts.into();
-    let ix = cancel_order_ix(keys, args)?;
+    let ix = cancel_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn cancel_order_invoke(
+    accounts: CancelOrderAccounts<'_, '_>,
+    args: CancelOrderIxArgs,
+) -> ProgramResult {
+    cancel_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelOrderAccounts<'_, '_>,
+    args: CancelOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: CancelOrderKeys = accounts.into();
+    let ix = cancel_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn cancel_order_invoke_signed(
     accounts: CancelOrderAccounts<'_, '_>,
     args: CancelOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: CancelOrderKeys = accounts.into();
-    let ix = cancel_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    cancel_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_order_verify_account_keys(
     accounts: CancelOrderAccounts<'_, '_>,
@@ -2931,22 +3049,37 @@ pub fn cancel_order_by_user_id_ix(
 ) -> std::io::Result<Instruction> {
     cancel_order_by_user_id_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn cancel_order_by_user_id_invoke(
+pub fn cancel_order_by_user_id_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: CancelOrderByUserIdAccounts<'_, '_>,
     args: CancelOrderByUserIdIxArgs,
 ) -> ProgramResult {
     let keys: CancelOrderByUserIdKeys = accounts.into();
-    let ix = cancel_order_by_user_id_ix(keys, args)?;
+    let ix = cancel_order_by_user_id_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn cancel_order_by_user_id_invoke(
+    accounts: CancelOrderByUserIdAccounts<'_, '_>,
+    args: CancelOrderByUserIdIxArgs,
+) -> ProgramResult {
+    cancel_order_by_user_id_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_order_by_user_id_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelOrderByUserIdAccounts<'_, '_>,
+    args: CancelOrderByUserIdIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: CancelOrderByUserIdKeys = accounts.into();
+    let ix = cancel_order_by_user_id_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn cancel_order_by_user_id_invoke_signed(
     accounts: CancelOrderByUserIdAccounts<'_, '_>,
     args: CancelOrderByUserIdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: CancelOrderByUserIdKeys = accounts.into();
-    let ix = cancel_order_by_user_id_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    cancel_order_by_user_id_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_order_by_user_id_verify_account_keys(
     accounts: CancelOrderByUserIdAccounts<'_, '_>,
@@ -3124,22 +3257,37 @@ pub fn cancel_orders_ix(
 ) -> std::io::Result<Instruction> {
     cancel_orders_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn cancel_orders_invoke(
+pub fn cancel_orders_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: CancelOrdersAccounts<'_, '_>,
     args: CancelOrdersIxArgs,
 ) -> ProgramResult {
     let keys: CancelOrdersKeys = accounts.into();
-    let ix = cancel_orders_ix(keys, args)?;
+    let ix = cancel_orders_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn cancel_orders_invoke(
+    accounts: CancelOrdersAccounts<'_, '_>,
+    args: CancelOrdersIxArgs,
+) -> ProgramResult {
+    cancel_orders_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_orders_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelOrdersAccounts<'_, '_>,
+    args: CancelOrdersIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: CancelOrdersKeys = accounts.into();
+    let ix = cancel_orders_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn cancel_orders_invoke_signed(
     accounts: CancelOrdersAccounts<'_, '_>,
     args: CancelOrdersIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: CancelOrdersKeys = accounts.into();
-    let ix = cancel_orders_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    cancel_orders_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn cancel_orders_verify_account_keys(
     accounts: CancelOrdersAccounts<'_, '_>,
@@ -3316,22 +3464,37 @@ pub fn modify_order_ix(
 ) -> std::io::Result<Instruction> {
     modify_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn modify_order_invoke(
+pub fn modify_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ModifyOrderAccounts<'_, '_>,
     args: ModifyOrderIxArgs,
 ) -> ProgramResult {
     let keys: ModifyOrderKeys = accounts.into();
-    let ix = modify_order_ix(keys, args)?;
+    let ix = modify_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn modify_order_invoke(
+    accounts: ModifyOrderAccounts<'_, '_>,
+    args: ModifyOrderIxArgs,
+) -> ProgramResult {
+    modify_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn modify_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ModifyOrderAccounts<'_, '_>,
+    args: ModifyOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ModifyOrderKeys = accounts.into();
+    let ix = modify_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn modify_order_invoke_signed(
     accounts: ModifyOrderAccounts<'_, '_>,
     args: ModifyOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ModifyOrderKeys = accounts.into();
-    let ix = modify_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    modify_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn modify_order_verify_account_keys(
     accounts: ModifyOrderAccounts<'_, '_>,
@@ -3508,22 +3671,37 @@ pub fn modify_order_by_user_id_ix(
 ) -> std::io::Result<Instruction> {
     modify_order_by_user_id_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn modify_order_by_user_id_invoke(
+pub fn modify_order_by_user_id_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ModifyOrderByUserIdAccounts<'_, '_>,
     args: ModifyOrderByUserIdIxArgs,
 ) -> ProgramResult {
     let keys: ModifyOrderByUserIdKeys = accounts.into();
-    let ix = modify_order_by_user_id_ix(keys, args)?;
+    let ix = modify_order_by_user_id_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn modify_order_by_user_id_invoke(
+    accounts: ModifyOrderByUserIdAccounts<'_, '_>,
+    args: ModifyOrderByUserIdIxArgs,
+) -> ProgramResult {
+    modify_order_by_user_id_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn modify_order_by_user_id_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ModifyOrderByUserIdAccounts<'_, '_>,
+    args: ModifyOrderByUserIdIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ModifyOrderByUserIdKeys = accounts.into();
+    let ix = modify_order_by_user_id_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn modify_order_by_user_id_invoke_signed(
     accounts: ModifyOrderByUserIdAccounts<'_, '_>,
     args: ModifyOrderByUserIdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ModifyOrderByUserIdKeys = accounts.into();
-    let ix = modify_order_by_user_id_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    modify_order_by_user_id_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn modify_order_by_user_id_verify_account_keys(
     accounts: ModifyOrderByUserIdAccounts<'_, '_>,
@@ -3711,22 +3889,37 @@ pub fn place_and_take_perp_order_ix(
 ) -> std::io::Result<Instruction> {
     place_and_take_perp_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_and_take_perp_order_invoke(
+pub fn place_and_take_perp_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
     args: PlaceAndTakePerpOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceAndTakePerpOrderKeys = accounts.into();
-    let ix = place_and_take_perp_order_ix(keys, args)?;
+    let ix = place_and_take_perp_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_and_take_perp_order_invoke(
+    accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
+    args: PlaceAndTakePerpOrderIxArgs,
+) -> ProgramResult {
+    place_and_take_perp_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_and_take_perp_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
+    args: PlaceAndTakePerpOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlaceAndTakePerpOrderKeys = accounts.into();
+    let ix = place_and_take_perp_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_and_take_perp_order_invoke_signed(
     accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
     args: PlaceAndTakePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlaceAndTakePerpOrderKeys = accounts.into();
-    let ix = place_and_take_perp_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_and_take_perp_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_and_take_perp_order_verify_account_keys(
     accounts: PlaceAndTakePerpOrderAccounts<'_, '_>,
@@ -3937,22 +4130,37 @@ pub fn place_and_make_perp_order_ix(
 ) -> std::io::Result<Instruction> {
     place_and_make_perp_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_and_make_perp_order_invoke(
+pub fn place_and_make_perp_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
     args: PlaceAndMakePerpOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceAndMakePerpOrderKeys = accounts.into();
-    let ix = place_and_make_perp_order_ix(keys, args)?;
+    let ix = place_and_make_perp_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_and_make_perp_order_invoke(
+    accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
+    args: PlaceAndMakePerpOrderIxArgs,
+) -> ProgramResult {
+    place_and_make_perp_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_and_make_perp_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
+    args: PlaceAndMakePerpOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlaceAndMakePerpOrderKeys = accounts.into();
+    let ix = place_and_make_perp_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_and_make_perp_order_invoke_signed(
     accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
     args: PlaceAndMakePerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlaceAndMakePerpOrderKeys = accounts.into();
-    let ix = place_and_make_perp_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_and_make_perp_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_and_make_perp_order_verify_account_keys(
     accounts: PlaceAndMakePerpOrderAccounts<'_, '_>,
@@ -4136,22 +4344,37 @@ pub fn place_spot_order_ix(
 ) -> std::io::Result<Instruction> {
     place_spot_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_spot_order_invoke(
+pub fn place_spot_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlaceSpotOrderAccounts<'_, '_>,
     args: PlaceSpotOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceSpotOrderKeys = accounts.into();
-    let ix = place_spot_order_ix(keys, args)?;
+    let ix = place_spot_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_spot_order_invoke(
+    accounts: PlaceSpotOrderAccounts<'_, '_>,
+    args: PlaceSpotOrderIxArgs,
+) -> ProgramResult {
+    place_spot_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_spot_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceSpotOrderAccounts<'_, '_>,
+    args: PlaceSpotOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlaceSpotOrderKeys = accounts.into();
+    let ix = place_spot_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_spot_order_invoke_signed(
     accounts: PlaceSpotOrderAccounts<'_, '_>,
     args: PlaceSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlaceSpotOrderKeys = accounts.into();
-    let ix = place_spot_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_spot_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_spot_order_verify_account_keys(
     accounts: PlaceSpotOrderAccounts<'_, '_>,
@@ -4340,22 +4563,37 @@ pub fn place_and_take_spot_order_ix(
 ) -> std::io::Result<Instruction> {
     place_and_take_spot_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_and_take_spot_order_invoke(
+pub fn place_and_take_spot_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
     args: PlaceAndTakeSpotOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
-    let ix = place_and_take_spot_order_ix(keys, args)?;
+    let ix = place_and_take_spot_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_and_take_spot_order_invoke(
+    accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
+    args: PlaceAndTakeSpotOrderIxArgs,
+) -> ProgramResult {
+    place_and_take_spot_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_and_take_spot_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
+    args: PlaceAndTakeSpotOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
+    let ix = place_and_take_spot_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_and_take_spot_order_invoke_signed(
     accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
     args: PlaceAndTakeSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlaceAndTakeSpotOrderKeys = accounts.into();
-    let ix = place_and_take_spot_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_and_take_spot_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_and_take_spot_order_verify_account_keys(
     accounts: PlaceAndTakeSpotOrderAccounts<'_, '_>,
@@ -4567,22 +4805,37 @@ pub fn place_and_make_spot_order_ix(
 ) -> std::io::Result<Instruction> {
     place_and_make_spot_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn place_and_make_spot_order_invoke(
+pub fn place_and_make_spot_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
     args: PlaceAndMakeSpotOrderIxArgs,
 ) -> ProgramResult {
     let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
-    let ix = place_and_make_spot_order_ix(keys, args)?;
+    let ix = place_and_make_spot_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn place_and_make_spot_order_invoke(
+    accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
+    args: PlaceAndMakeSpotOrderIxArgs,
+) -> ProgramResult {
+    place_and_make_spot_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn place_and_make_spot_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
+    args: PlaceAndMakeSpotOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
+    let ix = place_and_make_spot_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn place_and_make_spot_order_invoke_signed(
     accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
     args: PlaceAndMakeSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PlaceAndMakeSpotOrderKeys = accounts.into();
-    let ix = place_and_make_spot_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    place_and_make_spot_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn place_and_make_spot_order_verify_account_keys(
     accounts: PlaceAndMakeSpotOrderAccounts<'_, '_>,
@@ -4853,22 +5106,37 @@ pub fn begin_swap_ix_with_program_id(
 pub fn begin_swap_ix(keys: BeginSwapKeys, args: BeginSwapIxArgs) -> std::io::Result<Instruction> {
     begin_swap_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn begin_swap_invoke(
+pub fn begin_swap_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: BeginSwapAccounts<'_, '_>,
     args: BeginSwapIxArgs,
 ) -> ProgramResult {
     let keys: BeginSwapKeys = accounts.into();
-    let ix = begin_swap_ix(keys, args)?;
+    let ix = begin_swap_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn begin_swap_invoke(
+    accounts: BeginSwapAccounts<'_, '_>,
+    args: BeginSwapIxArgs,
+) -> ProgramResult {
+    begin_swap_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn begin_swap_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: BeginSwapAccounts<'_, '_>,
+    args: BeginSwapIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: BeginSwapKeys = accounts.into();
+    let ix = begin_swap_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn begin_swap_invoke_signed(
     accounts: BeginSwapAccounts<'_, '_>,
     args: BeginSwapIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: BeginSwapKeys = accounts.into();
-    let ix = begin_swap_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    begin_swap_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn begin_swap_verify_account_keys(
     accounts: BeginSwapAccounts<'_, '_>,
@@ -5151,19 +5419,34 @@ pub fn end_swap_ix_with_program_id(
 pub fn end_swap_ix(keys: EndSwapKeys, args: EndSwapIxArgs) -> std::io::Result<Instruction> {
     end_swap_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn end_swap_invoke(accounts: EndSwapAccounts<'_, '_>, args: EndSwapIxArgs) -> ProgramResult {
+pub fn end_swap_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: EndSwapAccounts<'_, '_>,
+    args: EndSwapIxArgs,
+) -> ProgramResult {
     let keys: EndSwapKeys = accounts.into();
-    let ix = end_swap_ix(keys, args)?;
+    let ix = end_swap_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn end_swap_invoke(accounts: EndSwapAccounts<'_, '_>, args: EndSwapIxArgs) -> ProgramResult {
+    end_swap_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn end_swap_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: EndSwapAccounts<'_, '_>,
+    args: EndSwapIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: EndSwapKeys = accounts.into();
+    let ix = end_swap_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn end_swap_invoke_signed(
     accounts: EndSwapAccounts<'_, '_>,
     args: EndSwapIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: EndSwapKeys = accounts.into();
-    let ix = end_swap_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    end_swap_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn end_swap_verify_account_keys(
     accounts: EndSwapAccounts<'_, '_>,
@@ -5361,22 +5644,37 @@ pub fn add_perp_lp_shares_ix(
 ) -> std::io::Result<Instruction> {
     add_perp_lp_shares_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn add_perp_lp_shares_invoke(
+pub fn add_perp_lp_shares_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: AddPerpLpSharesAccounts<'_, '_>,
     args: AddPerpLpSharesIxArgs,
 ) -> ProgramResult {
     let keys: AddPerpLpSharesKeys = accounts.into();
-    let ix = add_perp_lp_shares_ix(keys, args)?;
+    let ix = add_perp_lp_shares_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn add_perp_lp_shares_invoke(
+    accounts: AddPerpLpSharesAccounts<'_, '_>,
+    args: AddPerpLpSharesIxArgs,
+) -> ProgramResult {
+    add_perp_lp_shares_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn add_perp_lp_shares_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: AddPerpLpSharesAccounts<'_, '_>,
+    args: AddPerpLpSharesIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: AddPerpLpSharesKeys = accounts.into();
+    let ix = add_perp_lp_shares_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn add_perp_lp_shares_invoke_signed(
     accounts: AddPerpLpSharesAccounts<'_, '_>,
     args: AddPerpLpSharesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: AddPerpLpSharesKeys = accounts.into();
-    let ix = add_perp_lp_shares_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    add_perp_lp_shares_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn add_perp_lp_shares_verify_account_keys(
     accounts: AddPerpLpSharesAccounts<'_, '_>,
@@ -5553,22 +5851,37 @@ pub fn remove_perp_lp_shares_ix(
 ) -> std::io::Result<Instruction> {
     remove_perp_lp_shares_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn remove_perp_lp_shares_invoke(
+pub fn remove_perp_lp_shares_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: RemovePerpLpSharesAccounts<'_, '_>,
     args: RemovePerpLpSharesIxArgs,
 ) -> ProgramResult {
     let keys: RemovePerpLpSharesKeys = accounts.into();
-    let ix = remove_perp_lp_shares_ix(keys, args)?;
+    let ix = remove_perp_lp_shares_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn remove_perp_lp_shares_invoke(
+    accounts: RemovePerpLpSharesAccounts<'_, '_>,
+    args: RemovePerpLpSharesIxArgs,
+) -> ProgramResult {
+    remove_perp_lp_shares_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn remove_perp_lp_shares_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RemovePerpLpSharesAccounts<'_, '_>,
+    args: RemovePerpLpSharesIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RemovePerpLpSharesKeys = accounts.into();
+    let ix = remove_perp_lp_shares_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn remove_perp_lp_shares_invoke_signed(
     accounts: RemovePerpLpSharesAccounts<'_, '_>,
     args: RemovePerpLpSharesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RemovePerpLpSharesKeys = accounts.into();
-    let ix = remove_perp_lp_shares_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    remove_perp_lp_shares_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn remove_perp_lp_shares_verify_account_keys(
     accounts: RemovePerpLpSharesAccounts<'_, '_>,
@@ -5744,22 +6057,42 @@ pub fn remove_perp_lp_shares_in_expiring_market_ix(
 ) -> std::io::Result<Instruction> {
     remove_perp_lp_shares_in_expiring_market_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn remove_perp_lp_shares_in_expiring_market_invoke(
+pub fn remove_perp_lp_shares_in_expiring_market_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
     args: RemovePerpLpSharesInExpiringMarketIxArgs,
 ) -> ProgramResult {
     let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
-    let ix = remove_perp_lp_shares_in_expiring_market_ix(keys, args)?;
+    let ix = remove_perp_lp_shares_in_expiring_market_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn remove_perp_lp_shares_in_expiring_market_invoke(
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
+    args: RemovePerpLpSharesInExpiringMarketIxArgs,
+) -> ProgramResult {
+    remove_perp_lp_shares_in_expiring_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
+    args: RemovePerpLpSharesInExpiringMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
+    let ix = remove_perp_lp_shares_in_expiring_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn remove_perp_lp_shares_in_expiring_market_invoke_signed(
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
     args: RemovePerpLpSharesInExpiringMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RemovePerpLpSharesInExpiringMarketKeys = accounts.into();
-    let ix = remove_perp_lp_shares_in_expiring_market_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    remove_perp_lp_shares_in_expiring_market_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn remove_perp_lp_shares_in_expiring_market_verify_account_keys(
     accounts: RemovePerpLpSharesInExpiringMarketAccounts<'_, '_>,
@@ -5910,22 +6243,37 @@ pub fn update_user_name_ix(
 ) -> std::io::Result<Instruction> {
     update_user_name_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_user_name_invoke(
+pub fn update_user_name_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserNameAccounts<'_, '_>,
     args: UpdateUserNameIxArgs,
 ) -> ProgramResult {
     let keys: UpdateUserNameKeys = accounts.into();
-    let ix = update_user_name_ix(keys, args)?;
+    let ix = update_user_name_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_name_invoke(
+    accounts: UpdateUserNameAccounts<'_, '_>,
+    args: UpdateUserNameIxArgs,
+) -> ProgramResult {
+    update_user_name_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_user_name_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserNameAccounts<'_, '_>,
+    args: UpdateUserNameIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserNameKeys = accounts.into();
+    let ix = update_user_name_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_name_invoke_signed(
     accounts: UpdateUserNameAccounts<'_, '_>,
     args: UpdateUserNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserNameKeys = accounts.into();
-    let ix = update_user_name_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_name_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_user_name_verify_account_keys(
     accounts: UpdateUserNameAccounts<'_, '_>,
@@ -6095,22 +6443,37 @@ pub fn update_user_custom_margin_ratio_ix(
 ) -> std::io::Result<Instruction> {
     update_user_custom_margin_ratio_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_user_custom_margin_ratio_invoke(
+pub fn update_user_custom_margin_ratio_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
     args: UpdateUserCustomMarginRatioIxArgs,
 ) -> ProgramResult {
     let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
-    let ix = update_user_custom_margin_ratio_ix(keys, args)?;
+    let ix = update_user_custom_margin_ratio_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_custom_margin_ratio_invoke(
+    accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
+    args: UpdateUserCustomMarginRatioIxArgs,
+) -> ProgramResult {
+    update_user_custom_margin_ratio_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_user_custom_margin_ratio_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
+    args: UpdateUserCustomMarginRatioIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
+    let ix = update_user_custom_margin_ratio_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_custom_margin_ratio_invoke_signed(
     accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
     args: UpdateUserCustomMarginRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserCustomMarginRatioKeys = accounts.into();
-    let ix = update_user_custom_margin_ratio_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_custom_margin_ratio_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_user_custom_margin_ratio_verify_account_keys(
     accounts: UpdateUserCustomMarginRatioAccounts<'_, '_>,
@@ -6281,22 +6644,42 @@ pub fn update_user_margin_trading_enabled_ix(
 ) -> std::io::Result<Instruction> {
     update_user_margin_trading_enabled_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_user_margin_trading_enabled_invoke(
+pub fn update_user_margin_trading_enabled_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
     args: UpdateUserMarginTradingEnabledIxArgs,
 ) -> ProgramResult {
     let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
-    let ix = update_user_margin_trading_enabled_ix(keys, args)?;
+    let ix = update_user_margin_trading_enabled_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_margin_trading_enabled_invoke(
+    accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
+    args: UpdateUserMarginTradingEnabledIxArgs,
+) -> ProgramResult {
+    update_user_margin_trading_enabled_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_user_margin_trading_enabled_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
+    args: UpdateUserMarginTradingEnabledIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
+    let ix = update_user_margin_trading_enabled_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_margin_trading_enabled_invoke_signed(
     accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
     args: UpdateUserMarginTradingEnabledIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserMarginTradingEnabledKeys = accounts.into();
-    let ix = update_user_margin_trading_enabled_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_margin_trading_enabled_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_user_margin_trading_enabled_verify_account_keys(
     accounts: UpdateUserMarginTradingEnabledAccounts<'_, '_>,
@@ -6458,22 +6841,37 @@ pub fn update_user_delegate_ix(
 ) -> std::io::Result<Instruction> {
     update_user_delegate_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_user_delegate_invoke(
+pub fn update_user_delegate_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserDelegateAccounts<'_, '_>,
     args: UpdateUserDelegateIxArgs,
 ) -> ProgramResult {
     let keys: UpdateUserDelegateKeys = accounts.into();
-    let ix = update_user_delegate_ix(keys, args)?;
+    let ix = update_user_delegate_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_delegate_invoke(
+    accounts: UpdateUserDelegateAccounts<'_, '_>,
+    args: UpdateUserDelegateIxArgs,
+) -> ProgramResult {
+    update_user_delegate_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_user_delegate_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserDelegateAccounts<'_, '_>,
+    args: UpdateUserDelegateIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserDelegateKeys = accounts.into();
+    let ix = update_user_delegate_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_delegate_invoke_signed(
     accounts: UpdateUserDelegateAccounts<'_, '_>,
     args: UpdateUserDelegateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserDelegateKeys = accounts.into();
-    let ix = update_user_delegate_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_delegate_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_user_delegate_verify_account_keys(
     accounts: UpdateUserDelegateAccounts<'_, '_>,
@@ -6643,18 +7041,31 @@ pub fn delete_user_ix_with_program_id(
 pub fn delete_user_ix(keys: DeleteUserKeys) -> std::io::Result<Instruction> {
     delete_user_ix_with_program_id(crate::ID, keys)
 }
-pub fn delete_user_invoke(accounts: DeleteUserAccounts<'_, '_>) -> ProgramResult {
+pub fn delete_user_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: DeleteUserAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: DeleteUserKeys = accounts.into();
-    let ix = delete_user_ix(keys)?;
+    let ix = delete_user_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn delete_user_invoke(accounts: DeleteUserAccounts<'_, '_>) -> ProgramResult {
+    delete_user_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn delete_user_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeleteUserAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: DeleteUserKeys = accounts.into();
+    let ix = delete_user_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn delete_user_invoke_signed(
     accounts: DeleteUserAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: DeleteUserKeys = accounts.into();
-    let ix = delete_user_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    delete_user_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn delete_user_verify_account_keys(
     accounts: DeleteUserAccounts<'_, '_>,
@@ -6865,22 +7276,37 @@ pub fn fill_perp_order_ix(
 ) -> std::io::Result<Instruction> {
     fill_perp_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn fill_perp_order_invoke(
+pub fn fill_perp_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: FillPerpOrderAccounts<'_, '_>,
     args: FillPerpOrderIxArgs,
 ) -> ProgramResult {
     let keys: FillPerpOrderKeys = accounts.into();
-    let ix = fill_perp_order_ix(keys, args)?;
+    let ix = fill_perp_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn fill_perp_order_invoke(
+    accounts: FillPerpOrderAccounts<'_, '_>,
+    args: FillPerpOrderIxArgs,
+) -> ProgramResult {
+    fill_perp_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn fill_perp_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: FillPerpOrderAccounts<'_, '_>,
+    args: FillPerpOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: FillPerpOrderKeys = accounts.into();
+    let ix = fill_perp_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn fill_perp_order_invoke_signed(
     accounts: FillPerpOrderAccounts<'_, '_>,
     args: FillPerpOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: FillPerpOrderKeys = accounts.into();
-    let ix = fill_perp_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    fill_perp_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn fill_perp_order_verify_account_keys(
     accounts: FillPerpOrderAccounts<'_, '_>,
@@ -7059,18 +7485,31 @@ pub fn revert_fill_ix_with_program_id(
 pub fn revert_fill_ix(keys: RevertFillKeys) -> std::io::Result<Instruction> {
     revert_fill_ix_with_program_id(crate::ID, keys)
 }
-pub fn revert_fill_invoke(accounts: RevertFillAccounts<'_, '_>) -> ProgramResult {
+pub fn revert_fill_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: RevertFillAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: RevertFillKeys = accounts.into();
-    let ix = revert_fill_ix(keys)?;
+    let ix = revert_fill_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn revert_fill_invoke(accounts: RevertFillAccounts<'_, '_>) -> ProgramResult {
+    revert_fill_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn revert_fill_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RevertFillAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RevertFillKeys = accounts.into();
+    let ix = revert_fill_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn revert_fill_invoke_signed(
     accounts: RevertFillAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RevertFillKeys = accounts.into();
-    let ix = revert_fill_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    revert_fill_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn revert_fill_verify_account_keys(
     accounts: RevertFillAccounts<'_, '_>,
@@ -7282,22 +7721,37 @@ pub fn fill_spot_order_ix(
 ) -> std::io::Result<Instruction> {
     fill_spot_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn fill_spot_order_invoke(
+pub fn fill_spot_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: FillSpotOrderAccounts<'_, '_>,
     args: FillSpotOrderIxArgs,
 ) -> ProgramResult {
     let keys: FillSpotOrderKeys = accounts.into();
-    let ix = fill_spot_order_ix(keys, args)?;
+    let ix = fill_spot_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn fill_spot_order_invoke(
+    accounts: FillSpotOrderAccounts<'_, '_>,
+    args: FillSpotOrderIxArgs,
+) -> ProgramResult {
+    fill_spot_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn fill_spot_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: FillSpotOrderAccounts<'_, '_>,
+    args: FillSpotOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: FillSpotOrderKeys = accounts.into();
+    let ix = fill_spot_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn fill_spot_order_invoke_signed(
     accounts: FillSpotOrderAccounts<'_, '_>,
     args: FillSpotOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: FillSpotOrderKeys = accounts.into();
-    let ix = fill_spot_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    fill_spot_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn fill_spot_order_verify_account_keys(
     accounts: FillSpotOrderAccounts<'_, '_>,
@@ -7492,22 +7946,37 @@ pub fn trigger_order_ix(
 ) -> std::io::Result<Instruction> {
     trigger_order_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn trigger_order_invoke(
+pub fn trigger_order_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: TriggerOrderAccounts<'_, '_>,
     args: TriggerOrderIxArgs,
 ) -> ProgramResult {
     let keys: TriggerOrderKeys = accounts.into();
-    let ix = trigger_order_ix(keys, args)?;
+    let ix = trigger_order_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn trigger_order_invoke(
+    accounts: TriggerOrderAccounts<'_, '_>,
+    args: TriggerOrderIxArgs,
+) -> ProgramResult {
+    trigger_order_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn trigger_order_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: TriggerOrderAccounts<'_, '_>,
+    args: TriggerOrderIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: TriggerOrderKeys = accounts.into();
+    let ix = trigger_order_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn trigger_order_invoke_signed(
     accounts: TriggerOrderAccounts<'_, '_>,
     args: TriggerOrderIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: TriggerOrderKeys = accounts.into();
-    let ix = trigger_order_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    trigger_order_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn trigger_order_verify_account_keys(
     accounts: TriggerOrderAccounts<'_, '_>,
@@ -7679,18 +8148,31 @@ pub fn force_cancel_orders_ix_with_program_id(
 pub fn force_cancel_orders_ix(keys: ForceCancelOrdersKeys) -> std::io::Result<Instruction> {
     force_cancel_orders_ix_with_program_id(crate::ID, keys)
 }
-pub fn force_cancel_orders_invoke(accounts: ForceCancelOrdersAccounts<'_, '_>) -> ProgramResult {
+pub fn force_cancel_orders_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: ForceCancelOrdersKeys = accounts.into();
-    let ix = force_cancel_orders_ix(keys)?;
+    let ix = force_cancel_orders_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn force_cancel_orders_invoke(accounts: ForceCancelOrdersAccounts<'_, '_>) -> ProgramResult {
+    force_cancel_orders_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn force_cancel_orders_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ForceCancelOrdersAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ForceCancelOrdersKeys = accounts.into();
+    let ix = force_cancel_orders_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn force_cancel_orders_invoke_signed(
     accounts: ForceCancelOrdersAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ForceCancelOrdersKeys = accounts.into();
-    let ix = force_cancel_orders_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    force_cancel_orders_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn force_cancel_orders_verify_account_keys(
     accounts: ForceCancelOrdersAccounts<'_, '_>,
@@ -7862,18 +8344,31 @@ pub fn update_user_idle_ix_with_program_id(
 pub fn update_user_idle_ix(keys: UpdateUserIdleKeys) -> std::io::Result<Instruction> {
     update_user_idle_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_user_idle_invoke(accounts: UpdateUserIdleAccounts<'_, '_>) -> ProgramResult {
+pub fn update_user_idle_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserIdleAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: UpdateUserIdleKeys = accounts.into();
-    let ix = update_user_idle_ix(keys)?;
+    let ix = update_user_idle_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_idle_invoke(accounts: UpdateUserIdleAccounts<'_, '_>) -> ProgramResult {
+    update_user_idle_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_user_idle_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserIdleAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserIdleKeys = accounts.into();
+    let ix = update_user_idle_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_idle_invoke_signed(
     accounts: UpdateUserIdleAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserIdleKeys = accounts.into();
-    let ix = update_user_idle_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_idle_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_user_idle_verify_account_keys(
     accounts: UpdateUserIdleAccounts<'_, '_>,
@@ -8051,20 +8546,33 @@ pub fn update_user_open_orders_count_ix(
 ) -> std::io::Result<Instruction> {
     update_user_open_orders_count_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_user_open_orders_count_invoke(
+pub fn update_user_open_orders_count_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
-    let ix = update_user_open_orders_count_ix(keys)?;
+    let ix = update_user_open_orders_count_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_open_orders_count_invoke(
+    accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
+) -> ProgramResult {
+    update_user_open_orders_count_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_user_open_orders_count_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
+    let ix = update_user_open_orders_count_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_open_orders_count_invoke_signed(
     accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserOpenOrdersCountKeys = accounts.into();
-    let ix = update_user_open_orders_count_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_open_orders_count_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_user_open_orders_count_verify_account_keys(
     accounts: UpdateUserOpenOrdersCountAccounts<'_, '_>,
@@ -8249,22 +8757,37 @@ pub fn settle_pnl_ix_with_program_id(
 pub fn settle_pnl_ix(keys: SettlePnlKeys, args: SettlePnlIxArgs) -> std::io::Result<Instruction> {
     settle_pnl_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn settle_pnl_invoke(
+pub fn settle_pnl_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: SettlePnlAccounts<'_, '_>,
     args: SettlePnlIxArgs,
 ) -> ProgramResult {
     let keys: SettlePnlKeys = accounts.into();
-    let ix = settle_pnl_ix(keys, args)?;
+    let ix = settle_pnl_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_pnl_invoke(
+    accounts: SettlePnlAccounts<'_, '_>,
+    args: SettlePnlIxArgs,
+) -> ProgramResult {
+    settle_pnl_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn settle_pnl_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettlePnlAccounts<'_, '_>,
+    args: SettlePnlIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettlePnlKeys = accounts.into();
+    let ix = settle_pnl_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_pnl_invoke_signed(
     accounts: SettlePnlAccounts<'_, '_>,
     args: SettlePnlIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettlePnlKeys = accounts.into();
-    let ix = settle_pnl_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_pnl_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn settle_pnl_verify_account_keys(
     accounts: SettlePnlAccounts<'_, '_>,
@@ -8411,20 +8934,33 @@ pub fn settle_funding_payment_ix_with_program_id(
 pub fn settle_funding_payment_ix(keys: SettleFundingPaymentKeys) -> std::io::Result<Instruction> {
     settle_funding_payment_ix_with_program_id(crate::ID, keys)
 }
-pub fn settle_funding_payment_invoke(
+pub fn settle_funding_payment_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: SettleFundingPaymentAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: SettleFundingPaymentKeys = accounts.into();
-    let ix = settle_funding_payment_ix(keys)?;
+    let ix = settle_funding_payment_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_funding_payment_invoke(
+    accounts: SettleFundingPaymentAccounts<'_, '_>,
+) -> ProgramResult {
+    settle_funding_payment_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn settle_funding_payment_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleFundingPaymentAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettleFundingPaymentKeys = accounts.into();
+    let ix = settle_funding_payment_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_funding_payment_invoke_signed(
     accounts: SettleFundingPaymentAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettleFundingPaymentKeys = accounts.into();
-    let ix = settle_funding_payment_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_funding_payment_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn settle_funding_payment_verify_account_keys(
     accounts: SettleFundingPaymentAccounts<'_, '_>,
@@ -8569,19 +9105,34 @@ pub fn settle_lp_ix_with_program_id(
 pub fn settle_lp_ix(keys: SettleLpKeys, args: SettleLpIxArgs) -> std::io::Result<Instruction> {
     settle_lp_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn settle_lp_invoke(accounts: SettleLpAccounts<'_, '_>, args: SettleLpIxArgs) -> ProgramResult {
+pub fn settle_lp_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleLpAccounts<'_, '_>,
+    args: SettleLpIxArgs,
+) -> ProgramResult {
     let keys: SettleLpKeys = accounts.into();
-    let ix = settle_lp_ix(keys, args)?;
+    let ix = settle_lp_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_lp_invoke(accounts: SettleLpAccounts<'_, '_>, args: SettleLpIxArgs) -> ProgramResult {
+    settle_lp_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn settle_lp_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleLpAccounts<'_, '_>,
+    args: SettleLpIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettleLpKeys = accounts.into();
+    let ix = settle_lp_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_lp_invoke_signed(
     accounts: SettleLpAccounts<'_, '_>,
     args: SettleLpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettleLpKeys = accounts.into();
-    let ix = settle_lp_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_lp_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn settle_lp_verify_account_keys(
     accounts: SettleLpAccounts<'_, '_>,
@@ -8731,22 +9282,37 @@ pub fn settle_expired_market_ix(
 ) -> std::io::Result<Instruction> {
     settle_expired_market_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn settle_expired_market_invoke(
+pub fn settle_expired_market_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: SettleExpiredMarketAccounts<'_, '_>,
     args: SettleExpiredMarketIxArgs,
 ) -> ProgramResult {
     let keys: SettleExpiredMarketKeys = accounts.into();
-    let ix = settle_expired_market_ix(keys, args)?;
+    let ix = settle_expired_market_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_expired_market_invoke(
+    accounts: SettleExpiredMarketAccounts<'_, '_>,
+    args: SettleExpiredMarketIxArgs,
+) -> ProgramResult {
+    settle_expired_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn settle_expired_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleExpiredMarketAccounts<'_, '_>,
+    args: SettleExpiredMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettleExpiredMarketKeys = accounts.into();
+    let ix = settle_expired_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_expired_market_invoke_signed(
     accounts: SettleExpiredMarketAccounts<'_, '_>,
     args: SettleExpiredMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettleExpiredMarketKeys = accounts.into();
-    let ix = settle_expired_market_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_expired_market_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn settle_expired_market_verify_account_keys(
     accounts: SettleExpiredMarketAccounts<'_, '_>,
@@ -8945,22 +9511,37 @@ pub fn liquidate_perp_ix(
 ) -> std::io::Result<Instruction> {
     liquidate_perp_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn liquidate_perp_invoke(
+pub fn liquidate_perp_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: LiquidatePerpAccounts<'_, '_>,
     args: LiquidatePerpIxArgs,
 ) -> ProgramResult {
     let keys: LiquidatePerpKeys = accounts.into();
-    let ix = liquidate_perp_ix(keys, args)?;
+    let ix = liquidate_perp_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn liquidate_perp_invoke(
+    accounts: LiquidatePerpAccounts<'_, '_>,
+    args: LiquidatePerpIxArgs,
+) -> ProgramResult {
+    liquidate_perp_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn liquidate_perp_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: LiquidatePerpAccounts<'_, '_>,
+    args: LiquidatePerpIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: LiquidatePerpKeys = accounts.into();
+    let ix = liquidate_perp_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn liquidate_perp_invoke_signed(
     accounts: LiquidatePerpAccounts<'_, '_>,
     args: LiquidatePerpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: LiquidatePerpKeys = accounts.into();
-    let ix = liquidate_perp_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    liquidate_perp_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn liquidate_perp_verify_account_keys(
     accounts: LiquidatePerpAccounts<'_, '_>,
@@ -9180,22 +9761,37 @@ pub fn liquidate_spot_ix(
 ) -> std::io::Result<Instruction> {
     liquidate_spot_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn liquidate_spot_invoke(
+pub fn liquidate_spot_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: LiquidateSpotAccounts<'_, '_>,
     args: LiquidateSpotIxArgs,
 ) -> ProgramResult {
     let keys: LiquidateSpotKeys = accounts.into();
-    let ix = liquidate_spot_ix(keys, args)?;
+    let ix = liquidate_spot_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn liquidate_spot_invoke(
+    accounts: LiquidateSpotAccounts<'_, '_>,
+    args: LiquidateSpotIxArgs,
+) -> ProgramResult {
+    liquidate_spot_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn liquidate_spot_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: LiquidateSpotAccounts<'_, '_>,
+    args: LiquidateSpotIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: LiquidateSpotKeys = accounts.into();
+    let ix = liquidate_spot_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn liquidate_spot_invoke_signed(
     accounts: LiquidateSpotAccounts<'_, '_>,
     args: LiquidateSpotIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: LiquidateSpotKeys = accounts.into();
-    let ix = liquidate_spot_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    liquidate_spot_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn liquidate_spot_verify_account_keys(
     accounts: LiquidateSpotAccounts<'_, '_>,
@@ -9421,22 +10017,37 @@ pub fn liquidate_borrow_for_perp_pnl_ix(
 ) -> std::io::Result<Instruction> {
     liquidate_borrow_for_perp_pnl_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn liquidate_borrow_for_perp_pnl_invoke(
+pub fn liquidate_borrow_for_perp_pnl_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
     args: LiquidateBorrowForPerpPnlIxArgs,
 ) -> ProgramResult {
     let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
-    let ix = liquidate_borrow_for_perp_pnl_ix(keys, args)?;
+    let ix = liquidate_borrow_for_perp_pnl_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn liquidate_borrow_for_perp_pnl_invoke(
+    accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
+    args: LiquidateBorrowForPerpPnlIxArgs,
+) -> ProgramResult {
+    liquidate_borrow_for_perp_pnl_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn liquidate_borrow_for_perp_pnl_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
+    args: LiquidateBorrowForPerpPnlIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
+    let ix = liquidate_borrow_for_perp_pnl_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn liquidate_borrow_for_perp_pnl_invoke_signed(
     accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
     args: LiquidateBorrowForPerpPnlIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: LiquidateBorrowForPerpPnlKeys = accounts.into();
-    let ix = liquidate_borrow_for_perp_pnl_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    liquidate_borrow_for_perp_pnl_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn liquidate_borrow_for_perp_pnl_verify_account_keys(
     accounts: LiquidateBorrowForPerpPnlAccounts<'_, '_>,
@@ -9664,22 +10275,37 @@ pub fn liquidate_perp_pnl_for_deposit_ix(
 ) -> std::io::Result<Instruction> {
     liquidate_perp_pnl_for_deposit_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn liquidate_perp_pnl_for_deposit_invoke(
+pub fn liquidate_perp_pnl_for_deposit_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
     args: LiquidatePerpPnlForDepositIxArgs,
 ) -> ProgramResult {
     let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
-    let ix = liquidate_perp_pnl_for_deposit_ix(keys, args)?;
+    let ix = liquidate_perp_pnl_for_deposit_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn liquidate_perp_pnl_for_deposit_invoke(
+    accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
+    args: LiquidatePerpPnlForDepositIxArgs,
+) -> ProgramResult {
+    liquidate_perp_pnl_for_deposit_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn liquidate_perp_pnl_for_deposit_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
+    args: LiquidatePerpPnlForDepositIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
+    let ix = liquidate_perp_pnl_for_deposit_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn liquidate_perp_pnl_for_deposit_invoke_signed(
     accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
     args: LiquidatePerpPnlForDepositIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: LiquidatePerpPnlForDepositKeys = accounts.into();
-    let ix = liquidate_perp_pnl_for_deposit_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    liquidate_perp_pnl_for_deposit_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn liquidate_perp_pnl_for_deposit_verify_account_keys(
     accounts: LiquidatePerpPnlForDepositAccounts<'_, '_>,
@@ -9897,22 +10523,37 @@ pub fn resolve_perp_pnl_deficit_ix(
 ) -> std::io::Result<Instruction> {
     resolve_perp_pnl_deficit_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn resolve_perp_pnl_deficit_invoke(
+pub fn resolve_perp_pnl_deficit_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
     args: ResolvePerpPnlDeficitIxArgs,
 ) -> ProgramResult {
     let keys: ResolvePerpPnlDeficitKeys = accounts.into();
-    let ix = resolve_perp_pnl_deficit_ix(keys, args)?;
+    let ix = resolve_perp_pnl_deficit_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn resolve_perp_pnl_deficit_invoke(
+    accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
+    args: ResolvePerpPnlDeficitIxArgs,
+) -> ProgramResult {
+    resolve_perp_pnl_deficit_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn resolve_perp_pnl_deficit_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
+    args: ResolvePerpPnlDeficitIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ResolvePerpPnlDeficitKeys = accounts.into();
+    let ix = resolve_perp_pnl_deficit_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn resolve_perp_pnl_deficit_invoke_signed(
     accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
     args: ResolvePerpPnlDeficitIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ResolvePerpPnlDeficitKeys = accounts.into();
-    let ix = resolve_perp_pnl_deficit_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    resolve_perp_pnl_deficit_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn resolve_perp_pnl_deficit_verify_account_keys(
     accounts: ResolvePerpPnlDeficitAccounts<'_, '_>,
@@ -10172,22 +10813,37 @@ pub fn resolve_perp_bankruptcy_ix(
 ) -> std::io::Result<Instruction> {
     resolve_perp_bankruptcy_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn resolve_perp_bankruptcy_invoke(
+pub fn resolve_perp_bankruptcy_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
     args: ResolvePerpBankruptcyIxArgs,
 ) -> ProgramResult {
     let keys: ResolvePerpBankruptcyKeys = accounts.into();
-    let ix = resolve_perp_bankruptcy_ix(keys, args)?;
+    let ix = resolve_perp_bankruptcy_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn resolve_perp_bankruptcy_invoke(
+    accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
+    args: ResolvePerpBankruptcyIxArgs,
+) -> ProgramResult {
+    resolve_perp_bankruptcy_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn resolve_perp_bankruptcy_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
+    args: ResolvePerpBankruptcyIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ResolvePerpBankruptcyKeys = accounts.into();
+    let ix = resolve_perp_bankruptcy_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn resolve_perp_bankruptcy_invoke_signed(
     accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
     args: ResolvePerpBankruptcyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ResolvePerpBankruptcyKeys = accounts.into();
-    let ix = resolve_perp_bankruptcy_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    resolve_perp_bankruptcy_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn resolve_perp_bankruptcy_verify_account_keys(
     accounts: ResolvePerpBankruptcyAccounts<'_, '_>,
@@ -10457,22 +11113,37 @@ pub fn resolve_spot_bankruptcy_ix(
 ) -> std::io::Result<Instruction> {
     resolve_spot_bankruptcy_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn resolve_spot_bankruptcy_invoke(
+pub fn resolve_spot_bankruptcy_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
     args: ResolveSpotBankruptcyIxArgs,
 ) -> ProgramResult {
     let keys: ResolveSpotBankruptcyKeys = accounts.into();
-    let ix = resolve_spot_bankruptcy_ix(keys, args)?;
+    let ix = resolve_spot_bankruptcy_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn resolve_spot_bankruptcy_invoke(
+    accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
+    args: ResolveSpotBankruptcyIxArgs,
+) -> ProgramResult {
+    resolve_spot_bankruptcy_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn resolve_spot_bankruptcy_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
+    args: ResolveSpotBankruptcyIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ResolveSpotBankruptcyKeys = accounts.into();
+    let ix = resolve_spot_bankruptcy_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn resolve_spot_bankruptcy_invoke_signed(
     accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
     args: ResolveSpotBankruptcyIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ResolveSpotBankruptcyKeys = accounts.into();
-    let ix = resolve_spot_bankruptcy_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    resolve_spot_bankruptcy_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn resolve_spot_bankruptcy_verify_account_keys(
     accounts: ResolveSpotBankruptcyAccounts<'_, '_>,
@@ -10707,22 +11378,37 @@ pub fn settle_revenue_to_insurance_fund_ix(
 ) -> std::io::Result<Instruction> {
     settle_revenue_to_insurance_fund_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn settle_revenue_to_insurance_fund_invoke(
+pub fn settle_revenue_to_insurance_fund_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
     args: SettleRevenueToInsuranceFundIxArgs,
 ) -> ProgramResult {
     let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
-    let ix = settle_revenue_to_insurance_fund_ix(keys, args)?;
+    let ix = settle_revenue_to_insurance_fund_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_revenue_to_insurance_fund_invoke(
+    accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
+    args: SettleRevenueToInsuranceFundIxArgs,
+) -> ProgramResult {
+    settle_revenue_to_insurance_fund_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn settle_revenue_to_insurance_fund_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
+    args: SettleRevenueToInsuranceFundIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
+    let ix = settle_revenue_to_insurance_fund_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_revenue_to_insurance_fund_invoke_signed(
     accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
     args: SettleRevenueToInsuranceFundIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettleRevenueToInsuranceFundKeys = accounts.into();
-    let ix = settle_revenue_to_insurance_fund_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_revenue_to_insurance_fund_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn settle_revenue_to_insurance_fund_verify_account_keys(
     accounts: SettleRevenueToInsuranceFundAccounts<'_, '_>,
@@ -10897,22 +11583,37 @@ pub fn update_funding_rate_ix(
 ) -> std::io::Result<Instruction> {
     update_funding_rate_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_funding_rate_invoke(
+pub fn update_funding_rate_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateFundingRateAccounts<'_, '_>,
     args: UpdateFundingRateIxArgs,
 ) -> ProgramResult {
     let keys: UpdateFundingRateKeys = accounts.into();
-    let ix = update_funding_rate_ix(keys, args)?;
+    let ix = update_funding_rate_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_funding_rate_invoke(
+    accounts: UpdateFundingRateAccounts<'_, '_>,
+    args: UpdateFundingRateIxArgs,
+) -> ProgramResult {
+    update_funding_rate_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_funding_rate_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateFundingRateAccounts<'_, '_>,
+    args: UpdateFundingRateIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateFundingRateKeys = accounts.into();
+    let ix = update_funding_rate_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_funding_rate_invoke_signed(
     accounts: UpdateFundingRateAccounts<'_, '_>,
     args: UpdateFundingRateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateFundingRateKeys = accounts.into();
-    let ix = update_funding_rate_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_funding_rate_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_funding_rate_verify_account_keys(
     accounts: UpdateFundingRateAccounts<'_, '_>,
@@ -11073,20 +11774,33 @@ pub fn update_spot_market_cumulative_interest_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_cumulative_interest_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_spot_market_cumulative_interest_invoke(
+pub fn update_spot_market_cumulative_interest_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
-    let ix = update_spot_market_cumulative_interest_ix(keys)?;
+    let ix = update_spot_market_cumulative_interest_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_cumulative_interest_invoke(
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
+) -> ProgramResult {
+    update_spot_market_cumulative_interest_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_spot_market_cumulative_interest_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
+    let ix = update_spot_market_cumulative_interest_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_cumulative_interest_invoke_signed(
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketCumulativeInterestKeys = accounts.into();
-    let ix = update_spot_market_cumulative_interest_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_cumulative_interest_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_spot_market_cumulative_interest_verify_account_keys(
     accounts: UpdateSpotMarketCumulativeInterestAccounts<'_, '_>,
@@ -11237,22 +11951,37 @@ pub fn update_amms_ix(
 ) -> std::io::Result<Instruction> {
     update_amms_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_amms_invoke(
+pub fn update_amms_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateAmmsAccounts<'_, '_>,
     args: UpdateAmmsIxArgs,
 ) -> ProgramResult {
     let keys: UpdateAmmsKeys = accounts.into();
-    let ix = update_amms_ix(keys, args)?;
+    let ix = update_amms_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_amms_invoke(
+    accounts: UpdateAmmsAccounts<'_, '_>,
+    args: UpdateAmmsIxArgs,
+) -> ProgramResult {
+    update_amms_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_amms_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateAmmsAccounts<'_, '_>,
+    args: UpdateAmmsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateAmmsKeys = accounts.into();
+    let ix = update_amms_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_amms_invoke_signed(
     accounts: UpdateAmmsAccounts<'_, '_>,
     args: UpdateAmmsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateAmmsKeys = accounts.into();
-    let ix = update_amms_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_amms_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_amms_verify_account_keys(
     accounts: UpdateAmmsAccounts<'_, '_>,
@@ -11418,22 +12147,37 @@ pub fn update_spot_market_expiry_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_expiry_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_expiry_invoke(
+pub fn update_spot_market_expiry_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
     args: UpdateSpotMarketExpiryIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketExpiryKeys = accounts.into();
-    let ix = update_spot_market_expiry_ix(keys, args)?;
+    let ix = update_spot_market_expiry_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_expiry_invoke(
+    accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
+    args: UpdateSpotMarketExpiryIxArgs,
+) -> ProgramResult {
+    update_spot_market_expiry_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_expiry_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
+    args: UpdateSpotMarketExpiryIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketExpiryKeys = accounts.into();
+    let ix = update_spot_market_expiry_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_expiry_invoke_signed(
     accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
     args: UpdateSpotMarketExpiryIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketExpiryKeys = accounts.into();
-    let ix = update_spot_market_expiry_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_expiry_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_expiry_verify_account_keys(
     accounts: UpdateSpotMarketExpiryAccounts<'_, '_>,
@@ -11638,20 +12382,37 @@ pub fn update_user_quote_asset_insurance_stake_ix(
 ) -> std::io::Result<Instruction> {
     update_user_quote_asset_insurance_stake_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_user_quote_asset_insurance_stake_invoke(
+pub fn update_user_quote_asset_insurance_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
-    let ix = update_user_quote_asset_insurance_stake_ix(keys)?;
+    let ix = update_user_quote_asset_insurance_stake_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_user_quote_asset_insurance_stake_invoke(
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
+) -> ProgramResult {
+    update_user_quote_asset_insurance_stake_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_user_quote_asset_insurance_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
+    let ix = update_user_quote_asset_insurance_stake_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_user_quote_asset_insurance_stake_invoke_signed(
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateUserQuoteAssetInsuranceStakeKeys = accounts.into();
-    let ix = update_user_quote_asset_insurance_stake_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_user_quote_asset_insurance_stake_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        seeds,
+    )
 }
 pub fn update_user_quote_asset_insurance_stake_verify_account_keys(
     accounts: UpdateUserQuoteAssetInsuranceStakeAccounts<'_, '_>,
@@ -11903,22 +12664,37 @@ pub fn initialize_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     initialize_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_insurance_fund_stake_invoke(
+pub fn initialize_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
     args: InitializeInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: InitializeInsuranceFundStakeKeys = accounts.into();
-    let ix = initialize_insurance_fund_stake_ix(keys, args)?;
+    let ix = initialize_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_insurance_fund_stake_invoke(
+    accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
+    args: InitializeInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    initialize_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
+    args: InitializeInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeInsuranceFundStakeKeys = accounts.into();
+    let ix = initialize_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_insurance_fund_stake_invoke_signed(
     accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
     args: InitializeInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeInsuranceFundStakeKeys = accounts.into();
-    let ix = initialize_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_insurance_fund_stake_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_insurance_fund_stake_verify_account_keys(
     accounts: InitializeInsuranceFundStakeAccounts<'_, '_>,
@@ -12184,22 +12960,37 @@ pub fn add_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     add_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn add_insurance_fund_stake_invoke(
+pub fn add_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: AddInsuranceFundStakeAccounts<'_, '_>,
     args: AddInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: AddInsuranceFundStakeKeys = accounts.into();
-    let ix = add_insurance_fund_stake_ix(keys, args)?;
+    let ix = add_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn add_insurance_fund_stake_invoke(
+    accounts: AddInsuranceFundStakeAccounts<'_, '_>,
+    args: AddInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    add_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn add_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: AddInsuranceFundStakeAccounts<'_, '_>,
+    args: AddInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: AddInsuranceFundStakeKeys = accounts.into();
+    let ix = add_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn add_insurance_fund_stake_invoke_signed(
     accounts: AddInsuranceFundStakeAccounts<'_, '_>,
     args: AddInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: AddInsuranceFundStakeKeys = accounts.into();
-    let ix = add_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    add_insurance_fund_stake_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn add_insurance_fund_stake_verify_account_keys(
     accounts: AddInsuranceFundStakeAccounts<'_, '_>,
@@ -12427,22 +13218,42 @@ pub fn request_remove_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     request_remove_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn request_remove_insurance_fund_stake_invoke(
+pub fn request_remove_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: RequestRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = request_remove_insurance_fund_stake_ix(keys, args)?;
+    let ix = request_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn request_remove_insurance_fund_stake_invoke(
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: RequestRemoveInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    request_remove_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn request_remove_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: RequestRemoveInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = request_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn request_remove_insurance_fund_stake_invoke_signed(
     accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: RequestRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RequestRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = request_remove_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    request_remove_insurance_fund_stake_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn request_remove_insurance_fund_stake_verify_account_keys(
     accounts: RequestRemoveInsuranceFundStakeAccounts<'_, '_>,
@@ -12669,22 +13480,42 @@ pub fn cancel_request_remove_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     cancel_request_remove_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn cancel_request_remove_insurance_fund_stake_invoke(
+pub fn cancel_request_remove_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: CancelRequestRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = cancel_request_remove_insurance_fund_stake_ix(keys, args)?;
+    let ix = cancel_request_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn cancel_request_remove_insurance_fund_stake_invoke(
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: CancelRequestRemoveInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    cancel_request_remove_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn cancel_request_remove_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: CancelRequestRemoveInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = cancel_request_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn cancel_request_remove_insurance_fund_stake_invoke_signed(
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: CancelRequestRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: CancelRequestRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = cancel_request_remove_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    cancel_request_remove_insurance_fund_stake_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn cancel_request_remove_insurance_fund_stake_verify_account_keys(
     accounts: CancelRequestRemoveInsuranceFundStakeAccounts<'_, '_>,
@@ -12942,22 +13773,37 @@ pub fn remove_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     remove_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn remove_insurance_fund_stake_invoke(
+pub fn remove_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
     args: RemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: RemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = remove_insurance_fund_stake_ix(keys, args)?;
+    let ix = remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn remove_insurance_fund_stake_invoke(
+    accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: RemoveInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    remove_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn remove_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: RemoveInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn remove_insurance_fund_stake_invoke_signed(
     accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
     args: RemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = remove_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    remove_insurance_fund_stake_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn remove_insurance_fund_stake_verify_account_keys(
     accounts: RemoveInsuranceFundStakeAccounts<'_, '_>,
@@ -13178,18 +14024,31 @@ pub fn initialize_ix_with_program_id(
 pub fn initialize_ix(keys: InitializeKeys) -> std::io::Result<Instruction> {
     initialize_ix_with_program_id(crate::ID, keys)
 }
-pub fn initialize_invoke(accounts: InitializeAccounts<'_, '_>) -> ProgramResult {
+pub fn initialize_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: InitializeKeys = accounts.into();
-    let ix = initialize_ix(keys)?;
+    let ix = initialize_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_invoke(accounts: InitializeAccounts<'_, '_>) -> ProgramResult {
+    initialize_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn initialize_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeKeys = accounts.into();
+    let ix = initialize_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_invoke_signed(
     accounts: InitializeAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeKeys = accounts.into();
-    let ix = initialize_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn initialize_verify_account_keys(
     accounts: InitializeAccounts<'_, '_>,
@@ -13468,22 +14327,37 @@ pub fn initialize_spot_market_ix(
 ) -> std::io::Result<Instruction> {
     initialize_spot_market_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_spot_market_invoke(
+pub fn initialize_spot_market_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeSpotMarketAccounts<'_, '_>,
     args: InitializeSpotMarketIxArgs,
 ) -> ProgramResult {
     let keys: InitializeSpotMarketKeys = accounts.into();
-    let ix = initialize_spot_market_ix(keys, args)?;
+    let ix = initialize_spot_market_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_spot_market_invoke(
+    accounts: InitializeSpotMarketAccounts<'_, '_>,
+    args: InitializeSpotMarketIxArgs,
+) -> ProgramResult {
+    initialize_spot_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_spot_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeSpotMarketAccounts<'_, '_>,
+    args: InitializeSpotMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeSpotMarketKeys = accounts.into();
+    let ix = initialize_spot_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_spot_market_invoke_signed(
     accounts: InitializeSpotMarketAccounts<'_, '_>,
     args: InitializeSpotMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeSpotMarketKeys = accounts.into();
-    let ix = initialize_spot_market_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_spot_market_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_spot_market_verify_account_keys(
     accounts: InitializeSpotMarketAccounts<'_, '_>,
@@ -13776,22 +14650,42 @@ pub fn initialize_serum_fulfillment_config_ix(
 ) -> std::io::Result<Instruction> {
     initialize_serum_fulfillment_config_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_serum_fulfillment_config_invoke(
+pub fn initialize_serum_fulfillment_config_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
     args: InitializeSerumFulfillmentConfigIxArgs,
 ) -> ProgramResult {
     let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
-    let ix = initialize_serum_fulfillment_config_ix(keys, args)?;
+    let ix = initialize_serum_fulfillment_config_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_serum_fulfillment_config_invoke(
+    accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
+    args: InitializeSerumFulfillmentConfigIxArgs,
+) -> ProgramResult {
+    initialize_serum_fulfillment_config_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_serum_fulfillment_config_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
+    args: InitializeSerumFulfillmentConfigIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_serum_fulfillment_config_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_serum_fulfillment_config_invoke_signed(
     accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
     args: InitializeSerumFulfillmentConfigIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializeSerumFulfillmentConfigKeys = accounts.into();
-    let ix = initialize_serum_fulfillment_config_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_serum_fulfillment_config_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn initialize_serum_fulfillment_config_verify_account_keys(
     accounts: InitializeSerumFulfillmentConfigAccounts<'_, '_>,
@@ -13995,22 +14889,42 @@ pub fn update_serum_fulfillment_config_status_ix(
 ) -> std::io::Result<Instruction> {
     update_serum_fulfillment_config_status_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_serum_fulfillment_config_status_invoke(
+pub fn update_serum_fulfillment_config_status_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
     args: UpdateSerumFulfillmentConfigStatusIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
-    let ix = update_serum_fulfillment_config_status_ix(keys, args)?;
+    let ix = update_serum_fulfillment_config_status_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_serum_fulfillment_config_status_invoke(
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
+    args: UpdateSerumFulfillmentConfigStatusIxArgs,
+) -> ProgramResult {
+    update_serum_fulfillment_config_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_serum_fulfillment_config_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
+    args: UpdateSerumFulfillmentConfigStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
+    let ix = update_serum_fulfillment_config_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_serum_fulfillment_config_status_invoke_signed(
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
     args: UpdateSerumFulfillmentConfigStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSerumFulfillmentConfigStatusKeys = accounts.into();
-    let ix = update_serum_fulfillment_config_status_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_serum_fulfillment_config_status_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_serum_fulfillment_config_status_verify_account_keys(
     accounts: UpdateSerumFulfillmentConfigStatusAccounts<'_, '_>,
@@ -14278,22 +15192,42 @@ pub fn initialize_phoenix_fulfillment_config_ix(
 ) -> std::io::Result<Instruction> {
     initialize_phoenix_fulfillment_config_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_phoenix_fulfillment_config_invoke(
+pub fn initialize_phoenix_fulfillment_config_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
     args: InitializePhoenixFulfillmentConfigIxArgs,
 ) -> ProgramResult {
     let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
-    let ix = initialize_phoenix_fulfillment_config_ix(keys, args)?;
+    let ix = initialize_phoenix_fulfillment_config_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_phoenix_fulfillment_config_invoke(
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
+    args: InitializePhoenixFulfillmentConfigIxArgs,
+) -> ProgramResult {
+    initialize_phoenix_fulfillment_config_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_phoenix_fulfillment_config_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
+    args: InitializePhoenixFulfillmentConfigIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
+    let ix = initialize_phoenix_fulfillment_config_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_phoenix_fulfillment_config_invoke_signed(
     accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
     args: InitializePhoenixFulfillmentConfigIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializePhoenixFulfillmentConfigKeys = accounts.into();
-    let ix = initialize_phoenix_fulfillment_config_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_phoenix_fulfillment_config_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn initialize_phoenix_fulfillment_config_verify_account_keys(
     accounts: InitializePhoenixFulfillmentConfigAccounts<'_, '_>,
@@ -14491,22 +15425,42 @@ pub fn phoenix_fulfillment_config_status_ix(
 ) -> std::io::Result<Instruction> {
     phoenix_fulfillment_config_status_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn phoenix_fulfillment_config_status_invoke(
+pub fn phoenix_fulfillment_config_status_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
     args: PhoenixFulfillmentConfigStatusIxArgs,
 ) -> ProgramResult {
     let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
-    let ix = phoenix_fulfillment_config_status_ix(keys, args)?;
+    let ix = phoenix_fulfillment_config_status_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn phoenix_fulfillment_config_status_invoke(
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
+    args: PhoenixFulfillmentConfigStatusIxArgs,
+) -> ProgramResult {
+    phoenix_fulfillment_config_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn phoenix_fulfillment_config_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
+    args: PhoenixFulfillmentConfigStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
+    let ix = phoenix_fulfillment_config_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn phoenix_fulfillment_config_status_invoke_signed(
     accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
     args: PhoenixFulfillmentConfigStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: PhoenixFulfillmentConfigStatusKeys = accounts.into();
-    let ix = phoenix_fulfillment_config_status_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    phoenix_fulfillment_config_status_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn phoenix_fulfillment_config_status_verify_account_keys(
     accounts: PhoenixFulfillmentConfigStatusAccounts<'_, '_>,
@@ -14669,18 +15623,31 @@ pub fn update_serum_vault_ix_with_program_id(
 pub fn update_serum_vault_ix(keys: UpdateSerumVaultKeys) -> std::io::Result<Instruction> {
     update_serum_vault_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_serum_vault_invoke(accounts: UpdateSerumVaultAccounts<'_, '_>) -> ProgramResult {
+pub fn update_serum_vault_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSerumVaultAccounts<'_, '_>,
+) -> ProgramResult {
     let keys: UpdateSerumVaultKeys = accounts.into();
-    let ix = update_serum_vault_ix(keys)?;
+    let ix = update_serum_vault_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_serum_vault_invoke(accounts: UpdateSerumVaultAccounts<'_, '_>) -> ProgramResult {
+    update_serum_vault_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_serum_vault_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSerumVaultAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSerumVaultKeys = accounts.into();
+    let ix = update_serum_vault_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_serum_vault_invoke_signed(
     accounts: UpdateSerumVaultAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSerumVaultKeys = accounts.into();
-    let ix = update_serum_vault_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_serum_vault_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_serum_vault_verify_account_keys(
     accounts: UpdateSerumVaultAccounts<'_, '_>,
@@ -14899,22 +15866,37 @@ pub fn initialize_perp_market_ix(
 ) -> std::io::Result<Instruction> {
     initialize_perp_market_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn initialize_perp_market_invoke(
+pub fn initialize_perp_market_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: InitializePerpMarketAccounts<'_, '_>,
     args: InitializePerpMarketIxArgs,
 ) -> ProgramResult {
     let keys: InitializePerpMarketKeys = accounts.into();
-    let ix = initialize_perp_market_ix(keys, args)?;
+    let ix = initialize_perp_market_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn initialize_perp_market_invoke(
+    accounts: InitializePerpMarketAccounts<'_, '_>,
+    args: InitializePerpMarketIxArgs,
+) -> ProgramResult {
+    initialize_perp_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn initialize_perp_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: InitializePerpMarketAccounts<'_, '_>,
+    args: InitializePerpMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: InitializePerpMarketKeys = accounts.into();
+    let ix = initialize_perp_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn initialize_perp_market_invoke_signed(
     accounts: InitializePerpMarketAccounts<'_, '_>,
     args: InitializePerpMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: InitializePerpMarketKeys = accounts.into();
-    let ix = initialize_perp_market_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    initialize_perp_market_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn initialize_perp_market_verify_account_keys(
     accounts: InitializePerpMarketAccounts<'_, '_>,
@@ -15101,22 +16083,37 @@ pub fn delete_initialized_perp_market_ix(
 ) -> std::io::Result<Instruction> {
     delete_initialized_perp_market_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn delete_initialized_perp_market_invoke(
+pub fn delete_initialized_perp_market_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
     args: DeleteInitializedPerpMarketIxArgs,
 ) -> ProgramResult {
     let keys: DeleteInitializedPerpMarketKeys = accounts.into();
-    let ix = delete_initialized_perp_market_ix(keys, args)?;
+    let ix = delete_initialized_perp_market_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn delete_initialized_perp_market_invoke(
+    accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
+    args: DeleteInitializedPerpMarketIxArgs,
+) -> ProgramResult {
+    delete_initialized_perp_market_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn delete_initialized_perp_market_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
+    args: DeleteInitializedPerpMarketIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
+    let ix = delete_initialized_perp_market_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn delete_initialized_perp_market_invoke_signed(
     accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
     args: DeleteInitializedPerpMarketIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: DeleteInitializedPerpMarketKeys = accounts.into();
-    let ix = delete_initialized_perp_market_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    delete_initialized_perp_market_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn delete_initialized_perp_market_verify_account_keys(
     accounts: DeleteInitializedPerpMarketAccounts<'_, '_>,
@@ -15294,22 +16291,37 @@ pub fn move_amm_price_ix(
 ) -> std::io::Result<Instruction> {
     move_amm_price_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn move_amm_price_invoke(
+pub fn move_amm_price_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: MoveAmmPriceAccounts<'_, '_>,
     args: MoveAmmPriceIxArgs,
 ) -> ProgramResult {
     let keys: MoveAmmPriceKeys = accounts.into();
-    let ix = move_amm_price_ix(keys, args)?;
+    let ix = move_amm_price_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn move_amm_price_invoke(
+    accounts: MoveAmmPriceAccounts<'_, '_>,
+    args: MoveAmmPriceIxArgs,
+) -> ProgramResult {
+    move_amm_price_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn move_amm_price_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: MoveAmmPriceAccounts<'_, '_>,
+    args: MoveAmmPriceIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: MoveAmmPriceKeys = accounts.into();
+    let ix = move_amm_price_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn move_amm_price_invoke_signed(
     accounts: MoveAmmPriceAccounts<'_, '_>,
     args: MoveAmmPriceIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: MoveAmmPriceKeys = accounts.into();
-    let ix = move_amm_price_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    move_amm_price_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn move_amm_price_verify_account_keys(
     accounts: MoveAmmPriceAccounts<'_, '_>,
@@ -15487,22 +16499,37 @@ pub fn update_perp_market_expiry_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_expiry_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_expiry_invoke(
+pub fn update_perp_market_expiry_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
     args: UpdatePerpMarketExpiryIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketExpiryKeys = accounts.into();
-    let ix = update_perp_market_expiry_ix(keys, args)?;
+    let ix = update_perp_market_expiry_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_expiry_invoke(
+    accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
+    args: UpdatePerpMarketExpiryIxArgs,
+) -> ProgramResult {
+    update_perp_market_expiry_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_expiry_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
+    args: UpdatePerpMarketExpiryIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketExpiryKeys = accounts.into();
+    let ix = update_perp_market_expiry_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_expiry_invoke_signed(
     accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
     args: UpdatePerpMarketExpiryIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketExpiryKeys = accounts.into();
-    let ix = update_perp_market_expiry_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_expiry_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_expiry_verify_account_keys(
     accounts: UpdatePerpMarketExpiryAccounts<'_, '_>,
@@ -15688,20 +16715,37 @@ pub fn settle_expired_market_pools_to_revenue_pool_ix(
 ) -> std::io::Result<Instruction> {
     settle_expired_market_pools_to_revenue_pool_ix_with_program_id(crate::ID, keys)
 }
-pub fn settle_expired_market_pools_to_revenue_pool_invoke(
+pub fn settle_expired_market_pools_to_revenue_pool_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(keys)?;
+    let ix = settle_expired_market_pools_to_revenue_pool_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn settle_expired_market_pools_to_revenue_pool_invoke(
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
+) -> ProgramResult {
+    settle_expired_market_pools_to_revenue_pool_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
+    let ix = settle_expired_market_pools_to_revenue_pool_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn settle_expired_market_pools_to_revenue_pool_invoke_signed(
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: SettleExpiredMarketPoolsToRevenuePoolKeys = accounts.into();
-    let ix = settle_expired_market_pools_to_revenue_pool_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    settle_expired_market_pools_to_revenue_pool_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        seeds,
+    )
 }
 pub fn settle_expired_market_pools_to_revenue_pool_verify_account_keys(
     accounts: SettleExpiredMarketPoolsToRevenuePoolAccounts<'_, '_>,
@@ -15941,22 +16985,42 @@ pub fn deposit_into_perp_market_fee_pool_ix(
 ) -> std::io::Result<Instruction> {
     deposit_into_perp_market_fee_pool_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn deposit_into_perp_market_fee_pool_invoke(
+pub fn deposit_into_perp_market_fee_pool_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
     args: DepositIntoPerpMarketFeePoolIxArgs,
 ) -> ProgramResult {
     let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
-    let ix = deposit_into_perp_market_fee_pool_ix(keys, args)?;
+    let ix = deposit_into_perp_market_fee_pool_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn deposit_into_perp_market_fee_pool_invoke(
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
+    args: DepositIntoPerpMarketFeePoolIxArgs,
+) -> ProgramResult {
+    deposit_into_perp_market_fee_pool_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn deposit_into_perp_market_fee_pool_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
+    args: DepositIntoPerpMarketFeePoolIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
+    let ix = deposit_into_perp_market_fee_pool_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn deposit_into_perp_market_fee_pool_invoke_signed(
     accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
     args: DepositIntoPerpMarketFeePoolIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: DepositIntoPerpMarketFeePoolKeys = accounts.into();
-    let ix = deposit_into_perp_market_fee_pool_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    deposit_into_perp_market_fee_pool_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn deposit_into_perp_market_fee_pool_verify_account_keys(
     accounts: DepositIntoPerpMarketFeePoolAccounts<'_, '_>,
@@ -16154,22 +17218,37 @@ pub fn repeg_amm_curve_ix(
 ) -> std::io::Result<Instruction> {
     repeg_amm_curve_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn repeg_amm_curve_invoke(
+pub fn repeg_amm_curve_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: RepegAmmCurveAccounts<'_, '_>,
     args: RepegAmmCurveIxArgs,
 ) -> ProgramResult {
     let keys: RepegAmmCurveKeys = accounts.into();
-    let ix = repeg_amm_curve_ix(keys, args)?;
+    let ix = repeg_amm_curve_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn repeg_amm_curve_invoke(
+    accounts: RepegAmmCurveAccounts<'_, '_>,
+    args: RepegAmmCurveIxArgs,
+) -> ProgramResult {
+    repeg_amm_curve_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn repeg_amm_curve_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: RepegAmmCurveAccounts<'_, '_>,
+    args: RepegAmmCurveIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: RepegAmmCurveKeys = accounts.into();
+    let ix = repeg_amm_curve_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn repeg_amm_curve_invoke_signed(
     accounts: RepegAmmCurveAccounts<'_, '_>,
     args: RepegAmmCurveIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: RepegAmmCurveKeys = accounts.into();
-    let ix = repeg_amm_curve_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    repeg_amm_curve_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn repeg_amm_curve_verify_account_keys(
     accounts: RepegAmmCurveAccounts<'_, '_>,
@@ -16350,20 +17429,33 @@ pub fn update_perp_market_amm_oracle_twap_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_amm_oracle_twap_ix_with_program_id(crate::ID, keys)
 }
-pub fn update_perp_market_amm_oracle_twap_invoke(
+pub fn update_perp_market_amm_oracle_twap_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
-    let ix = update_perp_market_amm_oracle_twap_ix(keys)?;
+    let ix = update_perp_market_amm_oracle_twap_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_amm_oracle_twap_invoke(
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
+) -> ProgramResult {
+    update_perp_market_amm_oracle_twap_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn update_perp_market_amm_oracle_twap_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = update_perp_market_amm_oracle_twap_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_amm_oracle_twap_invoke_signed(
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketAmmOracleTwapKeys = accounts.into();
-    let ix = update_perp_market_amm_oracle_twap_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_amm_oracle_twap_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn update_perp_market_amm_oracle_twap_verify_account_keys(
     accounts: UpdatePerpMarketAmmOracleTwapAccounts<'_, '_>,
@@ -16544,20 +17636,33 @@ pub fn reset_perp_market_amm_oracle_twap_ix(
 ) -> std::io::Result<Instruction> {
     reset_perp_market_amm_oracle_twap_ix_with_program_id(crate::ID, keys)
 }
-pub fn reset_perp_market_amm_oracle_twap_invoke(
+pub fn reset_perp_market_amm_oracle_twap_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
 ) -> ProgramResult {
     let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
-    let ix = reset_perp_market_amm_oracle_twap_ix(keys)?;
+    let ix = reset_perp_market_amm_oracle_twap_ix_with_program_id(program_id, keys)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn reset_perp_market_amm_oracle_twap_invoke(
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
+) -> ProgramResult {
+    reset_perp_market_amm_oracle_twap_invoke_with_program_id(crate::ID, accounts)
+}
+pub fn reset_perp_market_amm_oracle_twap_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
+    let ix = reset_perp_market_amm_oracle_twap_ix_with_program_id(program_id, keys)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn reset_perp_market_amm_oracle_twap_invoke_signed(
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: ResetPerpMarketAmmOracleTwapKeys = accounts.into();
-    let ix = reset_perp_market_amm_oracle_twap_ix(keys)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    reset_perp_market_amm_oracle_twap_invoke_signed_with_program_id(crate::ID, accounts, seeds)
 }
 pub fn reset_perp_market_amm_oracle_twap_verify_account_keys(
     accounts: ResetPerpMarketAmmOracleTwapAccounts<'_, '_>,
@@ -16740,19 +17845,34 @@ pub fn update_k_ix_with_program_id(
 pub fn update_k_ix(keys: UpdateKKeys, args: UpdateKIxArgs) -> std::io::Result<Instruction> {
     update_k_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_k_invoke(accounts: UpdateKAccounts<'_, '_>, args: UpdateKIxArgs) -> ProgramResult {
+pub fn update_k_invoke_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateKAccounts<'_, '_>,
+    args: UpdateKIxArgs,
+) -> ProgramResult {
     let keys: UpdateKKeys = accounts.into();
-    let ix = update_k_ix(keys, args)?;
+    let ix = update_k_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_k_invoke(accounts: UpdateKAccounts<'_, '_>, args: UpdateKIxArgs) -> ProgramResult {
+    update_k_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_k_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateKAccounts<'_, '_>,
+    args: UpdateKIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateKKeys = accounts.into();
+    let ix = update_k_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_k_invoke_signed(
     accounts: UpdateKAccounts<'_, '_>,
     args: UpdateKIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateKKeys = accounts.into();
-    let ix = update_k_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_k_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_k_verify_account_keys(
     accounts: UpdateKAccounts<'_, '_>,
@@ -16939,22 +18059,37 @@ pub fn update_perp_market_margin_ratio_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_margin_ratio_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_margin_ratio_invoke(
+pub fn update_perp_market_margin_ratio_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
     args: UpdatePerpMarketMarginRatioIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
-    let ix = update_perp_market_margin_ratio_ix(keys, args)?;
+    let ix = update_perp_market_margin_ratio_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_margin_ratio_invoke(
+    accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
+    args: UpdatePerpMarketMarginRatioIxArgs,
+) -> ProgramResult {
+    update_perp_market_margin_ratio_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_margin_ratio_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
+    args: UpdatePerpMarketMarginRatioIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
+    let ix = update_perp_market_margin_ratio_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_margin_ratio_invoke_signed(
     accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
     args: UpdatePerpMarketMarginRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMarginRatioKeys = accounts.into();
-    let ix = update_perp_market_margin_ratio_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_margin_ratio_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_margin_ratio_verify_account_keys(
     accounts: UpdatePerpMarketMarginRatioAccounts<'_, '_>,
@@ -17140,22 +18275,42 @@ pub fn update_perp_market_max_imbalances_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_max_imbalances_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_max_imbalances_invoke(
+pub fn update_perp_market_max_imbalances_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
     args: UpdatePerpMarketMaxImbalancesIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
-    let ix = update_perp_market_max_imbalances_ix(keys, args)?;
+    let ix = update_perp_market_max_imbalances_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_max_imbalances_invoke(
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxImbalancesIxArgs,
+) -> ProgramResult {
+    update_perp_market_max_imbalances_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_max_imbalances_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxImbalancesIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
+    let ix = update_perp_market_max_imbalances_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_max_imbalances_invoke_signed(
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
     args: UpdatePerpMarketMaxImbalancesIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMaxImbalancesKeys = accounts.into();
-    let ix = update_perp_market_max_imbalances_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_max_imbalances_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_max_imbalances_verify_account_keys(
     accounts: UpdatePerpMarketMaxImbalancesAccounts<'_, '_>,
@@ -17340,22 +18495,42 @@ pub fn update_perp_market_liquidation_fee_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_liquidation_fee_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_liquidation_fee_invoke(
+pub fn update_perp_market_liquidation_fee_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
     args: UpdatePerpMarketLiquidationFeeIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
-    let ix = update_perp_market_liquidation_fee_ix(keys, args)?;
+    let ix = update_perp_market_liquidation_fee_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_liquidation_fee_invoke(
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
+    args: UpdatePerpMarketLiquidationFeeIxArgs,
+) -> ProgramResult {
+    update_perp_market_liquidation_fee_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_liquidation_fee_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
+    args: UpdatePerpMarketLiquidationFeeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_perp_market_liquidation_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_liquidation_fee_invoke_signed(
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
     args: UpdatePerpMarketLiquidationFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketLiquidationFeeKeys = accounts.into();
-    let ix = update_perp_market_liquidation_fee_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_liquidation_fee_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_liquidation_fee_verify_account_keys(
     accounts: UpdatePerpMarketLiquidationFeeAccounts<'_, '_>,
@@ -17543,22 +18718,42 @@ pub fn update_insurance_fund_unstaking_period_ix(
 ) -> std::io::Result<Instruction> {
     update_insurance_fund_unstaking_period_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_insurance_fund_unstaking_period_invoke(
+pub fn update_insurance_fund_unstaking_period_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
     args: UpdateInsuranceFundUnstakingPeriodIxArgs,
 ) -> ProgramResult {
     let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
-    let ix = update_insurance_fund_unstaking_period_ix(keys, args)?;
+    let ix = update_insurance_fund_unstaking_period_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_insurance_fund_unstaking_period_invoke(
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
+    args: UpdateInsuranceFundUnstakingPeriodIxArgs,
+) -> ProgramResult {
+    update_insurance_fund_unstaking_period_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_insurance_fund_unstaking_period_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
+    args: UpdateInsuranceFundUnstakingPeriodIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
+    let ix = update_insurance_fund_unstaking_period_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_insurance_fund_unstaking_period_invoke_signed(
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
     args: UpdateInsuranceFundUnstakingPeriodIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateInsuranceFundUnstakingPeriodKeys = accounts.into();
-    let ix = update_insurance_fund_unstaking_period_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_insurance_fund_unstaking_period_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_insurance_fund_unstaking_period_verify_account_keys(
     accounts: UpdateInsuranceFundUnstakingPeriodAccounts<'_, '_>,
@@ -17744,22 +18939,42 @@ pub fn update_spot_market_liquidation_fee_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_liquidation_fee_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_liquidation_fee_invoke(
+pub fn update_spot_market_liquidation_fee_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
     args: UpdateSpotMarketLiquidationFeeIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
-    let ix = update_spot_market_liquidation_fee_ix(keys, args)?;
+    let ix = update_spot_market_liquidation_fee_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_liquidation_fee_invoke(
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
+    args: UpdateSpotMarketLiquidationFeeIxArgs,
+) -> ProgramResult {
+    update_spot_market_liquidation_fee_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_liquidation_fee_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
+    args: UpdateSpotMarketLiquidationFeeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
+    let ix = update_spot_market_liquidation_fee_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_liquidation_fee_invoke_signed(
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
     args: UpdateSpotMarketLiquidationFeeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketLiquidationFeeKeys = accounts.into();
-    let ix = update_spot_market_liquidation_fee_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_liquidation_fee_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_liquidation_fee_verify_account_keys(
     accounts: UpdateSpotMarketLiquidationFeeAccounts<'_, '_>,
@@ -17943,22 +19158,37 @@ pub fn update_withdraw_guard_threshold_ix(
 ) -> std::io::Result<Instruction> {
     update_withdraw_guard_threshold_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_withdraw_guard_threshold_invoke(
+pub fn update_withdraw_guard_threshold_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
     args: UpdateWithdrawGuardThresholdIxArgs,
 ) -> ProgramResult {
     let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
-    let ix = update_withdraw_guard_threshold_ix(keys, args)?;
+    let ix = update_withdraw_guard_threshold_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_withdraw_guard_threshold_invoke(
+    accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
+    args: UpdateWithdrawGuardThresholdIxArgs,
+) -> ProgramResult {
+    update_withdraw_guard_threshold_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_withdraw_guard_threshold_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
+    args: UpdateWithdrawGuardThresholdIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
+    let ix = update_withdraw_guard_threshold_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_withdraw_guard_threshold_invoke_signed(
     accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
     args: UpdateWithdrawGuardThresholdIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateWithdrawGuardThresholdKeys = accounts.into();
-    let ix = update_withdraw_guard_threshold_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_withdraw_guard_threshold_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_withdraw_guard_threshold_verify_account_keys(
     accounts: UpdateWithdrawGuardThresholdAccounts<'_, '_>,
@@ -18140,22 +19370,37 @@ pub fn update_spot_market_if_factor_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_if_factor_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_if_factor_invoke(
+pub fn update_spot_market_if_factor_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
     args: UpdateSpotMarketIfFactorIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
-    let ix = update_spot_market_if_factor_ix(keys, args)?;
+    let ix = update_spot_market_if_factor_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_if_factor_invoke(
+    accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
+    args: UpdateSpotMarketIfFactorIxArgs,
+) -> ProgramResult {
+    update_spot_market_if_factor_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_if_factor_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
+    args: UpdateSpotMarketIfFactorIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
+    let ix = update_spot_market_if_factor_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_if_factor_invoke_signed(
     accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
     args: UpdateSpotMarketIfFactorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketIfFactorKeys = accounts.into();
-    let ix = update_spot_market_if_factor_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_if_factor_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_if_factor_verify_account_keys(
     accounts: UpdateSpotMarketIfFactorAccounts<'_, '_>,
@@ -18344,22 +19589,42 @@ pub fn update_spot_market_revenue_settle_period_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_revenue_settle_period_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_revenue_settle_period_invoke(
+pub fn update_spot_market_revenue_settle_period_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
     args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
-    let ix = update_spot_market_revenue_settle_period_ix(keys, args)?;
+    let ix = update_spot_market_revenue_settle_period_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_revenue_settle_period_invoke(
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
+    args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
+) -> ProgramResult {
+    update_spot_market_revenue_settle_period_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_revenue_settle_period_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
+    args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
+    let ix = update_spot_market_revenue_settle_period_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_revenue_settle_period_invoke_signed(
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
     args: UpdateSpotMarketRevenueSettlePeriodIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketRevenueSettlePeriodKeys = accounts.into();
-    let ix = update_spot_market_revenue_settle_period_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_revenue_settle_period_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_revenue_settle_period_verify_account_keys(
     accounts: UpdateSpotMarketRevenueSettlePeriodAccounts<'_, '_>,
@@ -18537,22 +19802,37 @@ pub fn update_spot_market_status_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_status_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_status_invoke(
+pub fn update_spot_market_status_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
     args: UpdateSpotMarketStatusIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketStatusKeys = accounts.into();
-    let ix = update_spot_market_status_ix(keys, args)?;
+    let ix = update_spot_market_status_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_status_invoke(
+    accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
+    args: UpdateSpotMarketStatusIxArgs,
+) -> ProgramResult {
+    update_spot_market_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
+    args: UpdateSpotMarketStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketStatusKeys = accounts.into();
+    let ix = update_spot_market_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_status_invoke_signed(
     accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
     args: UpdateSpotMarketStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketStatusKeys = accounts.into();
-    let ix = update_spot_market_status_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_status_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_status_verify_account_keys(
     accounts: UpdateSpotMarketStatusAccounts<'_, '_>,
@@ -18734,22 +20014,37 @@ pub fn update_spot_market_asset_tier_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_asset_tier_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_asset_tier_invoke(
+pub fn update_spot_market_asset_tier_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
     args: UpdateSpotMarketAssetTierIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
-    let ix = update_spot_market_asset_tier_ix(keys, args)?;
+    let ix = update_spot_market_asset_tier_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_asset_tier_invoke(
+    accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
+    args: UpdateSpotMarketAssetTierIxArgs,
+) -> ProgramResult {
+    update_spot_market_asset_tier_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_asset_tier_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
+    args: UpdateSpotMarketAssetTierIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
+    let ix = update_spot_market_asset_tier_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_asset_tier_invoke_signed(
     accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
     args: UpdateSpotMarketAssetTierIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketAssetTierKeys = accounts.into();
-    let ix = update_spot_market_asset_tier_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_asset_tier_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_asset_tier_verify_account_keys(
     accounts: UpdateSpotMarketAssetTierAccounts<'_, '_>,
@@ -18937,22 +20232,42 @@ pub fn update_spot_market_margin_weights_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_margin_weights_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_margin_weights_invoke(
+pub fn update_spot_market_margin_weights_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
     args: UpdateSpotMarketMarginWeightsIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
-    let ix = update_spot_market_margin_weights_ix(keys, args)?;
+    let ix = update_spot_market_margin_weights_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_margin_weights_invoke(
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
+    args: UpdateSpotMarketMarginWeightsIxArgs,
+) -> ProgramResult {
+    update_spot_market_margin_weights_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_margin_weights_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
+    args: UpdateSpotMarketMarginWeightsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
+    let ix = update_spot_market_margin_weights_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_margin_weights_invoke_signed(
     accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
     args: UpdateSpotMarketMarginWeightsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketMarginWeightsKeys = accounts.into();
-    let ix = update_spot_market_margin_weights_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_margin_weights_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_margin_weights_verify_account_keys(
     accounts: UpdateSpotMarketMarginWeightsAccounts<'_, '_>,
@@ -19138,22 +20453,37 @@ pub fn update_spot_market_borrow_rate_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_borrow_rate_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_borrow_rate_invoke(
+pub fn update_spot_market_borrow_rate_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
     args: UpdateSpotMarketBorrowRateIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
-    let ix = update_spot_market_borrow_rate_ix(keys, args)?;
+    let ix = update_spot_market_borrow_rate_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_borrow_rate_invoke(
+    accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
+    args: UpdateSpotMarketBorrowRateIxArgs,
+) -> ProgramResult {
+    update_spot_market_borrow_rate_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_borrow_rate_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
+    args: UpdateSpotMarketBorrowRateIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
+    let ix = update_spot_market_borrow_rate_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_borrow_rate_invoke_signed(
     accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
     args: UpdateSpotMarketBorrowRateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketBorrowRateKeys = accounts.into();
-    let ix = update_spot_market_borrow_rate_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_borrow_rate_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_borrow_rate_verify_account_keys(
     accounts: UpdateSpotMarketBorrowRateAccounts<'_, '_>,
@@ -19341,22 +20671,42 @@ pub fn update_spot_market_max_token_deposits_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_max_token_deposits_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_max_token_deposits_invoke(
+pub fn update_spot_market_max_token_deposits_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
     args: UpdateSpotMarketMaxTokenDepositsIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
-    let ix = update_spot_market_max_token_deposits_ix(keys, args)?;
+    let ix = update_spot_market_max_token_deposits_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_max_token_deposits_invoke(
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
+    args: UpdateSpotMarketMaxTokenDepositsIxArgs,
+) -> ProgramResult {
+    update_spot_market_max_token_deposits_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_max_token_deposits_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
+    args: UpdateSpotMarketMaxTokenDepositsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
+    let ix = update_spot_market_max_token_deposits_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_max_token_deposits_invoke_signed(
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
     args: UpdateSpotMarketMaxTokenDepositsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketMaxTokenDepositsKeys = accounts.into();
-    let ix = update_spot_market_max_token_deposits_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_max_token_deposits_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_max_token_deposits_verify_account_keys(
     accounts: UpdateSpotMarketMaxTokenDepositsAccounts<'_, '_>,
@@ -19546,22 +20896,37 @@ pub fn update_spot_market_oracle_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_oracle_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_oracle_invoke(
+pub fn update_spot_market_oracle_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
     args: UpdateSpotMarketOracleIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketOracleKeys = accounts.into();
-    let ix = update_spot_market_oracle_ix(keys, args)?;
+    let ix = update_spot_market_oracle_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_oracle_invoke(
+    accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
+    args: UpdateSpotMarketOracleIxArgs,
+) -> ProgramResult {
+    update_spot_market_oracle_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_oracle_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
+    args: UpdateSpotMarketOracleIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketOracleKeys = accounts.into();
+    let ix = update_spot_market_oracle_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_oracle_invoke_signed(
     accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
     args: UpdateSpotMarketOracleIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketOracleKeys = accounts.into();
-    let ix = update_spot_market_oracle_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_oracle_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_oracle_verify_account_keys(
     accounts: UpdateSpotMarketOracleAccounts<'_, '_>,
@@ -19752,22 +21117,42 @@ pub fn update_spot_market_step_size_and_tick_size_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_step_size_and_tick_size_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_step_size_and_tick_size_invoke(
+pub fn update_spot_market_step_size_and_tick_size_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
     args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
-    let ix = update_spot_market_step_size_and_tick_size_ix(keys, args)?;
+    let ix = update_spot_market_step_size_and_tick_size_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_step_size_and_tick_size_invoke(
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
+) -> ProgramResult {
+    update_spot_market_step_size_and_tick_size_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_step_size_and_tick_size_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_spot_market_step_size_and_tick_size_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_step_size_and_tick_size_invoke_signed(
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
     args: UpdateSpotMarketStepSizeAndTickSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketStepSizeAndTickSizeKeys = accounts.into();
-    let ix = update_spot_market_step_size_and_tick_size_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_step_size_and_tick_size_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_step_size_and_tick_size_verify_account_keys(
     accounts: UpdateSpotMarketStepSizeAndTickSizeAccounts<'_, '_>,
@@ -19951,22 +21336,42 @@ pub fn update_spot_market_min_order_size_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_min_order_size_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_min_order_size_invoke(
+pub fn update_spot_market_min_order_size_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
     args: UpdateSpotMarketMinOrderSizeIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
-    let ix = update_spot_market_min_order_size_ix(keys, args)?;
+    let ix = update_spot_market_min_order_size_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_min_order_size_invoke(
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
+    args: UpdateSpotMarketMinOrderSizeIxArgs,
+) -> ProgramResult {
+    update_spot_market_min_order_size_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_min_order_size_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
+    args: UpdateSpotMarketMinOrderSizeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_spot_market_min_order_size_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_min_order_size_invoke_signed(
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
     args: UpdateSpotMarketMinOrderSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketMinOrderSizeKeys = accounts.into();
-    let ix = update_spot_market_min_order_size_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_min_order_size_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_min_order_size_verify_account_keys(
     accounts: UpdateSpotMarketMinOrderSizeAccounts<'_, '_>,
@@ -20151,22 +21556,42 @@ pub fn update_spot_market_orders_enabled_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_orders_enabled_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_orders_enabled_invoke(
+pub fn update_spot_market_orders_enabled_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
     args: UpdateSpotMarketOrdersEnabledIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
-    let ix = update_spot_market_orders_enabled_ix(keys, args)?;
+    let ix = update_spot_market_orders_enabled_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_orders_enabled_invoke(
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
+    args: UpdateSpotMarketOrdersEnabledIxArgs,
+) -> ProgramResult {
+    update_spot_market_orders_enabled_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_orders_enabled_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
+    args: UpdateSpotMarketOrdersEnabledIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
+    let ix = update_spot_market_orders_enabled_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_orders_enabled_invoke_signed(
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
     args: UpdateSpotMarketOrdersEnabledIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketOrdersEnabledKeys = accounts.into();
-    let ix = update_spot_market_orders_enabled_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_orders_enabled_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_spot_market_orders_enabled_verify_account_keys(
     accounts: UpdateSpotMarketOrdersEnabledAccounts<'_, '_>,
@@ -20342,22 +21767,37 @@ pub fn update_spot_market_name_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_market_name_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_market_name_invoke(
+pub fn update_spot_market_name_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotMarketNameAccounts<'_, '_>,
     args: UpdateSpotMarketNameIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotMarketNameKeys = accounts.into();
-    let ix = update_spot_market_name_ix(keys, args)?;
+    let ix = update_spot_market_name_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_market_name_invoke(
+    accounts: UpdateSpotMarketNameAccounts<'_, '_>,
+    args: UpdateSpotMarketNameIxArgs,
+) -> ProgramResult {
+    update_spot_market_name_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_market_name_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotMarketNameAccounts<'_, '_>,
+    args: UpdateSpotMarketNameIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotMarketNameKeys = accounts.into();
+    let ix = update_spot_market_name_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_market_name_invoke_signed(
     accounts: UpdateSpotMarketNameAccounts<'_, '_>,
     args: UpdateSpotMarketNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotMarketNameKeys = accounts.into();
-    let ix = update_spot_market_name_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_market_name_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_market_name_verify_account_keys(
     accounts: UpdateSpotMarketNameAccounts<'_, '_>,
@@ -20535,22 +21975,37 @@ pub fn update_perp_market_status_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_status_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_status_invoke(
+pub fn update_perp_market_status_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
     args: UpdatePerpMarketStatusIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketStatusKeys = accounts.into();
-    let ix = update_perp_market_status_ix(keys, args)?;
+    let ix = update_perp_market_status_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_status_invoke(
+    accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
+    args: UpdatePerpMarketStatusIxArgs,
+) -> ProgramResult {
+    update_perp_market_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
+    args: UpdatePerpMarketStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketStatusKeys = accounts.into();
+    let ix = update_perp_market_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_status_invoke_signed(
     accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
     args: UpdatePerpMarketStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketStatusKeys = accounts.into();
-    let ix = update_perp_market_status_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_status_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_status_verify_account_keys(
     accounts: UpdatePerpMarketStatusAccounts<'_, '_>,
@@ -20735,22 +22190,37 @@ pub fn update_perp_market_contract_tier_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_contract_tier_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_contract_tier_invoke(
+pub fn update_perp_market_contract_tier_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
     args: UpdatePerpMarketContractTierIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketContractTierKeys = accounts.into();
-    let ix = update_perp_market_contract_tier_ix(keys, args)?;
+    let ix = update_perp_market_contract_tier_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_contract_tier_invoke(
+    accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
+    args: UpdatePerpMarketContractTierIxArgs,
+) -> ProgramResult {
+    update_perp_market_contract_tier_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_contract_tier_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
+    args: UpdatePerpMarketContractTierIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketContractTierKeys = accounts.into();
+    let ix = update_perp_market_contract_tier_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_contract_tier_invoke_signed(
     accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
     args: UpdatePerpMarketContractTierIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketContractTierKeys = accounts.into();
-    let ix = update_perp_market_contract_tier_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_contract_tier_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_contract_tier_verify_account_keys(
     accounts: UpdatePerpMarketContractTierAccounts<'_, '_>,
@@ -20933,22 +22403,37 @@ pub fn update_perp_market_imf_factor_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_imf_factor_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_imf_factor_invoke(
+pub fn update_perp_market_imf_factor_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
     args: UpdatePerpMarketImfFactorIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
-    let ix = update_perp_market_imf_factor_ix(keys, args)?;
+    let ix = update_perp_market_imf_factor_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_imf_factor_invoke(
+    accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
+    args: UpdatePerpMarketImfFactorIxArgs,
+) -> ProgramResult {
+    update_perp_market_imf_factor_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_imf_factor_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
+    args: UpdatePerpMarketImfFactorIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
+    let ix = update_perp_market_imf_factor_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_imf_factor_invoke_signed(
     accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
     args: UpdatePerpMarketImfFactorIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketImfFactorKeys = accounts.into();
-    let ix = update_perp_market_imf_factor_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_imf_factor_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_imf_factor_verify_account_keys(
     accounts: UpdatePerpMarketImfFactorAccounts<'_, '_>,
@@ -21142,22 +22627,42 @@ pub fn update_perp_market_unrealized_asset_weight_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_unrealized_asset_weight_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_unrealized_asset_weight_invoke(
+pub fn update_perp_market_unrealized_asset_weight_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
     args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
-    let ix = update_perp_market_unrealized_asset_weight_ix(keys, args)?;
+    let ix = update_perp_market_unrealized_asset_weight_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_unrealized_asset_weight_invoke(
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
+    args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
+) -> ProgramResult {
+    update_perp_market_unrealized_asset_weight_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_unrealized_asset_weight_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
+    args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
+    let ix = update_perp_market_unrealized_asset_weight_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_unrealized_asset_weight_invoke_signed(
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
     args: UpdatePerpMarketUnrealizedAssetWeightIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketUnrealizedAssetWeightKeys = accounts.into();
-    let ix = update_perp_market_unrealized_asset_weight_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_unrealized_asset_weight_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_unrealized_asset_weight_verify_account_keys(
     accounts: UpdatePerpMarketUnrealizedAssetWeightAccounts<'_, '_>,
@@ -21345,22 +22850,42 @@ pub fn update_perp_market_concentration_coef_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_concentration_coef_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_concentration_coef_invoke(
+pub fn update_perp_market_concentration_coef_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
     args: UpdatePerpMarketConcentrationCoefIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
-    let ix = update_perp_market_concentration_coef_ix(keys, args)?;
+    let ix = update_perp_market_concentration_coef_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_concentration_coef_invoke(
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
+    args: UpdatePerpMarketConcentrationCoefIxArgs,
+) -> ProgramResult {
+    update_perp_market_concentration_coef_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_concentration_coef_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
+    args: UpdatePerpMarketConcentrationCoefIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
+    let ix = update_perp_market_concentration_coef_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_concentration_coef_invoke_signed(
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
     args: UpdatePerpMarketConcentrationCoefIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketConcentrationCoefKeys = accounts.into();
-    let ix = update_perp_market_concentration_coef_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_concentration_coef_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_concentration_coef_verify_account_keys(
     accounts: UpdatePerpMarketConcentrationCoefAccounts<'_, '_>,
@@ -21553,22 +23078,42 @@ pub fn update_perp_market_curve_update_intensity_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_curve_update_intensity_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_curve_update_intensity_invoke(
+pub fn update_perp_market_curve_update_intensity_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
     args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
-    let ix = update_perp_market_curve_update_intensity_ix(keys, args)?;
+    let ix = update_perp_market_curve_update_intensity_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_curve_update_intensity_invoke(
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
+    args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
+) -> ProgramResult {
+    update_perp_market_curve_update_intensity_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_curve_update_intensity_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
+    args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
+    let ix = update_perp_market_curve_update_intensity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_curve_update_intensity_invoke_signed(
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
     args: UpdatePerpMarketCurveUpdateIntensityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketCurveUpdateIntensityKeys = accounts.into();
-    let ix = update_perp_market_curve_update_intensity_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_curve_update_intensity_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_curve_update_intensity_verify_account_keys(
     accounts: UpdatePerpMarketCurveUpdateIntensityAccounts<'_, '_>,
@@ -21766,22 +23311,50 @@ pub fn update_perp_market_target_base_asset_amount_per_lp_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_target_base_asset_amount_per_lp_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_target_base_asset_amount_per_lp_invoke(
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
     args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
-    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(keys, args)?;
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix_with_program_id(
+        program_id, keys, args,
+    )?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke(
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
+    args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
+) -> ProgramResult {
+    update_perp_market_target_base_asset_amount_per_lp_invoke_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+    )
+}
+pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
+    args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
+    let ix = update_perp_market_target_base_asset_amount_per_lp_ix_with_program_id(
+        program_id, keys, args,
+    )?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_invoke_signed(
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
     args: UpdatePerpMarketTargetBaseAssetAmountPerLpIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketTargetBaseAssetAmountPerLpKeys = accounts.into();
-    let ix = update_perp_market_target_base_asset_amount_per_lp_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_target_base_asset_amount_per_lp_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_target_base_asset_amount_per_lp_verify_account_keys(
     accounts: UpdatePerpMarketTargetBaseAssetAmountPerLpAccounts<'_, '_>,
@@ -21943,22 +23516,37 @@ pub fn update_lp_cooldown_time_ix(
 ) -> std::io::Result<Instruction> {
     update_lp_cooldown_time_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_lp_cooldown_time_invoke(
+pub fn update_lp_cooldown_time_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
     args: UpdateLpCooldownTimeIxArgs,
 ) -> ProgramResult {
     let keys: UpdateLpCooldownTimeKeys = accounts.into();
-    let ix = update_lp_cooldown_time_ix(keys, args)?;
+    let ix = update_lp_cooldown_time_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_lp_cooldown_time_invoke(
+    accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
+    args: UpdateLpCooldownTimeIxArgs,
+) -> ProgramResult {
+    update_lp_cooldown_time_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_lp_cooldown_time_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
+    args: UpdateLpCooldownTimeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateLpCooldownTimeKeys = accounts.into();
+    let ix = update_lp_cooldown_time_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_lp_cooldown_time_invoke_signed(
     accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
     args: UpdateLpCooldownTimeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateLpCooldownTimeKeys = accounts.into();
-    let ix = update_lp_cooldown_time_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_lp_cooldown_time_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_lp_cooldown_time_verify_account_keys(
     accounts: UpdateLpCooldownTimeAccounts<'_, '_>,
@@ -22121,22 +23709,37 @@ pub fn update_perp_fee_structure_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_fee_structure_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_fee_structure_invoke(
+pub fn update_perp_fee_structure_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
     args: UpdatePerpFeeStructureIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpFeeStructureKeys = accounts.into();
-    let ix = update_perp_fee_structure_ix(keys, args)?;
+    let ix = update_perp_fee_structure_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_fee_structure_invoke(
+    accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
+    args: UpdatePerpFeeStructureIxArgs,
+) -> ProgramResult {
+    update_perp_fee_structure_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_fee_structure_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
+    args: UpdatePerpFeeStructureIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpFeeStructureKeys = accounts.into();
+    let ix = update_perp_fee_structure_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_fee_structure_invoke_signed(
     accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
     args: UpdatePerpFeeStructureIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpFeeStructureKeys = accounts.into();
-    let ix = update_perp_fee_structure_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_fee_structure_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_fee_structure_verify_account_keys(
     accounts: UpdatePerpFeeStructureAccounts<'_, '_>,
@@ -22299,22 +23902,37 @@ pub fn update_spot_fee_structure_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_fee_structure_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_fee_structure_invoke(
+pub fn update_spot_fee_structure_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
     args: UpdateSpotFeeStructureIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotFeeStructureKeys = accounts.into();
-    let ix = update_spot_fee_structure_ix(keys, args)?;
+    let ix = update_spot_fee_structure_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_fee_structure_invoke(
+    accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
+    args: UpdateSpotFeeStructureIxArgs,
+) -> ProgramResult {
+    update_spot_fee_structure_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_fee_structure_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
+    args: UpdateSpotFeeStructureIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotFeeStructureKeys = accounts.into();
+    let ix = update_spot_fee_structure_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_fee_structure_invoke_signed(
     accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
     args: UpdateSpotFeeStructureIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotFeeStructureKeys = accounts.into();
-    let ix = update_spot_fee_structure_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_fee_structure_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_fee_structure_verify_account_keys(
     accounts: UpdateSpotFeeStructureAccounts<'_, '_>,
@@ -22484,22 +24102,37 @@ pub fn update_initial_pct_to_liquidate_ix(
 ) -> std::io::Result<Instruction> {
     update_initial_pct_to_liquidate_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_initial_pct_to_liquidate_invoke(
+pub fn update_initial_pct_to_liquidate_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
     args: UpdateInitialPctToLiquidateIxArgs,
 ) -> ProgramResult {
     let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
-    let ix = update_initial_pct_to_liquidate_ix(keys, args)?;
+    let ix = update_initial_pct_to_liquidate_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_initial_pct_to_liquidate_invoke(
+    accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
+    args: UpdateInitialPctToLiquidateIxArgs,
+) -> ProgramResult {
+    update_initial_pct_to_liquidate_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_initial_pct_to_liquidate_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
+    args: UpdateInitialPctToLiquidateIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
+    let ix = update_initial_pct_to_liquidate_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_initial_pct_to_liquidate_invoke_signed(
     accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
     args: UpdateInitialPctToLiquidateIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateInitialPctToLiquidateKeys = accounts.into();
-    let ix = update_initial_pct_to_liquidate_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_initial_pct_to_liquidate_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_initial_pct_to_liquidate_verify_account_keys(
     accounts: UpdateInitialPctToLiquidateAccounts<'_, '_>,
@@ -22664,22 +24297,37 @@ pub fn update_liquidation_duration_ix(
 ) -> std::io::Result<Instruction> {
     update_liquidation_duration_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_liquidation_duration_invoke(
+pub fn update_liquidation_duration_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateLiquidationDurationAccounts<'_, '_>,
     args: UpdateLiquidationDurationIxArgs,
 ) -> ProgramResult {
     let keys: UpdateLiquidationDurationKeys = accounts.into();
-    let ix = update_liquidation_duration_ix(keys, args)?;
+    let ix = update_liquidation_duration_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_liquidation_duration_invoke(
+    accounts: UpdateLiquidationDurationAccounts<'_, '_>,
+    args: UpdateLiquidationDurationIxArgs,
+) -> ProgramResult {
+    update_liquidation_duration_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_liquidation_duration_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateLiquidationDurationAccounts<'_, '_>,
+    args: UpdateLiquidationDurationIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateLiquidationDurationKeys = accounts.into();
+    let ix = update_liquidation_duration_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_liquidation_duration_invoke_signed(
     accounts: UpdateLiquidationDurationAccounts<'_, '_>,
     args: UpdateLiquidationDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateLiquidationDurationKeys = accounts.into();
-    let ix = update_liquidation_duration_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_liquidation_duration_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_liquidation_duration_verify_account_keys(
     accounts: UpdateLiquidationDurationAccounts<'_, '_>,
@@ -22842,22 +24490,37 @@ pub fn update_oracle_guard_rails_ix(
 ) -> std::io::Result<Instruction> {
     update_oracle_guard_rails_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_oracle_guard_rails_invoke(
+pub fn update_oracle_guard_rails_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
     args: UpdateOracleGuardRailsIxArgs,
 ) -> ProgramResult {
     let keys: UpdateOracleGuardRailsKeys = accounts.into();
-    let ix = update_oracle_guard_rails_ix(keys, args)?;
+    let ix = update_oracle_guard_rails_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_oracle_guard_rails_invoke(
+    accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
+    args: UpdateOracleGuardRailsIxArgs,
+) -> ProgramResult {
+    update_oracle_guard_rails_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_oracle_guard_rails_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
+    args: UpdateOracleGuardRailsIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateOracleGuardRailsKeys = accounts.into();
+    let ix = update_oracle_guard_rails_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_oracle_guard_rails_invoke_signed(
     accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
     args: UpdateOracleGuardRailsIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateOracleGuardRailsKeys = accounts.into();
-    let ix = update_oracle_guard_rails_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_oracle_guard_rails_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_oracle_guard_rails_verify_account_keys(
     accounts: UpdateOracleGuardRailsAccounts<'_, '_>,
@@ -23026,22 +24689,37 @@ pub fn update_state_settlement_duration_ix(
 ) -> std::io::Result<Instruction> {
     update_state_settlement_duration_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_state_settlement_duration_invoke(
+pub fn update_state_settlement_duration_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
     args: UpdateStateSettlementDurationIxArgs,
 ) -> ProgramResult {
     let keys: UpdateStateSettlementDurationKeys = accounts.into();
-    let ix = update_state_settlement_duration_ix(keys, args)?;
+    let ix = update_state_settlement_duration_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_state_settlement_duration_invoke(
+    accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
+    args: UpdateStateSettlementDurationIxArgs,
+) -> ProgramResult {
+    update_state_settlement_duration_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_state_settlement_duration_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
+    args: UpdateStateSettlementDurationIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateStateSettlementDurationKeys = accounts.into();
+    let ix = update_state_settlement_duration_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_state_settlement_duration_invoke_signed(
     accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
     args: UpdateStateSettlementDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateStateSettlementDurationKeys = accounts.into();
-    let ix = update_state_settlement_duration_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_state_settlement_duration_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_state_settlement_duration_verify_account_keys(
     accounts: UpdateStateSettlementDurationAccounts<'_, '_>,
@@ -23230,22 +24908,37 @@ pub fn update_perp_market_oracle_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_oracle_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_oracle_invoke(
+pub fn update_perp_market_oracle_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
     args: UpdatePerpMarketOracleIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketOracleKeys = accounts.into();
-    let ix = update_perp_market_oracle_ix(keys, args)?;
+    let ix = update_perp_market_oracle_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_oracle_invoke(
+    accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
+    args: UpdatePerpMarketOracleIxArgs,
+) -> ProgramResult {
+    update_perp_market_oracle_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_oracle_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
+    args: UpdatePerpMarketOracleIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketOracleKeys = accounts.into();
+    let ix = update_perp_market_oracle_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_oracle_invoke_signed(
     accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
     args: UpdatePerpMarketOracleIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketOracleKeys = accounts.into();
-    let ix = update_perp_market_oracle_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_oracle_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_oracle_verify_account_keys(
     accounts: UpdatePerpMarketOracleAccounts<'_, '_>,
@@ -23430,22 +25123,37 @@ pub fn update_perp_market_base_spread_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_base_spread_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_base_spread_invoke(
+pub fn update_perp_market_base_spread_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
     args: UpdatePerpMarketBaseSpreadIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
-    let ix = update_perp_market_base_spread_ix(keys, args)?;
+    let ix = update_perp_market_base_spread_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_base_spread_invoke(
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
+    args: UpdatePerpMarketBaseSpreadIxArgs,
+) -> ProgramResult {
+    update_perp_market_base_spread_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_base_spread_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
+    args: UpdatePerpMarketBaseSpreadIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
+    let ix = update_perp_market_base_spread_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_base_spread_invoke_signed(
     accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
     args: UpdatePerpMarketBaseSpreadIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketBaseSpreadKeys = accounts.into();
-    let ix = update_perp_market_base_spread_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_base_spread_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_base_spread_verify_account_keys(
     accounts: UpdatePerpMarketBaseSpreadAccounts<'_, '_>,
@@ -23621,22 +25329,37 @@ pub fn update_amm_jit_intensity_ix(
 ) -> std::io::Result<Instruction> {
     update_amm_jit_intensity_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_amm_jit_intensity_invoke(
+pub fn update_amm_jit_intensity_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
     args: UpdateAmmJitIntensityIxArgs,
 ) -> ProgramResult {
     let keys: UpdateAmmJitIntensityKeys = accounts.into();
-    let ix = update_amm_jit_intensity_ix(keys, args)?;
+    let ix = update_amm_jit_intensity_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_amm_jit_intensity_invoke(
+    accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
+    args: UpdateAmmJitIntensityIxArgs,
+) -> ProgramResult {
+    update_amm_jit_intensity_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_amm_jit_intensity_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
+    args: UpdateAmmJitIntensityIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateAmmJitIntensityKeys = accounts.into();
+    let ix = update_amm_jit_intensity_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_amm_jit_intensity_invoke_signed(
     accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
     args: UpdateAmmJitIntensityIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateAmmJitIntensityKeys = accounts.into();
-    let ix = update_amm_jit_intensity_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_amm_jit_intensity_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_amm_jit_intensity_verify_account_keys(
     accounts: UpdateAmmJitIntensityAccounts<'_, '_>,
@@ -23818,22 +25541,37 @@ pub fn update_perp_market_max_spread_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_max_spread_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_max_spread_invoke(
+pub fn update_perp_market_max_spread_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
     args: UpdatePerpMarketMaxSpreadIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
-    let ix = update_perp_market_max_spread_ix(keys, args)?;
+    let ix = update_perp_market_max_spread_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_max_spread_invoke(
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxSpreadIxArgs,
+) -> ProgramResult {
+    update_perp_market_max_spread_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_max_spread_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxSpreadIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
+    let ix = update_perp_market_max_spread_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_max_spread_invoke_signed(
     accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
     args: UpdatePerpMarketMaxSpreadIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMaxSpreadKeys = accounts.into();
-    let ix = update_perp_market_max_spread_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_max_spread_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_max_spread_verify_account_keys(
     accounts: UpdatePerpMarketMaxSpreadAccounts<'_, '_>,
@@ -24023,22 +25761,42 @@ pub fn update_perp_market_step_size_and_tick_size_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_step_size_and_tick_size_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_step_size_and_tick_size_invoke(
+pub fn update_perp_market_step_size_and_tick_size_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
     args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
-    let ix = update_perp_market_step_size_and_tick_size_ix(keys, args)?;
+    let ix = update_perp_market_step_size_and_tick_size_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_step_size_and_tick_size_invoke(
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
+) -> ProgramResult {
+    update_perp_market_step_size_and_tick_size_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_step_size_and_tick_size_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
+    args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
+    let ix = update_perp_market_step_size_and_tick_size_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_step_size_and_tick_size_invoke_signed(
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
     args: UpdatePerpMarketStepSizeAndTickSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketStepSizeAndTickSizeKeys = accounts.into();
-    let ix = update_perp_market_step_size_and_tick_size_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_step_size_and_tick_size_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_step_size_and_tick_size_verify_account_keys(
     accounts: UpdatePerpMarketStepSizeAndTickSizeAccounts<'_, '_>,
@@ -24214,22 +25972,37 @@ pub fn update_perp_market_name_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_name_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_name_invoke(
+pub fn update_perp_market_name_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketNameAccounts<'_, '_>,
     args: UpdatePerpMarketNameIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketNameKeys = accounts.into();
-    let ix = update_perp_market_name_ix(keys, args)?;
+    let ix = update_perp_market_name_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_name_invoke(
+    accounts: UpdatePerpMarketNameAccounts<'_, '_>,
+    args: UpdatePerpMarketNameIxArgs,
+) -> ProgramResult {
+    update_perp_market_name_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_name_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketNameAccounts<'_, '_>,
+    args: UpdatePerpMarketNameIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketNameKeys = accounts.into();
+    let ix = update_perp_market_name_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_name_invoke_signed(
     accounts: UpdatePerpMarketNameAccounts<'_, '_>,
     args: UpdatePerpMarketNameIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketNameKeys = accounts.into();
-    let ix = update_perp_market_name_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_name_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_market_name_verify_account_keys(
     accounts: UpdatePerpMarketNameAccounts<'_, '_>,
@@ -24413,22 +26186,42 @@ pub fn update_perp_market_min_order_size_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_min_order_size_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_min_order_size_invoke(
+pub fn update_perp_market_min_order_size_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
     args: UpdatePerpMarketMinOrderSizeIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
-    let ix = update_perp_market_min_order_size_ix(keys, args)?;
+    let ix = update_perp_market_min_order_size_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_min_order_size_invoke(
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
+    args: UpdatePerpMarketMinOrderSizeIxArgs,
+) -> ProgramResult {
+    update_perp_market_min_order_size_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_min_order_size_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
+    args: UpdatePerpMarketMinOrderSizeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
+    let ix = update_perp_market_min_order_size_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_min_order_size_invoke_signed(
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
     args: UpdatePerpMarketMinOrderSizeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMinOrderSizeKeys = accounts.into();
-    let ix = update_perp_market_min_order_size_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_min_order_size_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_min_order_size_verify_account_keys(
     accounts: UpdatePerpMarketMinOrderSizeAccounts<'_, '_>,
@@ -24616,22 +26409,42 @@ pub fn update_perp_market_max_slippage_ratio_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_max_slippage_ratio_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_max_slippage_ratio_invoke(
+pub fn update_perp_market_max_slippage_ratio_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
     args: UpdatePerpMarketMaxSlippageRatioIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
-    let ix = update_perp_market_max_slippage_ratio_ix(keys, args)?;
+    let ix = update_perp_market_max_slippage_ratio_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_max_slippage_ratio_invoke(
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxSlippageRatioIxArgs,
+) -> ProgramResult {
+    update_perp_market_max_slippage_ratio_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_max_slippage_ratio_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxSlippageRatioIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
+    let ix = update_perp_market_max_slippage_ratio_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_max_slippage_ratio_invoke_signed(
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
     args: UpdatePerpMarketMaxSlippageRatioIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMaxSlippageRatioKeys = accounts.into();
-    let ix = update_perp_market_max_slippage_ratio_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_max_slippage_ratio_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_max_slippage_ratio_verify_account_keys(
     accounts: UpdatePerpMarketMaxSlippageRatioAccounts<'_, '_>,
@@ -24827,22 +26640,44 @@ pub fn update_perp_market_max_fill_reserve_fraction_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_max_fill_reserve_fraction_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_max_fill_reserve_fraction_invoke(
+pub fn update_perp_market_max_fill_reserve_fraction_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
     args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
-    let ix = update_perp_market_max_fill_reserve_fraction_ix(keys, args)?;
+    let ix =
+        update_perp_market_max_fill_reserve_fraction_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_max_fill_reserve_fraction_invoke(
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
+) -> ProgramResult {
+    update_perp_market_max_fill_reserve_fraction_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
+    let ix =
+        update_perp_market_max_fill_reserve_fraction_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_max_fill_reserve_fraction_invoke_signed(
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
     args: UpdatePerpMarketMaxFillReserveFractionIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMaxFillReserveFractionKeys = accounts.into();
-    let ix = update_perp_market_max_fill_reserve_fraction_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_max_fill_reserve_fraction_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_max_fill_reserve_fraction_verify_account_keys(
     accounts: UpdatePerpMarketMaxFillReserveFractionAccounts<'_, '_>,
@@ -25028,22 +26863,42 @@ pub fn update_perp_market_max_open_interest_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_market_max_open_interest_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_market_max_open_interest_invoke(
+pub fn update_perp_market_max_open_interest_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
     args: UpdatePerpMarketMaxOpenInterestIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
-    let ix = update_perp_market_max_open_interest_ix(keys, args)?;
+    let ix = update_perp_market_max_open_interest_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_market_max_open_interest_invoke(
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxOpenInterestIxArgs,
+) -> ProgramResult {
+    update_perp_market_max_open_interest_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_market_max_open_interest_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
+    args: UpdatePerpMarketMaxOpenInterestIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
+    let ix = update_perp_market_max_open_interest_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_market_max_open_interest_invoke_signed(
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
     args: UpdatePerpMarketMaxOpenInterestIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpMarketMaxOpenInterestKeys = accounts.into();
-    let ix = update_perp_market_max_open_interest_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_market_max_open_interest_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn update_perp_market_max_open_interest_verify_account_keys(
     accounts: UpdatePerpMarketMaxOpenInterestAccounts<'_, '_>,
@@ -25205,22 +27060,37 @@ pub fn update_admin_ix(
 ) -> std::io::Result<Instruction> {
     update_admin_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_admin_invoke(
+pub fn update_admin_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateAdminAccounts<'_, '_>,
     args: UpdateAdminIxArgs,
 ) -> ProgramResult {
     let keys: UpdateAdminKeys = accounts.into();
-    let ix = update_admin_ix(keys, args)?;
+    let ix = update_admin_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_admin_invoke(
+    accounts: UpdateAdminAccounts<'_, '_>,
+    args: UpdateAdminIxArgs,
+) -> ProgramResult {
+    update_admin_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_admin_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateAdminAccounts<'_, '_>,
+    args: UpdateAdminIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateAdminKeys = accounts.into();
+    let ix = update_admin_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_admin_invoke_signed(
     accounts: UpdateAdminAccounts<'_, '_>,
     args: UpdateAdminIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateAdminKeys = accounts.into();
-    let ix = update_admin_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_admin_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_admin_verify_account_keys(
     accounts: UpdateAdminAccounts<'_, '_>,
@@ -25381,22 +27251,37 @@ pub fn update_whitelist_mint_ix(
 ) -> std::io::Result<Instruction> {
     update_whitelist_mint_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_whitelist_mint_invoke(
+pub fn update_whitelist_mint_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateWhitelistMintAccounts<'_, '_>,
     args: UpdateWhitelistMintIxArgs,
 ) -> ProgramResult {
     let keys: UpdateWhitelistMintKeys = accounts.into();
-    let ix = update_whitelist_mint_ix(keys, args)?;
+    let ix = update_whitelist_mint_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_whitelist_mint_invoke(
+    accounts: UpdateWhitelistMintAccounts<'_, '_>,
+    args: UpdateWhitelistMintIxArgs,
+) -> ProgramResult {
+    update_whitelist_mint_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_whitelist_mint_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateWhitelistMintAccounts<'_, '_>,
+    args: UpdateWhitelistMintIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateWhitelistMintKeys = accounts.into();
+    let ix = update_whitelist_mint_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_whitelist_mint_invoke_signed(
     accounts: UpdateWhitelistMintAccounts<'_, '_>,
     args: UpdateWhitelistMintIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateWhitelistMintKeys = accounts.into();
-    let ix = update_whitelist_mint_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_whitelist_mint_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_whitelist_mint_verify_account_keys(
     accounts: UpdateWhitelistMintAccounts<'_, '_>,
@@ -25557,22 +27442,37 @@ pub fn update_discount_mint_ix(
 ) -> std::io::Result<Instruction> {
     update_discount_mint_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_discount_mint_invoke(
+pub fn update_discount_mint_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateDiscountMintAccounts<'_, '_>,
     args: UpdateDiscountMintIxArgs,
 ) -> ProgramResult {
     let keys: UpdateDiscountMintKeys = accounts.into();
-    let ix = update_discount_mint_ix(keys, args)?;
+    let ix = update_discount_mint_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_discount_mint_invoke(
+    accounts: UpdateDiscountMintAccounts<'_, '_>,
+    args: UpdateDiscountMintIxArgs,
+) -> ProgramResult {
+    update_discount_mint_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_discount_mint_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateDiscountMintAccounts<'_, '_>,
+    args: UpdateDiscountMintIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateDiscountMintKeys = accounts.into();
+    let ix = update_discount_mint_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_discount_mint_invoke_signed(
     accounts: UpdateDiscountMintAccounts<'_, '_>,
     args: UpdateDiscountMintIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateDiscountMintKeys = accounts.into();
-    let ix = update_discount_mint_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_discount_mint_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_discount_mint_verify_account_keys(
     accounts: UpdateDiscountMintAccounts<'_, '_>,
@@ -25733,22 +27633,37 @@ pub fn update_exchange_status_ix(
 ) -> std::io::Result<Instruction> {
     update_exchange_status_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_exchange_status_invoke(
+pub fn update_exchange_status_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateExchangeStatusAccounts<'_, '_>,
     args: UpdateExchangeStatusIxArgs,
 ) -> ProgramResult {
     let keys: UpdateExchangeStatusKeys = accounts.into();
-    let ix = update_exchange_status_ix(keys, args)?;
+    let ix = update_exchange_status_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_exchange_status_invoke(
+    accounts: UpdateExchangeStatusAccounts<'_, '_>,
+    args: UpdateExchangeStatusIxArgs,
+) -> ProgramResult {
+    update_exchange_status_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_exchange_status_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateExchangeStatusAccounts<'_, '_>,
+    args: UpdateExchangeStatusIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateExchangeStatusKeys = accounts.into();
+    let ix = update_exchange_status_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_exchange_status_invoke_signed(
     accounts: UpdateExchangeStatusAccounts<'_, '_>,
     args: UpdateExchangeStatusIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateExchangeStatusKeys = accounts.into();
-    let ix = update_exchange_status_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_exchange_status_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_exchange_status_verify_account_keys(
     accounts: UpdateExchangeStatusAccounts<'_, '_>,
@@ -25915,22 +27830,37 @@ pub fn update_perp_auction_duration_ix(
 ) -> std::io::Result<Instruction> {
     update_perp_auction_duration_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_perp_auction_duration_invoke(
+pub fn update_perp_auction_duration_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
     args: UpdatePerpAuctionDurationIxArgs,
 ) -> ProgramResult {
     let keys: UpdatePerpAuctionDurationKeys = accounts.into();
-    let ix = update_perp_auction_duration_ix(keys, args)?;
+    let ix = update_perp_auction_duration_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_perp_auction_duration_invoke(
+    accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
+    args: UpdatePerpAuctionDurationIxArgs,
+) -> ProgramResult {
+    update_perp_auction_duration_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_perp_auction_duration_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
+    args: UpdatePerpAuctionDurationIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdatePerpAuctionDurationKeys = accounts.into();
+    let ix = update_perp_auction_duration_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_perp_auction_duration_invoke_signed(
     accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
     args: UpdatePerpAuctionDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdatePerpAuctionDurationKeys = accounts.into();
-    let ix = update_perp_auction_duration_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_perp_auction_duration_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_perp_auction_duration_verify_account_keys(
     accounts: UpdatePerpAuctionDurationAccounts<'_, '_>,
@@ -26097,22 +28027,37 @@ pub fn update_spot_auction_duration_ix(
 ) -> std::io::Result<Instruction> {
     update_spot_auction_duration_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn update_spot_auction_duration_invoke(
+pub fn update_spot_auction_duration_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
     args: UpdateSpotAuctionDurationIxArgs,
 ) -> ProgramResult {
     let keys: UpdateSpotAuctionDurationKeys = accounts.into();
-    let ix = update_spot_auction_duration_ix(keys, args)?;
+    let ix = update_spot_auction_duration_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn update_spot_auction_duration_invoke(
+    accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
+    args: UpdateSpotAuctionDurationIxArgs,
+) -> ProgramResult {
+    update_spot_auction_duration_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn update_spot_auction_duration_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
+    args: UpdateSpotAuctionDurationIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: UpdateSpotAuctionDurationKeys = accounts.into();
+    let ix = update_spot_auction_duration_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn update_spot_auction_duration_invoke_signed(
     accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
     args: UpdateSpotAuctionDurationIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: UpdateSpotAuctionDurationKeys = accounts.into();
-    let ix = update_spot_auction_duration_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    update_spot_auction_duration_invoke_signed_with_program_id(crate::ID, accounts, args, seeds)
 }
 pub fn update_spot_auction_duration_verify_account_keys(
     accounts: UpdateSpotAuctionDurationAccounts<'_, '_>,
@@ -26341,22 +28286,42 @@ pub fn admin_remove_insurance_fund_stake_ix(
 ) -> std::io::Result<Instruction> {
     admin_remove_insurance_fund_stake_ix_with_program_id(crate::ID, keys, args)
 }
-pub fn admin_remove_insurance_fund_stake_invoke(
+pub fn admin_remove_insurance_fund_stake_invoke_with_program_id(
+    program_id: Pubkey,
     accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: AdminRemoveInsuranceFundStakeIxArgs,
 ) -> ProgramResult {
     let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = admin_remove_insurance_fund_stake_ix(keys, args)?;
+    let ix = admin_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
     invoke_instruction(&ix, accounts)
+}
+pub fn admin_remove_insurance_fund_stake_invoke(
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: AdminRemoveInsuranceFundStakeIxArgs,
+) -> ProgramResult {
+    admin_remove_insurance_fund_stake_invoke_with_program_id(crate::ID, accounts, args)
+}
+pub fn admin_remove_insurance_fund_stake_invoke_signed_with_program_id(
+    program_id: Pubkey,
+    accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
+    args: AdminRemoveInsuranceFundStakeIxArgs,
+    seeds: &[&[&[u8]]],
+) -> ProgramResult {
+    let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
+    let ix = admin_remove_insurance_fund_stake_ix_with_program_id(program_id, keys, args)?;
+    invoke_instruction_signed(&ix, accounts, seeds)
 }
 pub fn admin_remove_insurance_fund_stake_invoke_signed(
     accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
     args: AdminRemoveInsuranceFundStakeIxArgs,
     seeds: &[&[&[u8]]],
 ) -> ProgramResult {
-    let keys: AdminRemoveInsuranceFundStakeKeys = accounts.into();
-    let ix = admin_remove_insurance_fund_stake_ix(keys, args)?;
-    invoke_instruction_signed(&ix, accounts, seeds)
+    admin_remove_insurance_fund_stake_invoke_signed_with_program_id(
+        crate::ID,
+        accounts,
+        args,
+        seeds,
+    )
 }
 pub fn admin_remove_insurance_fund_stake_verify_account_keys(
     accounts: AdminRemoveInsuranceFundStakeAccounts<'_, '_>,
