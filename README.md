@@ -180,7 +180,7 @@ For supporting older solana programs (system, stake), solores also supports a cu
 
 The instructions must be declared in enum order to work with bincode.
 
-No account definitions are supported.
+No account definitions are supported, since system and stake program have their account defs in `solana-program` already.
 
 ## Features
 

@@ -1,5 +1,5 @@
 use heck::ToPascalCase;
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 
 use crate::idl_format::IdlCodegenModule;
@@ -10,6 +10,12 @@ pub use instruction::*;
 pub struct IxCodegenModule<'a> {
     pub program_name: &'a str,
     pub instructions: &'a [NamedInstruction],
+}
+
+impl<'a> IxCodegenModule<'a> {
+    pub fn program_ix_enum_ident(&self) -> Ident {
+        format_ident!("{}ProgramIx", self.program_name.to_pascal_case())
+    }
 }
 
 impl IdlCodegenModule for IxCodegenModule<'_> {
@@ -67,8 +73,7 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
         }
 
         // program ix enum
-        let program_ix_enum_ident =
-            format_ident!("{}ProgramIx", self.program_name.to_pascal_case());
+        let program_ix_enum_ident = self.program_ix_enum_ident();
         let program_ix_enum_variants = self.instructions.iter().map(enum_variant);
 
         res.extend(quote! {
@@ -102,15 +107,24 @@ impl IdlCodegenModule for IxCodegenModule<'_> {
     }
 
     fn gen_body(&self) -> TokenStream {
+        let program_ix_enum_ident = self.program_ix_enum_ident();
         self.instructions
             .iter()
-            .map(|e| e.into_token_stream())
+            .enumerate()
+            .map(|(i, ix)| {
+                NamedInstructionFull {
+                    ix,
+                    index: i,
+                    program_ix_enum_ident: &program_ix_enum_ident,
+                }
+                .into_token_stream()
+            })
             .collect()
     }
 }
 
 pub fn enum_variant(ix: &NamedInstruction) -> TokenStream {
-    let variant_ident = format_ident!("{}", ix.name.to_pascal_case());
+    let variant_ident = ix.enum_variant_ident();
     let mut res = quote!(
         #variant_ident
     );

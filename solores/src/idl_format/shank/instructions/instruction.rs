@@ -156,7 +156,7 @@ impl NamedInstruction {
         });
     }
 
-    /// From<&XAccounts> for XKeys
+    /// From<XAccounts> for XKeys
     pub fn write_from_accounts_for_keys(&self, tokens: &mut TokenStream, accounts: &[IxAccount]) {
         if !self.has_accounts() {
             return;

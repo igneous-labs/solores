@@ -12,18 +12,95 @@ pub struct NamedInstruction {
     pub name: String,
     pub accounts: Option<Vec<IxAccount>>,
     pub args: Option<Vec<TypedefField>>,
-    pub discriminant: u32,
+}
+
+pub struct NamedInstructionFull<'a> {
+    pub ix: &'a NamedInstruction,
+    pub index: usize,
+    pub program_ix_enum_ident: &'a Ident,
+}
+
+impl<'a> NamedInstructionFull<'a> {
+    pub fn write_discm(&self, tokens: &mut TokenStream) {
+        let discm_ident = format_ident!("{}_IX_DISCM", &self.ix.name.to_shouty_snake_case());
+        let discm_value: u32 = self.index.try_into().unwrap();
+        let discm_arr = discm_value.to_le_bytes();
+        let discm_tokens: TokenStream = format!("{:?}", discm_arr).parse().unwrap();
+
+        tokens.extend(quote! {
+            pub const #discm_ident: [u8; 4] = #discm_tokens;
+        });
+    }
+
+    /// _ix()
+    /// _ix_with_program_id()
+    pub fn write_ix_fn(&self, tokens: &mut TokenStream) {
+        let ix_fn_ident = self.ix.ix_fn_ident();
+        let ix_with_program_id_fn_ident = self.ix.ix_fn_with_program_id_ident();
+        let keys_ident = self.ix.keys_ident();
+        let ix_args_ident = self.ix.ix_args_ident();
+        let accounts_len_ident = self.ix.accounts_len_ident();
+
+        let mut fn_params = quote! {};
+        let mut fn_args = quote! {};
+        if self.ix.has_accounts() {
+            fn_params.extend(quote! { keys: #keys_ident, });
+            fn_args.extend(quote! { keys, });
+        }
+        if self.ix.has_ix_args() {
+            fn_params.extend(quote! { args: #ix_args_ident, });
+            fn_args.extend(quote! { args, });
+        }
+
+        let (fn_body, accounts_expr) = if self.ix.has_accounts() {
+            (
+                quote! {
+                    let metas: [AccountMeta; #accounts_len_ident] = keys.into();
+                },
+                quote! {
+                    Vec::from(metas)
+                },
+            )
+        } else {
+            (
+                quote! {},
+                quote! {
+                    Vec::new()
+                },
+            )
+        };
+        let data_expr = if self.ix.has_ix_args() {
+            let program_ix_enum_ident = self.program_ix_enum_ident;
+            let variant_ident = self.ix.enum_variant_ident();
+            quote! { &#program_ix_enum_ident::#variant_ident(args) }
+        } else {
+            quote! { &() }
+        };
+
+        tokens.extend(quote! {
+            pub fn #ix_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> Instruction {
+                #fn_body
+                Instruction::new_with_bincode(
+                    program_id,
+                    #data_expr,
+                    #accounts_expr
+                )
+            }
+
+            pub fn #ix_fn_ident(#fn_params) -> Instruction {
+                #ix_with_program_id_fn_ident(crate::ID, #fn_args)
+            }
+        });
+    }
 }
 
 impl NamedInstruction {
-    pub fn ix_args_ident(&self) -> Ident {
-        format_ident!("{}IxArgs", self.name.to_pascal_case())
+    pub fn enum_variant_ident(&self) -> Ident {
+        format_ident!("{}", self.name.to_pascal_case())
     }
 
-    // TODO: delete
-    // TODO: re-add write_discm
-    pub fn ix_data_ident(&self) -> Ident {
-        format_ident!("{}IxData", self.name.to_pascal_case())
+    pub fn ix_args_ident(&self) -> Ident {
+        format_ident!("{}IxArgs", self.name.to_pascal_case())
     }
 
     pub fn ix_fn_ident(&self) -> Ident {
@@ -32,10 +109,6 @@ impl NamedInstruction {
 
     pub fn ix_fn_with_program_id_ident(&self) -> Ident {
         format_ident!("{}_ix_with_program_id", self.name.to_snake_case())
-    }
-
-    pub fn discm_ident(&self) -> Ident {
-        format_ident!("{}_IX_DISCM", &self.name.to_shouty_snake_case())
     }
 
     pub fn accounts_ident(&self) -> Ident {
@@ -155,7 +228,7 @@ impl NamedInstruction {
         });
     }
 
-    /// From<&XAccounts> for XKeys
+    /// From<XAccounts> for XKeys
     pub fn write_from_accounts_for_keys(
         &self,
         tokens: &mut TokenStream,
@@ -297,94 +370,14 @@ impl NamedInstruction {
         let ix_args_ident = self.ix_args_ident();
         let args_fields = args.iter().map(|a| quote! { pub #a });
         tokens.extend(quote! {
-            #[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
             pub struct #ix_args_ident {
                 #(#args_fields),*
             }
         });
     }
 
-    pub fn write_from_ix_args_for_ix_data(&self, tokens: &mut TokenStream) {
-        if !self.has_ix_args() {
-            return;
-        }
-        let ix_data_ident = self.ix_data_ident();
-        let ix_args_ident = self.ix_args_ident();
-        tokens.extend(quote! {
-            impl From<#ix_args_ident> for #ix_data_ident {
-                fn from(args: #ix_args_ident) -> Self {
-                    Self(args)
-                }
-            }
-        });
-    }
-
-    /// _ix()
-    /// _ix_with_program_id()
-    pub fn write_ix_fn(&self, tokens: &mut TokenStream) {
-        let ix_fn_ident = self.ix_fn_ident();
-        let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
-        let keys_ident = self.keys_ident();
-        let ix_args_ident = self.ix_args_ident();
-        let accounts_len_ident = self.accounts_len_ident();
-        let ix_data_ident = self.ix_data_ident();
-
-        let mut fn_params = quote! {};
-        let mut fn_args = quote! {};
-        if self.has_accounts() {
-            fn_params.extend(quote! { keys: #keys_ident, });
-            fn_args.extend(quote! { keys, });
-        }
-        if self.has_ix_args() {
-            fn_params.extend(quote! { args: #ix_args_ident, });
-            fn_args.extend(quote! { args, });
-        }
-
-        let (mut fn_body, accounts_expr) = if self.has_accounts() {
-            (
-                quote! {
-                    let metas: [AccountMeta; #accounts_len_ident] = keys.into();
-                },
-                quote! {
-                    Vec::from(metas)
-                },
-            )
-        } else {
-            (
-                quote! {},
-                quote! {
-                    Vec::new()
-                },
-            )
-        };
-        if self.has_ix_args() {
-            fn_body.extend(quote! {
-                let data: #ix_data_ident = args.into();
-            })
-        }
-        let data_expr = if self.has_ix_args() {
-            quote! { data.try_to_vec()? }
-        } else {
-            quote! { #ix_data_ident.try_to_vec()? }
-        };
-
-        tokens.extend(quote! {
-            pub fn #ix_with_program_id_fn_ident(program_id: Pubkey, #fn_params) -> std::io::Result<Instruction> {
-                #fn_body
-                Ok(Instruction {
-                    program_id,
-                    accounts: #accounts_expr,
-                    data: #data_expr,
-                })
-            }
-
-            pub fn #ix_fn_ident(#fn_params) -> std::io::Result<Instruction> {
-                #ix_with_program_id_fn_ident(crate::ID, #fn_args)
-            }
-        });
-    }
-
+    /// accounts: XAccounts, args: XIxArgs
     fn invoke_fn_params_prefix(&self) -> TokenStream {
         let accounts_ident = self.accounts_ident();
         let ix_args_ident = self.ix_args_ident();
@@ -398,6 +391,7 @@ impl NamedInstruction {
         fn_params
     }
 
+    /// accounts, args
     fn invoke_fn_args_prefix(&self) -> TokenStream {
         let mut fn_args = quote! {};
         if self.has_accounts() {
@@ -409,6 +403,8 @@ impl NamedInstruction {
         fn_args
     }
 
+    /// let keys: XKeys = accounts.into();
+    /// let ix = X_ix_with_program_id(program_id, keys, args)?;
     fn ix_call_assign(&self) -> TokenStream {
         let ix_with_program_id_fn_ident = self.ix_fn_with_program_id_ident();
         let keys_ident = self.keys_ident();
@@ -424,7 +420,7 @@ impl NamedInstruction {
             args.extend(quote! { args });
         }
         res.extend(quote! {
-            let ix = #ix_with_program_id_fn_ident(program_id, #args)?;
+            let ix = #ix_with_program_id_fn_ident(program_id, #args);
         });
         res
     }
@@ -659,14 +655,20 @@ impl ToTokens for NamedInstruction {
         self.write_from_account_info_arr_for_accounts(tokens, accounts);
 
         self.write_ix_args_struct(tokens);
-        self.write_from_ix_args_for_ix_data(tokens);
 
-        self.write_ix_fn(tokens);
         self.write_invoke_fn(tokens);
         self.write_invoke_signed_fn(tokens);
 
         self.write_verify_account_keys_fn(tokens, unique_accounts);
         self.write_verify_account_privileges_fns(tokens, unique_accounts);
+    }
+}
+
+impl<'a> ToTokens for NamedInstructionFull<'a> {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        self.write_discm(tokens);
+        self.write_ix_fn(tokens);
+        tokens.extend(self.ix.to_token_stream());
     }
 }
 

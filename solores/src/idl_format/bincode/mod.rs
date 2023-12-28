@@ -11,6 +11,7 @@ use super::{IdlCodegenModule, IdlFormat};
 use self::{
     errors::{ErrorEnumVariant, ErrorsCodegenModule},
     instructions::{IxCodegenModule, NamedInstruction},
+    typedefs::{NamedType, TypedefsCodegenModule},
 };
 
 pub mod errors;
@@ -23,6 +24,7 @@ pub struct BincodeIdl {
     pub version: String,
     pub metadata: Metadata,
     pub instructions: Option<Vec<NamedInstruction>>,
+    pub types: Option<Vec<NamedType>>,
     pub errors: Option<Vec<ErrorEnumVariant>>,
 }
 
@@ -49,8 +51,14 @@ impl IdlFormat for BincodeIdl {
         self.metadata.origin == "bincode"
     }
 
-    fn modules<'me>(&'me self, _args: &'me crate::Args) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
+    fn modules<'me>(&'me self, args: &'me crate::Args) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
         let mut res: Vec<Box<dyn IdlCodegenModule + 'me>> = Vec::new();
+        if let Some(v) = &self.r#types {
+            res.push(Box::new(TypedefsCodegenModule {
+                cli_args: args,
+                named_types: v,
+            }));
+        }
         if let Some(v) = &self.instructions {
             res.push(Box::new(IxCodegenModule {
                 program_name: self.program_name(),
