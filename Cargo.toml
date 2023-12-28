@@ -9,6 +9,7 @@ members = [
     "examples/anchor/drift/*",
     "examples/anchor/marinade/*",
     "examples/anchor/unstake_it/*",
+    "examples/bincode/stake/*",
     "examples/bincode/system/*",
     "examples/shank/ix_blank/*",
     "examples/shank/ix_no_accounts/*",
@@ -54,6 +55,7 @@ void = "^1.0"
 drift_interface = { path = "./examples/anchor/drift/drift_interface" }
 marinade_finance_interface = { path = "./examples/anchor/marinade/marinade_finance_interface" }
 mpl_token_metadata_interface = { path = "./examples/shank/token_metadata/mpl_token_metadata_interface" }
+stake_program_interface = { path = "./examples/bincode/stake/stake_program_interface" }
 system_program_interface = { path = "./examples/bincode/system/system_program_interface" }
 test_utils = { path = "./test_utils" }
 unstake_interface = { path = "./examples/anchor/unstake_it/unstake_interface" }

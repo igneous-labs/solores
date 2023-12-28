@@ -4404,6 +4404,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "stake_program_client"
+version = "0.1.0"
+dependencies = [
+ "rand 0.8.5",
+ "solana-program",
+ "stake_program_interface",
+]
+
+[[package]]
+name = "stake_program_interface"
+version = "1.17.13"
+dependencies = [
+ "serde",
+ "solana-program",
+]
+
+[[package]]
 name = "strsim"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
