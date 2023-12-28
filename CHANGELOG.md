@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- bincode support
 - `*_ix_with_program_id()`, `*_invoke_with_program_id()`, `*_invoke_signed_with_program_id()`
 
 ## [0.6.1] - 2023-12-27
