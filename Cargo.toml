@@ -4,6 +4,7 @@ resolver = "2"
 members = [
     "examples/anchor/ix_blank/*",
     "examples/anchor/ix_no_accounts/*",
+    "examples/anchor/ix_no_accounts_pubkey_arg/*",
     "examples/anchor/ix_no_args/*",
     "examples/anchor/ix_no_privilege/*",
     "examples/anchor/drift/*",
@@ -13,6 +14,7 @@ members = [
     "examples/bincode/system/*",
     "examples/shank/ix_blank/*",
     "examples/shank/ix_no_accounts/*",
+    "examples/shank/ix_no_accounts_pubkey_arg/*",
     "examples/shank/ix_no_args/*",
     "examples/shank/ix_no_privilege/*",
     "examples/shank/phoenix_v1/*",
