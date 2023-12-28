@@ -9,7 +9,7 @@ publish = false
 [dev-dependencies]
 borsh = { workspace = true }
 lazy_static = { workspace = true }
-marinade_finance_interface = { path = "../marinade_finance_interface", features = ["serde"] }
+marinade_finance_interface = { workspace = true, features = ["serde"] }
 serde_json = { workspace = true }
 solana-client = { workspace = true }
 solana-sdk = { workspace = true }

@@ -4488,6 +4488,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "system_program_client"
+version = "0.1.0"
+dependencies = [
+ "rand 0.8.5",
+ "solana-program",
+ "system_program_interface",
+]
+
+[[package]]
+name = "system_program_interface"
+version = "1.17.13"
+dependencies = [
+ "serde",
+ "solana-program",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

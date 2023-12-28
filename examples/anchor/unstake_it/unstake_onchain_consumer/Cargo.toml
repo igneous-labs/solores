@@ -10,7 +10,7 @@ no-entrypoint = []
 [dependencies]
 borsh = { workspace = true }
 solana-program = { workspace = true }
-unstake_interface = { path = "../unstake_interface" }
+unstake_interface = { workspace = true }
 
 [lib]
 crate-type = ["cdylib", "lib"]

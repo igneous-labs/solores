@@ -1,0 +1,9 @@
+[package]
+name = "system_program_client"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+rand = { workspace = true }
+solana-program = { workspace = true }
+system_program_interface = { workspace = true }

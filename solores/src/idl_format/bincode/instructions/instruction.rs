@@ -40,6 +40,8 @@ impl<'a> NamedInstructionFull<'a> {
         let keys_ident = self.ix.keys_ident();
         let ix_args_ident = self.ix.ix_args_ident();
         let accounts_len_ident = self.ix.accounts_len_ident();
+        let program_ix_enum_ident = self.program_ix_enum_ident;
+        let variant_ident = self.ix.enum_variant_ident();
 
         let mut fn_params = quote! {};
         let mut fn_args = quote! {};
@@ -70,11 +72,9 @@ impl<'a> NamedInstructionFull<'a> {
             )
         };
         let data_expr = if self.ix.has_ix_args() {
-            let program_ix_enum_ident = self.program_ix_enum_ident;
-            let variant_ident = self.ix.enum_variant_ident();
             quote! { &#program_ix_enum_ident::#variant_ident(args) }
         } else {
-            quote! { &() }
+            quote! { &#program_ix_enum_ident::#variant_ident }
         };
 
         tokens.extend(quote! {
