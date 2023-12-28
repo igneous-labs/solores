@@ -1,4 +1,10 @@
 use serde::Deserialize;
+use toml::{map::Map, Value};
+
+use crate::write_cargotoml::{
+    DependencyValue, FeaturesDependencyValue, OptionalDependencyValue, BORSH_CRATE, BYTEMUCK_CRATE,
+    NUM_DERIVE_CRATE, NUM_TRAITS_CRATE, SERDE_CRATE, SOLANA_PROGRAM_CRATE, THISERROR_CRATE,
+};
 
 use super::{IdlCodegenModule, IdlFormat};
 
@@ -48,10 +54,6 @@ impl IdlFormat for ShankIdl {
         self.metadata.origin == "shank"
     }
 
-    fn has_errors(&self) -> bool {
-        self.errors.is_some()
-    }
-
     fn modules<'me>(&'me self, args: &'me crate::Args) -> Vec<Box<dyn IdlCodegenModule + 'me>> {
         let mut res: Vec<Box<dyn IdlCodegenModule + 'me>> = Vec::new();
         if let Some(v) = &self.accounts {
@@ -79,5 +81,43 @@ impl IdlFormat for ShankIdl {
             }));
         }
         res
+    }
+
+    fn dependencies(&self, args: &crate::Args) -> Map<String, Value> {
+        let mut map = Map::new();
+        map.insert(BORSH_CRATE.into(), DependencyValue(&args.borsh_vers).into());
+        if !args.zero_copy.is_empty() {
+            map.insert(
+                BYTEMUCK_CRATE.into(),
+                FeaturesDependencyValue {
+                    dependency: DependencyValue(&args.bytemuck_vers),
+                    features: vec!["derive".into()],
+                }
+                .into(),
+            );
+        }
+        map.insert(
+            SOLANA_PROGRAM_CRATE.into(),
+            DependencyValue(&args.solana_program_vers).into(),
+        );
+        map.insert(
+            SERDE_CRATE.into(),
+            OptionalDependencyValue(DependencyValue(&args.serde_vers)).into(),
+        );
+        if self.errors.is_some() {
+            map.insert(
+                THISERROR_CRATE.into(),
+                DependencyValue(&args.thiserror_vers).into(),
+            );
+            map.insert(
+                NUM_DERIVE_CRATE.into(),
+                DependencyValue(&args.num_derive_vers).into(),
+            );
+            map.insert(
+                NUM_TRAITS_CRATE.into(),
+                DependencyValue(&args.num_traits_vers).into(),
+            );
+        }
+        map
     }
 }

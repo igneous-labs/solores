@@ -153,3 +153,17 @@ fn test_drift() -> Result<(), Box<dyn std::error::Error>> {
     )?;
     check_example(EXAMPLE_PATH, "drift_interface")
 }
+
+#[test]
+fn test_system_program() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "bincode/system";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "system_program_interface")
+}
+
+#[test]
+fn test_stake_program() -> Result<(), Box<dyn std::error::Error>> {
+    const EXAMPLE_PATH: &str = "bincode/stake";
+    gen_example(EXAMPLE_PATH, &BASE_WORKSPACE_DEPS_ARGS)?;
+    check_example(EXAMPLE_PATH, "stake_program_interface")
+}

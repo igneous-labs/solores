@@ -9,7 +9,7 @@ no-entrypoint = []
 
 [dependencies]
 borsh = { workspace = true }
-mpl_token_metadata_interface = { path = "../mpl_token_metadata_interface" }
+mpl_token_metadata_interface = { workspace = true }
 solana-program = { workspace = true }
 
 [lib]

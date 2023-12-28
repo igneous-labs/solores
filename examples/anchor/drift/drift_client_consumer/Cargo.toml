@@ -6,4 +6,4 @@ publish = false
 
 [dependencies]
 solana-program = { workspace = true }
-drift_interface = { path = "../drift_interface" }
+drift_interface = { workspace = true }

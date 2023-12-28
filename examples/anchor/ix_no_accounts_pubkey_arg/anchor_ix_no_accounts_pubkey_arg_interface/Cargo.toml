@@ -6,9 +6,9 @@ edition = "2021"
 [dependencies.borsh]
 workspace = true
 
-[dependencies.solana-program]
-workspace = true
-
 [dependencies.serde]
 optional = true
+workspace = true
+
+[dependencies.solana-program]
 workspace = true

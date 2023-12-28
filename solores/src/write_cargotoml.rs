@@ -5,6 +5,14 @@ use toml::{map::Map, Value};
 
 use crate::{idl_format::IdlFormat, utils::open_file_create_overwrite, Args};
 
+pub const BORSH_CRATE: &str = "borsh";
+pub const BYTEMUCK_CRATE: &str = "bytemuck";
+pub const SERDE_CRATE: &str = "serde";
+pub const SOLANA_PROGRAM_CRATE: &str = "solana-program";
+pub const THISERROR_CRATE: &str = "thiserror";
+pub const NUM_DERIVE_CRATE: &str = "num-derive";
+pub const NUM_TRAITS_CRATE: &str = "num-traits";
+
 pub fn write_cargotoml(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> {
     let cargo_toml = CargoToml::from_args_and_idl(args, idl);
     let cargo_toml_str = toml::to_string(&cargo_toml).unwrap();
@@ -18,38 +26,18 @@ pub fn write_cargotoml(args: &Args, idl: &dyn IdlFormat) -> std::io::Result<()> 
 #[derive(Serialize)]
 pub struct CargoToml<'a> {
     pub package: Package<'a>,
-    pub dependencies: GeneratedCrateDependencies<'a>,
+    pub dependencies: Map<String, Value>,
 }
 
 impl<'a> CargoToml<'a> {
     pub fn from_args_and_idl(args: &'a Args, idl: &'a dyn IdlFormat) -> Self {
-        let (thiserror, num_derive, num_traits) = match idl.has_errors() {
-            true => (
-                Some(args.thiserror_vers.as_str()),
-                Some(args.num_derive_vers.as_str()),
-                Some(args.num_traits_vers.as_str()),
-            ),
-            false => (None, None, None),
-        };
-        let bytemuck = match args.zero_copy.is_empty() {
-            true => None,
-            false => Some(args.bytemuck_vers.as_str()),
-        };
         Self {
             package: Package {
                 name: &args.output_crate_name,
                 version: idl.program_version(),
                 edition: "2021",
             },
-            dependencies: GeneratedCrateDependencies {
-                borsh: DependencyValue(&args.borsh_vers),
-                solana_program: DependencyValue(&args.solana_program_vers),
-                serde: OptionalDependencyValue(&args.serde_vers),
-                thiserror: thiserror.map(DependencyValue),
-                num_derive: num_derive.map(DependencyValue),
-                num_traits: num_traits.map(DependencyValue),
-                bytemuck: bytemuck.map(BytemuckDependencyValue),
-            },
+            dependencies: idl.dependencies(args),
         }
     }
 }
@@ -61,75 +49,67 @@ pub struct Package<'a> {
     pub edition: &'a str,
 }
 
-#[derive(Serialize)]
-pub struct GeneratedCrateDependencies<'a> {
-    pub borsh: DependencyValue<'a>,
-
-    #[serde(rename = "solana-program")]
-    pub solana_program: DependencyValue<'a>,
-
-    pub serde: OptionalDependencyValue<'a>,
-
-    pub thiserror: Option<DependencyValue<'a>>,
-
-    #[serde(rename = "num-derive")]
-    pub num_derive: Option<DependencyValue<'a>>,
-
-    #[serde(rename = "num-traits")]
-    pub num_traits: Option<DependencyValue<'a>>,
-
-    pub bytemuck: Option<BytemuckDependencyValue<'a>>,
-}
-
 /// Contained str value is the version string arg.
 /// e.g. "^1.16", "workspace = true"
 pub struct DependencyValue<'a>(pub &'a str);
 
-impl Serialize for DependencyValue<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match toml::from_str::<Map<_, _>>(self.0) {
-            Ok(v) => v.serialize(serializer), // "workspace = true"
-            Err(_) => self.0.serialize(serializer),
+impl From<DependencyValue<'_>> for Map<String, Value> {
+    fn from(value: DependencyValue) -> Self {
+        match toml::from_str::<Map<_, _>>(value.0) {
+            Ok(m) => m, // "workspace = true"
+            Err(_) => {
+                let mut map = Map::new();
+                map.insert("version".into(), value.0.into());
+                map
+            }
         }
     }
 }
 
-fn version_str_to_dep_map(s: &str) -> Map<String, Value> {
-    match toml::from_str(s) {
-        Ok(v) => v,
-        Err(_) => {
-            let mut m = Map::new();
-            m.insert("version".to_owned(), s.into());
-            m
-        }
+impl From<DependencyValue<'_>> for Value {
+    fn from(value: DependencyValue) -> Self {
+        Value::Table(value.into())
     }
 }
 
-pub struct OptionalDependencyValue<'a>(pub &'a str);
+pub struct OptionalDependencyValue<T>(pub T);
 
-impl Serialize for OptionalDependencyValue<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut map = version_str_to_dep_map(self.0);
-        map.insert("optional".to_owned(), true.into());
-        map.serialize(serializer)
+impl<T: Into<Map<String, Value>>> From<OptionalDependencyValue<T>> for Map<String, Value> {
+    fn from(value: OptionalDependencyValue<T>) -> Self {
+        let mut map = value.0.into();
+        map.insert("optional".into(), true.into());
+        map
     }
 }
 
-pub struct BytemuckDependencyValue<'a>(pub &'a str);
+impl<T: Into<Map<String, Value>>> From<OptionalDependencyValue<T>> for Value {
+    fn from(value: OptionalDependencyValue<T>) -> Self {
+        Value::Table(value.into())
+    }
+}
 
-impl Serialize for BytemuckDependencyValue<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut map = version_str_to_dep_map(self.0);
-        map.insert("features".to_owned(), vec!["derive"].into());
-        map.serialize(serializer)
+/// Contained str value is the version string arg.
+/// e.g. "^1.16", "workspace = true"
+pub struct FeaturesDependencyValue<T> {
+    pub dependency: T,
+    pub features: Vec<String>,
+}
+
+impl<T: Into<Map<String, Value>>> From<FeaturesDependencyValue<T>> for Map<String, Value> {
+    fn from(
+        FeaturesDependencyValue {
+            dependency,
+            features,
+        }: FeaturesDependencyValue<T>,
+    ) -> Self {
+        let mut map = dependency.into();
+        map.insert("features".into(), features.into());
+        map
+    }
+}
+
+impl<T: Into<Map<String, Value>>> From<FeaturesDependencyValue<T>> for Value {
+    fn from(value: FeaturesDependencyValue<T>) -> Self {
+        Value::Table(value.into())
     }
 }

@@ -7,4 +7,4 @@ publish = false
 [dependencies]
 solana-cli-config = { workspace = true }
 solana-sdk = { workspace = true }
-unstake_interface = { path = "../unstake_interface" }
+unstake_interface = { workspace = true }

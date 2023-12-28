@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-mpl_token_metadata_interface = { path = "../mpl_token_metadata_interface" }
+mpl_token_metadata_interface = { workspace = true }
 solana-cli-config = { workspace = true }
 solana-sdk = { workspace = true }
 

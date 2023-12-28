@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+### Breaking
+
+- Changed instruction codegen internals to support `*_with_program_id()`
+- Changed `IdlFormat` trait def to make dependency and `Cargo.toml` writing more dyn
+- Now panics instead of continuing if accounts with the same name are detected in the any IDL instruction.
+
 ### Added
 
+- bincode support
 - `*_ix_with_program_id()`, `*_invoke_with_program_id()`, `*_invoke_signed_with_program_id()`
 
 ## [0.6.1] - 2023-12-27

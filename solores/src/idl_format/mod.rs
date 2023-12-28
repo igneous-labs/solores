@@ -1,8 +1,10 @@
 #![doc = include_str!("./README.md")]
 
 use proc_macro2::TokenStream;
+use toml::{map::Map, Value};
 
 pub mod anchor;
+pub mod bincode;
 pub mod shank;
 
 pub trait IdlCodegenModule {
@@ -26,7 +28,7 @@ pub trait IdlFormat {
 
     fn is_correct_idl_format(&self) -> bool;
 
-    fn has_errors(&self) -> bool;
+    fn dependencies(&self, args: &crate::Args) -> Map<String, Value>;
 
     fn modules<'me>(&'me self, args: &'me crate::Args) -> Vec<Box<dyn IdlCodegenModule + 'me>>;
 }

@@ -1,0 +1,10 @@
+[package]
+name = "stake_program_interface"
+version = "1.17.13"
+edition = "2021"
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.solana-program]
+workspace = true

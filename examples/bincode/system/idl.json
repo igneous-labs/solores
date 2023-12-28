@@ -1,0 +1,323 @@
+{
+  "version": "1.17.13",
+  "name": "system_program",
+  "instructions": [
+    {
+      "name": "CreateAccount",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "Funding account"
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "The new account to be created"
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "Assign",
+      "accounts": [
+        {
+          "name": "assign",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "The system account to assign a new program owner to"
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "Transfer",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "Funding account"
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Recipient account"
+        }
+      ],
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "CreateAccountWithSeed",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "Funding account"
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "The new account to be created"
+        },
+        {
+          "name": "base",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "Base account. Optional. The account matching the base Pubkey below must be provided as a signer, but may be the same as from"
+        }
+      ],
+      "args": [
+        {
+          "name": "base",
+          "type": "publicKey"
+        },
+        {
+          "name": "seed",
+          "type": "String"
+        },
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "AdvanceNonceAccount",
+      "accounts": [
+        {
+          "name": "nonce",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Nonce account"
+        },
+        {
+          "name": "recentBlockhashes",
+          "isMut": false,
+          "isSigner": false,
+          "desc": "RecentBlockhashes sysvar"
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "nonce's authority"
+        }
+      ]
+    },
+    {
+      "name": "WithdrawNonceAccount",
+      "accounts": [
+        {
+          "name": "nonce",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Nonce account"
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Recipient account"
+        },
+        {
+          "name": "recentBlockhashes",
+          "isMut": false,
+          "isSigner": false,
+          "desc": "RecentBlockhashes sysvar"
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "desc": "Rent sysvar"
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "nonce's authority"
+        }
+      ],
+      "args": [{ "name": "lamports", "type": "u64" }]
+    },
+    {
+      "name": "InitializeNonceAccount",
+      "accounts": [
+        {
+          "name": "nonce",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Nonce account"
+        },
+        {
+          "name": "recentBlockhashes",
+          "isMut": false,
+          "isSigner": false,
+          "desc": "RecentBlockhashes sysvar"
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "desc": "Rent sysvar"
+        }
+      ],
+      "args": [{ "name": "authority", "type": "publicKey" }]
+    },
+    {
+      "name": "AuthorizeNonceAccount",
+      "accounts": [
+        {
+          "name": "nonce",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Nonce account"
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "nonce's authority"
+        }
+      ],
+      "args": [{ "name": "new_authority", "type": "publicKey" }]
+    },
+    {
+      "name": "Allocate",
+      "accounts": [
+        {
+          "name": "allocate",
+          "isMut": true,
+          "isSigner": true,
+          "desc": "The new account to allocate space for"
+        }
+      ],
+      "args": [{ "name": "space", "type": "u64" }]
+    },
+    {
+      "name": "AllocateWithSeed",
+      "accounts": [
+        {
+          "name": "allocate",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "The new account to allocate space for"
+        },
+        {
+          "name": "base",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "Base account"
+        }
+      ],
+      "args": [
+        { "name": "base", "type": "publicKey" },
+        { "name": "seed", "type": "String" },
+        { "name": "space", "type": "u64" },
+        { "name": "owner", "type": "publicKey" }
+      ]
+    },
+    {
+      "name": "AssignWithSeed",
+      "accounts": [
+        {
+          "name": "assign",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "The system account to assign a new program owner to"
+        },
+        {
+          "name": "base",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "Base account"
+        }
+      ],
+      "args": [
+        { "name": "base", "type": "publicKey" },
+        { "name": "seed", "type": "String" },
+        { "name": "owner", "type": "publicKey" }
+      ]
+    },
+    {
+      "name": "TransferWithSeed",
+      "accounts": [
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Funding account"
+        },
+        {
+          "name": "base",
+          "isMut": false,
+          "isSigner": true,
+          "desc": "from's base account"
+        },
+        {
+          "name": "to",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Recipient account"
+        }
+      ],
+      "args": [
+        { "name": "lamports", "type": "u64" },
+        { "name": "fromSeed", "type": "String" },
+        { "name": "fromOwner", "type": "publicKey" }
+      ]
+    },
+    {
+      "name": "UpgradeNonceAccount",
+      "accounts": [
+        {
+          "name": "nonce",
+          "isMut": true,
+          "isSigner": false,
+          "desc": "Nonce account"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "origin": "bincode",
+    "address": "11111111111111111111111111111111"
+  }
+}

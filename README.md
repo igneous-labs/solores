@@ -15,6 +15,7 @@ This software is still in its early stages of development. USE AT YOUR OWN RISK.
   - [Examples](#examples)
     - [Shank IDL](#shank-idl)
     - [Anchor IDL](#anchor-idl)
+    - [Bincode IDL](#bincode-idl)
   - [Features](#features)
     - [Serde](#serde)
     - [Keys From Array](#keys-from-array)
@@ -172,6 +173,14 @@ The usage for anchor IDLs is essentially the same as [Shank IDL's](#shank-idl). 
 - export all accounts' discriminant as consts.
 - create a `*Account` newtype that includes account discriminant checking in borsh serde operations
 - export event struct defs
+
+### Bincode IDL
+
+For supporting older solana programs (system, stake), solores also supports a custom bincode IDL format identified by `{ "metadata": { "origin": "bincode" }}`.
+
+The instructions must be declared in enum order to work with bincode.
+
+No account definitions are supported, since system and stake program have their account defs in `solana-program` already.
 
 ## Features
 

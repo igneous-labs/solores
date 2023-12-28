@@ -9,7 +9,7 @@ use serde::Deserialize;
 use syn::Index;
 use void::Void;
 
-use crate::utils::string_or_struct;
+use crate::utils::{primitive_or_pubkey_to_token, string_or_struct, PUBKEY_TOKEN};
 
 #[derive(Deserialize)]
 pub struct NamedType {
@@ -231,18 +231,6 @@ impl ToTokens for EnumVariant {
         tokens.extend(quote! {
             #v #maybe_inner_fields
         });
-    }
-}
-
-pub const PUBKEY_TOKEN: &str = "Pubkey";
-
-pub fn primitive_or_pubkey_to_token(s: &str) -> String {
-    if s == "publicKey" {
-        PUBKEY_TOKEN.to_owned()
-    } else if s == "string" {
-        s.to_pascal_case()
-    } else {
-        s.to_owned()
     }
 }
 
