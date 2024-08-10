@@ -24,7 +24,7 @@ members = [
 ]
 
 [workspace.dependencies]
-borsh = {version = "^1.5", features = ["derive"] }
+borsh = "^1.5"
 bs58 = ">=0.5"
 bytemuck = "^1.16"
 clap = "4.5.14"
