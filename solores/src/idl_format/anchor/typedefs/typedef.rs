@@ -9,7 +9,9 @@ use serde::Deserialize;
 use syn::Index;
 use void::Void;
 
-use crate::utils::{primitive_or_pubkey_to_token, string_or_struct, PUBKEY_TOKEN};
+use crate::utils::{
+    conditional_pascal_case, primitive_or_pubkey_to_token, string_or_struct, PUBKEY_TOKEN,
+};
 
 #[derive(Deserialize)]
 pub struct NamedType {
@@ -19,7 +21,7 @@ pub struct NamedType {
 
 impl NamedType {
     pub fn to_token_stream(&self, cli_args: &crate::Args) -> TokenStream {
-        let name = format_ident!("{}", self.name.to_pascal_case());
+        let name = format_ident!("{}", conditional_pascal_case(&self.name));
         // rust enums cannot impl Pod due to illegal bitpatterns
         let typedef_struct = match &self.r#type {
             TypedefType::r#struct(typedef_struct) => typedef_struct,
