@@ -23,6 +23,7 @@ keywords = [
 [features]
 default = []
 test_gen_examples = []
+bytes_to_u8 = []
 
 [lib]
 name = "solores"

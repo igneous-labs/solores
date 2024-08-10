@@ -18,12 +18,20 @@ use void::Void;
 pub const PUBKEY_TOKEN: &str = "Pubkey";
 
 pub fn primitive_or_pubkey_to_token(s: &str) -> String {
-    if s == "publicKey" {
-        PUBKEY_TOKEN.to_owned()
-    } else if s == "string" {
-        s.to_pascal_case()
-    } else {
-        s.to_owned()
+    match s {
+        "publicKey" => PUBKEY_TOKEN.to_owned(),
+        "string" => s.to_pascal_case(),
+        "bytes" => {
+            #[cfg(feature = "bytes_to_u8")]
+            {
+                "u8".to_owned()
+            }
+            #[cfg(not(feature = "bytes_to_u8"))]
+            {
+                "bytes".to_owned()
+            }
+        }
+        _ => s.to_owned(),
     }
 }
 
@@ -105,4 +113,35 @@ where
         }
     }
     UniqueByReportDupsResult { unique, duplicates }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[cfg(feature = "bytes_to_u8")]
+    fn test_bytes_to_u8_feature_enabled() {
+        let result = primitive_or_pubkey_to_token("bytes");
+        assert_eq!(result, "u8");
+
+        let result = primitive_or_pubkey_to_token("publicKey");
+        assert_eq!(result, PUBKEY_TOKEN.to_owned());
+
+        let result = primitive_or_pubkey_to_token("string");
+        assert_eq!(result, "String");
+    }
+
+    #[test]
+    #[cfg(not(feature = "bytes_to_u8"))]
+    fn test_bytes_to_u8_feature_disabled() {
+        let result = primitive_or_pubkey_to_token("bytes");
+        assert_eq!(result, "bytes");
+
+        let result = primitive_or_pubkey_to_token("publicKey");
+        assert_eq!(result, PUBKEY_TOKEN.to_owned());
+
+        let result = primitive_or_pubkey_to_token("string");
+        assert_eq!(result, "String");
+    }
 }
