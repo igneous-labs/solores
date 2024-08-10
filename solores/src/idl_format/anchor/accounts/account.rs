@@ -24,8 +24,8 @@ impl NamedAccount {
 
         let struct_def = self.0.to_token_stream(cli_args);
 
-        let struct_ident = format_ident!("{}", name);
-        let account_ident = format_ident!("{}Account", name);
+        let struct_ident = format_ident!("{}", name.to_pascal_case());
+        let account_ident = format_ident!("{}Account", name.to_pascal_case());
         quote! {
             pub const #account_discm_ident: [u8; 8] = #discm_tokens;
 

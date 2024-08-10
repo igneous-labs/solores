@@ -19,7 +19,7 @@ pub struct NamedType {
 
 impl NamedType {
     pub fn to_token_stream(&self, cli_args: &crate::Args) -> TokenStream {
-        let name = format_ident!("{}", self.name);
+        let name = format_ident!("{}", self.name.to_pascal_case());
         // rust enums cannot impl Pod due to illegal bitpatterns
         let typedef_struct = match &self.r#type {
             TypedefType::r#struct(typedef_struct) => typedef_struct,
