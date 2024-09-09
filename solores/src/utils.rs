@@ -18,12 +18,20 @@ use void::Void;
 pub const PUBKEY_TOKEN: &str = "Pubkey";
 
 pub fn primitive_or_pubkey_to_token(s: &str) -> String {
-    if s == "publicKey" {
-        PUBKEY_TOKEN.to_owned()
-    } else if s == "string" {
-        s.to_pascal_case()
-    } else {
-        s.to_owned()
+    match s {
+        "publicKey" => PUBKEY_TOKEN.to_owned(),
+        "string" => s.to_pascal_case(),
+        "bytes" => {
+            #[cfg(feature = "bytes_to_u8")]
+            {
+                "u8".to_owned()
+            }
+            #[cfg(not(feature = "bytes_to_u8"))]
+            {
+                "bytes".to_owned()
+            }
+        }
+        _ => s.to_owned(),
     }
 }
 
@@ -105,4 +113,100 @@ where
         }
     }
     UniqueByReportDupsResult { unique, duplicates }
+}
+
+pub fn conditional_pascal_case(s: &str) -> String {
+    // Only apply PascalCase if the string does not start with an uppercase letter.
+    if s.chars().next().map_or(false, |c| c.is_uppercase()) {
+        s.to_string()
+    } else {
+        s.to_pascal_case()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[cfg(feature = "bytes_to_u8")]
+    fn test_bytes_to_u8_feature_enabled() {
+        let result = primitive_or_pubkey_to_token("bytes");
+        assert_eq!(result, "u8");
+
+        let result = primitive_or_pubkey_to_token("publicKey");
+        assert_eq!(result, PUBKEY_TOKEN.to_owned());
+
+        let result = primitive_or_pubkey_to_token("string");
+        assert_eq!(result, "String");
+    }
+
+    #[test]
+    #[cfg(not(feature = "bytes_to_u8"))]
+    fn test_bytes_to_u8_feature_disabled() {
+        let result = primitive_or_pubkey_to_token("bytes");
+        assert_eq!(result, "bytes");
+
+        let result = primitive_or_pubkey_to_token("publicKey");
+        assert_eq!(result, PUBKEY_TOKEN.to_owned());
+
+        let result = primitive_or_pubkey_to_token("string");
+        assert_eq!(result, "String");
+    }
+
+    #[test]
+    fn test_already_uppercase() {
+        let input = "I80F48";
+        let expected = "I80F48";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_lowercase_single_word() {
+        let input = "pool";
+        let expected = "Pool";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_mixed_case_string() {
+        let input = "exampleString";
+        let expected = "ExampleString";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_empty_string() {
+        let input = "";
+        let expected = "";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_already_pascal_case() {
+        let input = "PascalCase";
+        let expected = "PascalCase";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_multiple_words() {
+        let input = "multiple words";
+        let expected = "MultipleWords";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_numeric_start() {
+        let input = "123abc";
+        let expected = "123abc";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
+
+    #[test]
+    fn test_uppercase_first_letter() {
+        let input = "Uppercase";
+        let expected = "Uppercase";
+        assert_eq!(conditional_pascal_case(input), expected);
+    }
 }

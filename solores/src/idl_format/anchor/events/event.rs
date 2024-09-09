@@ -77,8 +77,48 @@ impl ToTokens for EventType {
         tokens.extend(quote! {
             #[derive(Clone, Debug, PartialEq, BorshDeserialize, BorshSerialize)]
             pub struct #struct_ident {
-                #(#struct_fields),*
+                #(pub #struct_fields),*
             }
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::idl_format::anchor::typedefs::TypedefFieldType;
+
+    #[test]
+    fn test_event_type_to_tokens_with_pub_fields() {
+        // Define some fields for the EventType struct.
+        let field1 = TypedefField {
+            name: "field1".to_string(),
+            r#type: TypedefFieldType::PrimitiveOrPubkey("u32".into()),
+        };
+
+        let field2 = TypedefField {
+            name: "field2".to_string(),
+            r#type: TypedefFieldType::PrimitiveOrPubkey("String".into()),
+        };
+
+        // Create an EventType with the fields.
+        let event_type = EventType {
+            name: "TestEvent".to_string(),
+            fields: vec![field1, field2],
+        };
+
+        // Generate the tokens.
+        let mut tokens = proc_macro2::TokenStream::new();
+        event_type.to_tokens(&mut tokens);
+
+        // Convert the tokens to a string for comparison.
+        let generated_code = tokens.to_string();
+
+        // Check that the generated code includes "pub" for each field.
+        assert!(generated_code.contains("pub field1 : u32"));
+        assert!(generated_code.contains("pub field2 : String"));
+
+        // Check that the struct name is correct.
+        assert!(generated_code.contains("pub struct TestEvent"));
     }
 }
