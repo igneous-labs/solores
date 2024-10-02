@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2024-08-23
+
+### Breaking
+
+- Updated all dependencies to latest compatible versions.
+
+### Changed
+
+- Anchor event struct fields are now public.
+
+### Added
+
+- `bytes_to_u8` feature that replaces all generated primitive instances of `bytes` with `u8`.
+
+### Fixed
+
+- Anchor `accounts` and `typedefs` generated names now conform to Rust PascalCase convention.
+
 ## [0.7.0] - 2023-12-28
 
 ### Breaking

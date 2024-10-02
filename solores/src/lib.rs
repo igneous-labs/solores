@@ -62,7 +62,7 @@ pub struct Args {
         long,
         short,
         help = "solana-program dependency version for generated crate",
-        default_value = "^1.16"
+        default_value = "^2.0"
     )]
     pub solana_program_vers: String,
 
@@ -70,7 +70,7 @@ pub struct Args {
         long,
         short,
         help = "borsh dependency version for generated crate",
-        default_value = "^0.10"
+        default_value = "^1.5"
     )]
     pub borsh_vers: String,
 
@@ -84,7 +84,7 @@ pub struct Args {
     #[arg(
         long,
         help = "num-derive dependency version for generated crate",
-        default_value = "^0.3"
+        default_value = "0.4.2"
     )]
     pub num_derive_vers: String,
 
@@ -105,7 +105,7 @@ pub struct Args {
     #[arg(
         long,
         help = "bytemuck dependency version for generated crate",
-        default_value = "^1.0"
+        default_value = "^1.16"
     )]
     pub bytemuck_vers: String,
 }
